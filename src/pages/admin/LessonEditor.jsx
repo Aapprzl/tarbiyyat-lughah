@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, ArrowLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, FileText, Layers, X, ChevronDown, ChevronUp, Music, Puzzle } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, FileText, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle } from 'lucide-react';
 import PdfViewer from '../../components/PdfViewer';
 import AudioPlayer from '../../components/AudioPlayer';
 import MatchUpGame from '../../components/MatchUpGame';
+import QuizGame from '../../components/QuizGame';
+import FlashCardGame from '../../components/FlashCardGame';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const LessonEditor = () => {
@@ -142,6 +144,18 @@ const LessonEditor = () => {
       type,
       data: type === 'vocab' ? { items: [{ arab: '', indo: '' }] } 
             : type === 'matchup' ? { title: 'Pasangkan', pairs: [{ id: 1, question: '', answer: '' }] }
+            : type === 'quiz' ? { 
+                title: 'Kuis', 
+                questions: [{ 
+                    id: 1, 
+                    text: '', 
+                    options: [
+                        { id: 1, text: '', isCorrect: true },
+                        { id: 2, text: '', isCorrect: false }
+                    ] 
+                }] 
+              }
+            : type === 'flashcard' ? { title: 'Flash Card', items: [{ id: 1, front: '', back: '' }] }
             : { title: '', content: '' }
     };
 
@@ -354,6 +368,8 @@ const LessonEditor = () => {
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={FileText} label="File" color="text-blue-600" bg="bg-blue-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Game" color="text-pink-600" bg="bg-pink-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-teal-600" bg="bg-teal-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Flash Card" color="text-indigo-600" bg="bg-indigo-50" />
                         </div>
                     </div>
                 </div>
@@ -419,6 +435,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                  {block.type === 'audio' && 'Audio Player'}
                  {block.type === 'pdf' && 'File PDF / Download'}
                  {block.type === 'matchup' && 'Game: Pasangkan'}
+                 {block.type === 'quiz' && 'Game: Kuis Pilihan Ganda'}
                </span>
                <button onClick={onRemove} className="text-[var(--color-text-muted)] hover:text-red-500 p-1">
                  <X className="w-3 h-3" />
@@ -629,7 +646,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                 </div>
               )}
 
-              {/* --- MATCH UP GAME BLOCK --- */}
+              {/* --- GAME: MATCH UP --- */}
               {block.type === 'matchup' && (
                 <div className="space-y-4">
                      <div className="flex items-center gap-2 mb-2">
@@ -672,42 +689,253 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     }}
                                  />
                                  <button 
-                                    onClick={() => {
-                                        if (block.data.pairs.length === 1) return;
-                                        const newPairs = block.data.pairs.filter((_, i) => i !== idx);
-                                        onUpdate({ ...block.data, pairs: newPairs });
-                                    }}
-                                    className="text-[var(--color-text-muted)] hover:text-red-500 p-1"
-                                    disabled={block.data.pairs.length === 1}
+                                     onClick={() => {
+                                         if (block.data.pairs.length === 1) return;
+                                         const newPairs = block.data.pairs.filter((_, i) => i !== idx);
+                                         onUpdate({ ...block.data, pairs: newPairs });
+                                     }}
+                                     className="text-gray-400 hover:text-red-500 p-1"
                                  >
-                                    <Trash2 className="w-4 h-4" />
+                                     <X className="w-4 h-4" />
                                  </button>
                              </div>
                          ))}
-
+                         
                          <button 
-                            onClick={() => {
-                                const newId = block.data.pairs.length > 0 ? Math.max(...block.data.pairs.map(p => p.id)) + 1 : 1;
-                                onUpdate({ 
-                                    ...block.data, 
-                                    pairs: [...(block.data.pairs || []), { id: newId, question: '', answer: '' }] 
-                                });
-                            }}
-                            className="text-xs font-bold text-pink-600 hover:text-pink-700 flex items-center gap-1 mt-2"
+                             onClick={() => {
+                                 const newId = (block.data.pairs[block.data.pairs.length - 1]?.id || 0) + 1;
+                                 onUpdate({ ...block.data, pairs: [...block.data.pairs, { id: newId, question: '', answer: '' }] });
+                             }}
+                             className="text-xs text-pink-600 font-bold hover:underline mt-2 flex items-center gap-1"
                          >
-                            <Plus className="w-3 h-3" />
-                            Tambah Pasangan
+                             <Plus className="w-3 h-3" />
+                             Tambah Pasangan
                          </button>
                      </div>
-
-                     {/* Game Preview */}
-                     <div className="mt-4 border-t border-[var(--color-border)] pt-4">
-                         <div className="text-xs font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview Game:</div>
-                         <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
+                     
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                            <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
+                        </div>
                      </div>
                 </div>
               )}
-            
+
+              {/* --- GAME: QUIZ --- */}
+              {block.type === 'quiz' && (
+                <div className="space-y-4">
+                     <div className="flex items-center gap-2 mb-2">
+                        <HelpCircle className="w-5 h-5 text-teal-500" />
+                        <input 
+                            type="text" 
+                            className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"
+                            value={block.data.title || 'Kuis'}
+                            onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                            placeholder="Judul Kuis..."
+                        />
+                     </div>
+
+                     <div className="space-y-6">
+                        {block.data.questions?.map((q, qIdx) => (
+                            <div key={q.id} className="bg-[var(--color-bg-muted)] p-4 rounded-xl border border-[var(--color-border)] relative group/q">
+                                <div className="flex justify-between items-start mb-3">
+                                    <div className="flex-1 mr-4">
+                                        <label className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Pertanyaan {qIdx + 1}</label>
+                                        <input 
+                                            className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-teal-500"
+                                            placeholder="Tulis pertanyaan..."
+                                            value={q.text}
+                                            onChange={(e) => {
+                                                const newQuestions = [...block.data.questions];
+                                                newQuestions[qIdx].text = e.target.value;
+                                                onUpdate({ ...block.data, questions: newQuestions });
+                                            }}
+                                        />
+                                    </div>
+                                    <button 
+                                        onClick={() => {
+                                            if (block.data.questions.length === 1) return;
+                                            const newQuestions = block.data.questions.filter((_, i) => i !== qIdx);
+                                            onUpdate({ ...block.data, questions: newQuestions });
+                                        }}
+                                        className="text-gray-400 hover:text-red-500 p-1"
+                                        title="Hapus Pertanyaan"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+
+                                {/* Options */}
+                                <div className="pl-4 border-l-2 border-[var(--color-border)] space-y-2">
+                                    {q.options?.map((opt, optIdx) => (
+                                        <div key={opt.id} className="flex items-center gap-2">
+                                            <input 
+                                                type="radio"
+                                                name={`correct-${block.id}-${q.id}`}
+                                                checked={opt.isCorrect}
+                                                onChange={() => {
+                                                    const newQuestions = [...block.data.questions];
+                                                    newQuestions[qIdx].options = newQuestions[qIdx].options.map((o, i) => ({
+                                                        ...o, isCorrect: i === optIdx
+                                                    }));
+                                                    onUpdate({ ...block.data, questions: newQuestions });
+                                                }}
+                                                className="text-teal-600 focus:ring-teal-500 cursor-pointer"
+                                                title="Tandai sebagai jawaban benar"
+                                            />
+                                            <input 
+                                                className={`flex-1 bg-[var(--color-bg-card)] border ${opt.isCorrect ? 'border-teal-500 ring-1 ring-teal-500' : 'border-[var(--color-border)]'} rounded text-xs px-2 py-1.5 outline-none focus:border-teal-500`}
+                                                placeholder={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
+                                                value={opt.text}
+                                                onChange={(e) => {
+                                                    const newQuestions = [...block.data.questions];
+                                                    newQuestions[qIdx].options[optIdx].text = e.target.value;
+                                                    onUpdate({ ...block.data, questions: newQuestions });
+                                                }}
+                                            />
+                                            <button 
+                                                onClick={() => {
+                                                    if (q.options.length <= 2) return; // Min 2 options
+                                                    const newQuestions = [...block.data.questions];
+                                                    newQuestions[qIdx].options = q.options.filter((_, i) => i !== optIdx);
+                                                    onUpdate({ ...block.data, questions: newQuestions });
+                                                }}
+                                                className="text-gray-300 hover:text-red-400 p-1"
+                                                disabled={q.options.length <= 2}
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button 
+                                        onClick={() => {
+                                            const newQuestions = [...block.data.questions];
+                                            const newId = Math.max(...q.options.map(o => o.id)) + 1;
+                                            newQuestions[qIdx].options.push({ id: newId, text: '', isCorrect: false });
+                                            onUpdate({ ...block.data, questions: newQuestions });
+                                        }}
+                                        className="text-xs text-teal-600 font-bold hover:underline mt-1 ml-6"
+                                    >
+                                        + Tambah Pilihan
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+
+                        <button 
+                            onClick={() => {
+                                const newId = block.data.questions.length > 0 ? Math.max(...block.data.questions.map(q => q.id)) + 1 : 1;
+                                onUpdate({ 
+                                    ...block.data, 
+                                    questions: [...(block.data.questions || []), { 
+                                        id: newId, 
+                                        text: '', 
+                                        options: [{id:1, text:'', isCorrect:true}, {id:2, text:'', isCorrect:false}] 
+                                    }] 
+                                });
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-xl text-xs font-bold text-[var(--color-text-muted)] hover:border-teal-500 hover:text-teal-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Tambah Pertanyaan Baru
+                        </button>
+                     </div>
+
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-90 origin-top-left">
+                            <QuizGame questions={block.data.questions} title={block.data.title} />
+                        </div>
+                     </div>
+                </div>
+              )}
+              {/* --- GAME: FLASH CARD --- */}
+              {block.type === 'flashcard' && (
+                <div className="space-y-4">
+                     <div className="flex items-center gap-2 mb-2">
+                        <Layers className="w-5 h-5 text-indigo-500" />
+                        <input 
+                            type="text" 
+                            className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"
+                            value={block.data.title || 'Flash Card'}
+                            onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                            placeholder="Judul Flash Card..."
+                        />
+                     </div>
+
+                     <div className="space-y-4">
+                        {block.data.items?.map((item, idx) => (
+                            <div key={item.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex items-center gap-4">
+                                <div className="flex-1 space-y-2">
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">DEPAN</span>
+                                        <input 
+                                            className="w-full pl-16 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-lg font-arabic dir-rtl focus:border-indigo-500 outline-none"
+                                            placeholder="Teks Arab..."
+                                            value={item.front}
+                                            onChange={(e) => {
+                                                const newItems = [...block.data.items];
+                                                newItems[idx].front = e.target.value;
+                                                onUpdate({ ...block.data, items: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">BELAKANG</span>
+                                        <input 
+                                            className="w-full pl-20 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-main)] focus:border-indigo-500 outline-none"
+                                            placeholder="Teks Indonesia / Jawaban..."
+                                            value={item.back}
+                                            onChange={(e) => {
+                                                const newItems = [...block.data.items];
+                                                newItems[idx].back = e.target.value;
+                                                onUpdate({ ...block.data, items: newItems });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if (block.data.items.length === 1) return;
+                                        const newItems = block.data.items.filter((_, i) => i !== idx);
+                                        onUpdate({ ...block.data, items: newItems });
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 p-2"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+
+                        <button 
+                            onClick={() => {
+                                const newId = block.data.items.length > 0 ? Math.max(...block.data.items.map(i => i.id || 0)) + 1 : 1;
+                                onUpdate({ 
+                                    ...block.data, 
+                                    items: [...(block.data.items || []), { id: newId, front: '', back: '' }] 
+                                });
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-xl text-xs font-bold text-[var(--color-text-muted)] hover:border-indigo-500 hover:text-indigo-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Tambah Kartu Baru
+                        </button>
+                     </div>
+
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                            <FlashCardGame items={block.data.items} title={block.data.title} />
+                        </div>
+                     </div>
+                </div>
+              )}
+
+
             </div>
         </div>
     );

@@ -6,6 +6,8 @@ import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
 import MatchUpGame from '../components/MatchUpGame';
+import QuizGame from '../components/QuizGame';
+import FlashCardGame from '../components/FlashCardGame';
 
 const MaterialDetail = () => {
   const { topicId } = useParams();
@@ -291,6 +293,18 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="my-8">
                      <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
+                </div>
+            );
+        case 'quiz':
+            return (
+                <div className="my-8">
+                     <QuizGame questions={block.data.questions} title={block.data.title} />
+                </div>
+            );
+        case 'flashcard':
+            return (
+                <div className="my-8">
+                     <FlashCardGame items={block.data.items} title={block.data.title} />
                 </div>
             );
         default:
