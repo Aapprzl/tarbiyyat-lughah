@@ -49,60 +49,69 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
       </div>
 
       {/* Game Area */}
-      <div className="p-6 md:p-12 flex flex-col items-center justify-center min-h-[400px]">
+      <div className="p-4 md:p-8 flex flex-col items-center min-h-[500px]">
          
          {/* Card Container */}
          <div 
-            className="relative w-full max-w-md aspect-[4/3] cursor-pointer perspective-1000 group"
+            className="relative w-full max-w-lg min-h-[350px] cursor-pointer perspective-1000 group mb-6"
             onClick={handleFlip}
          >
             <div 
                 className={`w-full h-full relative transition-all duration-500 transform-style-3d shadow-xl rounded-2xl ${isFlipped ? 'rotate-y-180' : ''}`}
+                style={{ minHeight: '350px' }}
             >
                 {/* FRONT */}
-                <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center border-2 border-indigo-400/50">
-                    <span className="text-white/70 text-sm font-bold uppercase tracking-widest mb-4">Depan (Pertanyaan)</span>
-                    <h3 className="text-3xl md:text-5xl font-bold text-white leading-relaxed dir-rtl" style={{ fontFamily: 'var(--font-arabic)' }}>
-                        {currentItem.front}
-                    </h3>
-                    <p className="mt-8 text-white/50 text-xs flex items-center gap-2 animate-pulse">
+                <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center border-2 border-indigo-400/50">
+                    <span className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2 flex-shrink-0">Depan (Pertanyaan)</span>
+                    
+                    <div className="flex-1 w-full flex items-center justify-center overflow-y-auto custom-scrollbar my-2">
+                         <h3 className="text-2xl md:text-4xl font-bold text-white leading-relaxed dir-rtl px-2 break-words max-w-full" style={{ fontFamily: 'var(--font-arabic)' }}>
+                            {currentItem.front}
+                        </h3>
+                    </div>
+
+                    <p className="mt-2 text-white/50 text-xs flex items-center gap-2 animate-pulse flex-shrink-0">
                         <RotateCw className="w-4 h-4" /> Klik untuk balik
                     </p>
                 </div>
 
                 {/* BACK */}
-                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white dark:bg-gray-800 rounded-2xl p-8 flex flex-col items-center justify-center text-center border-2 border-[var(--color-border)]">
-                     <span className="text-[var(--color-text-muted)] text-sm font-bold uppercase tracking-widest mb-4">Belakang (Jawaban)</span>
-                     <h3 className="text-2xl md:text-4xl font-bold text-[var(--color-text-main)] leading-relaxed">
-                        {currentItem.back}
-                    </h3>
+                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white dark:bg-gray-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center border-2 border-[var(--color-border)]">
+                     <span className="text-[var(--color-text-muted)] text-xs font-bold uppercase tracking-widest mb-2 flex-shrink-0">Belakang (Jawaban)</span>
+                     
+                     <div className="flex-1 w-full flex items-center justify-center overflow-y-auto custom-scrollbar my-2">
+                        <h3 className="text-xl md:text-3xl font-bold text-[var(--color-text-main)] leading-relaxed px-2 break-words max-w-full">
+                            {currentItem.back}
+                        </h3>
+                     </div>
                 </div>
             </div>
          </div>
 
          {/* Controls */}
-         <div className="flex items-center gap-8 mt-10">
+         <div className="flex items-center gap-4 md:gap-8 w-full justify-center">
             <button 
                 onClick={handlePrev}
                 disabled={currentIndex === 0}
-                className="p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)]"
+                className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
             >
-                <ArrowLeft className="w-6 h-6" />
+                <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
             <button 
                 onClick={handleFlip}
-                className="px-6 py-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors"
+                className="flex-1 max-w-[200px] px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors active:scale-95 flex items-center justify-center gap-2"
             >
-                Putar Kartu
+                <RotateCw className="w-4 h-4" />
+                Putar
             </button>
 
             <button 
                 onClick={handleNext}
                 disabled={currentIndex === items.length - 1}
-                className="p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)]"
+                className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
             >
-                <ArrowRight className="w-6 h-6" />
+                <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
          </div>
 
@@ -113,6 +122,10 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
+        /* Custom scrollbar for inside card */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 4px; }
       `}</style>
     </div>
   );

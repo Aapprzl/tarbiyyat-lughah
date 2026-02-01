@@ -108,7 +108,7 @@ const MaterialDetail = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pb-24 min-h-[100vh]">
+    <div className="max-w-4xl mx-auto px-0 md:px-4 pb-24 min-h-[100vh]">
       {/* Breadcrumb / Nav */}
       <div className="flex items-center text-sm text-[var(--color-text-muted)] mb-8 py-4">
         <Link to="/materi" className="hover:text-[var(--color-primary)] flex items-center transition-colors">
@@ -120,7 +120,7 @@ const MaterialDetail = () => {
       </div>
 
       {/* Header Section */}
-      <div className="bg-[var(--color-bg-card)] rounded-3xl shadow-sm border border-[var(--color-border)] p-8 md:p-12 mb-12 relative overflow-hidden group">
+      <div className="bg-[var(--color-bg-card)] rounded-none md:rounded-3xl shadow-sm border-y md:border border-[var(--color-border)] p-5 md:p-12 mb-6 md:mb-12 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 rounded-full -mr-32 -mt-32 opacity-30 blur-3xl transition-all group-hover:bg-teal-500/10"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
@@ -169,7 +169,7 @@ const MaterialDetail = () => {
       ) : isJson ? (
         <div className="space-y-12">
           {displayData.map((stage, stageIdx) => (
-             <div key={stage.id || stageIdx} className="bg-[var(--color-bg-card)] rounded-3xl shadow-sm border border-[var(--color-border)] p-8 md:p-12 relative">
+             <div key={stage.id || stageIdx} className="bg-[var(--color-bg-card)] rounded-none md:rounded-3xl shadow-sm border-y md:border border-[var(--color-border)] p-4 md:p-12 relative">
                 {/* Stage Header */}
                 <div className="flex items-center gap-6 mb-12 border-b border-[var(--color-border)] pb-8">
                      <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white font-bold px-5 py-2 rounded-xl text-sm tracking-widest shadow-lg shadow-teal-500/20 uppercase">

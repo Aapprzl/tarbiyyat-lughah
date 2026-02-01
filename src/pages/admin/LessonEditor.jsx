@@ -321,7 +321,7 @@ const LessonEditor = () => {
       </div>
 
       {/* STAGES LIST */}
-      <div className="space-y-12 px-4 md:px-0">
+      <div className="space-y-12 px-0 md:px-0">
         {stages.map((stage, stageIndex) => (
             <div key={stage.id} className="relative">
                 {/* Stage Header */}
@@ -345,7 +345,7 @@ const LessonEditor = () => {
                 </div>
                 
                 {/* Stage Body (Blocks) */}
-                <div className="border-l-2 border-[var(--color-border)] pl-4 md:pl-8 space-y-6">
+                <div className="border-l-0 md:border-l-2 border-[var(--color-border)] pl-0 md:pl-8 space-y-6">
                     {stage.items.length === 0 ? (
                         <div className="text-center py-8 border-2 border-dashed border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] text-sm italic">
                             Belum ada konten di tahapan ini
@@ -454,7 +454,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                </button>
             </div>
 
-            <div className="p-4">
+            <div className="p-3 md:p-4">
               {/* Reuse logic from original component, simplified for space */}
               
               {/* --- TEXT BLOCK --- */}
@@ -673,40 +673,53 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      </div>
 
                      <div className="bg-[var(--color-bg-muted)] p-4 rounded-xl border border-[var(--color-border)] space-y-3">
-                         <div className="grid grid-cols-2 gap-4 text-xs font-bold text-[var(--color-text-muted)] uppercase mb-2">
+                         {/* Desktop Header */}
+                         <div className="hidden md:grid grid-cols-2 gap-4 text-xs font-bold text-[var(--color-text-muted)] uppercase mb-2">
                              <div>Pertanyaan (Diam)</div>
                              <div>Jawaban (Digeser)</div>
                          </div>
                          
                          {block.data.pairs?.map((pair, idx) => (
-                             <div key={pair.id || idx} className="grid grid-cols-[1fr,1fr,auto] gap-2 items-center">
-                                 <input 
-                                    className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
-                                    placeholder="Pertanyaan..."
-                                    value={pair.question}
-                                    onChange={(e) => {
-                                        const newPairs = [...block.data.pairs];
-                                        newPairs[idx].question = e.target.value;
-                                        onUpdate({ ...block.data, pairs: newPairs });
-                                    }}
-                                 />
-                                 <input 
-                                    className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
-                                    placeholder="Jawaban..."
-                                    value={pair.answer}
-                                    onChange={(e) => {
-                                        const newPairs = [...block.data.pairs];
-                                        newPairs[idx].answer = e.target.value;
-                                        onUpdate({ ...block.data, pairs: newPairs });
-                                    }}
-                                 />
+                             <div key={pair.id || idx} className="flex flex-col md:grid md:grid-cols-[1fr,1fr,auto] gap-3 md:gap-2 items-stretch md:items-center bg-[var(--color-bg-card)] md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border border-[var(--color-border)] md:border-none relative">
+                                 {/* Question Input */}
+                                 <div className="w-full">
+                                     <label className="md:hidden text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Pertanyaan</label>
+                                     <input 
+                                        className="w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
+                                        placeholder="Pertanyaan..."
+                                        value={pair.question}
+                                        onChange={(e) => {
+                                            const newPairs = [...block.data.pairs];
+                                            newPairs[idx].question = e.target.value;
+                                            onUpdate({ ...block.data, pairs: newPairs });
+                                        }}
+                                     />
+                                 </div>
+
+                                 {/* Answer Input */}
+                                 <div className="w-full">
+                                     <label className="md:hidden text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Jawaban</label>
+                                     <input 
+                                        className="w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
+                                        placeholder="Jawaban..."
+                                        value={pair.answer}
+                                        onChange={(e) => {
+                                            const newPairs = [...block.data.pairs];
+                                            newPairs[idx].answer = e.target.value;
+                                            onUpdate({ ...block.data, pairs: newPairs });
+                                        }}
+                                     />
+                                 </div>
+
+                                 {/* Delete Button */}
                                  <button 
                                      onClick={() => {
                                          if (block.data.pairs.length === 1) return;
                                          const newPairs = block.data.pairs.filter((_, i) => i !== idx);
                                          onUpdate({ ...block.data, pairs: newPairs });
                                      }}
-                                     className="text-gray-400 hover:text-red-500 p-1"
+                                     className="absolute top-2 right-2 md:static text-gray-400 hover:text-red-500 p-1 bg-[var(--color-bg-card)] md:bg-transparent rounded-full shadow-sm md:shadow-none border md:border-none border-[var(--color-border)]"
+                                     title="Hapus Pasangan"
                                  >
                                      <X className="w-4 h-4" />
                                  </button>
@@ -728,7 +741,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
                         </div>
                      </div>
