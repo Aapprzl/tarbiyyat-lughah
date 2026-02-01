@@ -22,10 +22,8 @@ const AdminPrograms = () => {
   const loadData = async () => {
     const progs = await contentService.getSpecialPrograms();
     setSpecialPrograms(progs);
-    // Expand all by default
-    const expanded = {};
-    progs.forEach(cat => expanded[cat.id] = true);
-    setExpandedCategories(expanded);
+    // Default closed
+    setExpandedCategories({});
     setLoading(false);
   };
 

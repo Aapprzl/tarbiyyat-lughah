@@ -406,6 +406,8 @@ const LessonEditor = () => {
 
 // --- Sub Components ---
 
+// --- Sub Components ---
+
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
     <button 
         onClick={onClick}
@@ -417,44 +419,106 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
 );
 
 const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst, isLast, toast }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    // Helper to get icon and label
+    const getBlockInfo = (type) => {
+        switch(type) {
+            case 'text': return { icon: Type, label: 'Teks', color: 'text-teal-600', bg: 'bg-teal-50' };
+            case 'vocab': return { icon: Table, label: 'Kosakata', color: 'text-indigo-600', bg: 'bg-indigo-50' };
+            case 'alert': return { icon: AlertCircle, label: 'Info', color: 'text-amber-600', bg: 'bg-amber-50' };
+            case 'youtube': return { icon: Youtube, label: 'Video', color: 'text-red-600', bg: 'bg-red-50' };
+            case 'audio': return { icon: Music, label: 'Audio', color: 'text-violet-600', bg: 'bg-violet-50' };
+            case 'pdf': return { icon: FileText, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
+            case 'matchup': return { icon: Puzzle, label: 'Match Up', color: 'text-pink-600', bg: 'bg-pink-50' };
+            case 'quiz': return { icon: HelpCircle, label: 'Quiz', color: 'text-teal-600', bg: 'bg-teal-50' };
+            case 'flashcard': return { icon: Layers, label: 'Flash Card', color: 'text-indigo-600', bg: 'bg-indigo-50' };
+            case 'anagram': return { icon: GripVertical, label: 'Anagram', color: 'text-orange-600', bg: 'bg-orange-50' };
+            case 'completesentence': return { icon: Type, label: 'Lengkapi Kalimat', color: 'text-blue-600', bg: 'bg-blue-50' };
+            case 'unjumble': return { icon: ArrowLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
+            case 'spinwheel': return { icon: RefreshCcw, label: 'Spin Wheel', color: 'text-pink-600', bg: 'bg-pink-50' };
+            default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
+        }
+    };
+
+    const info = getBlockInfo(block.type);
+    const Icon = info.icon;
+
+    // Get a preview title for the header
+    const getTitlePreview = () => {
+        if (block.data.title && block.data.title.trim() !== '') return block.data.title;
+        if (block.type === 'text' && block.data.content) return block.data.content.substring(0, 30) + (block.data.content.length > 30 ? '...' : '');
+        return info.label;
+    };
+
     return (
         <div className="bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border)] overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="bg-[var(--color-bg-muted)] px-4 py-2 border-b border-[var(--color-border)] flex justify-between items-center text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">
-               <span className="flex items-center">
+            {/* Header / Accordion Trigger */}
+            <div 
+                onClick={() => setIsOpen(!isOpen)}
+                className="bg-[var(--color-bg-muted)] px-3 py-2 border-b border-[var(--color-border)] flex justify-between items-center cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
+                role="button"
+                tabIndex={0}
+            >
+               <div className="flex items-center gap-3 overflow-hidden">
+                   {/* Icon Badge */}
+                   <div className={`${info.bg} ${info.color} p-1.5 rounded-lg flex-shrink-0`}>
+                       <Icon className="w-4 h-4" />
+                   </div>
+                   
+                   {/* Title/Label */}
+                   <div className="flex flex-col min-w-0">
+                       <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">{info.label}</span>
+                       <span className="text-sm font-semibold text-[var(--color-text-main)] truncate max-w-[150px] md:max-w-xs block">
+                            {getTitlePreview()}
+                       </span>
+                   </div>
+               </div>
+
+               <div className="flex items-center gap-2">
                  {/* Move Buttons */}
-                 <div className="flex flex-col mr-2">
+                 <div className="flex bg-[var(--color-bg-card)] rounded-lg border border-[var(--color-border)] p-0.5" onClick={(e) => e.stopPropagation()}>
                    <button 
                      onClick={onMoveUp} 
                      disabled={isFirst}
-                     className="text-[var(--color-text-muted)] hover:text-teal-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                     className="p-1 text-[var(--color-text-muted)] hover:text-teal-600 hover:bg-teal-50 rounded-md disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke atas"
                    >
-                     <ChevronUp className="w-3 h-3" />
+                     <ChevronUp className="w-3.5 h-3.5" />
                    </button>
                    <button 
                      onClick={onMoveDown} 
                      disabled={isLast}
-                     className="text-[var(--color-text-muted)] hover:text-teal-600 disabled:opacity-20 disabled:cursor-not-allowed transition-colors"
+                     className="p-1 text-[var(--color-text-muted)] hover:text-teal-600 hover:bg-teal-50 rounded-md disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke bawah"
                    >
-                     <ChevronDown className="w-3 h-3" />
+                     <ChevronDown className="w-3.5 h-3.5" />
                    </button>
                  </div>
-                 {block.type === 'text' && 'Teks / Penjelasan'}
-                 {block.type === 'vocab' && 'Tabel Kosakata'}
-                 {block.type === 'alert' && 'Info Penting'}
-                 {block.type === 'youtube' && 'Video YouTube'}
-                 {block.type === 'audio' && 'Audio Player'}
-                 {block.type === 'pdf' && 'File PDF / Download'}
-                 {block.type === 'matchup' && 'Game: Pasangkan'}
-                 {block.type === 'quiz' && 'Game: Kuis Pilihan Ganda'}
-               </span>
-               <button onClick={onRemove} className="text-[var(--color-text-muted)] hover:text-red-500 p-1">
-                 <X className="w-3 h-3" />
-               </button>
+
+                 {/* Delete Button */}
+                 <button 
+                     onClick={(e) => {
+                         e.stopPropagation();
+                         const isConfirmed = window.confirm('Yakin ingin menghapus blok ini?');
+                         if (isConfirmed) onRemove();
+                     }} 
+                     className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                     title="Hapus Blok"
+                 >
+                     <Trash2 className="w-4 h-4" />
+                 </button>
+                 
+                 {/* Toggle Chevron */}
+                 <div className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-4 h-4 text-[var(--color-text-muted)]" />
+                 </div>
+               </div>
             </div>
 
-            <div className="p-3 md:p-4">
+            {/* Content Body */}
+            {isOpen && (
+            <div className="p-3 md:p-4 animate-in slide-in-from-top-2 duration-200">
               {/* Reuse logic from original component, simplified for space */}
               
               {/* --- TEXT BLOCK --- */}
@@ -741,7 +805,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
                         </div>
                      </div>
@@ -871,7 +935,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-90 md:origin-top-left">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <QuizGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -953,7 +1017,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <FlashCardGame items={block.data.items} title={block.data.title} />
                         </div>
                      </div>
@@ -1036,7 +1100,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <AnagramGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1108,7 +1172,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1176,7 +1240,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <UnjumbleGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1243,7 +1307,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <SpinWheelGame items={block.data.items} title={block.data.title} />
                         </div>
                      </div>
@@ -1252,6 +1316,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
 
 
             </div>
+            )}
         </div>
     );
 };
