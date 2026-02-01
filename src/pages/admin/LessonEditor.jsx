@@ -375,7 +375,7 @@ const LessonEditor = () => {
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={FileText} label="File" color="text-blue-600" bg="bg-blue-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Game" color="text-pink-600" bg="bg-pink-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-teal-600" bg="bg-teal-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Flash Card" color="text-indigo-600" bg="bg-indigo-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50" />
