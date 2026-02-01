@@ -10,6 +10,7 @@ import QuizGame from '../components/QuizGame';
 import FlashCardGame from '../components/FlashCardGame';
 import AnagramGame from '../components/AnagramGame';
 import CompleteSentenceGame from '../components/CompleteSentenceGame';
+import UnjumbleGame from '../components/UnjumbleGame';
 
 const MaterialDetail = () => {
   const { topicId } = useParams();
@@ -319,6 +320,12 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="my-8">
                      <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
+                </div>
+            );
+        case 'unjumble':
+            return (
+                <div className="my-8">
+                     <UnjumbleGame questions={block.data.questions} title={block.data.title} />
                 </div>
             );
         default:
