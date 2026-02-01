@@ -22,10 +22,25 @@ const dataUrlToBlobUrl = (dataUrl) => {
 
 const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName = 'document.pdf' }) => {
   const { theme } = useTheme();
+  const [isMobile, setIsMobile] = React.useState(false);
   
   // Backwards compatibility: use src or fileUrl
   const finalSrc = src || fileUrl;
   
+  // Detect Mobile
+  React.useEffect(() => {
+    const checkMobile = () => {
+       const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
+       const mobile = Boolean(userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i));
+       // Also check width just in case
+       const smallScreen = window.innerWidth < 768;
+       setIsMobile(mobile || smallScreen);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const blobUrl = useMemo(() => {
     if (!finalSrc) return null;
     if (finalSrc.startsWith('data:')) {
@@ -58,7 +73,31 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
     );
   }
 
-  // Direct Render Mode (No intermediate buttons)
+  // Mobile Fallback: Direct Button
+  if (isMobile) {
+      return (
+        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-8 flex flex-col items-center justify-center text-center shadow-sm" style={{ minHeight: 300 }}>
+             <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
+                  <FileText className="w-10 h-10" />
+             </div>
+             <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-2">Materi PDF</h3>
+             <p className="text-[var(--color-text-muted)] mb-6 max-w-xs text-sm">
+                 Pratinjau PDF tidak tersedia di tampilan mobile. Silakan buka file untuk membaca.
+             </p>
+             <a 
+                href={blobUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                download={fileName} // Mobile browsers often prefer download for data URIs
+                className="bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-transform active:scale-95 shadow-lg shadow-red-600/20 flex items-center"
+             >
+                 Buka File PDF
+             </a>
+        </div>
+      );
+  }
+
+  // Direct Render Mode (Desktop)
   return (
     <div className="bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] shadow-sm" style={{ height }}>
       <iframe 

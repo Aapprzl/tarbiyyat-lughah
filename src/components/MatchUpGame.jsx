@@ -334,6 +334,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                                                 e.stopPropagation();
                                                 handleDragStart(e, { id: filledAnswerId, text: filledAnswer, origin: 'slot', questionId: pair.id });
                                             }}
+                                            style={{ touchAction: 'none' }} // Prevent scrolling
                                         >
                                             <span className={isArabic(filledAnswer) ? 'font-arabic text-lg' : ''}>{filledAnswer}</span>
                                             {!isSubmitted && (
@@ -400,6 +401,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                                          onTouchStart={(e) => { 
                                              handleDragStart(e, { id: ans.id, text: ans.text, origin: 'pool' });
                                          }}
+                                         style={{ touchAction: 'none' }} // Prevent scrolling while dragging
                                      >
                                          <span className={isArabic(ans.text) ? 'font-arabic' : ''}>{ans.text}</span>
                                      </button>
