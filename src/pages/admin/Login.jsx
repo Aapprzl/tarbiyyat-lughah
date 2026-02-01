@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { Lock } from 'lucide-react';
 
@@ -78,6 +78,11 @@ const LoginPage = () => {
              Hubungi administrator jika lupa password.
           </div>
         </form>
+        <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
+          <Link to="/" className="text-[var(--color-primary)] font-bold hover:underline transition-all text-sm">
+            ← Kembali ke Website Utama
+          </Link>
+        </div>
       </div>
     </div>
   );

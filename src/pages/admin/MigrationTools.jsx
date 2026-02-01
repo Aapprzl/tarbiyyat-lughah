@@ -257,11 +257,11 @@ const MigrationTools = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-center gap-4 mb-8">
+                <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
                     <button 
                         onClick={scanForBase64}
                         disabled={isMigrating}
-                        className="px-6 py-4 rounded-xl font-bold border-2 border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all flex items-center gap-2"
+                        className="px-6 py-4 rounded-xl font-bold border-2 border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all flex items-center justify-center gap-2 w-full md:w-auto"
                     >
                         <UploadCloud className="w-5 h-5" />
                         Cek File Dulu (Scan)
@@ -271,7 +271,7 @@ const MigrationTools = () => {
                         onClick={startMigration}
                         disabled={isMigrating}
                         className={`
-                            px-8 py-4 rounded-xl font-bold text-lg flex items-center gap-3 shadow-lg transition-all
+                            px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all w-full md:w-auto
                             ${isMigrating 
                                 ? 'bg-gray-200 dark:bg-gray-800 text-gray-500 cursor-not-allowed' 
                                 : 'bg-teal-600 text-white hover:bg-teal-700 hover:scale-[1.02] active:scale-95'}
