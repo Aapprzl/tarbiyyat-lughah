@@ -9,6 +9,7 @@ import MatchUpGame from '../components/MatchUpGame';
 import QuizGame from '../components/QuizGame';
 import FlashCardGame from '../components/FlashCardGame';
 import AnagramGame from '../components/AnagramGame';
+import CompleteSentenceGame from '../components/CompleteSentenceGame';
 
 const MaterialDetail = () => {
   const { topicId } = useParams();
@@ -312,6 +313,12 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="my-8">
                      <AnagramGame questions={block.data.questions} title={block.data.title} />
+                </div>
+            );
+        case 'completesentence':
+            return (
+                <div className="my-8">
+                     <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
                 </div>
             );
         default:

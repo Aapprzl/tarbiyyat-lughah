@@ -9,6 +9,7 @@ import MatchUpGame from '../../components/MatchUpGame';
 import QuizGame from '../../components/QuizGame';
 import FlashCardGame from '../../components/FlashCardGame';
 import AnagramGame from '../../components/AnagramGame';
+import CompleteSentenceGame from '../../components/CompleteSentenceGame';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const LessonEditor = () => {
@@ -158,6 +159,7 @@ const LessonEditor = () => {
               }
             : type === 'flashcard' ? { title: 'Flash Card', items: [{ id: 1, front: '', back: '' }] }
             : type === 'anagram' ? { title: 'Anagram', questions: [{ id: 1, answer: '', clue: '' }] }
+            : type === 'completesentence' ? { title: 'Lengkapi Kalimat', questions: [{ id: 1, text: '' }] }
             : { title: '', content: '' }
     };
 
@@ -373,6 +375,7 @@ const LessonEditor = () => {
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-teal-600" bg="bg-teal-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Flash Card" color="text-indigo-600" bg="bg-indigo-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi Kalimat" color="text-blue-600" bg="bg-blue-50" />
                         </div>
                     </div>
                 </div>
@@ -1016,6 +1019,78 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
                         <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <AnagramGame questions={block.data.questions} title={block.data.title} />
+                        </div>
+                     </div>
+                </div>
+              )}
+
+              {/* --- GAME: COMPLETE SENTENCE --- */}
+              {block.type === 'completesentence' && (
+                <div className="space-y-4">
+                     <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg border border-blue-100 dark:border-blue-800 text-xs text-blue-800 dark:text-blue-200 mb-4">
+                        <strong>Cara Membuat:</strong> Tulis kalimat lengkap, lalu beri tanda kurung kurawal <code>{'{'}...{'}'}</code> pada kata yang akan dihilangkan.<br/>
+                        Contoh: <code>Saya {'{makan}'} nasi di {'{kantin}'}.</code>
+                     </div>
+
+                     <div className="flex items-center gap-2 mb-2">
+                        <Type className="w-5 h-5 text-blue-500" />
+                        <input 
+                            type="text" 
+                            className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"
+                            value={block.data.title || 'Lengkapi Kalimat'}
+                            onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                            placeholder="Judul Game..."
+                        />
+                     </div>
+
+                     <div className="space-y-4">
+                        {block.data.questions?.map((q, idx) => (
+                            <div key={q.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex gap-4">
+                                <div className="flex-1">
+                                    <textarea 
+                                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-3 text-sm focus:border-blue-500 outline-none h-20"
+                                        placeholder="Tulis kalimat di sini..."
+                                        value={q.text}
+                                        onChange={(e) => {
+                                            const newQ = [...block.data.questions];
+                                            newQ[idx].text = e.target.value;
+                                            onUpdate({ ...block.data, questions: newQ });
+                                        }}
+                                    />
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if (block.data.questions.length === 1) return;
+                                        const newQ = block.data.questions.filter((_, i) => i !== idx);
+                                        onUpdate({ ...block.data, questions: newQ });
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 p-2 h-fit"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+
+                        <button 
+                            onClick={() => {
+                                const newId = block.data.questions.length > 0 ? Math.max(...block.data.questions.map(q => q.id || 0)) + 1 : 1;
+                                onUpdate({ 
+                                    ...block.data, 
+                                    questions: [...(block.data.questions || []), { id: newId, text: '' }] 
+                                });
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-xl text-xs font-bold text-[var(--color-text-muted)] hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Tambah Kalimat Baru
+                        </button>
+                     </div>
+
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                            <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
                 </div>
