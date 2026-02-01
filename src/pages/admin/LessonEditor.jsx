@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, ArrowLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, FileText, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle } from 'lucide-react';
+import { Save, ArrowLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, FileText, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw } from 'lucide-react';
 import PdfViewer from '../../components/PdfViewer';
 import AudioPlayer from '../../components/AudioPlayer';
 import MatchUpGame from '../../components/MatchUpGame';
@@ -11,6 +11,7 @@ import FlashCardGame from '../../components/FlashCardGame';
 import AnagramGame from '../../components/AnagramGame';
 import CompleteSentenceGame from '../../components/CompleteSentenceGame';
 import UnjumbleGame from '../../components/UnjumbleGame';
+import SpinWheelGame from '../../components/SpinWheelGame';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const LessonEditor = () => {
@@ -162,6 +163,7 @@ const LessonEditor = () => {
             : type === 'anagram' ? { title: 'Anagram', questions: [{ id: 1, answer: '', clue: '' }] }
             : type === 'completesentence' ? { title: 'Lengkapi Kalimat', questions: [{ id: 1, text: '' }] }
             : type === 'unjumble' ? { title: 'Susun Kalimat', questions: [{ id: 1, text: '' }] }
+            : type === 'spinwheel' ? { title: 'Spin the Wheel', items: [{ id: 1, text: '' }, { id: 2, text: '' }] }
             : { title: '', content: '' }
     };
 
@@ -379,6 +381,7 @@ const LessonEditor = () => {
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi Kalimat" color="text-blue-600" bg="bg-blue-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={ArrowLeft} label="Unjumble" color="text-purple-600" bg="bg-purple-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'spinwheel')} icon={RefreshCcw} label="Spin Wheel" color="text-pink-600" bg="bg-pink-50" />
                         </div>
                     </div>
                 </div>
@@ -1162,6 +1165,73 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
                         <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <UnjumbleGame questions={block.data.questions} title={block.data.title} />
+                        </div>
+                     </div>
+                </div>
+              )}
+
+              {/* --- GAME: SPIN WHEEL --- */}
+              {block.type === 'spinwheel' && (
+                <div className="space-y-4">
+                     <div className="flex items-center gap-2 mb-2">
+                        <RefreshCcw className="w-5 h-5 text-pink-500" />
+                        <input 
+                            type="text" 
+                            className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"
+                            value={block.data.title || 'Spin the Wheel'}
+                            onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                            placeholder="Judul Game..."
+                        />
+                     </div>
+
+                     <div className="space-y-4">
+                        {block.data.items?.map((item, idx) => (
+                            <div key={item.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex items-center gap-4">
+                                <div className="flex-1">
+                                    <input 
+                                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm focus:border-pink-500 outline-none"
+                                        placeholder={`Item ${idx + 1}`}
+                                        value={item.text}
+                                        onChange={(e) => {
+                                            const newItems = [...block.data.items];
+                                            newItems[idx].text = e.target.value;
+                                            onUpdate({ ...block.data, items: newItems });
+                                        }}
+                                    />
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if (block.data.items.length <= 2) return; // Min 2 items 
+                                        const newItems = block.data.items.filter((_, i) => i !== idx);
+                                        onUpdate({ ...block.data, items: newItems });
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 p-2"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+
+                        <button 
+                            onClick={() => {
+                                const newId = block.data.items.length > 0 ? Math.max(...block.data.items.map(i => i.id || 0)) + 1 : 1;
+                                onUpdate({ 
+                                    ...block.data, 
+                                    items: [...(block.data.items || []), { id: newId, text: '' }] 
+                                });
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-xl text-xs font-bold text-[var(--color-text-muted)] hover:border-pink-500 hover:text-pink-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Tambah Item
+                        </button>
+                     </div>
+
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                            <SpinWheelGame items={block.data.items} title={block.data.title} />
                         </div>
                      </div>
                 </div>

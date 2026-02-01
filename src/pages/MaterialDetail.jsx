@@ -11,6 +11,7 @@ import FlashCardGame from '../components/FlashCardGame';
 import AnagramGame from '../components/AnagramGame';
 import CompleteSentenceGame from '../components/CompleteSentenceGame';
 import UnjumbleGame from '../components/UnjumbleGame';
+import SpinWheelGame from '../components/SpinWheelGame';
 
 const MaterialDetail = () => {
   const { topicId } = useParams();
@@ -326,6 +327,12 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="my-8">
                      <UnjumbleGame questions={block.data.questions} title={block.data.title} />
+                </div>
+            );
+        case 'spinwheel':
+            return (
+                <div className="my-8">
+                     <SpinWheelGame items={block.data.items} title={block.data.title} />
                 </div>
             );
         default:
