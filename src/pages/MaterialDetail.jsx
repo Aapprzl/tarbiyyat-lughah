@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink } from 'lucide-react';
+import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -13,20 +13,69 @@ import CompleteSentenceGame from '../components/CompleteSentenceGame';
 import UnjumbleGame from '../components/UnjumbleGame';
 import SpinWheelGame from '../components/SpinWheelGame';
 
-const MaterialDetail = () => {
-  const { topicId } = useParams();
+// Simple Error Boundary Component for local debugging
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null, errorInfo: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("MaterialDetail Crash:", error, errorInfo);
+    this.setState({ error, errorInfo });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 text-center bg-red-50 text-red-900 rounded-xl m-4 border border-red-200">
+          <h2 className="text-xl font-bold mb-2">Terjadi Kesalahan (Crash)</h2>
+          <p className="mb-4">Halaman mengalami error saat rendering.</p>
+          <details className="text-left bg-white p-4 rounded border text-xs overflow-auto font-mono">
+            <summary className="cursor-pointer font-bold mb-2">Detail Error</summary>
+            {this.state.error && this.state.error.toString()}
+            <br />
+            {this.state.errorInfo && this.state.errorInfo.componentStack}
+          </details>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
+            Muat Ulang
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const MaterialDetailContent = () => {
+    // ... existing MaterialDetail component logic ...
+    // Renaming original MaterialDetail to MaterialDetailContent
+    // and exporting wrapped version
+    const { topicId } = useParams();
+
   
   // State
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [parentSection, setParentSection] = useState(null);
   const [topic, setTopic] = useState(null);
+  const [isCategoryView, setIsCategoryView] = useState(false);
+  const [categoryTopics, setCategoryTopics] = useState([]);
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         window.scrollTo(0, 0);
+        setIsCategoryView(false);
+        setCategoryTopics([]);
         console.log(`[MaterialDetail] Loading topic: ${topicId}`);
 
         // 1. Get Metadata from Curriculum (via Service)
@@ -42,9 +91,12 @@ const MaterialDetail = () => {
                 break;
             }
         }
-        // 2. If not found in Curriculum, check Special Programs (now category-based)
+        
+        // 2. If not found in Curriculum, check Special Programs (Topics OR Categories)
         if (!foundTopic) {
             const progs = await contentService.getSpecialPrograms();
+            
+            // Check if it's a Topic in Special Programs
             for (const category of progs) {
                 if (category.topics) {
                     const t = category.topics.find(t => t.id.toLowerCase() === topicId.toLowerCase());
@@ -55,14 +107,25 @@ const MaterialDetail = () => {
                     }
                 }
             }
+
+            // Check if it is a Category ID itself (Program Landing Page)
+            if (!foundTopic) {
+                const foundCategory = progs.find(c => c.id.toLowerCase() === topicId.toLowerCase());
+                if (foundCategory) {
+                    foundTopic = foundCategory; // Use Category as "Topic" for header display
+                    setIsCategoryView(true);
+                    setCategoryTopics(foundCategory.topics || []);
+                    foundSection = { title: 'Program Unggulan', icon: 'Star' };
+                }
+            }
         }
 
-        console.log(`[MaterialDetail] Found topic:`, foundTopic);
+        console.log(`[MaterialDetail] Found topic/category:`, foundTopic);
         setTopic(foundTopic);
         setParentSection(foundSection);
 
-        // 2. Get Content (HTML or Markdown)
-        if (foundTopic) {
+        // 3. Get Content (Only if it's a regular topic)
+        if (foundTopic && !isCategoryView) {
             const data = await contentService.getLessonContent(topicId);
             console.log(`[MaterialDetail] Fetched content length: ${data?.length || 0}`);
             setContent(data);
@@ -90,11 +153,11 @@ const MaterialDetail = () => {
     );
   }
 
-  // Detect content type
+  // Detect content type (Only for regular topics)
   const isJson = content && content.trim().startsWith('[');
   let displayData = []; 
 
-  if (isJson) {
+  if (isJson && !isCategoryView) {
     try {
       const parsed = JSON.parse(content);
       if (Array.isArray(parsed) && parsed.length > 0 && Array.isArray(parsed[0].items)) {
@@ -130,7 +193,7 @@ const MaterialDetail = () => {
                 </div>
                 
                 <h1 className="text-3xl md:text-5xl font-bold text-[var(--color-text-main)] mb-6 leading-[1.2] arabic-title tracking-tight">
-                    {topic?.title}
+                    {topic?.title || 'Loading...'}
                 </h1>
                 
                 {topic?.desc && (
@@ -140,7 +203,7 @@ const MaterialDetail = () => {
                 )}
             </div>
             
-            {contentService.isAuthenticated() && (
+            {contentService.isAuthenticated() && !isCategoryView && (
                 <Link to={`/admin/edit/${topicId}`} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-muted)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-bg-card)] rounded-xl transition-all shadow-sm border border-[var(--color-border)]" title="Edit Materi">
                     <Edit className="w-4 h-4" />
                     <span className="text-sm font-medium">Edit Konten</span>
@@ -156,6 +219,48 @@ const MaterialDetail = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
             <p className="text-[var(--color-text-muted)] font-medium animate-pulse">Memuat materi...</p>
          </div>
+      ) : isCategoryView ? (
+        // --- CATEGORY VIEW: Topic List ---
+        // SAFEGUARD: Check if categoryTopics is valid array
+        <div className="space-y-6">
+            <h3 className="text-2xl font-bold text-[var(--color-text-main)] mb-6 flex items-center">
+                <BookOpen className="w-6 h-6 mr-3 text-[var(--color-primary)]" />
+                Daftar Topik
+            </h3>
+            
+            {!Array.isArray(categoryTopics) || categoryTopics.length === 0 ? (
+                <div className="text-center py-12 bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)]">
+                    <p className="text-[var(--color-text-muted)] mb-4">Belum ada topik materi dalam program ini.</p>
+                </div>
+            ) : (
+                <div className="grid gap-4">
+                    {categoryTopics.filter(t => t).map((item, idx) => (
+                        <Link  
+                            key={item.id || idx} // Safety fallback for key
+                            to={`/program/${item.id}`} 
+                            className="bg-[var(--color-bg-card)] p-6 rounded-2xl border border-[var(--color-border)] hover:border-teal-400 hover:shadow-lg transition-all flex items-center justify-between group"
+                        >
+                             <div className="flex items-start gap-4">
+                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold text-sm mt-0.5">
+                                    {idx + 1}
+                                </span>
+                                <div>
+                                    <h4 className="text-lg font-bold text-[var(--color-text-main)] group-hover:text-teal-600 transition-colors arabic-index-topic">
+                                        {item.title || 'Tanpa Judul'}
+                                    </h4>
+                                    {item.desc && (
+                                        <p className="text-[var(--color-text-muted)] text-sm mt-1 mb-0">{item.desc}</p>
+                                    )}
+                                </div>
+                             </div>
+                             <div className="flex items-center text-sm font-medium text-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
+                                Mulai <ArrowRight className="w-4 h-4 ml-1" />
+                             </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </div>
       ) : !content ? (
         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-8 md:p-10 mb-12 text-amber-800 dark:text-amber-400 flex items-start shadow-sm">
           <AlertCircle className="w-8 h-8 mr-6 flex-shrink-0 mt-1 opacity-80" />
@@ -339,5 +444,11 @@ const ContentBlock = ({ block }) => {
             return null;
     }
 };
+
+const MaterialDetail = () => (
+    <ErrorBoundary>
+        <MaterialDetailContent />
+    </ErrorBoundary>
+);
 
 export default MaterialDetail;
