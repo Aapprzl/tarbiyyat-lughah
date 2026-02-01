@@ -871,7 +871,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-90 origin-top-left">
+                        <div className="w-full md:w-auto md:scale-90 md:origin-top-left">
                             <QuizGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -953,7 +953,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <FlashCardGame items={block.data.items} title={block.data.title} />
                         </div>
                      </div>
@@ -1036,7 +1036,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <AnagramGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1108,7 +1108,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1176,7 +1176,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <UnjumbleGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
@@ -1243,7 +1243,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      {/* Preview */}
                      <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
-                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                        <div className="w-full md:w-auto md:scale-75 md:origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <SpinWheelGame items={block.data.items} title={block.data.title} />
                         </div>
                      </div>
