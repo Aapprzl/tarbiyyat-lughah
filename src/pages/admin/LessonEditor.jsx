@@ -8,6 +8,7 @@ import AudioPlayer from '../../components/AudioPlayer';
 import MatchUpGame from '../../components/MatchUpGame';
 import QuizGame from '../../components/QuizGame';
 import FlashCardGame from '../../components/FlashCardGame';
+import AnagramGame from '../../components/AnagramGame';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const LessonEditor = () => {
@@ -156,6 +157,7 @@ const LessonEditor = () => {
                 }] 
               }
             : type === 'flashcard' ? { title: 'Flash Card', items: [{ id: 1, front: '', back: '' }] }
+            : type === 'anagram' ? { title: 'Anagram', questions: [{ id: 1, answer: '', clue: '' }] }
             : { title: '', content: '' }
     };
 
@@ -370,6 +372,7 @@ const LessonEditor = () => {
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Game" color="text-pink-600" bg="bg-pink-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-teal-600" bg="bg-teal-50" />
                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Flash Card" color="text-indigo-600" bg="bg-indigo-50" />
+                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50" />
                         </div>
                     </div>
                 </div>
@@ -930,6 +933,89 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
                         <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
                             <FlashCardGame items={block.data.items} title={block.data.title} />
+                        </div>
+                     </div>
+                </div>
+              )}
+
+              {/* --- GAME: ANAGRAM --- */}
+              {block.type === 'anagram' && (
+                <div className="space-y-4">
+                     <div className="flex items-center gap-2 mb-2">
+                        <GripVertical className="w-5 h-5 text-orange-500" />
+                        <input 
+                            type="text" 
+                            className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"
+                            value={block.data.title || 'Anagram'}
+                            onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                            placeholder="Judul Game Anagram..."
+                        />
+                     </div>
+
+                     <div className="space-y-4">
+                        {block.data.questions?.map((q, idx) => (
+                            <div key={q.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex items-center gap-4">
+                                <div className="flex-1 space-y-2">
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">JAWABAN (KATA)</span>
+                                        <input 
+                                            className="w-full pl-24 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-lg font-bold uppercase tracking-widest focus:border-orange-500 outline-none"
+                                            placeholder="Contoh: KUCING"
+                                            value={q.answer}
+                                            onChange={(e) => {
+                                                const newQ = [...block.data.questions];
+                                                newQ[idx].answer = e.target.value;
+                                                onUpdate({ ...block.data, questions: newQ });
+                                            }}
+                                        />
+                                    </div>
+                                    <div className="relative">
+                                        <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">PETUNJUK</span>
+                                        <input 
+                                            className="w-full pl-20 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-main)] focus:border-orange-500 outline-none"
+                                            placeholder="Contoh: Hewan berkaki empat, suka ikan..."
+                                            value={q.clue}
+                                            onChange={(e) => {
+                                                const newQ = [...block.data.questions];
+                                                newQ[idx].clue = e.target.value;
+                                                onUpdate({ ...block.data, questions: newQ });
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => {
+                                        if (block.data.questions.length === 1) return;
+                                        const newQ = block.data.questions.filter((_, i) => i !== idx);
+                                        onUpdate({ ...block.data, questions: newQ });
+                                    }}
+                                    className="text-gray-400 hover:text-red-500 p-2"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        ))}
+
+                        <button 
+                            onClick={() => {
+                                const newId = block.data.questions.length > 0 ? Math.max(...block.data.questions.map(q => q.id || 0)) + 1 : 1;
+                                onUpdate({ 
+                                    ...block.data, 
+                                    questions: [...(block.data.questions || []), { id: newId, answer: '', clue: '' }] 
+                                });
+                            }}
+                            className="w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-xl text-xs font-bold text-[var(--color-text-muted)] hover:border-orange-500 hover:text-orange-600 transition-colors flex items-center justify-center gap-2"
+                        >
+                            <Plus className="w-4 h-4" />
+                            Tambah Kata Baru
+                        </button>
+                     </div>
+
+                     {/* Preview */}
+                     <div className="mt-6 border-t border-[var(--color-border)] pt-4 opacity-50 hover:opacity-100 transition-opacity">
+                        <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-2">Preview:</p>
+                        <div className="scale-75 origin-top-left border border-[var(--color-border)] rounded-xl overflow-hidden bg-[var(--color-bg-main)]">
+                            <AnagramGame questions={block.data.questions} title={block.data.title} />
                         </div>
                      </div>
                 </div>

@@ -8,6 +8,7 @@ import AudioPlayer from '../components/AudioPlayer';
 import MatchUpGame from '../components/MatchUpGame';
 import QuizGame from '../components/QuizGame';
 import FlashCardGame from '../components/FlashCardGame';
+import AnagramGame from '../components/AnagramGame';
 
 const MaterialDetail = () => {
   const { topicId } = useParams();
@@ -305,6 +306,12 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="my-8">
                      <FlashCardGame items={block.data.items} title={block.data.title} />
+                </div>
+            );
+        case 'anagram':
+            return (
+                <div className="my-8">
+                     <AnagramGame questions={block.data.questions} title={block.data.title} />
                 </div>
             );
         default:
