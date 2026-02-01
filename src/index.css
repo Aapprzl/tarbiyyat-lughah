@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Premium Islamic Palette */
+  --color-primary: #0e7065; /* Deep Teal */
+  --color-primary-dark: #095048; /* Darker Teal */
+  --color-secondary: #cca352; /* Soft Gold */
+
+  /* Backgrounds */
+  --color-bg-main: #fcfbf9; /* Warm Paper */
+  --color-bg-sidebar: #ffffff; 
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #f3f4f6; /* New: Global Hover */
+  --color-bg-muted: #f9fafb; /* New: Subtle Backgrounds */
+  --color-bg-surface: #ffffff; /* New: Generic Surface */
+
+  /* Typography */
+  --color-text-main: #1f2937;
+  --color-text-muted: #6b7280;
+  --color-text-light: #e5e7eb; /* For sidebar */
+  --color-text-highlight: #0f766e; /* Teal-700 */
+
+  /* Borders & Shadows */
+  --color-border: #e2e4e7;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+
+  /* Fonts */
+  --font-arabic: 'Cairo', sans-serif;
+  --font-latin: 'Plus Jakarta Sans', sans-serif;
+  
+  /* Arabic Font Customization (Controlled by Admin) */
+  --font-arabic-title-size: 2.25rem; /* text-4xl fallback */
+  --font-arabic-content-size: 1.25rem; /* text-xl fallback */
+  --font-arabic-sidebar-size: 1.5rem; /* text-2xl fallback */
+  --font-arabic-sidebar-content-size: 1.125rem; /* text-lg fallback */
+  --font-arabic-index-topic-size: 1.25rem; /* text-xl fallback */
+}
+
+/* Dark Mode Tokens */
+[data-theme='dark'] {
+  --color-primary: #2dd4bf; /* Teal-400 (Brighter for Dark) */
+  --color-primary-dark: #14b8a6; /* Teal-500 */
+  --color-secondary: #fbbf24; /* Amber-400 */
+  
+  --color-bg-main: #0f172a; /* Slate-900 */
+  --color-bg-sidebar: #1e293b; /* Slate-800 */
+  --color-bg-card: #1e293b; 
+  --color-bg-hover: #334155; /* Slate-700 */
+  --color-bg-muted: #1e293b; /* Slate-800 */
+  --color-bg-surface: #1e293b;
+
+  --color-text-main: #f8fafc; /* Slate-50 */
+  --color-text-muted: #cbd5e1; /* Slate-300 (Lighter for readability) */
+  --color-text-light: #e2e8f0;
+  --color-text-highlight: #5eead4; /* Teal-300 */
+  
+  --color-border: #334155; /* Slate-700 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+}
+
+html, body {
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  font-family: var(--font-latin), sans-serif;
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Force Form Elements to inherit or use variable */
+button, input, select, textarea {
+  font-family: var(--font-latin), sans-serif !important;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--color-primary-dark);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.arabic-text {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-content-size);
+  direction: rtl;
+}
+
+.arabic-title {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-title-size);
+}
+
+.arabic-content {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-content-size);
+}
+
+.arabic-sidebar {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-sidebar-size);
+}
+
+.arabic-sidebar-content {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-sidebar-content-size);
+}
+
+/* Explicit Utilities to bypass Tailwind Config lag */
+.font-arabic {
+  font-family: var(--font-arabic) !important;
+}
+
+.font-sans {
+  font-family: var(--font-latin), ui-sans-serif, system-ui, sans-serif !important;
+}
+
+.arabic-index-topic {
+  font-family: var(--font-arabic);
+  font-size: var(--font-arabic-index-topic-size);
+}
+
+/* Scrollbar Polish */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
