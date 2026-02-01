@@ -159,8 +159,8 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                                     : 'bg-orange-100 border-orange-300 text-orange-800 hover:bg-orange-200'
                                 : 'bg-[var(--color-bg-muted)] border-[var(--color-border)] border-dashed border-2'
                             }
+                            ${letter && isArabic(letter.char) ? 'font-arabic' : ''}
                         `}
-                        style={{ fontFamily: letter && isArabic(letter.char) ? 'var(--font-arabic)' : 'inherit' }}
                     >
                         {letter ? letter.char : ''}
                     </button>
@@ -182,8 +182,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                         key={letter.id}
                         onClick={() => handleLetterClick(letter, 'pool')}
                         disabled={isCorrect}
-                        className="w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-[var(--color-border)] text-lg font-bold text-[var(--color-text-main)] hover:bg-gray-50 dark:hover:bg-gray-600 hover:-translate-y-1 transition-transform active:scale-95 flex items-center justify-center"
-                        style={{ fontFamily: isArabic(letter.char) ? 'var(--font-arabic)' : 'inherit' }}
+                        className={`w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-[var(--color-border)] text-lg font-bold text-[var(--color-text-main)] hover:bg-gray-50 dark:hover:bg-gray-600 hover:-translate-y-1 transition-transform active:scale-95 flex items-center justify-center ${isArabic(letter.char) ? 'font-arabic' : ''}`}
                     >
                         {letter.char}
                     </button>

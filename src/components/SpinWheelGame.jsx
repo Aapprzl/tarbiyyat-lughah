@@ -7,9 +7,18 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
   const [result, setResult] = useState(null);
   
   // Physics state
+  // Physics state
   const rotationRef = useRef(0);
   const velocityRef = useRef(0);
   const animationRef = useRef(null);
+  const arabicFontRef = useRef("sans-serif");
+
+  // Load Arabic font from CSS variable
+  useEffect(() => {
+      const font = getComputedStyle(document.documentElement).getPropertyValue('--font-arabic');
+      if (font) arabicFontRef.current = font.trim();
+      drawWheel();
+  }, []);
 
   // Colors
   const colors = [
@@ -61,7 +70,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
           ctx.fillStyle = '#fff';
           ctx.font = 'bold 16px sans-serif';
           if (/[\u0600-\u06FF]/.test(item.text)) {
-             ctx.font = 'bold 18px Amiri, sans-serif';
+             ctx.font = `bold 18px ${arabicFontRef.current}`;
           }
           ctx.fillText(item.text, radius - 20, 6);
           ctx.restore();

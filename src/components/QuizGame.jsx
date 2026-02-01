@@ -13,6 +13,9 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
   const [isAnswered, setIsAnswered] = useState(false); // To freeze interaction after click
 
   const currentQuestion = questions[currentIndex];
+
+  // Helper to detect Arabic
+  const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
   
   const handleOptionClick = (option) => {
     if (isAnswered) return;
@@ -106,7 +109,10 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
 
       <div className="p-6 md:p-8">
          {/* Question */}
-         <h4 className="text-xl md:text-2xl font-bold text-[var(--color-text-main)] mb-8 leading-relaxed">
+         <h4 
+            className={`text-xl md:text-2xl font-bold text-[var(--color-text-main)] mb-8 leading-relaxed ${isArabic(currentQuestion.text) ? 'font-arabic text-right' : ''}`}
+            dir={isArabic(currentQuestion.text) ? 'rtl' : 'ltr'}
+         >
             {currentQuestion.text}
          </h4>
 
@@ -145,7 +151,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
                    disabled={isAnswered}
                    className={`relative p-4 rounded-xl text-left transition-all flex items-center justify-between group ${containerClass}`}
                  >
-                    <span className={`font-medium ${isAnswered && isCorrect ? 'text-green-700 dark:text-green-400 font-bold' : 'text-[var(--color-text-main)]'}`}>
+                    <span className={`font-medium ${isAnswered && isCorrect ? 'text-green-700 dark:text-green-400 font-bold' : 'text-[var(--color-text-main)]'} ${isArabic(option.text) ? 'font-arabic text-lg' : ''}`}>
                       {option.text}
                     </span>
                     {icon}

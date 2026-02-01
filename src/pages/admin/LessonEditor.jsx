@@ -421,7 +421,9 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
 const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst, isLast, toast }) => {
     const [isOpen, setIsOpen] = useState(false);
 
-    // Helper to get icon and label
+    // Helper to detect Arabic
+    const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
+
     const getBlockInfo = (type) => {
         switch(type) {
             case 'text': return { icon: Type, label: 'Teks', color: 'text-teal-600', bg: 'bg-teal-50' };
@@ -749,7 +751,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                  <div className="w-full">
                                      <label className="md:hidden text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Pertanyaan</label>
                                      <input 
-                                        className="w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
+                                        className={`w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500 ${isArabic(pair.question) ? 'font-arabic text-lg' : ''}`}
                                         placeholder="Pertanyaan..."
                                         value={pair.question}
                                         onChange={(e) => {
@@ -764,7 +766,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                  <div className="w-full">
                                      <label className="md:hidden text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Jawaban</label>
                                      <input 
-                                        className="w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500"
+                                        className={`w-full bg-[var(--color-bg-muted)] md:bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm text-[var(--color-text-main)] outline-none focus:border-pink-500 ${isArabic(pair.answer) ? 'font-arabic text-lg' : ''}`}
                                         placeholder="Jawaban..."
                                         value={pair.answer}
                                         onChange={(e) => {
@@ -833,7 +835,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     <div className="flex-1 mr-4">
                                         <label className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Pertanyaan {qIdx + 1}</label>
                                         <input 
-                                            className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-teal-500"
+                                            className={`w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm font-medium outline-none focus:border-teal-500 ${isArabic(q.text) ? 'font-arabic text-right text-lg' : ''}`}
+                                            dir={isArabic(q.text) ? 'rtl' : 'ltr'}
                                             placeholder="Tulis pertanyaan..."
                                             value={q.text}
                                             onChange={(e) => {
@@ -875,7 +878,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                 title="Tandai sebagai jawaban benar"
                                             />
                                             <input 
-                                                className={`flex-1 bg-[var(--color-bg-card)] border ${opt.isCorrect ? 'border-teal-500 ring-1 ring-teal-500' : 'border-[var(--color-border)]'} rounded text-xs px-2 py-1.5 outline-none focus:border-teal-500`}
+                                                className={`flex-1 bg-[var(--color-bg-card)] border ${opt.isCorrect ? 'border-teal-500 ring-1 ring-teal-500' : 'border-[var(--color-border)]'} rounded text-xs px-2 py-1.5 outline-none focus:border-teal-500 ${isArabic(opt.text) ? 'font-arabic text-sm' : ''}`}
                                                 placeholder={`Pilihan ${String.fromCharCode(65 + optIdx)}`}
                                                 value={opt.text}
                                                 onChange={(e) => {
@@ -1045,7 +1048,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     <div className="relative">
                                         <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">JAWABAN (KATA)</span>
                                         <input 
-                                            className="w-full pl-24 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-lg font-bold uppercase tracking-widest focus:border-orange-500 outline-none"
+                                            className={`w-full pl-24 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-lg font-bold uppercase tracking-widest focus:border-orange-500 outline-none ${isArabic(q.answer) ? 'font-arabic' : ''}`}
                                             placeholder="Contoh: KUCING"
                                             value={q.answer}
                                             onChange={(e) => {
@@ -1058,7 +1061,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     <div className="relative">
                                         <span className="absolute left-3 top-2 text-[10px] font-bold text-[var(--color-text-muted)]">PETUNJUK</span>
                                         <input 
-                                            className="w-full pl-20 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-main)] focus:border-orange-500 outline-none"
+                                            className={`w-full pl-20 pr-3 py-2 bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg text-sm text-[var(--color-text-main)] focus:border-orange-500 outline-none ${isArabic(q.clue) ? 'font-arabic text-lg' : ''}`}
                                             placeholder="Contoh: Hewan berkaki empat, suka ikan..."
                                             value={q.clue}
                                             onChange={(e) => {
@@ -1131,7 +1134,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                             <div key={q.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex gap-4">
                                 <div className="flex-1">
                                     <textarea 
-                                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-3 text-sm focus:border-blue-500 outline-none h-20"
+                                        className={`w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-3 text-sm focus:border-blue-500 outline-none h-20 ${isArabic(q.text) ? 'font-arabic text-lg text-right' : ''}`}
+                                        dir={isArabic(q.text) ? 'rtl' : 'ltr'}
                                         placeholder="Tulis kalimat di sini..."
                                         value={q.text}
                                         onChange={(e) => {
@@ -1199,7 +1203,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                 <div className="flex-1">
                                     <label className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase mb-1 block">Kalimat Yang Benar</label>
                                     <textarea 
-                                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-3 text-sm focus:border-purple-500 outline-none h-20"
+                                        className={`w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-3 text-sm focus:border-purple-500 outline-none h-20 ${isArabic(q.text) ? 'font-arabic text-lg text-right' : ''}`}
+                                        dir={isArabic(q.text) ? 'rtl' : 'ltr'}
                                         placeholder="Tulis kalimat lengkap di sini..."
                                         value={q.text}
                                         onChange={(e) => {
@@ -1266,7 +1271,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                             <div key={item.id || idx} className="bg-[var(--color-bg-muted)] p-3 rounded-xl border border-[var(--color-border)] flex items-center gap-4">
                                 <div className="flex-1">
                                     <input 
-                                        className="w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm focus:border-pink-500 outline-none"
+                                        className={`w-full bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-3 py-2 text-sm focus:border-pink-500 outline-none ${isArabic(item.text) ? 'font-arabic text-lg' : ''}`}
                                         placeholder={`Item ${idx + 1}`}
                                         value={item.text}
                                         onChange={(e) => {

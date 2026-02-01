@@ -43,6 +43,9 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
         setSelectedId(null);
     };
 
+    // Helper to detect Arabic
+    const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
+
     // --- Tap / Click Interaction Logic ---
 
     const handleItemClick = (item) => {
@@ -312,7 +315,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                                     className="w-full md:w-1/2 bg-[var(--color-bg-muted)] p-4 rounded-t-xl md:rounded-l-xl md:rounded-tr-none border border-[var(--color-border)] flex items-center font-medium text-[var(--color-text-main)] cursor-pointer"
                                     onClick={() => handleSlotClick(pair.id, filledAnswerId, filledAnswer)}
                                 >
-                                    {pair.question}
+                                    <span className={isArabic(pair.question) ? 'font-arabic text-lg' : ''}>{pair.question}</span>
                                 </div>
                                 
                                 {/* Drop Slot / Answer Box */}
@@ -332,7 +335,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                                                 handleDragStart(e, { id: filledAnswerId, text: filledAnswer, origin: 'slot', questionId: pair.id });
                                             }}
                                         >
-                                            {filledAnswer}
+                                            <span className={isArabic(filledAnswer) ? 'font-arabic text-lg' : ''}>{filledAnswer}</span>
                                             {!isSubmitted && (
                                                 <button 
                                                     onClick={(e) => {
@@ -398,7 +401,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                                              handleDragStart(e, { id: ans.id, text: ans.text, origin: 'pool' });
                                          }}
                                      >
-                                         {ans.text}
+                                         <span className={isArabic(ans.text) ? 'font-arabic' : ''}>{ans.text}</span>
                                      </button>
                                  );
                              })}
@@ -441,7 +444,7 @@ const MatchUpGame = ({ pairs = [], title = "Pasangkan" }) => {
                         width: 'max-content'
                     }}
                 >
-                    {dragItem.text}
+                    <span className={isArabic(dragItem.text) ? 'font-arabic' : ''}>{dragItem.text}</span>
                 </div>
             )}
         </div>
