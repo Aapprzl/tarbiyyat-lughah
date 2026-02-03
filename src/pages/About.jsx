@@ -32,10 +32,21 @@ const About = () => {
                 {/* Main Content */}
                 <div className="md:col-span-2 space-y-8">
                     <div 
-                        className="bg-[var(--color-bg-card)] rounded-2xl p-8 shadow-sm border border-[var(--color-border)] prose prose-lg prose-teal dark:prose-invert max-w-none text-[var(--color-text-main)]"
+                        className="bg-[var(--color-bg-card)] rounded-2xl p-8 shadow-sm border border-[var(--color-border)] prose prose-lg prose-teal dark:prose-invert max-w-none text-[var(--color-text-main)] about-content"
                         dangerouslySetInnerHTML={{ __html: data.content }}
                     />
                 </div>
+
+                <style>{`
+                    .about-content a {
+                        color: #0d9488 !important;
+                        text-decoration: underline !important;
+                        font-weight: 500;
+                    }
+                    .about-content a:hover {
+                        color: #0f766e !important;
+                    }
+                `}</style>
 
                 {/* Sidebar Info */}
                 <div className="space-y-6">
