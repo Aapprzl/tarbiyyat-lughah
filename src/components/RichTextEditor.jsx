@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Bold, Italic, List, ListOrdered, Heading, Quote, Undo, Redo } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Heading, Quote, Link as LinkIcon, Undo, Redo } from 'lucide-react';
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
   const editorRef = useRef(null);
@@ -70,6 +70,14 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     updateActiveFormats();
   };
 
+  const insertLink = () => {
+    const url = prompt('Masukkan URL (contoh: https://example.com):');
+    if (url) {
+      document.execCommand('createLink', false, url);
+      editorRef.current?.focus();
+    }
+  };
+
   const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
     <button
       type="button"
@@ -105,6 +113,10 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
         <div className="w-px bg-gray-300 mx-1"></div>
         
         {formatButton(<Quote className="w-4 h-4" />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
+        
+        <div className="w-px bg-gray-300 mx-1"></div>
+        
+        {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Sisipkan Link/Tautan', null, false, insertLink)}
         
         <div className="flex-1"></div>
         
