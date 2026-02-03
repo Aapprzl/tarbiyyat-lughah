@@ -4,8 +4,6 @@ import { Bold, Italic, List, ListOrdered, Heading, Quote, Link as LinkIcon, Undo
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
   const editorRef = useRef(null);
   const [activeFormats, setActiveFormats] = useState({});
-  const [showLinkModal, setShowLinkModal] = useState(false);
-  const [linkUrl, setLinkUrl] = useState('');
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
@@ -32,14 +30,16 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
       insertOrderedList: document.queryCommandState('insertOrderedList'),
     };
     
-    // Check if current selection is in blockquote
+    // Check if current selection is in blockquote or link
     const selection = window.getSelection();
     if (selection.rangeCount > 0) {
       let node = selection.anchorNode;
       while (node && node !== editorRef.current) {
         if (node.nodeName === 'BLOCKQUOTE') {
           formats.blockquote = true;
-          break;
+        }
+        if (node.nodeName === 'A') {
+          formats.link = true;
         }
         node = node.parentNode;
       }
@@ -72,38 +72,34 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     updateActiveFormats();
   };
 
-  const openLinkModal = () => {
-    // Check if text is selected
-    const selection = window.getSelection();
-    const selectedText = selection.toString().trim();
-    
-    if (!selectedText) {
-      alert('Silakan pilih/select text terlebih dahulu sebelum menambahkan link!');
-      return;
-    }
-    
-    setLinkUrl('');
-    setShowLinkModal(true);
-  };
+  const toggleLink = () => {
+    if (activeFormats.link) {
+      document.execCommand('unlink');
+    } else {
+      const selection = window.getSelection();
+      let url = selection.toString().trim();
+      
+      if (!url) {
+        alert('Silakan pilih teks terlebih dahulu!');
+        return;
+      }
 
-  const insertLink = () => {
-    if (linkUrl.trim()) {
-      // Ensure URL has protocol
-      let finalUrl = linkUrl.trim();
-      if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
-        finalUrl = 'https://' + finalUrl;
+      // If selection looks like a URL, use it, otherwise use #
+      if (!url.includes('.') || url.includes(' ')) {
+        url = '#';
+      } else if (!url.startsWith('http')) {
+        url = 'https://' + url;
       }
-      
-      document.execCommand('createLink', false, finalUrl);
-      editorRef.current?.focus();
-      
-      // Trigger onChange to save the new content
-      if (editorRef.current) {
-        onChange(editorRef.current.innerHTML);
-      }
+
+      document.execCommand('createLink', false, url);
     }
-    setShowLinkModal(false);
-    setLinkUrl('');
+    editorRef.current?.focus();
+    
+    // Trigger onChange
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+    updateActiveFormats();
   };
 
   const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
@@ -145,7 +141,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
           
           <div className="w-px bg-gray-300 mx-1"></div>
           
-          {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Sisipkan Link/Tautan', null, false, openLinkModal)}
+          {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Tautan (Toggle)', null, activeFormats.link, toggleLink)}
           
           <div className="flex-1"></div>
           
@@ -222,53 +218,6 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
           }
         `}</style>
       </div>
-
-      {/* Custom Link Modal */}
-      {showLinkModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]" onClick={() => setShowLinkModal(false)}>
-          <div className="bg-[var(--color-bg-card)] rounded-xl shadow-2xl border border-[var(--color-border)] p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-4">Sisipkan Link/Tautan</h3>
-            
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-[var(--color-text-main)] mb-2">
-                URL Alamat
-              </label>
-              <input
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') insertLink();
-                  if (e.key === 'Escape') setShowLinkModal(false);
-                }}
-                placeholder="https://example.com"
-                className="w-full p-3 border border-[var(--color-border)] bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
-                autoFocus
-              />
-              <p className="text-xs text-[var(--color-text-muted)] mt-1">
-                Pilih teks terlebih dahulu, lalu masukkan URL lengkap (termasuk https://)
-              </p>
-            </div>
-
-            <div className="flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setShowLinkModal(false)}
-                className="px-4 py-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] transition-colors"
-              >
-                Batal
-              </button>
-              <button
-                type="button"
-                onClick={insertLink}
-                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-colors"
-              >
-                Sisipkan Link
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
