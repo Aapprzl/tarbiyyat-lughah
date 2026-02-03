@@ -31,14 +31,12 @@ const Layout = () => {
       
       <Header onMenuClick={() => setIsSidebarOpen(true)} />
 
-      <main className="lg:ml-72 pt-16 min-h-screen transition-all duration-300">
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
-          <Outlet key={location.pathname} />
-        </div>
+      <main className="lg:ml-80 pt-20 min-h-screen transition-all duration-300 relative overflow-x-hidden">
+        <Outlet key={location.pathname} />
         
         {/* Footer */}
-        <footer className="mt-12 py-6 text-center text-sm text-[var(--color-text-muted)] border-t border-[var(--color-border)]/50">
-          <p>{footerText}</p>
+        <footer className="mt-20 py-10 text-center text-xs font-bold tracking-widest text-slate-400 dark:text-slate-600 border-t border-slate-200 dark:border-white/5 uppercase">
+          <p>{footerText || '© 2026 Tarbiyyat Lughah. All Rights Reserved.'}</p>
         </footer>
       </main>
     </div>

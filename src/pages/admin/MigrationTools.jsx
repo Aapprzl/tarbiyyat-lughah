@@ -4,8 +4,10 @@ import { storageService } from '../../services/storageService';
 import { cleanupService } from '../../services/cleanupService';
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, writeBatch, collection } from 'firebase/firestore';
-import { Database, UploadCloud, CheckCircle, AlertTriangle, Play, FileText, Image as ImageIcon, Trash2, RefreshCw, BookOpen } from 'lucide-react';
+import { Database, UploadCloud, CheckCircle, AlertTriangle, Play, FileText, Image as ImageIcon, Trash2, RefreshCw, BookOpen, ShieldAlert, Activity, Cpu, Sparkles, Terminal } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../../utils/cn';
 
 const MigrationTools = () => {
     const [logs, setLogs] = useState([]);
@@ -403,167 +405,259 @@ const MigrationTools = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 pb-20 space-y-8">
-            <div className="bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)] p-8 shadow-xl">
-                {/* Header ... */}
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-teal-100 dark:bg-teal-900/30 rounded-2xl flex items-center justify-center text-teal-600">
-                        <Database className="w-8 h-8" />
+        <div className="max-w-6xl mx-auto p-6 pb-32 space-y-12">
+            <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white dark:bg-white/5 rounded-[3.5rem] border border-slate-200 dark:border-white/10 p-10 md:p-16 shadow-2xl relative overflow-hidden"
+            >
+                {/* Background Accent */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-500/5 blur-[100px] rounded-full"></div>
+
+                {/* Header */}
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-8 mb-12">
+                    <div className="w-20 h-20 bg-teal-500/10 dark:bg-teal-500/5 rounded-[2rem] flex items-center justify-center text-teal-600 shadow-inner">
+                        <Database className="w-10 h-10" />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-[var(--color-text-main)]">Migrasi Database & Cloud</h1>
-                        <p className="text-[var(--color-text-muted)]">Pindahkan semua data dari Browser (Offline) ke Firebase (Online).</p>
-                    </div>
-                </div>
-
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 mb-8 flex gap-3">
-                    <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
-                    <div className="text-sm text-amber-800 dark:text-amber-200">
-                        <strong>Penting:</strong> Proses ini akan membaca data LocalStorage Anda, mengupload gambar/PDF ke Firebase Storage, dan menyimpan teks ke Firestore. <br/>
-                        Pastikan koneksi internet stabil. Jangan tutup halaman ini sampai selesai.
-                    </div>
-                </div>
-
-                <div className="flex flex-col md:flex-row justify-center gap-4 mb-8">
-                    <button 
-                        onClick={scanForBase64}
-                        disabled={isMigrating}
-                        className="px-6 py-4 rounded-xl font-bold border-2 border-teal-600 text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 transition-all flex items-center justify-center gap-2 w-full md:w-auto"
-                    >
-                        <UploadCloud className="w-5 h-5" />
-                        Cek File Dulu (Scan)
-                    </button>
-
-                    <button 
-                        onClick={startMigration}
-                        disabled={isMigrating}
-                        className={`
-                            px-8 py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-3 shadow-lg transition-all w-full md:w-auto
-                            ${isMigrating 
-                                ? 'bg-gray-200 dark:bg-gray-800 text-gray-500 cursor-not-allowed' 
-                                : 'bg-teal-600 text-white hover:bg-teal-700 hover:scale-[1.02] active:scale-95'}
-                        `}
-                    >
-                        {isMigrating ? (
-                            <>
-                                <div className="w-6 h-6 border-4 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                                Sedang Memproses ({progress}%)...
-                            </>
-                        ) : (
-                            <>
-                                <UploadCloud className="w-6 h-6" />
-                                Mulai Migrasi Sekarang
-                            </>
-                        )}
-                    </button>
-                </div>
-
-                {/* Logs Console */}
-                <div className="bg-gray-900 rounded-xl p-4 h-96 overflow-y-auto font-mono text-xs border border-gray-800 shadow-inner">
-                    {logs.length === 0 ? (
-                        <div className="h-full flex flex-col items-center justify-center text-gray-600">
-                            <Play className="w-12 h-12 mb-2 opacity-20" />
-                            <p>Klik tombol di atas untuk memulai...</p>
+                        <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
+                            <Cpu className="w-3 h-3" /> Core Infrastructure
                         </div>
-                    ) : (
-                        <div className="space-y-1.5">
-                            {logs.map((log, i) => (
-                                <div key={i} className={`flex gap-2 ${
-                                    log.type === 'error' ? 'text-red-400' :
-                                    log.type === 'success' ? 'text-green-400' :
-                                    log.type === 'warning' ? 'text-amber-400' :
-                                    'text-blue-300'
-                                }`}>
-                                    <span className="text-gray-500">[{log.time}]</span>
-                                    <span>{log.msg}</span>
+                        <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Sinkronisasi Cloud</h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium">Migrasikan aset & data dari penyimpanan lokal ke infrastruktur Firebase Online.</p>
+                    </div>
+                </div>
+
+                <div className="grid lg:grid-cols-12 gap-12">
+                    <div className="lg:col-span-12">
+                         <div className="bg-amber-50 dark:bg-amber-500/5 border border-amber-200 dark:border-amber-500/20 rounded-[2.5rem] p-8 mb-12 flex items-start gap-5">
+                            <div className="w-12 h-12 bg-amber-100 dark:bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600 flex-shrink-0">
+                                <ShieldAlert className="w-6 h-6" />
+                            </div>
+                            <div className="text-sm text-amber-900 dark:text-amber-200 leading-relaxed font-bold">
+                                <strong>Protokol Keamanan:</strong> Proses ini akan memindai LocalStorage, mengunggah aset biner ke Firebase Storage, dan menyinkronkan data transaksional ke Firestore. 
+                                <span className="block mt-2 opacity-60 font-medium italic">Pastikan stabilitas koneksi jaringan selama proses berlangsung.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="lg:col-span-5 space-y-8">
+                        <div className="flex flex-col gap-4">
+                            <button 
+                                onClick={scanForBase64}
+                                disabled={isMigrating}
+                                className="group px-8 py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs border-2 border-teal-500/30 text-teal-600 hover:bg-teal-500 hover:text-white transition-all flex items-center justify-center gap-3 w-full shadow-lg shadow-teal-500/5 active:scale-95"
+                            >
+                                <Activity className="w-5 h-5 transition-transform group-hover:scale-125" />
+                                Pindai Aset Lokal
+                            </button>
+
+                            <button 
+                                onClick={startMigration}
+                                disabled={isMigrating}
+                                className={cn(
+                                    "px-8 py-6 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-4 shadow-2xl transition-all w-full relative overflow-hidden group",
+                                    isMigrating 
+                                        ? 'bg-slate-100 dark:bg-white/5 text-slate-400 cursor-not-allowed' 
+                                        : 'bg-teal-600 text-white shadow-teal-500/30 hover:bg-teal-700 active:scale-95'
+                                )}
+                            >
+                                {isMigrating ? (
+                                    <>
+                                        <div className="w-5 h-5 border-3 border-teal-500/30 border-t-teal-500 rounded-full animate-spin" />
+                                        Migrasi ({progress}%)
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <UploadCloud className="w-6 h-6 relative z-10" />
+                                        <span className="relative z-10">Eksekusi Migrasi</span>
+                                        <Sparkles className="w-5 h-5 relative z-10 text-amber-300" />
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        
+                        <div className="p-8 bg-slate-50 dark:bg-white/5 rounded-[2.5rem] border border-slate-100 dark:border-white/5">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Statistik Infrastruktur</h3>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-center bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-100 dark:border-white/10">
+                                    <span className="text-xs font-bold text-slate-500 tracking-tight">Firestore Status</span>
+                                    <span className="flex items-center gap-2 text-[10px] font-black text-teal-500 uppercase">
+                                        <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse"></div> Online
+                                    </span>
                                 </div>
-                            ))}
-                            {/* Auto scroll anchor */}
-                            <div className="h-0" ref={(el) => el?.scrollIntoView({ behavior: 'smooth' })} />
+                                <div className="flex justify-between items-center bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-100 dark:border-white/10">
+                                    <span className="text-xs font-bold text-slate-500 tracking-tight">Storage Latency</span>
+                                    <span className="text-[10px] font-black text-slate-400 uppercase">Optimized</span>
+                                </div>
+                            </div>
                         </div>
-                    )}
+                    </div>
+
+                    <div className="lg:col-span-7">
+                        {/* Logs Console */}
+                        <div className="bg-[#030712] rounded-[3rem] p-8 min-h-[400px] font-mono text-sm border-2 border-slate-800 shadow-2xl relative overflow-hidden group">
+                           <div className="absolute top-4 right-6 flex items-center gap-2">
+                               <div className="w-2 h-2 rounded-full bg-red-500/50"></div>
+                               <div className="w-2 h-2 rounded-full bg-amber-500/50"></div>
+                               <div className="w-2 h-2 rounded-full bg-green-500/50"></div>
+                           </div>
+                           
+                           <div className="flex items-center gap-3 text-slate-600 mb-6 border-b border-slate-800 pb-4">
+                               <Terminal className="w-4 h-4" />
+                               <span className="text-[10px] font-black uppercase tracking-widest">System Engine Logs</span>
+                           </div>
+
+                            <div className="h-[300px] overflow-y-auto custom-scrollbar space-y-2">
+                                {logs.length === 0 ? (
+                                    <div className="h-full flex flex-col items-center justify-center text-slate-700">
+                                        <Play className="w-12 h-12 mb-4 opacity-10" />
+                                        <p className="text-xs uppercase tracking-[0.3em] font-black">Waiting for Command...</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1.5">
+                                        {logs.map((log, i) => (
+                                            <motion.div 
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                key={i} 
+                                                className={cn(
+                                                    "flex gap-3 text-xs py-1",
+                                                    log.type === 'error' ? 'text-red-400 bg-red-500/5 px-2 rounded-lg' :
+                                                    log.type === 'success' ? 'text-teal-400' :
+                                                    log.type === 'warning' ? 'text-amber-400' :
+                                                    'text-indigo-300'
+                                                )}
+                                            >
+                                                <span className="text-slate-700 shrink-0">[{log.time}]</span>
+                                                <span className="font-medium">{log.msg}</span>
+                                            </motion.div>
+                                        ))}
+                                        <div className="h-0" ref={(el) => el?.scrollIntoView({ behavior: 'smooth' })} />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </motion.div>
 
             {/* === DATA CLEANUP SECTION === */}
-            <div className="bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)] p-8 shadow-xl">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center text-red-600">
-                        <Trash2 className="w-8 h-8" />
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1 }}
+                className="bg-white dark:bg-white/5 rounded-[4rem] border border-slate-200 dark:border-white/10 p-12 md:p-16 shadow-xl"
+            >
+                <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                    <div className="flex items-center gap-6">
+                        <div className="w-20 h-20 bg-red-100 dark:bg-red-500/5 rounded-[2rem] flex items-center justify-center text-red-600 shadow-inner">
+                            <Trash2 className="w-10 h-10" />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Pembersihan Sektor</h2>
+                            <p className="text-slate-500 dark:text-slate-400 font-medium">Reset state atau hapus permanen data metadata & aset.</p>
+                        </div>
                     </div>
-                    <div>
-                        <h2 className="text-2xl font-bold text-[var(--color-text-main)]">Pembersihan Data</h2>
-                        <p className="text-[var(--color-text-muted)]">Hapus data lama untuk memulai fresh.</p>
+                    
+                    <div className="flex items-center gap-3 bg-red-50 dark:bg-red-500/5 px-6 py-3 rounded-full border border-red-100 dark:border-red-500/20">
+                        <AlertTriangle className="w-5 h-5 text-red-500" />
+                        <span className="text-[10px] font-black text-red-600 uppercase tracking-widest">High Risk Operations</span>
                     </div>
                 </div>
 
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 flex gap-3">
-                    <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
-                    <div className="text-sm text-red-800 dark:text-red-200">
-                        <strong>Peringatan:</strong> Tindakan pembersihan bersifat PERMANEN dan TIDAK BISA dibatalkan. 
-                        Pastikan Anda sudah backup data penting sebelum melanjutkan.
-                    </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {/* Clear All Data */}
                     <button
                         onClick={handleClearAllData}
                         disabled={isCleaningUp || isMigrating}
-                        className="p-4 rounded-xl border-2 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                        className="p-8 rounded-[2.5rem] border-2 border-red-500/10 hover:border-red-500 hover:bg-red-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-4 text-center"
                     >
-                        <Trash2 className="w-5 h-5" />
-                        Hapus Semua Data
+                        <div className="w-14 h-14 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                            <Trash2 className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-black uppercase text-red-500 tracking-widest mb-1">Destructive Root</div>
+                            <div className="text-[10px] font-bold text-slate-400">Hapus Semua Sektor</div>
+                        </div>
                     </button>
 
                     {/* Clear LocalStorage */}
                     <button
                         onClick={handleClearLocalStorage}
                         disabled={isCleaningUp || isMigrating}
-                        className="p-4 rounded-xl border-2 border-orange-600 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                        className="p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-teal-500 hover:bg-teal-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-4 text-center"
                     >
-                        <RefreshCw className="w-5 h-5" />
-                        Hapus LocalStorage
+                        <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-teal-500 group-hover:scale-110 transition-all">
+                            <RefreshCw className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-black uppercase text-slate-500 group-hover:text-teal-500 tracking-widest mb-1">Reset Cache</div>
+                            <div className="text-[10px] font-bold text-slate-400">Lokal Sektor</div>
+                        </div>
                     </button>
 
                     {/* Clear Firestore */}
                     <button
                         onClick={handleClearFirestore}
                         disabled={isCleaningUp || isMigrating}
-                        className="p-4 rounded-xl border-2 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                        className="p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-red-500 hover:bg-red-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-4 text-center"
                     >
-                        <Database className="w-5 h-5" />
-                        Hapus Firestore
+                        <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-red-500 group-hover:scale-110 transition-all">
+                            <Database className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-black uppercase text-slate-500 group-hover:text-red-500 tracking-widest mb-1">Cloud Purge</div>
+                            <div className="text-[10px] font-bold text-slate-400">Firebase Sektor</div>
+                        </div>
                     </button>
 
                     {/* Clear Settings */}
                     <button
                         onClick={handleClearSettings}
                         disabled={isCleaningUp || isMigrating}
-                        className="p-4 rounded-xl border-2 border-amber-600 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                        className="p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-amber-500 hover:bg-amber-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-4 text-center"
                     >
-                        <FileText className="w-5 h-5" />
-                        Hapus Settings
+                        <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-amber-500 group-hover:scale-110 transition-all">
+                            <FileText className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <div className="text-xs font-black uppercase text-slate-500 group-hover:text-amber-500 tracking-widest mb-1">Config Reset</div>
+                            <div className="text-[10px] font-bold text-slate-400">Settings Sektor</div>
+                        </div>
                     </button>
 
                     {/* Clear Lessons */}
                     <button
                         onClick={handleClearLessons}
                         disabled={isCleaningUp || isMigrating}
-                        className="p-4 rounded-xl border-2 border-amber-600 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold md:col-span-2"
+                        className="sm:col-span-2 lg:col-span-2 p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-teal-500 hover:bg-teal-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-row items-center justify-center gap-6"
                     >
-                        <BookOpen className="w-5 h-5" />
-                        Hapus Materi
+                        <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-teal-500 group-hover:scale-110 transition-all">
+                            <BookOpen className="w-8 h-8" />
+                        </div>
+                        <div className="text-left">
+                            <div className="text-xs font-black uppercase text-slate-500 group-hover:text-teal-600 tracking-widest mb-1">Curriculum Wipe</div>
+                            <div className="text-[10px] font-bold text-slate-400">Hapus Semua Materi & Tahapan</div>
+                        </div>
                     </button>
                 </div>
 
-                {isCleaningUp && (
-                    <div className="mt-6 flex items-center justify-center gap-3 text-[var(--color-text-muted)]">
-                        <div className="w-5 h-5 border-4 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                        <span>Sedang membersihkan data...</span>
-                    </div>
-                )}
-            </div>
+                <AnimatePresence>
+                    {isCleaningUp && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="mt-12 flex items-center justify-center gap-4 p-4 bg-slate-900 text-white rounded-[1.5rem] shadow-xl"
+                        >
+                            <div className="w-5 h-5 border-3 border-white/20 border-t-white rounded-full animate-spin" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Purging system data...</span>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
         </div>
     );
 };

@@ -16,7 +16,7 @@ const About = () => {
     if (!data) return null;
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="container mx-auto px-4 py-12 max-w-4xl">
             {/* Header */}
             <div className="bg-gradient-to-br from-teal-600 to-teal-700 dark:from-teal-800 dark:to-teal-950 text-white rounded-3xl p-8 md:p-12 mb-12 shadow-xl relative overflow-hidden">
                 <div className="relative z-10">

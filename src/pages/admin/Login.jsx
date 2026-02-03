@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Lock } from 'lucide-react';
+import { Lock, Mail, Key, ArrowLeft, ShieldCheck, Sparkles } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../../utils/cn';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -19,71 +21,130 @@ const LoginPage = () => {
       await contentService.login(email, password);
       navigate('/admin/dashboard');
     } catch (err) {
-      console.error(err);
-      setError('Login gagal. Periksa email dan password.');
+      setError('Akses ditolak. Periksa kredensial anda.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-muted)] flex items-center justify-center p-4">
-      <div className="bg-[var(--color-bg-card)] p-8 rounded-2xl shadow-xl w-full max-w-md border border-[var(--color-border)]">
-        <div className="text-center mb-8">
-          <div className="bg-[var(--color-primary)] w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-white mb-4 shadow-lg shadow-teal-500/20">
-            <Lock className="w-8 h-8" />
-          </div>
-          <h1 className="text-2xl font-bold text-[var(--color-text-main)]">Admin Login</h1>
-          <p className="text-[var(--color-text-muted)]">Masuk untuk mengelola materi.</p>
-        </div>
-
-        <form onSubmit={handleLogin} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-main)] mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-muted)] text-[var(--color-text-main)] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all placeholder-[var(--color-text-muted)]/50"
-              placeholder="admin@example.com"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[var(--color-text-main)] mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-muted)] text-[var(--color-text-main)] focus:ring-2 focus:ring-teal-500 focus:border-teal-500 outline-none transition-all placeholder-[var(--color-text-muted)]/50"
-              placeholder="Masukkan password admin"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm text-center border border-red-100 dark:border-red-900/30">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[var(--color-primary)] hover:opacity-90 text-white py-3 rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50 hover:shadow-teal-500/30 active:scale-95"
-          >
-            {loading ? 'Memproses...' : 'Masuk Dashboard'}
-          </button>
-          
-          <div className="text-center text-xs text-[var(--color-text-muted)] mt-4">
-             Hubungi administrator jika lupa password.
-          </div>
-        </form>
-        <div className="mt-8 pt-6 border-t border-[var(--color-border)] text-center">
-          <Link to="/" className="text-[var(--color-primary)] font-bold hover:underline transition-all text-sm">
-            ← Kembali ke Website Utama
-          </Link>
-        </div>
+    <div className="relative min-h-screen w-full bg-[#030712] flex items-center justify-center p-6 overflow-hidden">
+      {/* Cinematic Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] bg-teal-500/10 blur-[120px] rounded-full animate-aurora"></div>
+        <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-indigo-500/10 blur-[120px] rounded-full animate-aurora [animation-delay:2s]"></div>
+        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-amber-500/5 blur-[120px] rounded-full animate-aurora [animation-delay:4s]"></div>
       </div>
+
+      <motion.div 
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-lg"
+      >
+        <div className="bg-white/5 backdrop-blur-2xl p-12 md:p-16 rounded-[4rem] border border-white/10 shadow-2xl space-y-12">
+          {/* Logo Section */}
+          <div className="text-center space-y-6">
+            <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="relative inline-block"
+            >
+                <div className="absolute inset-0 bg-teal-500 blur-2xl opacity-20 animate-pulse"></div>
+                <div className="relative bg-gradient-to-br from-teal-400 to-indigo-600 w-24 h-24 rounded-[2rem] mx-auto flex items-center justify-center text-white shadow-2xl overflow-hidden group">
+                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <Lock className="w-10 h-10 group-hover:scale-110 transition-transform" />
+                </div>
+            </motion.div>
+            
+            <div className="space-y-2">
+                <h1 className="text-4xl font-black text-white tracking-tight flex items-center justify-center gap-3">
+                   Admin Portal <Sparkles className="w-5 h-5 text-amber-500" />
+                </h1>
+                <p className="text-slate-400 font-medium">Autentikasi diperlukan untuk akses kontrol.</p>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-6">Email Address</label>
+                <div className="relative group/input">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-teal-400 transition-colors">
+                        <Mail className="w-5 h-5" />
+                    </div>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 rounded-[2rem] pl-16 pr-8 py-5 text-white font-bold placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500/50 outline-none transition-all shadow-inner"
+                        placeholder="admin@tarbiyatullughah.id"
+                        required
+                    />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-6">Secured Password</label>
+                <div className="relative group/input">
+                    <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within/input:text-teal-400 transition-colors">
+                        <Key className="w-5 h-5" />
+                    </div>
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full bg-white/[0.03] hover:bg-white/[0.05] border border-white/10 rounded-[2rem] pl-16 pr-8 py-5 text-white font-bold placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500/50 outline-none transition-all shadow-inner"
+                        placeholder="••••••••••••"
+                        required
+                    />
+                </div>
+              </div>
+            </div>
+
+            <AnimatePresence>
+                {error && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="bg-red-500/10 border border-red-500/20 text-red-500 p-5 rounded-[1.5rem] text-sm font-bold flex items-center gap-3 overflow-hidden shadow-lg shadow-red-500/5"
+                    >
+                        <ShieldCheck className="w-5 h-5 shrink-0" />
+                        {error}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            <button
+                type="submit"
+                disabled={loading}
+                className="w-full relative group overflow-hidden"
+            >
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500 to-indigo-600 transition-all group-hover:scale-105 active:scale-95 rounded-[2rem]"></div>
+                <div className="relative py-6 text-white font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3">
+                    {loading ? (
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                        <>Masuk Dashboard <Sparkles className="w-4 h-4" /></>
+                    )}
+                </div>
+            </button>
+          </form>
+
+          {/* Footer */}
+          <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <Link to="/" className="group flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-bold">
+               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+               Website Utama
+            </Link>
+            <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">
+               Port of Al-Azhar © 2024
+            </span>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 };

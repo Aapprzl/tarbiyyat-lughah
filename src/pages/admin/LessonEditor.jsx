@@ -12,6 +12,8 @@ import AnagramGame from '../../components/AnagramGame';
 import CompleteSentenceGame from '../../components/CompleteSentenceGame';
 import UnjumbleGame from '../../components/UnjumbleGame';
 import SpinWheelGame from '../../components/SpinWheelGame';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { cn } from '../../utils/cn';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const LessonEditor = () => {
@@ -284,123 +286,168 @@ const LessonEditor = () => {
     toast.success('Struktur tersimpan! Refresh halaman publik untuk melihat hasil.');
   };
 
-  if (loading) return <div className="p-12 text-center text-gray-500">Memuat Editor...</div>;
+  if (loading) return (
+    <div className="py-24 text-center">
+        <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Menyiapkan Canvas Materi...</p>
+    </div>
+  );
 
   return (
-    <div className="max-w-5xl mx-auto pb-32">
-       {/* Header */}
-      <div className="flex items-center justify-between mb-8 sticky top-0 bg-[var(--color-bg-card)]/95 backdrop-blur z-20 py-4 border-b border-[var(--color-border)] px-4 md:px-0">
-        <div className="flex items-center flex-1 mr-8">
-            <button onClick={() => navigate(isSpecialProgram ? '/admin/programs' : '/admin/dashboard')} className="mr-4 p-2 hover:bg-[var(--color-bg-hover)] rounded-full flex-shrink-0 text-[var(--color-text-muted)]">
+    <div className="max-w-6xl mx-auto pb-32">
+       {/* Premium Canvas Header */}
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-2xl z-20 py-8 border-b border-slate-200 dark:border-white/10 px-6 md:px-0 -mx-6 md:mx-0">
+        <div className="flex items-center flex-1 mr-8 w-full md:w-auto">
+            <button 
+                onClick={() => navigate(isSpecialProgram ? '/admin/programs' : '/admin/dashboard')} 
+                className="mr-6 p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex-shrink-0 text-slate-400 hover:text-teal-500 transition-all hover:shadow-lg"
+            >
                 <ArrowLeft className="w-5 h-5" />
             </button>
-            <div className="w-full">
-                <label className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider block mb-1">JUDUL MATERI</label>
+            <div className="w-full space-y-2">
+                <div className="flex items-center gap-2">
+                    <div className="px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-full text-[10px] font-black uppercase tracking-widest">
+                       {isSpecialProgram ? 'Program Khusus' : 'Kurikulum Utama'}
+                    </div>
+                </div>
                 <input 
                   type="text" 
                   value={topicTitle}
                   onChange={(e) => setTopicTitle(e.target.value)}
-                  className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none w-full placeholder-[var(--color-text-muted)]/50 p-0 focus:ring-0 mb-2 font-arabic"
-                  style={{ fontSize: 'var(--font-arabic-title-size)' }}
-                  placeholder="Nama Materi..."
+                  className="text-3xl font-black text-slate-900 dark:text-white bg-transparent border-none outline-none w-full placeholder-slate-300 dark:placeholder-white/10 p-0 focus:ring-0 tracking-tight font-arabic"
+                  placeholder="Judul Materi..."
                 />
                 <input 
                   type="text" 
                   value={topicDesc}
                   onChange={(e) => setTopicDesc(e.target.value)}
-                  className="text-sm text-[var(--color-text-muted)] bg-transparent border-none outline-none w-full placeholder-[var(--color-text-muted)]/50 p-0 focus:ring-0"
-                  placeholder="Deskripsi singkat materi..."
+                  className="text-base text-slate-500 dark:text-slate-400 bg-transparent border-none outline-none w-full placeholder-slate-300 dark:placeholder-white/10 p-0 focus:ring-0 font-medium"
+                  placeholder="Berikan deskripsi singkat untuk materi ini..."
                 />
             </div>
         </div>
 
-        <button 
-          onClick={handleSave} 
-          disabled={saving}
-          className="flex items-center bg-teal-600 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg hover:bg-teal-700 active:scale-95 transition-all flex-shrink-0 text-sm"
-        >
-          <Save className="w-4 h-4 mr-2" />
-          {saving ? 'Menyimpan...' : 'Simpan'}
-        </button>
+        <div className="flex items-center gap-4 mt-6 md:mt-0 w-full md:w-auto">
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="flex-1 md:flex-none flex items-center justify-center bg-teal-600 text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-teal-500/20 hover:bg-teal-700 active:scale-95 transition-all"
+            >
+              {saving ? (
+                  <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-3"></div>
+              ) : (
+                  <Save className="w-4 h-4 mr-3" />
+              )}
+              {saving ? 'Menyimpan...' : 'Simpan Materi'}
+            </button>
+        </div>
       </div>
 
-      {/* STAGES LIST */}
-      <div className="space-y-12 px-0 md:px-0">
-        {stages.map((stage, stageIndex) => (
-            <div key={stage.id} className="relative">
-                {/* Stage Header */}
-                <div className="flex items-center mb-4 group">
-                    <div className="bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 font-bold px-3 py-1 rounded-lg text-xs mr-3">
-                        TAHAP {stageIndex + 1}
-                    </div>
-                    <input 
-                        className="font-bold text-lg text-[var(--color-text-main)] bg-transparent border-b border-transparent hover:border-[var(--color-border)] focus:border-teal-500 outline-none flex-1 transition-colors px-2 py-1"
-                        value={stage.title}
-                        onChange={(e) => updateStageTitle(stage.id, e.target.value)}
-                        placeholder="Judul Tahapan..."
-                    />
-                    <button 
-                        onClick={() => removeStage(stage.id)}
-                        className="opacity-0 group-hover:opacity-100 p-2 text-[var(--color-text-muted)] hover:text-red-500 transition-all"
-                        title="Hapus Tahapan"
-                    >
-                        <Trash2 className="w-4 h-4" />
-                    </button>
-                </div>
-                
-                {/* Stage Body (Blocks) */}
-                <div className="border-l-0 md:border-l-2 border-[var(--color-border)] pl-0 md:pl-8 space-y-6">
-                    {stage.items.length === 0 ? (
-                        <div className="text-center py-8 border-2 border-dashed border-[var(--color-border)] rounded-xl text-[var(--color-text-muted)] text-sm italic">
-                            Belum ada konten di tahapan ini
-                        </div>
-                    ) : (
-                        stage.items.map((block, blockIdx) => (
-                            <BlockEditor 
-                                key={block.id} 
-                                block={block} 
-                                onRemove={() => removeBlock(stage.id, block.id)} 
-                                onUpdate={(newData) => updateBlock(stage.id, block.id, newData)}
-                                onMoveUp={() => moveBlock(stage.id, block.id, 'up')}
-                                onMoveDown={() => moveBlock(stage.id, block.id, 'down')}
-                                isFirst={blockIdx === 0}
-                                isLast={blockIdx === stage.items.length - 1}
-                                toast={toast}
-                            />
-                        ))
-                    )}
+      {/* CANVAS STAGES */}
+      <LayoutGroup>
+        <div className="space-y-20">
+          {stages.map((stage, stageIndex) => (
+              <motion.div 
+                layout
+                key={stage.id} 
+                className="relative"
+              >
+                  {/* Stage Header Card */}
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
+                      <div className="flex items-center gap-4 flex-1">
+                          <div className="w-14 h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex items-center justify-center text-teal-500 font-black text-xl shadow-sm">
+                             {stageIndex + 1}
+                          </div>
+                          <div className="flex-1">
+                              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1 block">Tingkatan / Tahap</label>
+                              <input 
+                                  className="font-black text-2xl text-slate-900 dark:text-white bg-transparent border-none focus:ring-0 outline-none w-full p-0 tracking-tight"
+                                  value={stage.title}
+                                  onChange={(e) => updateStageTitle(stage.id, e.target.value)}
+                                  placeholder="Judul Tahapan..."
+                              />
+                          </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2">
+                          <button 
+                              onClick={() => removeStage(stage.id)}
+                              className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                              title="Hapus Tahapan"
+                          >
+                              <Trash2 className="w-5 h-5" />
+                          </button>
+                      </div>
+                  </div>
+                  
+                  {/* Stage Body (Blocks Canvas) */}
+                  <div className="space-y-6 relative ml-7 md:ml-10 pl-10 md:pl-12 border-l-2 border-slate-200 dark:border-white/10 py-4">
+                      {/* Decorative Dot */}
+                      <div className="absolute top-0 -left-[9px] w-4 h-4 rounded-full bg-slate-200 dark:bg-white/10 ring-4 ring-slate-50 dark:ring-slate-950"></div>
+                      
+                      <AnimatePresence mode="popLayout">
+                        {stage.items.length === 0 ? (
+                            <motion.div 
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                className="text-center py-16 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[3rem] text-slate-400 flex flex-col items-center gap-4"
+                            >
+                                <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center">
+                                    <Layers className="w-8 h-8 opacity-20" />
+                                </div>
+                                <p className="font-bold uppercase tracking-widest text-[10px]">Canvas masih kosong. Gunakan pemilih di bawah.</p>
+                            </motion.div>
+                        ) : (
+                            stage.items.map((block, blockIdx) => (
+                                <BlockEditor 
+                                    key={block.id} 
+                                    block={block} 
+                                    onRemove={() => removeBlock(stage.id, block.id)} 
+                                    onUpdate={(newData) => updateBlock(stage.id, block.id, newData)}
+                                    onMoveUp={() => moveBlock(stage.id, block.id, 'up')}
+                                    onMoveDown={() => moveBlock(stage.id, block.id, 'down')}
+                                    isFirst={blockIdx === 0}
+                                    isLast={blockIdx === stage.items.length - 1}
+                                    toast={toast}
+                                />
+                            ))
+                        )}
+                      </AnimatePresence>
 
-                    {/* Add Block Controls (Per Stage) */}
-                    <div className="pt-4">
-                        <div className="flex flex-wrap gap-2">
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks" color="text-teal-600" bg="bg-teal-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'vocab')} icon={Table} label="Kosakata" color="text-indigo-600" bg="bg-indigo-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={FileText} label="File" color="text-blue-600" bg="bg-blue-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-teal-600" bg="bg-teal-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Flash Card" color="text-indigo-600" bg="bg-indigo-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi Kalimat" color="text-blue-600" bg="bg-blue-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={ArrowLeft} label="Unjumble" color="text-purple-600" bg="bg-purple-50" />
-                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'spinwheel')} icon={RefreshCcw} label="Spin Wheel" color="text-pink-600" bg="bg-pink-50" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        ))}
-      </div>
+                      <div className="absolute bottom-0 -left-[9px] w-4 h-4 rounded-full bg-slate-200 dark:bg-white/10 ring-4 ring-slate-50 dark:ring-slate-950"></div>
 
-      {/* Add Stage Button (Bottom) */}
-      <div className="mt-16 border-t border-[var(--color-border)] pt-8 text-center">
+                      {/* Floating Block Picker */}
+                      <div className="pt-8">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 block text-center md:text-left">Tambahkan Elemen Materi</label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks" color="text-teal-600" bg="bg-teal-50 dark:bg-teal-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'vocab')} icon={Table} label="Kosakata" color="text-indigo-600" bg="bg-indigo-50 dark:bg-indigo-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={FileText} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Card" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={ArrowLeft} label="Unjumble" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
+                          </div>
+                      </div>
+                  </div>
+              </motion.div>
+          ))}
+        </div>
+      </LayoutGroup>
+
+      {/* Add Stage Action */}
+      <div className="mt-24 border-t border-slate-200 dark:border-white/10 pt-12 text-center">
          <button 
             onClick={addStage}
-            className="inline-flex items-center text-[var(--color-text-muted)] bg-[var(--color-bg-card)] border border-[var(--color-border)] hover:border-teal-500 hover:text-teal-600 px-6 py-3 rounded-full font-medium transition-all shadow-sm hover:shadow-md"
+            className="group inline-flex items-center bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 hover:border-teal-500 hover:text-teal-600 px-10 py-5 rounded-[2.5rem] font-black uppercase tracking-widest text-xs transition-all shadow-sm hover:shadow-xl hover:scale-105 active:scale-95"
          >
-            <Plus className="w-4 h-4 mr-2" />
-            Tambah Tahapan Baru
+            <Plus className="w-5 h-5 mr-3 transition-transform group-hover:rotate-90" />
+            Buka Tahapan Baru
          </button>
       </div>
 
@@ -415,9 +462,12 @@ const LessonEditor = () => {
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
     <button 
         onClick={onClick}
-        className={`${bg} ${color} px-3 py-1.5 rounded-lg flex items-center text-xs font-bold hover:brightness-95 active:scale-95 transition-all`}
+        className={cn(
+            bg, color, 
+            "px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:brightness-95 active:scale-95 transition-all border border-transparent hover:border-current shadow-sm"
+        )}
     >
-        <Icon className="w-3 h-3 mr-1.5" />
+        <Icon className="w-3.5 h-3.5" />
         {label}
     </button>
 );
@@ -458,47 +508,57 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
     };
 
     return (
-        <div className="bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border)] overflow-hidden group hover:shadow-md transition-shadow">
+        <motion.div 
+            layout
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="bg-white dark:bg-white/5 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 overflow-hidden group hover:shadow-xl transition-all"
+        >
             {/* Header / Accordion Trigger */}
             <div 
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-[var(--color-bg-muted)] px-3 py-2 border-b border-[var(--color-border)] flex justify-between items-center cursor-pointer select-none hover:bg-[var(--color-bg-hover)] transition-colors"
-                role="button"
-                tabIndex={0}
+                className={cn(
+                    "px-6 py-4 flex justify-between items-center cursor-pointer select-none transition-all",
+                    isOpen ? "bg-slate-50 dark:bg-white/[0.02]" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.01]"
+                )}
             >
-               <div className="flex items-center gap-3 overflow-hidden">
+               <div className="flex items-center gap-5 overflow-hidden">
                    {/* Icon Badge */}
-                   <div className={`${info.bg} ${info.color} p-1.5 rounded-lg flex-shrink-0`}>
-                       <Icon className="w-4 h-4" />
+                   <div className={cn(
+                       "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all shadow-sm",
+                       isOpen ? `${info.bg} ${info.color} scale-110 shadow-lg shadow-current/10` : "bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:scale-110"
+                   )}>
+                       <Icon className="w-5 h-5" />
                    </div>
                    
                    {/* Title/Label */}
                    <div className="flex flex-col min-w-0">
-                       <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider">{info.label}</span>
-                       <span className="text-sm font-semibold text-[var(--color-text-main)] truncate max-w-[150px] md:max-w-xs block">
+                       <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{info.label}</span>
+                       <span className="text-base font-black text-slate-900 dark:text-white truncate max-w-[200px] md:max-w-md block tracking-tight font-arabic">
                             {getTitlePreview()}
                        </span>
                    </div>
                </div>
 
-               <div className="flex items-center gap-2">
+               <div className="flex items-center gap-3">
                  {/* Move Buttons */}
-                 <div className="flex bg-[var(--color-bg-card)] rounded-lg border border-[var(--color-border)] p-0.5" onClick={(e) => e.stopPropagation()}>
+                 <div className="flex bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 p-1" onClick={(e) => e.stopPropagation()}>
                    <button 
                      onClick={onMoveUp} 
                      disabled={isFirst}
-                     className="p-1 text-[var(--color-text-muted)] hover:text-teal-600 hover:bg-teal-50 rounded-md disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-lg disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke atas"
                    >
-                     <ChevronUp className="w-3.5 h-3.5" />
+                     <ChevronUp className="w-4 h-4" />
                    </button>
                    <button 
                      onClick={onMoveDown} 
                      disabled={isLast}
-                     className="p-1 text-[var(--color-text-muted)] hover:text-teal-600 hover:bg-teal-50 rounded-md disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-lg disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke bawah"
                    >
-                     <ChevronDown className="w-3.5 h-3.5" />
+                     <ChevronDown className="w-4 h-4" />
                    </button>
                  </div>
 
@@ -506,25 +566,34 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                  <button 
                      onClick={(e) => {
                          e.stopPropagation();
-                         const isConfirmed = window.confirm('Yakin ingin menghapus blok ini?');
-                         if (isConfirmed) onRemove();
+                         onRemove();
                      }} 
-                     className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all"
+                     className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
                      title="Hapus Blok"
                  >
-                     <Trash2 className="w-4 h-4" />
+                     <Trash2 className="w-5 h-5" />
                  </button>
                  
                  {/* Toggle Chevron */}
-                 <div className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                    <ChevronDown className="w-4 h-4 text-[var(--color-text-muted)]" />
+                 <div className={cn(
+                     "w-10 h-10 rounded-full flex items-center justify-center transition-all",
+                     isOpen ? "bg-teal-500 text-white rotate-180" : "bg-slate-100 dark:bg-white/5 text-slate-400"
+                 )}>
+                    <ChevronDown className="w-5 h-5" />
                  </div>
                </div>
             </div>
 
             {/* Content Body */}
-            {isOpen && (
-            <div className="p-3 md:p-4 animate-in slide-in-from-top-2 duration-200">
+            <AnimatePresence>
+                {isOpen && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                    >
+                        <div className="px-8 pb-8 pt-4 border-t border-slate-100 dark:border-white/5">
               {/* Reuse logic from original component, simplified for space */}
               
               {/* --- TEXT BLOCK --- */}
@@ -1324,9 +1393,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
               )}
 
 
-            </div>
-            )}
-        </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 

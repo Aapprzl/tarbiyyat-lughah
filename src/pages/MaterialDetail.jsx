@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight } from 'lucide-react';
+import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -12,41 +12,32 @@ import AnagramGame from '../components/AnagramGame';
 import CompleteSentenceGame from '../components/CompleteSentenceGame';
 import UnjumbleGame from '../components/UnjumbleGame';
 import SpinWheelGame from '../components/SpinWheelGame';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../utils/cn';
 
-// Simple Error Boundary Component for local debugging
+// Simple Error Boundary
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
     this.state = { hasError: false, error: null, errorInfo: null };
   }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
   componentDidCatch(error, errorInfo) {
+    this.setState({ errorInfo });
     console.error("MaterialDetail Crash:", error, errorInfo);
-    this.setState({ error, errorInfo });
   }
-
   render() {
     if (this.state.hasError) {
       return (
-        <div className="p-8 text-center bg-red-50 text-red-900 rounded-xl m-4 border border-red-200">
-          <h2 className="text-xl font-bold mb-2">Terjadi Kesalahan (Crash)</h2>
-          <p className="mb-4">Halaman mengalami error saat rendering.</p>
-          <details className="text-left bg-white p-4 rounded border text-xs overflow-auto font-mono">
-            <summary className="cursor-pointer font-bold mb-2">Detail Error</summary>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo && this.state.errorInfo.componentStack}
-          </details>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-          >
-            Muat Ulang
-          </button>
+        <div className="p-12 text-center bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 rounded-[2.5rem] m-8 border border-red-200 dark:border-red-900/30">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+          <h2 className="text-2xl font-black mb-4 uppercase tracking-widest text-red-600">Sistem Mengalami Error</h2>
+          <p className="mb-6 font-medium">Halaman tidak dapat dimuat karena kesalahan teknis.</p>
+          <div className="text-left bg-white dark:bg-black/40 p-6 rounded-2xl border border-red-100 dark:border-red-900/40 text-xs font-mono mb-8 overflow-auto max-h-40">
+             <p className="font-bold text-red-600 mb-2">Technical Info:</p>
+             {this.state.error?.toString()}
+          </div>
+          <button onClick={() => window.location.reload()} className="px-8 py-4 bg-red-600 text-white rounded-2xl font-bold transition-all hover:scale-105 active:scale-95">Muat Ulang Halaman</button>
         </div>
       );
     }
@@ -55,13 +46,8 @@ class ErrorBoundary extends React.Component {
 }
 
 const MaterialDetailContent = () => {
-    // ... existing MaterialDetail component logic ...
-    // Renaming original MaterialDetail to MaterialDetailContent
-    // and exporting wrapped version
-    const { topicId } = useParams();
-
-  
-  // State
+  const { topicId } = useParams();
+  const navigate = useNavigate();
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [parentSection, setParentSection] = useState(null);
@@ -76,9 +62,7 @@ const MaterialDetailContent = () => {
         window.scrollTo(0, 0);
         setIsCategoryView(false);
         setCategoryTopics([]);
-        console.log(`[MaterialDetail] Loading topic: ${topicId}`);
 
-        // 1. Get Metadata from Curriculum (via Service)
         const curr = await contentService.getCurriculum();
         let foundTopic = null;
         let foundSection = null;
@@ -92,11 +76,8 @@ const MaterialDetailContent = () => {
             }
         }
         
-        // 2. If not found in Curriculum, check Special Programs (Topics OR Categories)
         if (!foundTopic) {
             const progs = await contentService.getSpecialPrograms();
-            
-            // Check if it's a Topic in Special Programs
             for (const category of progs) {
                 if (category.topics) {
                     const t = category.topics.find(t => t.id.toLowerCase() === topicId.toLowerCase());
@@ -108,11 +89,10 @@ const MaterialDetailContent = () => {
                 }
             }
 
-            // Check if it is a Category ID itself (Program Landing Page)
             if (!foundTopic) {
                 const foundCategory = progs.find(c => c.id.toLowerCase() === topicId.toLowerCase());
                 if (foundCategory) {
-                    foundTopic = foundCategory; // Use Category as "Topic" for header display
+                    foundTopic = foundCategory;
                     setIsCategoryView(true);
                     setCategoryTopics(foundCategory.topics || []);
                     foundSection = { title: 'Program Unggulan', icon: 'Star' };
@@ -120,14 +100,11 @@ const MaterialDetailContent = () => {
             }
         }
 
-        console.log(`[MaterialDetail] Found topic/category:`, foundTopic);
         setTopic(foundTopic);
         setParentSection(foundSection);
 
-        // 3. Get Content (Only if it's a regular topic)
         if (foundTopic && !isCategoryView) {
             const data = await contentService.getLessonContent(topicId);
-            console.log(`[MaterialDetail] Fetched content length: ${data?.length || 0}`);
             setContent(data);
         }
       } catch (err) {
@@ -141,20 +118,21 @@ const MaterialDetailContent = () => {
 
   if (!topic && !loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-6">
-        <AlertCircle className="w-16 h-16 text-red-300 mb-4" />
-        <h2 className="text-2xl font-bold text-gray-500 mb-2">Materi tidak ditemukan</h2>
-        <p className="text-gray-400 mb-6 max-w-sm">ID Materi: <code>{topicId}</code> mungkin sudah berubah atau dihapus.</p>
-        <Link to="/materi" className="inline-flex items-center px-6 py-3 bg-[var(--color-primary)] text-white rounded-xl hover:opacity-90 transition-all font-medium">
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Lihat Semua Materi
-        </Link>
+      <div className="flex flex-col items-center justify-center min-h-[70vh] text-center p-12">
+        <div className="w-24 h-24 bg-red-50 dark:bg-red-900/10 rounded-full flex items-center justify-center mb-8">
+            <AlertCircle className="w-12 h-12 text-red-500" />
+        </div>
+        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Konten Hilang dari Radar</h2>
+        <p className="text-slate-500 max-w-sm mb-10 leading-relaxed font-medium">Maaf, materi yang Anda cari tidak dapat ditemukan. Mungkin telah dipindahkan atau dihapus.</p>
+        <button onClick={() => navigate('/materi')} className="flex items-center gap-3 px-10 py-5 bg-teal-500 text-white rounded-[2rem] font-bold shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all">
+          <ArrowLeft className="w-5 h-5" />
+          Kembali ke Kurikulum
+        </button>
       </div>
     );
   }
 
-  // Detect content type (Only for regular topics)
-  const isJson = content && content.trim().startsWith('[');
+  const isJson = content && typeof content === 'string' && content.trim().startsWith('[');
   let displayData = []; 
 
   if (isJson && !isCategoryView) {
@@ -162,8 +140,8 @@ const MaterialDetailContent = () => {
       const parsed = JSON.parse(content);
       if (Array.isArray(parsed) && parsed.length > 0 && Array.isArray(parsed[0].items)) {
           displayData = parsed;
-      } else {
-          displayData = [{ id: 'legacy', title: '', items: parsed }];
+      } else if (Array.isArray(parsed)) {
+          displayData = [{ id: 'legacy', title: 'Materi Utama', items: parsed }];
       }
     } catch (e) {
       console.error("Failed to parse content JSON", e);
@@ -171,195 +149,243 @@ const MaterialDetailContent = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-0 md:px-4 pb-24 min-h-[100vh]">
-      {/* Breadcrumb / Nav */}
-      <div className="flex items-center text-sm text-[var(--color-text-muted)] mb-8 py-4">
-        <Link to="/materi" className="hover:text-[var(--color-primary)] flex items-center transition-colors">
-          <ArrowLeft className="w-4 h-4 mr-1.5" />
-          Materi
-        </Link>
-        <span className="mx-2 opacity-30 select-none">/</span>
-        <span className="text-[var(--color-text-main)] font-semibold">{parentSection?.title || 'Program'}</span>
-      </div>
+    <div className="container mx-auto px-4 py-12 max-w-5xl pb-40">
+      {/* Navigation & Header */}
+      <div className="relative mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
+         {/* Breadcrumb */}
+         <nav className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 px-4 md:px-0">
+            <Link to="/materi" className="hover:text-teal-600 transition-colors">Materi</Link>
+            <ChevronRight className="w-3 h-3 opacity-30" />
+            <span className="text-slate-600 dark:text-slate-200">{parentSection?.title || 'Program'}</span>
+         </nav>
 
-      {/* Header Section */}
-      <div className="bg-[var(--color-bg-card)] rounded-none md:rounded-3xl shadow-sm border-y md:border border-[var(--color-border)] p-5 md:p-12 mb-6 md:mb-12 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 rounded-full -mr-32 -mt-32 opacity-30 blur-3xl transition-all group-hover:bg-teal-500/10"></div>
-        
-        <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
-            <div className="flex-1">
-                <div className="w-16 h-16 bg-teal-500/10 rounded-2xl flex items-center justify-center text-[var(--color-primary)] mb-8 shadow-sm">
-                     <BookOpen className="w-8 h-8" />
-                </div>
-                
-                <h1 className="text-3xl md:text-5xl font-bold text-[var(--color-text-main)] mb-6 leading-[1.2] arabic-title tracking-tight">
-                    {topic?.title || 'Loading...'}
-                </h1>
-                
-                {topic?.desc && (
-                    <p className="text-xl text-[var(--color-text-muted)] leading-relaxed max-w-2xl font-light">
-                        {topic.desc}
-                    </p>
-                )}
-            </div>
+         {/* Hero Display */}
+         <div className="relative bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px] -mr-40 -mt-40"></div>
             
-            {contentService.isAuthenticated() && !isCategoryView && (
-                <Link to={`/admin/edit/${topicId}`} className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg-muted)] text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-bg-card)] rounded-xl transition-all shadow-sm border border-[var(--color-border)]" title="Edit Materi">
-                    <Edit className="w-4 h-4" />
-                    <span className="text-sm font-medium">Edit Konten</span>
-                </Link>
-            )}
-        </div>
+            <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start justify-between">
+               <div className="flex-1">
+                  <motion.div 
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20 mb-8 text-white"
+                  >
+                     <BookOpen className="w-7 h-7" />
+                  </motion.div>
+                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight arabic-title">
+                     {topic?.title || 'Memuat Judul...'}
+                  </h1>
+                  {topic?.desc && (
+                     <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
+                        {topic.desc}
+                     </p>
+                  )}
+               </div>
+
+               {contentService.isAuthenticated() && !isCategoryView && (
+                  <Link to={`/admin/edit/${topicId}`} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:scale-105 active:scale-95">
+                      <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      <span>Edit Konten</span>
+                  </Link>
+               )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                   <Clock className="w-4 h-4" />
+                   {isCategoryView ? 'Daftar Modul' : 'Materi Terstruktur'}
+                </div>
+                <div className="flex items-center gap-2 text-xs font-bold text-teal-500 uppercase tracking-widest">
+                   <CheckCircle className="w-4 h-4" />
+                   Akses Terjamin
+                </div>
+            </div>
+         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="relative">
+      {/* Main Content Area */}
       {loading ? (
-         <div className="flex flex-col items-center justify-center py-20 gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--color-primary)]"></div>
-            <p className="text-[var(--color-text-muted)] font-medium animate-pulse">Memuat materi...</p>
+         <div className="flex flex-col items-center justify-center py-40 gap-4">
+            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-14 h-14 border-4 border-teal-500/20 border-t-teal-500 rounded-full" />
+            <p className="text-slate-400 font-black tracking-widest text-xs uppercase animate-pulse">Menyiapkan Materi...</p>
          </div>
       ) : isCategoryView ? (
-        // --- CATEGORY VIEW: Topic List ---
-        // SAFEGUARD: Check if categoryTopics is valid array
-        <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-[var(--color-text-main)] mb-6 flex items-center">
-                <BookOpen className="w-6 h-6 mr-3 text-[var(--color-primary)]" />
-                Daftar Topik
+        /* CATEGORY LANDING PAGE */
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-4 md:px-0">
+            <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+               <div className="h-px w-8 bg-slate-200 dark:bg-white/10"></div>
+               Daftar Modul Pembelajaran
             </h3>
             
             {!Array.isArray(categoryTopics) || categoryTopics.length === 0 ? (
-                <div className="text-center py-12 bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)]">
-                    <p className="text-[var(--color-text-muted)] mb-4">Belum ada topik materi dalam program ini.</p>
+                <div className="text-center py-20 bg-slate-50 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+                    <p className="text-slate-400 font-bold">Belum ada topik materi dalam program ini.</p>
                 </div>
             ) : (
                 <div className="grid gap-4">
                     {categoryTopics.filter(t => t).map((item, idx) => (
                         <Link  
-                            key={item.id || idx} // Safety fallback for key
+                            key={item.id || idx} 
                             to={`/program/${item.id}`} 
-                            className="bg-[var(--color-bg-card)] p-6 rounded-2xl border border-[var(--color-border)] hover:border-teal-400 hover:shadow-lg transition-all flex items-center justify-between group"
+                            className="group flex items-center justify-between p-8 bg-white dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 hover:border-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/10 transition-all overflow-hidden relative"
                         >
-                             <div className="flex items-start gap-4">
-                                <span className="flex-shrink-0 w-8 h-8 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center font-bold text-sm mt-0.5">
-                                    {idx + 1}
+                             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/0 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             <div className="flex items-center gap-6 relative z-10">
+                                <span className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:bg-teal-500 group-hover:text-white flex items-center justify-center font-black transition-all">
+                                    {String(idx + 1).padStart(2, '0')}
                                 </span>
                                 <div>
-                                    <h4 className="text-lg font-bold text-[var(--color-text-main)] group-hover:text-teal-600 transition-colors arabic-index-topic">
-                                        {item.title || 'Tanpa Judul'}
+                                    <h4 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors arabic-index-topic">
+                                        {item.title || 'Materi Tanpa Judul'}
                                     </h4>
-                                    {item.desc && (
-                                        <p className="text-[var(--color-text-muted)] text-sm mt-1 mb-0">{item.desc}</p>
-                                    )}
+                                    {item.desc && <p className="text-slate-500 text-sm mt-1 font-medium">{item.desc}</p>}
                                 </div>
                              </div>
-                             <div className="flex items-center text-sm font-medium text-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-[-10px] group-hover:translate-x-0">
-                                Mulai <ArrowRight className="w-4 h-4 ml-1" />
+                             <div className="hidden md:flex items-center gap-2 text-xs font-black uppercase text-teal-600 tracking-widest opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all relative z-10">
+                                Mulai Belajar <ArrowRight className="w-4 h-4" />
                              </div>
                         </Link>
                     ))}
                 </div>
             )}
-        </div>
+        </motion.div>
       ) : !content ? (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-2xl p-8 md:p-10 mb-12 text-amber-800 dark:text-amber-400 flex items-start shadow-sm">
-          <AlertCircle className="w-8 h-8 mr-6 flex-shrink-0 mt-1 opacity-80" />
-          <div className="max-w-xl">
-            <h4 className="text-xl font-bold mb-2">Materi Sedang Disiapkan</h4>
-            <p className="text-lg opacity-90 leading-relaxed font-light">
-              Maaf, konten untuk materi <strong>{topic?.title}</strong> belum tersedia secara lengkap di database kami saat ini. Silakan kembali lagi nanti atau hubungi pengajar.
-            </p>
-          </div>
-        </div>
+        /* NO CONTENT FALLBACK */
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mx-4 md:mx-0 p-12 md:p-20 text-center bg-amber-50 dark:bg-amber-900/10 rounded-[3rem] border border-amber-100 dark:border-amber-900/30">
+          <AlertCircle className="w-16 h-16 text-amber-400 mx-auto mb-8" />
+          <h4 className="text-3xl font-black text-amber-900 dark:text-amber-100 mb-4 tracking-tight">Materi Sedang Disiapkan</h4>
+          <p className="text-lg text-amber-800/70 dark:text-amber-400/70 max-w-lg mx-auto leading-relaxed font-medium">
+            Kami sedang meracik konten terbaik untuk modul ini. Silakan kunjungi kembali dalam waktu dekat atau hubungi instruktur Anda.
+          </p>
+        </motion.div>
       ) : isJson ? (
-        <div className="space-y-12">
+        /* STRUCTURED JSON CONTENT */
+        <div className="space-y-16 px-4 md:px-0">
           {displayData.map((stage, stageIdx) => (
-             <div key={stage.id || stageIdx} className="bg-[var(--color-bg-card)] rounded-none md:rounded-3xl shadow-sm border-y md:border border-[var(--color-border)] p-4 md:p-12 relative">
-                {/* Stage Header */}
-                <div className="flex items-center gap-6 mb-12 border-b border-[var(--color-border)] pb-8">
-                     <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white font-bold px-5 py-2 rounded-xl text-sm tracking-widest shadow-lg shadow-teal-500/20 uppercase">
-                         Tahap {stageIdx + 1}
-                     </div>
-                     <h2 className="text-2xl md:text-3xl font-bold text-[var(--color-text-main)]">
-                         {stage.title === 'Materi Utama' ? 'Materi Pembelajaran' : stage.title}
-                     </h2>
+             <motion.div 
+               key={stage.id || stageIdx}
+               initial={{ opacity: 0, y: 30 }}
+               whileInView={{ opacity: 1, y: 0 }}
+               viewport={{ once: true, margin: "-100px" }}
+               className="relative"
+             >
+                <div className="flex items-center gap-6 mb-12">
+                   <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-white/10"></div>
+                   <div className="px-6 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">
+                      Tahap {stageIdx + 1}: {stage.title === 'Materi Utama' ? 'Pembelajaran' : stage.title}
+                   </div>
+                   <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200 dark:to-white/10"></div>
                 </div>
                 
-                {/* Render Blocks */}
-                <div className="space-y-8">
-                    {stage.items.map((block) => (
-                        <ContentBlock key={block.id} block={block} />
+                <div className="space-y-10">
+                    {stage.items.map((block, bIdx) => (
+                        <ContentBlock key={block.id || bIdx} block={block} />
                     ))}
                     {stage.items.length === 0 && (
-                        <p className="text-[var(--color-text-muted)] italic text-center py-8 bg-[var(--color-bg-main)] rounded-xl border border-dashed border-[var(--color-border)]">
-                            Belum ada konten di tahapan ini.
-                        </p>
+                        <div className="text-center py-20 bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">
+                           <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Konten Belum Tersedia</p>
+                        </div>
                     )}
                 </div>
-             </div>
+             </motion.div>
           ))}
+          
+          {/* Finish Section */}
+          <div className="pt-20 text-center">
+              <div className="inline-block p-4 rounded-3xl bg-teal-500/10 mb-8">
+                 <CheckCircle className="w-12 h-12 text-teal-500" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-widest">Selesai Membaca?</h3>
+              <p className="text-slate-500 font-medium mb-10">Anda telah menyelesaikan sesi pembelajaran ini. Bagus!</p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                 <button onClick={() => navigate('/materi')} className="w-full sm:w-auto px-10 py-5 bg-white dark:bg-white/5 text-slate-900 dark:text-white border border-slate-200 dark:border-white/10 rounded-2xl font-bold transition-all hover:bg-slate-50 dark:hover:bg-white/10">Kembali ke Daftar</button>
+                 <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="w-full sm:w-auto px-10 py-5 bg-teal-500 text-white rounded-2xl font-bold shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all">Kembali ke Atas</button>
+              </div>
+          </div>
         </div>
       ) : (
-        /* Legacy Markdown fallback */
-        <article className="bg-[var(--color-bg-card)] rounded-3xl shadow-sm border border-[var(--color-border)] p-8 md:p-12 prose prose-lg prose-teal dark:prose-invert max-w-none shadow-premium transition-all hover:shadow-premium-hover">
+        /* LEGACY MARKDOWN CONTENT */
+        <article className="mx-4 md:mx-0 bg-white dark:bg-white/5 rounded-[3.5rem] p-10 md:p-20 border border-slate-200 dark:border-white/10 shadow-2xl prose prose-xl prose-teal dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:font-medium prose-p:leading-relaxed">
           <ReactMarkdown>{content}</ReactMarkdown>
         </article>
       )}
-      </div>
     </div>
   );
 };
 
-// --- Sub Component: Block Renderer ---
+// --- MODERN CONTENT BLOCK RENDERER ---
 const ContentBlock = ({ block }) => {
+    if (!block || !block.data) return null;
+
     switch (block.type) {
         case 'text':
             return (
-                <div className="prose prose-lg prose-teal dark:prose-invert max-w-none text-[var(--color-text-main)]">
-                    {block.data.title && <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-4">{block.data.title}</h3>}
-                    <p className="whitespace-pre-wrap leading-relaxed opacity-90">{block.data.content}</p>
+                <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+                    {block.data?.title && <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
+                       <FileText className="w-6 h-6 text-teal-500" /> 
+                       {block.data.title}
+                    </h3>}
+                    <div className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap">
+                        {block.data?.content}
+                    </div>
                 </div>
             );
         case 'vocab':
             return (
-                <div className="my-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {block.data.items?.map((item, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-[var(--color-bg-card)] p-4 rounded-xl shadow-sm border border-[var(--color-border)]">
-                                <span className="text-[var(--color-text-muted)] font-medium">{item.indo}</span>
-                                <span className="font-bold text-[var(--color-primary)] dir-rtl arabic-content">{item.arab}</span>
-                            </div>
+                <div className="space-y-6">
+                    <h4 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] font-sans flex items-center gap-3">
+                       <Bookmark className="w-4 h-4" /> Kosakata Baru
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {block.data?.items?.map((item, idx) => (
+                            <motion.div 
+                              key={idx} 
+                              whileHover={{ scale: 1.02 }}
+                              className="group flex flex-col items-center justify-center p-8 bg-white dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 hover:border-teal-500/30 transition-all text-center relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-20 h-20 bg-teal-500/5 rounded-full -ml-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                <span className="text-3xl font-black text-slate-900 dark:text-white mb-4 dir-rtl arabic-content leading-relaxed">
+                                   {item.arab}
+                                </span>
+                                <div className="h-px w-12 bg-slate-200 dark:bg-white/10 mx-auto mb-4"></div>
+                                <span className="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-wide">
+                                   {item.indo}
+                                </span>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
             );
         case 'alert':
             return (
-                <div className="bg-amber-100/50 dark:bg-amber-900/20 border-l-4 border-amber-400 p-4 rounded-r-lg my-6 flex items-start">
-                    <AlertCircle className="w-6 h-6 text-amber-600 dark:text-amber-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <p className="text-amber-900 dark:text-amber-100 leading-relaxed font-medium">{block.data.content}</p>
+                <div className="bg-teal-50 dark:bg-teal-900/10 border-l-8 border-teal-500 p-8 rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
+                    <div className="w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                       <AlertCircle className="w-6 h-6 text-teal-500" />
+                    </div>
+                    <div className="flex-1">
+                       <h5 className="font-black text-teal-900 dark:text-teal-100 uppercase tracking-widest text-xs mb-2">Penting Diketahui</h5>
+                       <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-bold">{block.data?.content}</p>
+                    </div>
                 </div>
             );
         case 'youtube':
             return (
-                <div className="my-8">
-                    {block.data.title && <h4 className="font-bold text-[var(--color-text-main)] mb-2">{block.data.title}</h4>}
-                    <div className="aspect-video bg-[var(--color-bg-main)] rounded-xl overflow-hidden shadow-sm">
+                <div className="space-y-6">
+                    {block.data?.title && <h4 className="text-xs font-black text-red-500 uppercase tracking-[0.3em] flex items-center gap-3"><Youtube className="w-4 h-4" /> {block.data.title}</h4>}
+                    <div className="aspect-video bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/5 relative group">
                         {(() => {
-                            const url = block.data.url || '';
+                            const url = block.data?.url || '';
                             let videoId = '';
                             if (url.includes('youtube.com/watch?v=')) videoId = url.split('v=')[1]?.split('&')[0];
                             else if (url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1];
                             
                             return videoId ? (
-                                <iframe 
-                                src={`https://www.youtube.com/embed/${videoId}`}
-                                title="YouTube video player"
-                                className="w-full h-full"
-                                allowFullScreen
-                                ></iframe>
+                                <iframe src={`https://www.youtube.com/embed/${videoId}`} title="YouTube video" className="w-full h-full" allowFullScreen></iframe>
                             ) : (
-                                <div className="w-full h-full flex items-center justify-center text-gray-400">Link Video Tidak Valid</div>
+                                <div className="w-full h-full flex flex-col items-center justify-center text-slate-500">
+                                   <Youtube className="w-12 h-12 mb-4 opacity-20" />
+                                   <span className="font-bold uppercase tracking-widest text-xs">Link Tidak Valid</span>
+                                </div>
                             );
                         })()}
                     </div>
@@ -367,79 +393,42 @@ const ContentBlock = ({ block }) => {
             );
         case 'pdf':
             return (
-                <div className="my-8">
-                    <div className="flex items-center justify-between mb-4">
-                        {block.data.title && <h4 className="font-bold text-[var(--color-text-main)]">{block.data.title}</h4>}
-                        {block.data.allowDownload !== false && block.data.url && (
-                            <a 
-                                href={block.data.url} 
-                                download={block.data.fileName || "Materi.pdf"}
-                                className="flex items-center text-sm font-medium text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
-                            >
-                                <Download className="w-4 h-4 mr-2" />
-                                Download PDF
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between px-4 md:px-0">
+                        <h4 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] flex items-center gap-3">
+                           <FileText className="w-4 h-4" /> {block.data?.title || 'Dokumen Materi'}
+                        </h4>
+                        {block.data?.allowDownload !== false && block.data?.url && (
+                            <a href={block.data.url} download className="flex items-center gap-2 text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest hover:underline transition-all">
+                                <Download className="w-4 h-4" /> Download PDF
                             </a>
                         )}
                     </div>
-                    {block.data.url ? (
-                        <div className="rounded-xl overflow-hidden border border-[var(--color-border)]">
-                            <PdfViewer src={block.data.url} height={500} />
-                        </div>
-                    ) : (
-                        <div className="flex items-center justify-center h-32 bg-[var(--color-bg-main)] rounded-xl text-[var(--color-text-muted)]">
-                            Preview PDF tidak tersedia
-                        </div>
-                    )}
+                    <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl bg-white dark:bg-white/5">
+                        <PdfViewer fileUrl={block.data?.url} height={600} />
+                    </div>
                 </div>
             );
         case 'audio':
             return (
-                <div className="my-8">
-                     <AudioPlayer src={block.data.url} title={block.data.title || 'Audio Pembelajaran'} />
+                <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 shadow-sm">
+                    <AudioPlayer src={block.data?.url} title={block.data?.title || 'Audio Pembelajaran'} />
                 </div>
             );
         case 'matchup':
-            return (
-                <div className="my-8">
-                     <MatchUpGame pairs={block.data.pairs} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><MatchUpGame pairs={block.data?.pairs} title={block.data?.title} /></div>;
         case 'quiz':
-            return (
-                <div className="my-8">
-                     <QuizGame questions={block.data.questions} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><QuizGame questions={block.data?.questions} title={block.data?.title} /></div>;
         case 'flashcard':
-            return (
-                <div className="my-8">
-                     <FlashCardGame items={block.data.items} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><FlashCardGame items={block.data?.items} title={block.data?.title} /></div>;
         case 'anagram':
-            return (
-                <div className="my-8">
-                     <AnagramGame questions={block.data.questions} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><AnagramGame questions={block.data?.questions} title={block.data?.title} /></div>;
         case 'completesentence':
-            return (
-                <div className="my-8">
-                     <CompleteSentenceGame questions={block.data.questions} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><CompleteSentenceGame questions={block.data?.questions} title={block.data?.title} /></div>;
         case 'unjumble':
-            return (
-                <div className="my-8">
-                     <UnjumbleGame questions={block.data.questions} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><UnjumbleGame questions={block.data?.questions} title={block.data?.title} /></div>;
         case 'spinwheel':
-            return (
-                <div className="my-8">
-                     <SpinWheelGame items={block.data.items} title={block.data.title} />
-                </div>
-            );
+            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><SpinWheelGame items={block.data?.items} title={block.data?.title} /></div>;
         default:
             return null;
     }

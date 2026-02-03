@@ -1,25 +1,30 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { useTheme } from '../components/ThemeProvider';
-import { LayoutDashboard, BookOpen, LogOut, Layout, Star, Info, Shield, Type, User, Home, Menu, Sun, Moon, Database } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, Layout, Star, Info, Shield, Type, User, Home, Menu, Sun, Moon, Database, ChevronRight, Sparkles, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../utils/cn';
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Listen for auth state
     const unsubscribe = contentService.onAuthStateChange((user) => {
       if (!user) {
          navigate('/admin/login');
       }
       setLoading(false);
     });
-
     return () => unsubscribe();
+  }, [navigate]);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
   }, [navigate]);
 
   const handleLogout = async () => {
@@ -27,137 +32,161 @@ const AdminLayout = () => {
     navigate('/admin/login');
   };
 
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false); // Close menu on route change
-  }, [navigate]);
-
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-muted)]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="relative">
+            <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
+            <LayoutDashboard className="absolute inset-0 m-auto w-6 h-6 text-teal-500 animate-pulse" />
+        </div>
       </div>
     );
   }
 
-  return (
-    <div className="min-h-screen bg-[var(--color-bg-muted)] flex" style={{ fontFamily: 'var(--font-latin)' }}>
-      {/* Mobile Sidebar Overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 md:hidden glass"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Admin Sidebar (Desktop & Mobile) */}
-      <aside className={`
-        fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex-col border-r border-slate-800 font-sans transition-transform duration-300 md:translate-x-0 md:static md:flex
-        ${isMobileMenuOpen ? 'translate-x-0 flex' : '-translate-x-full'}
-      `}>
-        <div className="p-6 border-b border-slate-800 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold">Admin Panel</h2>
-            <p className="text-xs text-slate-400">Bahasa Arab Praktis</p>
+  const NavItem = ({ to, icon: Icon, label, target }) => (
+    <NavLink 
+      to={to} 
+      target={target}
+      className={({ isActive }) => `
+        group relative flex items-center px-4 py-4 rounded-2xl transition-all duration-500
+        ${isActive 
+          ? 'bg-teal-600 text-white shadow-xl shadow-teal-500/20 translate-x-1' 
+          : 'text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] hover:translate-x-1'}
+      `}
+    >
+      {({ isActive }) => (
+        <>
+          <div className={cn(
+              "w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-colors duration-500",
+              isActive ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 group-hover:text-teal-400 group-hover:bg-teal-500/10"
+          )}>
+            <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
           </div>
-          <button onClick={() => setIsMobileMenuOpen(false)} className="md:hidden text-slate-400 hover:text-white">
-            <LayoutDashboard className="w-5 h-5 rotate-45" /> {/* Close Icon alternative */}
-          </button>
+          <span className="font-bold text-sm tracking-tight flex-1">{label}</span>
+          {isActive && (
+            <motion.div 
+              layoutId="activeTab"
+              className="absolute right-3 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_white]"
+            />
+          )}
+          {!isActive && <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-40 -translate-x-2 group-hover:translate-x-0 transition-all text-teal-400" />}
+        </>
+      )}
+    </NavLink>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans">
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Admin Sidebar */}
+      <aside className={`
+        fixed inset-y-4 left-4 z-50 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:static md:m-4 md:h-[calc(100vh-2rem)]
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)]'}
+      `}>
+        {/* Profile Header */}
+        <div className="p-8 pb-6">
+          <div className="flex items-center gap-4 mb-8">
+            <div className="w-12 h-12 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20">
+               <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-black text-slate-900 dark:text-white leading-none mb-1">Admin Panel</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-teal-500">Workspace V2.5</p>
+            </div>
+          </div>
+          
+          <div className="h-px w-full bg-gradient-to-r from-slate-200 dark:from-white/10 via-slate-100 dark:via-white/5 to-transparent"></div>
         </div>
         
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <NavLink 
-            to="/admin/dashboard" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <LayoutDashboard className="w-5 h-5 mr-3" />
-            Dashboard
-          </NavLink>
-          <NavLink 
-            to="/admin/programs" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <Star className="w-5 h-5 mr-3" />
-            Program Khusus
-          </NavLink>
-          <NavLink 
-            to="/admin/home-editor" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <Layout className="w-5 h-5 mr-3" />
-            Editor Beranda
-          </NavLink>
-          <NavLink 
-            to="/admin/about-cms" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <Info className="w-5 h-5 mr-3" />
-            Editor Tentang Kami
-          </NavLink>
-          <NavLink
-            to="/admin/profile-editor"
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>
-            <User className="w-5 h-5 mr-3" />
-            Editor Profil
-          </NavLink>
-          <NavLink
-            to="/admin/db-migration"
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}>
-            <Database className="w-5 h-5 mr-3" />
-            Migrasi Database
-          </NavLink>
-          <NavLink 
-            to="/admin/font-editor" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <Type className="w-5 h-5 mr-3" />
-            Font Arab
-          </NavLink>
-          <NavLink 
-            to="/admin/copyright" 
-            className={({ isActive }) => `flex items-center px-4 py-3 rounded-lg transition-colors ${isActive ? 'bg-slate-800 text-teal-400' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
-          >
-            <Shield className="w-5 h-5 mr-3" />
-            Editor Hak Cipta
-          </NavLink>
-          <Link to="/" target="_blank" className="flex items-center px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
-            <Home className="w-5 h-5 mr-3" />
-            Lihat Website
-          </Link>
+        {/* Navigation */}
+        <nav className="flex-1 p-6 space-y-2 overflow-y-auto custom-scrollbar">
+          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Menu Utama</div>
+          <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
+          <NavItem to="/admin/programs" icon={Star} label="Program Khusus" />
+          
+          <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
+          <NavItem to="/admin/home-editor" icon={Layout} label="Editor Beranda" />
+          <NavItem to="/admin/about-cms" icon={Info} label="Editor Tentang" />
+          <NavItem to="/admin/profile-editor" icon={User} label="Editor Profil" />
+          
+          <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
+          <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
+          <NavItem to="/admin/db-migration" icon={Database} label="Migrasi DB" />
+          <NavItem to="/admin/copyright" icon={Shield} label="Hak Cipta" />
+          
+          <div className="pt-8 px-4">
+             <Link to="/" target="_blank" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
+               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-teal-500/10 transition-colors">
+                  <Home className="w-4 h-4" />
+               </div>
+               <span className="text-xs font-bold uppercase tracking-widest">Lihat Website</span>
+             </Link>
+          </div>
         </nav>
 
-        <div className="p-4 border-t border-slate-800 space-y-2">
-           <button 
-             onClick={toggleTheme}
-             className="flex items-center w-full px-4 py-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
-           >
-             {theme === 'dark' ? <Sun className="w-5 h-5 mr-3" /> : <Moon className="w-5 h-5 mr-3" />}
-             Mode {theme === 'dark' ? 'Terang' : 'Gelap'}
-           </button>
-          
-           <button 
-            onClick={handleLogout}
-            className="flex items-center w-full px-4 py-2 text-red-400 hover:bg-slate-800 rounded-lg transition-colors"
-           >
-            <LogOut className="w-5 h-5 mr-3" />
-            Keluar
-           </button>
+        {/* Footer Actions */}
+        <div className="p-6 mt-auto">
+           <div className="bg-slate-50 dark:bg-white/5 rounded-3xl p-4 border border-slate-200 dark:border-white/5">
+              <div className="flex items-center justify-between mb-4">
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center">
+                       <User className="w-4 h-4 text-slate-400" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">Admin Utama</span>
+                 </div>
+                 <button 
+                  onClick={toggleTheme}
+                  className="p-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-white/10 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
+                 >
+                   {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                 </button>
+              </div>
+              
+              <button 
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all font-black uppercase tracking-widest text-[10px] border border-red-500/20"
+              >
+                <LogOut className="w-4 h-4" /> Keluar Sesi
+              </button>
+           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto h-screen w-full">
-        <header className="bg-[var(--color-bg-card)] shadow-sm h-16 flex items-center justify-between px-4 md:hidden border-b border-[var(--color-border)] sticky top-0 z-30">
-           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 -ml-2 text-[var(--color-text-main)]">
-             <Menu className="w-6 h-6" />
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Sticky Header (Mobile Only) */}
+        <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-white/5 sticky top-0 z-30">
+           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-xl">
+             <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
            </button>
-           <h2 className="font-bold text-[var(--color-text-main)] truncate mx-2">Admin Panel</h2>
-           <button onClick={handleLogout} className="p-2 -mr-2"><LogOut className="w-5 h-5 text-[var(--color-text-muted)]" /></button>
+           <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-teal-500" />
+              <span className="font-black text-slate-900 dark:text-white tracking-tight">ADMIN PANEL</span>
+           </div>
+           <div className="w-10"></div> {/* Spacer */}
         </header>
         
-        <div className="p-4 md:p-8 max-w-5xl mx-auto">
-          <Outlet />
+        {/* Content Wrapper */}
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-12 custom-scrollbar">
+           <motion.div 
+             initial={{ opacity: 0, y: 10 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.4 }}
+             className="max-w-6xl mx-auto"
+           >
+              <Outlet />
+           </motion.div>
         </div>
       </main>
     </div>

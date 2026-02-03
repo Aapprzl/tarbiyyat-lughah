@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Star, Users, ArrowRight, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Shield, X } from 'lucide-react';
+import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
+import { AuroraBackground } from '../components/animations/AuroraBackground';
+import { SplitText } from '../components/animations/SplitText';
+import { BentoGrid, BentoGridItem } from '../components/animations/BentoGrid';
+import { motion } from 'framer-motion';
+import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile
+  BookOpen, Star, Sparkles, Globe, Brain, Zap, PlayCircle
 };
 
 const Home = () => {
@@ -16,127 +21,177 @@ const Home = () => {
 
   useEffect(() => {
     const load = async () => {
-      // Load Programs
       const progs = await contentService.getSpecialPrograms();
       setSpecialPrograms(progs);
 
-      // Load Home Config
       const conf = await contentService.getHomeConfig();
       setConfig(conf);
       
-      // Load Copyright
       const cp = await contentService.getCopyrightConfig();
       setCopyrightConfig(cp);
     };
     load();
   }, []);
 
-  if (!config) return null; // or loading spinner
+  if (!config) return (
+    <div className="h-screen flex items-center justify-center bg-[var(--color-bg-main)]">
+        <motion.div 
+            animate={{ scale: [1, 1.1, 1] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+            className="w-16 h-16 bg-teal-500 rounded-2xl shadow-xl shadow-teal-500/20"
+        />
+    </div>
+  );
 
   return (
-    <div className="space-y-16">
-      {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-dark)] p-8 md:p-12 text-white shadow-xl">
-        <div className="relative z-10 max-w-2xl text-center md:text-left mx-auto md:mx-0">
-          <h1 className="font-extrabold mb-4 leading-relaxed drop-shadow-md tracking-wide text-white arabic-title">
-            {config.heroTitleArabic}
-          </h1>
-          <h2 className="text-2xl md:text-4xl font-bold font-sans mb-6 text-teal-50 drop-shadow-sm opacity-95">
-             {config.heroTitleLatin}
-          </h2>
-          <p className="text-lg md:text-xl text-teal-100 mb-8 leading-relaxed max-w-xl font-medium drop-shadow-sm">
+    <div className="relative overflow-x-hidden">
+      {/* Hero Section - Immersive Aurora */}
+      <AuroraBackground className="rounded-b-[3rem] shadow-2xl overflow-hidden mb-24">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{
+            delay: 0.3,
+            duration: 0.8,
+            ease: "easeInOut",
+          }}
+          className="relative flex flex-col gap-6 items-center justify-center px-4 md:px-0 text-center max-w-4xl z-20"
+        >
+          {/* Badge */}
+          <div className="bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-4 animate-fade-in backdrop-blur-md">
+             Platform Belajar Bahasa Arab Modern
+          </div>
+
+          <div className="space-y-4">
+            <h1 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white arabic-title leading-tight drop-shadow-sm">
+                <SplitText text={config.heroTitleArabic} />
+            </h1>
+            <h2 className="text-2xl md:text-5xl font-extrabold text-[var(--color-primary-dark)] dark:text-teal-400 font-sans tracking-tight">
+                {config.heroTitleLatin}
+            </h2>
+          </div>
+
+          <p className="font-medium text-slate-600 dark:text-slate-400 md:text-xl max-w-2xl leading-relaxed mt-4 drop-shadow-sm px-4 md:px-0">
             {config.heroDescription}
           </p>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
-            <Link to="/materi" className="bg-white text-teal-700 px-8 py-4 rounded-xl font-bold transition-all shadow-lg flex items-center hover:bg-gray-50 hover:scale-105 active:scale-95">
-              {config.heroButtonText}
-              <ArrowRight className="ml-2 w-5 h-5" />
+
+          <div className="flex flex-col md:flex-row items-center gap-6 mt-10">
+            <Link 
+              to="/materi" 
+              className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-5 rounded-2xl font-bold transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center overflow-hidden"
+            >
+              <span className="relative z-10">{config.heroButtonText}</span>
+              <ArrowRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+              <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </Link>
-            <Link to="/about" className="bg-teal-700/30 hover:bg-teal-700/50 text-white px-8 py-4 rounded-xl font-medium backdrop-blur-sm transition-all border border-white/20 hover:scale-105 active:scale-95">
+
+            <Link 
+              to="/about" 
+              className="text-slate-600 dark:text-slate-300 font-bold hover:text-[var(--color-primary)] transition-colors flex items-center group px-4 py-2"
+            >
               {config.heroButtonSecondaryText || 'Tentang Kami'}
+              <div className="w-1.5 h-1.5 bg-[var(--color-primary)] rounded-full ml-2 opacity-0 group-hover:opacity-100 transition-all scale-0 group-hover:scale-100"></div>
             </Link>
-            
-            {/* Copyright Button */}
-            {copyrightConfig?.pdfUrl && (
+
+             {/* Copyright Button */}
+             {copyrightConfig?.pdfUrl && (
                 <button 
                     onClick={() => setShowCopyright(true)}
-                    className="bg-transparent hover:bg-white/10 text-white px-6 py-4 rounded-xl font-medium transition-all border border-white/20 flex items-center hover:scale-105 active:scale-95"
+                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors text-sm font-medium"
                 >
-                    <Shield className="w-5 h-5 mr-2" />
-                    Hak Cipta
+                    <Shield className="w-4 h-4" />
+                    Hak Cipta Terdaftar
                 </button>
             )}
           </div>
-        </div>
-        
-        {/* Decorative Circle */}
-        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[var(--color-secondary)]/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-12 right-12 w-32 h-32 bg-teal-400/20 rounded-full blur-2xl animate-pulse"></div>
-      </div>
+        </motion.div>
+      </AuroraBackground>
 
        {/* Copyright Modal */}
        {showCopyright && copyrightConfig?.pdfUrl && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-             <div className="bg-[var(--color-bg-card)] w-full max-w-4xl h-[80vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden relative border border-[var(--color-border)]">
-                <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)] bg-[var(--color-bg-muted)]">
-                   <h3 className="font-bold text-[var(--color-text-main)] flex items-center">
-                      <Shield className="w-5 h-5 mr-2 text-[var(--color-primary)]" />
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               className="bg-[var(--color-bg-card)] w-full max-w-4xl h-[85vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-[var(--color-border)]"
+             >
+                <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] bg-[var(--color-bg-muted)]">
+                   <h3 className="font-bold text-[var(--color-text-main)] flex items-center text-lg">
+                      <Shield className="w-6 h-6 mr-3 text-teal-600" />
                       Dokumen Hak Cipta
                    </h3>
                    <button 
                       onClick={() => setShowCopyright(false)}
-                      className="p-2 hover:bg-red-100 dark:hover:bg-red-900/20 text-[var(--color-text-muted)] hover:text-red-500 rounded-lg transition-colors"
+                      className="w-10 h-10 flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 rounded-xl transition-all"
                    >
                       <X className="w-6 h-6" />
                    </button>
                 </div>
-                <div className="flex-1 bg-gray-100 dark:bg-gray-900">
+                <div className="flex-1 bg-slate-100 dark:bg-slate-900 relative">
                    <PdfViewer fileUrl={copyrightConfig.pdfUrl} />
                 </div>
-             </div>
+             </motion.div>
           </div>
        )}
 
-      {/* Featured Programs Section */}
-      <div>
-        <div className="flex items-center mb-8">
-           <div className="h-8 w-1 bg-[var(--color-secondary)] rounded-full mr-4"></div>
-           <h2 className="text-2xl font-bold text-[var(--color-text-main)]">{config.programsSectionTitle || 'Program Unggulan'}</h2>
-        </div>
+      {/* Bento Grid Header */}
+      <div className="container mx-auto px-4 max-w-6xl mb-12">
+        <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
+        >
+          <div className="max-w-xl">
+             <div className="h-1.5 w-20 bg-teal-500 rounded-full mb-6"></div>
+             <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] mb-6">
+                 {config.programsSectionTitle || 'Program Unggulan Kami'}
+             </h2>
+             <p className="text-slate-600 dark:text-slate-400 text-lg font-medium leading-relaxed">
+                 Pilih program yang sesuai dengan kebutuhan dan level kemampuan Anda. Mulai dari dasar hingga mahir.
+             </p>
+          </div>
+          <Link to="/materi" className="hidden md:flex items-center gap-2 text-teal-600 font-bold hover:gap-4 transition-all pb-2 border-b-2 border-teal-500/20 hover:border-teal-500">
+              Lihat Materi Lainnya <ArrowRight className="w-5 h-5" />
+          </Link>
+        </motion.div>
         
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Bento Grid Layout */}
+        <BentoGrid>
           {specialPrograms.map((prog, idx) => {
              const Icon = iconMap[prog.icon] || Star;
              return (
-               <Link 
-                 key={prog.id} 
-                 to={`/program/${prog.id}`}
-                 className="group bg-[var(--color-bg-card)] rounded-2xl p-6 shadow-sm border border-[var(--color-border)] hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-               >
-                 <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-colors ${
-                    idx === 0 ? 'bg-amber-100/50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 group-hover:bg-amber-100' :
-                    idx === 1 ? 'bg-teal-100/50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 group-hover:bg-teal-100' :
-                    'bg-indigo-100/50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-100'
-                 }`}>
-                    <Icon className="w-7 h-7" />
-                 </div>
-                 
-                 <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-3 group-hover:text-[var(--color-primary)] transition-colors">
-                   {prog.title}
-                 </h3>
-                 <p className="text-[var(--color-text-muted)] text-sm leading-relaxed line-clamp-3">
-                   {prog.desc || 'Pelajari program khusus ini untuk meningkatkan kemampuan bahasa Arab Anda secara intensif.'}
-                 </p>
-                 
-                 <div className="mt-4 flex items-center text-sm font-semibold text-[var(--color-primary)] opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
-                    Lihat Program <ArrowRight className="ml-2 w-4 h-4" />
-                 </div>
+               <Link key={prog.id} to={`/program/${prog.id}`} className={cn(
+                  idx === 0 ? "md:col-span-2" : "md:col-span-1"
+               )}>
+                 <BentoGridItem
+                   title={prog.title}
+                   description={prog.desc || 'Pelajari program ini untuk meningkatkan kemampuan bahasa Arab Anda secara intensif.'}
+                   header={
+                     <div className={cn(
+                        "flex flex-1 w-full h-full min-h-[6rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[0.98]",
+                        idx === 0 ? "from-teal-500 to-teal-700" : 
+                        idx === 1 ? "from-amber-400 to-amber-600" : 
+                        "from-indigo-500 to-indigo-700"
+                     )}>
+                        <div className="w-full h-full flex items-center justify-center opacity-20 group-hover/bento:opacity-40 transition-opacity">
+                            <Icon className="w-24 h-24 text-white rotate-12" />
+                        </div>
+                     </div>
+                   }
+                   icon={<Icon className="h-4 w-4 text-teal-500" />}
+                 />
                </Link>
              );
           })}
+        </BentoGrid>
+
+        {/* Mobile View More */}
+        <div className="md:hidden mt-12 flex justify-center">
+             <Link to="/materi" className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 px-8 py-4 rounded-2xl font-bold flex items-center">
+                Lihat Materi Lainnya <ArrowRight className="ml-2 w-5 h-5" />
+             </Link>
         </div>
       </div>
-
 
     </div>
   );

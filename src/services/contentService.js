@@ -637,13 +637,14 @@ export const contentService = {
         const snapshot = await getDoc(docRef);
         
         if (snapshot.exists()) {
-             const content = snapshot.data().content;
+             const data = snapshot.data();
+             // Robust string recovery
+             const content = typeof data.content === 'string' ? data.content : JSON.stringify(data.content || data);
+             
              localStorage.setItem(STORAGE_KEYS.CONTENT_PREFIX + topicId, content);
              return content;
         }
         
-        // If not found in cloud, return empty string.
-        // Legacy local file backup (/materi/*.md) has been removed.
         console.warn(`[Content] Lesson ${topicId} not found in Firestore.`);
         return "";
     } catch(e) {
