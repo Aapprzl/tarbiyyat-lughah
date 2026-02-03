@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
+import { cleanupService } from '../../services/cleanupService';
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, writeBatch, collection } from 'firebase/firestore';
-import { Database, UploadCloud, CheckCircle, AlertTriangle, Play, FileText, Image as ImageIcon } from 'lucide-react';
+import { Database, UploadCloud, CheckCircle, AlertTriangle, Play, FileText, Image as ImageIcon, Trash2, RefreshCw, BookOpen } from 'lucide-react';
+import { useConfirm, useToast } from '../../components/Toast';
 
 const MigrationTools = () => {
     const [logs, setLogs] = useState([]);
     const [isMigrating, setIsMigrating] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [isCleaningUp, setIsCleaningUp] = useState(false);
+    
+    const confirm = useConfirm();
+    const toast = useToast();
 
     const addLog = (msg, type = 'info') => {
         setLogs(prev => [...prev, { msg, type, time: new Date().toLocaleTimeString() }]);
@@ -235,8 +241,164 @@ const MigrationTools = () => {
         }
     };
 
+    // === CLEANUP HANDLERS ===
+    
+    const handleClearAllData = async () => {
+        const confirmed = await confirm({
+            title: '⚠️ Hapus Semua Data?',
+            message: 'Ini akan menghapus SEMUA data dari LocalStorage dan Firestore. Tindakan ini TIDAK BISA dibatalkan!',
+            confirmText: 'Ya, Hapus Semua',
+            cancelText: 'Batal',
+            type: 'danger'
+        });
+        
+        if (!confirmed) return;
+        
+        setIsCleaningUp(true);
+        addLog('🗑️ Memulai pembersihan total...', 'warning');
+        
+        try {
+            const result = await cleanupService.clearAllData();
+            
+            addLog(`✅ LocalStorage: ${result.localStorage.itemsCleared} item dihapus`, 'success');
+            
+            Object.entries(result.firestore).forEach(([collection, data]) => {
+                if (data.success) {
+                    addLog(`✅ Firestore ${collection}: ${data.count} dokumen dihapus`, 'success');
+                } else {
+                    addLog(`❌ Firestore ${collection}: ${data.error}`, 'error');
+                }
+            });
+            
+            toast.success('Semua data berhasil dihapus!');
+            addLog('🎉 Pembersihan selesai! Database sekarang kosong.', 'success');
+        } catch (error) {
+            addLog(`❌ Error: ${error.message}`, 'error');
+            toast.error('Gagal menghapus data: ' + error.message);
+        } finally {
+            setIsCleaningUp(false);
+        }
+    };
+    
+    const handleClearLocalStorage = async () => {
+        const confirmed = await confirm({
+            title: 'Hapus LocalStorage?',
+            message: 'Ini akan menghapus semua data cache dari browser Anda.',
+            confirmText: 'Ya, Hapus',
+            cancelText: 'Batal'
+        });
+        
+        if (!confirmed) return;
+        
+        setIsCleaningUp(true);
+        addLog('🗑️ Membersihkan LocalStorage...', 'info');
+        
+        try {
+            const count = cleanupService.clearLocalStorage();
+            addLog(`✅ ${count} item dihapus dari LocalStorage`, 'success');
+            toast.success(`${count} item cache dihapus`);
+        } catch (error) {
+            addLog(`❌ Error: ${error.message}`, 'error');
+            toast.error('Gagal menghapus LocalStorage');
+        } finally {
+            setIsCleaningUp(false);
+        }
+    };
+    
+    const handleClearFirestore = async () => {
+        const confirmed = await confirm({
+            title: '⚠️ Hapus Semua Data Firestore?',
+            message: 'Ini akan menghapus SEMUA data dari database cloud. Tindakan ini TIDAK BISA dibatalkan!',
+            confirmText: 'Ya, Hapus Semua',
+            cancelText: 'Batal',
+            type: 'danger'
+        });
+        
+        if (!confirmed) return;
+        
+        setIsCleaningUp(true);
+        addLog('🗑️ Membersihkan Firestore...', 'warning');
+        
+        try {
+            const results = await cleanupService.clearAllFirestoreData();
+            
+            Object.entries(results).forEach(([collection, data]) => {
+                if (data.success) {
+                    addLog(`✅ ${collection}: ${data.count} dokumen dihapus`, 'success');
+                } else {
+                    addLog(`❌ ${collection}: ${data.error}`, 'error');
+                }
+            });
+            
+            toast.success('Semua data Firestore berhasil dihapus!');
+        } catch (error) {
+            addLog(`❌ Error: ${error.message}`, 'error');
+            toast.error('Gagal menghapus Firestore');
+        } finally {
+            setIsCleaningUp(false);
+        }
+    };
+    
+    const handleClearSettings = async () => {
+        const confirmed = await confirm({
+            title: 'Hapus Data Settings?',
+            message: 'Ini akan menghapus semua konfigurasi (home, about, profile, font, dll).',
+            confirmText: 'Ya, Hapus',
+            cancelText: 'Batal'
+        });
+        
+        if (!confirmed) return;
+        
+        setIsCleaningUp(true);
+        addLog('🗑️ Menghapus collection settings...', 'info');
+        
+        try {
+            const result = await cleanupService.clearSettingsOnly();
+            if (result.success) {
+                addLog(`✅ ${result.count} dokumen settings dihapus`, 'success');
+                toast.success('Settings berhasil dihapus');
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            addLog(`❌ Error: ${error.message}`, 'error');
+            toast.error('Gagal menghapus settings');
+        } finally {
+            setIsCleaningUp(false);
+        }
+    };
+    
+    const handleClearLessons = async () => {
+        const confirmed = await confirm({
+            title: 'Hapus Semua Materi?',
+            message: 'Ini akan menghapus semua konten materi pembelajaran dari database.',
+            confirmText: 'Ya, Hapus',
+            cancelText: 'Batal'
+        });
+        
+        if (!confirmed) return;
+        
+        setIsCleaningUp(true);
+        addLog('🗑️ Menghapus collection lessons...', 'info');
+        
+        try {
+            const result = await cleanupService.clearLessonsOnly();
+            if (result.success) {
+                addLog(`✅ ${result.count} dokumen lessons dihapus`, 'success');
+                toast.success('Materi berhasil dihapus');
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            addLog(`❌ Error: ${error.message}`, 'error');
+            toast.error('Gagal menghapus materi');
+        } finally {
+            setIsCleaningUp(false);
+        }
+    };
+
     return (
-        <div className="max-w-4xl mx-auto p-6 pb-20">
+        <div className="max-w-4xl mx-auto p-6 pb-20 space-y-8">
             <div className="bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)] p-8 shadow-xl">
                 {/* Header ... */}
                 <div className="flex items-center gap-4 mb-6">
@@ -316,6 +478,86 @@ const MigrationTools = () => {
                         </div>
                     )}
                 </div>
+            </div>
+
+            {/* === DATA CLEANUP SECTION === */}
+            <div className="bg-[var(--color-bg-card)] rounded-2xl border border-[var(--color-border)] p-8 shadow-xl">
+                <div className="flex items-center gap-4 mb-6">
+                    <div className="w-16 h-16 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center text-red-600">
+                        <Trash2 className="w-8 h-8" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-[var(--color-text-main)]">Pembersihan Data</h2>
+                        <p className="text-[var(--color-text-muted)]">Hapus data lama untuk memulai fresh.</p>
+                    </div>
+                </div>
+
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6 flex gap-3">
+                    <AlertTriangle className="w-6 h-6 text-red-600 flex-shrink-0 mt-1" />
+                    <div className="text-sm text-red-800 dark:text-red-200">
+                        <strong>Peringatan:</strong> Tindakan pembersihan bersifat PERMANEN dan TIDAK BISA dibatalkan. 
+                        Pastikan Anda sudah backup data penting sebelum melanjutkan.
+                    </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                    {/* Clear All Data */}
+                    <button
+                        onClick={handleClearAllData}
+                        disabled={isCleaningUp || isMigrating}
+                        className="p-4 rounded-xl border-2 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                    >
+                        <Trash2 className="w-5 h-5" />
+                        Hapus Semua Data
+                    </button>
+
+                    {/* Clear LocalStorage */}
+                    <button
+                        onClick={handleClearLocalStorage}
+                        disabled={isCleaningUp || isMigrating}
+                        className="p-4 rounded-xl border-2 border-orange-600 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                    >
+                        <RefreshCw className="w-5 h-5" />
+                        Hapus LocalStorage
+                    </button>
+
+                    {/* Clear Firestore */}
+                    <button
+                        onClick={handleClearFirestore}
+                        disabled={isCleaningUp || isMigrating}
+                        className="p-4 rounded-xl border-2 border-red-600 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                    >
+                        <Database className="w-5 h-5" />
+                        Hapus Firestore
+                    </button>
+
+                    {/* Clear Settings */}
+                    <button
+                        onClick={handleClearSettings}
+                        disabled={isCleaningUp || isMigrating}
+                        className="p-4 rounded-xl border-2 border-amber-600 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold"
+                    >
+                        <FileText className="w-5 h-5" />
+                        Hapus Settings
+                    </button>
+
+                    {/* Clear Lessons */}
+                    <button
+                        onClick={handleClearLessons}
+                        disabled={isCleaningUp || isMigrating}
+                        className="p-4 rounded-xl border-2 border-amber-600 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold md:col-span-2"
+                    >
+                        <BookOpen className="w-5 h-5" />
+                        Hapus Materi
+                    </button>
+                </div>
+
+                {isCleaningUp && (
+                    <div className="mt-6 flex items-center justify-center gap-3 text-[var(--color-text-muted)]">
+                        <div className="w-5 h-5 border-4 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                        <span>Sedang membersihkan data...</span>
+                    </div>
+                )}
             </div>
         </div>
     );
