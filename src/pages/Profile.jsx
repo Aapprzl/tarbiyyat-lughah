@@ -11,6 +11,7 @@ const Profile = () => {
     useEffect(() => {
         const load = async () => {
              const data = await contentService.getProfileConfig();
+             console.log('[Profile] Loaded config:', data); // Debug
              setConfig(data);
              setLoading(false);
         };
