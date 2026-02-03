@@ -3,10 +3,21 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
     
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && request.auth.token.email == 'icalaprizal23072003@gmail.com';
+    }
+    
     // Materials folder - Admin can write, public can read
     match /materials/{allPaths=**} {
       allow read: if true; // Public can read materials
-      allow write: if request.auth != null && request.auth.token.email == 'icalaprizal23072003@gmail.com';
+      allow write: if isAdmin();
+    }
+    
+    // Profile folder - Admin can write, public can read
+    match /profile/{allPaths=**} {
+      allow read: if true; // Public can read profile photos/CV
+      allow write: if isAdmin();
     }
     
     // Default deny all other paths
