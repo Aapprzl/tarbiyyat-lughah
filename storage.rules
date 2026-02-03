@@ -26,6 +26,12 @@ service firebase.storage {
       allow write: if isAdmin();
     }
     
+    // Identity folder - Admin can write, public can read (logos, branding)
+    match /identity/{allPaths=**} {
+      allow read: if true; // Public can read logos/branding
+      allow write: if isAdmin();
+    }
+    
     // Default deny all other paths
     match /{allPaths=**} {
       allow read, write: if false;
