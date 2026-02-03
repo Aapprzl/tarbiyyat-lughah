@@ -1,11 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import { contentService } from '../services/contentService';
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [footerText, setFooterText] = useState('');
   const location = useLocation();
+
+  useEffect(() => {
+    const loadFooter = async () => {
+      try {
+        const config = await contentService.getHomeConfig();
+        setFooterText(config?.footerText || `© ${new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.`);
+      } catch (err) {
+        console.error('Error loading footer:', err);
+        setFooterText(`© ${new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.`);
+      }
+    };
+    loadFooter();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-main)]">
@@ -23,7 +38,7 @@ const Layout = () => {
         
         {/* Footer */}
         <footer className="mt-12 py-6 text-center text-sm text-[var(--color-text-muted)] border-t border-[var(--color-border)]/50">
-          <p>© {new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.</p>
+          <p>{footerText}</p>
         </footer>
       </main>
     </div>
