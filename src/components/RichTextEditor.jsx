@@ -29,6 +29,20 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
       insertUnorderedList: document.queryCommandState('insertUnorderedList'),
       insertOrderedList: document.queryCommandState('insertOrderedList'),
     };
+    
+    // Check if current selection is in blockquote
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      let node = selection.anchorNode;
+      while (node && node !== editorRef.current) {
+        if (node.nodeName === 'BLOCKQUOTE') {
+          formats.blockquote = true;
+          break;
+        }
+        node = node.parentNode;
+      }
+    }
+    
     setActiveFormats(formats);
   };
 
@@ -45,10 +59,21 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     updateActiveFormats();
   };
 
-  const formatButton = (icon, command, title, value = null, isActive = false) => (
+  const toggleBlockquote = () => {
+    // If already in blockquote, convert to paragraph
+    if (activeFormats.blockquote) {
+      document.execCommand('formatBlock', false, 'p');
+    } else {
+      document.execCommand('formatBlock', false, 'blockquote');
+    }
+    editorRef.current?.focus();
+    updateActiveFormats();
+  };
+
+  const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
     <button
       type="button"
-      onClick={() => execCommand(command, value)}
+      onClick={() => customHandler ? customHandler() : execCommand(command, value)}
       className={`p-2 rounded transition-all ${
         isActive 
           ? 'bg-teal-600 text-white shadow-sm' 
@@ -79,7 +104,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
         
         <div className="w-px bg-gray-300 mx-1"></div>
         
-        {formatButton(<Quote className="w-4 h-4" />, 'formatBlock', 'Kutipan', 'blockquote')}
+        {formatButton(<Quote className="w-4 h-4" />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
         
         <div className="flex-1"></div>
         
@@ -126,19 +151,9 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
         [contentEditable] blockquote {
           border-left: 4px solid var(--color-primary);
           padding-left: 1em;
-          padding-top: 0.5em;
-          padding-bottom: 0.5em;
           margin: 0.5em 0;
           font-style: italic;
           opacity: 0.9;
-          min-height: 1.5em;
-        }
-        
-        [contentEditable] blockquote:empty:before {
-          content: 'Ketik kutipan di sini...';
-          color: var(--color-text-muted);
-          opacity: 0.5;
-          font-style: italic;
         }
         
         [contentEditable] p {
