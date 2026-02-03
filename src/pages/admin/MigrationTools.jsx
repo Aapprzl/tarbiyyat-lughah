@@ -24,10 +24,10 @@ const MigrationTools = () => {
         addLog('🔄 Memulai Migrasi Konfigurasi...', 'info');
         
         const configs = [
-            { key: 'arp_home_config', path: 'config/home', name: 'Home Config' },
-            { key: 'arp_about_config', path: 'config/about', name: 'About Config' },
-            { key: 'arp_profile_config', path: 'config/profile', name: 'Profile Config' },
-            { key: 'arp_font_config', path: 'config/fonts', name: 'Font Config' }
+            { key: 'arp_home_config', path: 'settings/home_config', name: 'Home Config' },
+            { key: 'arp_about_config', path: 'settings/about_config', name: 'About Config' },
+            { key: 'arp_profile_config', path: 'settings/profile_config', name: 'Profile Config' },
+            { key: 'arp_font_config', path: 'settings/font_config', name: 'Font Config' }
         ];
 
         for (const cfg of configs) {
@@ -65,7 +65,7 @@ const MigrationTools = () => {
 
         try {
             const parsed = JSON.parse(localCurr);
-            await setDoc(doc(db, 'curriculum', 'main'), { items: parsed });
+            await setDoc(doc(db, 'settings', 'curriculum'), { items: parsed });
             addLog(`✅ Kurikulum (${parsed.length} topik) terupload.`, 'success');
             return parsed; // Return for lesson iteration
         } catch (e) {
@@ -84,7 +84,7 @@ const MigrationTools = () => {
                  // PRE-PROCESS: Upload Base64 to Storage
                  parsed = await processBase64(parsed);
 
-                 await setDoc(doc(db, 'special_programs', 'main'), { items: parsed });
+                 await setDoc(doc(db, 'settings', 'special_programs'), { items: parsed });
                  
                  // Update LocalStorage
                  localStorage.setItem('arp_special_programs', JSON.stringify(parsed));
@@ -155,6 +155,9 @@ const MigrationTools = () => {
             const key = `arp_materials_${topic.id}`;
             const localContent = localStorage.getItem(key);
             
+            // Debug: Log what we're looking for
+            addLog(`🔍 Mencari: ${key}...`, 'info');
+            
             if (localContent) {
                 try {
                     addLog(`📄 Memproses ${topic.title}...`, 'info');
@@ -164,7 +167,7 @@ const MigrationTools = () => {
                     parsed = await processBase64(parsed);
                     
                     // Upload to Firestore
-                    await setDoc(doc(db, 'lessons', topic.id), { stages: parsed }); 
+                    await setDoc(doc(db, 'lessons', topic.id), { content: JSON.stringify(parsed) }); 
                     
                     // Update LocalStorage
                     localStorage.setItem(key, JSON.stringify(parsed));
@@ -173,6 +176,8 @@ const MigrationTools = () => {
                 } catch (e) {
                     addLog(`❌ Gagal topik ${topic.id}: ${e.message}`, 'error');
                 }
+            } else {
+                addLog(`⚠️ Tidak ditemukan: ${key}`, 'warning');
             }
             setProgress(Math.round(((count) / topics.length) * 100));
         }
@@ -272,10 +277,14 @@ const MigrationTools = () => {
             
             toast.success('Semua data berhasil dihapus!');
             addLog('🎉 Pembersihan selesai! Database sekarang kosong.', 'success');
+            
+            // Reload page after 2 seconds to re-fetch from Firestore
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } catch (error) {
             addLog(`❌ Error: ${error.message}`, 'error');
             toast.error('Gagal menghapus data: ' + error.message);
-        } finally {
             setIsCleaningUp(false);
         }
     };
@@ -296,11 +305,15 @@ const MigrationTools = () => {
         try {
             const count = cleanupService.clearLocalStorage();
             addLog(`✅ ${count} item dihapus dari LocalStorage`, 'success');
-            toast.success(`${count} item cache dihapus`);
+            toast.success(`${count} item cache dihapus. Halaman akan reload...`);
+            
+            // Reload page after 1 second to re-fetch data from Firestore
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } catch (error) {
             addLog(`❌ Error: ${error.message}`, 'error');
             toast.error('Gagal menghapus LocalStorage');
-        } finally {
             setIsCleaningUp(false);
         }
     };
@@ -331,10 +344,14 @@ const MigrationTools = () => {
             });
             
             toast.success('Semua data Firestore berhasil dihapus!');
+            
+            // Reload page after 2 seconds
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
         } catch (error) {
             addLog(`❌ Error: ${error.message}`, 'error');
             toast.error('Gagal menghapus Firestore');
-        } finally {
             setIsCleaningUp(false);
         }
     };
