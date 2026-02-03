@@ -73,14 +73,34 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
   };
 
   const openLinkModal = () => {
+    // Check if text is selected
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (!selectedText) {
+      alert('Silakan pilih/select text terlebih dahulu sebelum menambahkan link!');
+      return;
+    }
+    
     setLinkUrl('');
     setShowLinkModal(true);
   };
 
   const insertLink = () => {
     if (linkUrl.trim()) {
-      document.execCommand('createLink', false, linkUrl);
+      // Ensure URL has protocol
+      let finalUrl = linkUrl.trim();
+      if (!finalUrl.startsWith('http://') && !finalUrl.startsWith('https://')) {
+        finalUrl = 'https://' + finalUrl;
+      }
+      
+      document.execCommand('createLink', false, finalUrl);
       editorRef.current?.focus();
+      
+      // Trigger onChange to save the new content
+      if (editorRef.current) {
+        onChange(editorRef.current.innerHTML);
+      }
     }
     setShowLinkModal(false);
     setLinkUrl('');
@@ -190,8 +210,15 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
           }
           
           [contentEditable] a {
-            color: var(--color-primary);
-            text-decoration: underline;
+            color: #0d9488 !important;
+            text-decoration: underline !important;
+            cursor: pointer;
+            font-weight: 500;
+          }
+          
+          [contentEditable] a:hover {
+            color: #0f766e !important;
+            text-decoration: underline !important;
           }
         `}</style>
       </div>
