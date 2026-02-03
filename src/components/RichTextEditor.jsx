@@ -4,6 +4,8 @@ import { Bold, Italic, List, ListOrdered, Heading, Quote, Link as LinkIcon, Undo
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
   const editorRef = useRef(null);
   const [activeFormats, setActiveFormats] = useState({});
+  const [showLinkModal, setShowLinkModal] = useState(false);
+  const [linkUrl, setLinkUrl] = useState('');
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
@@ -70,12 +72,18 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     updateActiveFormats();
   };
 
+  const openLinkModal = () => {
+    setLinkUrl('');
+    setShowLinkModal(true);
+  };
+
   const insertLink = () => {
-    const url = prompt('Masukkan URL (contoh: https://example.com):');
-    if (url) {
-      document.execCommand('createLink', false, url);
+    if (linkUrl.trim()) {
+      document.execCommand('createLink', false, linkUrl);
       editorRef.current?.focus();
     }
+    setShowLinkModal(false);
+    setLinkUrl('');
   };
 
   const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
@@ -94,93 +102,147 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
   );
 
   return (
-    <div className="border border-[var(--color-border)] rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500">
-      {/* Toolbar */}
-      <div className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)] p-2 flex flex-wrap gap-1">
-        {formatButton(<Bold className="w-4 h-4" />, 'bold', 'Tebal (Ctrl+B)', null, activeFormats.bold)}
-        {formatButton(<Italic className="w-4 h-4" />, 'italic', 'Miring (Ctrl+I)', null, activeFormats.italic)}
-        
-        <div className="w-px bg-gray-300 mx-1"></div>
-        
-        {formatButton(<Heading className="w-4 h-4" />, 'formatBlock', 'Heading 2', 'h2')}
-        {formatButton(<Heading className="w-3 h-3" />, 'formatBlock', 'Heading 3', 'h3')}
-        
-        <div className="w-px bg-gray-300 mx-1"></div>
-        
-        {formatButton(<List className="w-4 h-4" />, 'insertUnorderedList', 'Daftar Bullet', null, activeFormats.insertUnorderedList)}
-        {formatButton(<ListOrdered className="w-4 h-4" />, 'insertOrderedList', 'Daftar Nomor', null, activeFormats.insertOrderedList)}
-        
-        <div className="w-px bg-gray-300 mx-1"></div>
-        
-        {formatButton(<Quote className="w-4 h-4" />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
-        
-        <div className="w-px bg-gray-300 mx-1"></div>
-        
-        {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Sisipkan Link/Tautan', null, false, insertLink)}
-        
-        <div className="flex-1"></div>
-        
-        {formatButton(<Undo className="w-4 h-4" />, 'undo', 'Undo (Ctrl+Z)')}
-        {formatButton(<Redo className="w-4 h-4" />, 'redo', 'Redo (Ctrl+Y)')}
+    <>
+      <div className="border border-[var(--color-border)] rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500">
+        {/* Toolbar */}
+        <div className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)] p-2 flex flex-wrap gap-1">
+          {formatButton(<Bold className="w-4 h-4" />, 'bold', 'Tebal (Ctrl+B)', null, activeFormats.bold)}
+          {formatButton(<Italic className="w-4 h-4" />, 'italic', 'Miring (Ctrl+I)', null, activeFormats.italic)}
+          
+          <div className="w-px bg-gray-300 mx-1"></div>
+          
+          {formatButton(<Heading className="w-4 h-4" />, 'formatBlock', 'Heading 2', 'h2')}
+          {formatButton(<Heading className="w-3 h-3" />, 'formatBlock', 'Heading 3', 'h3')}
+          
+          <div className="w-px bg-gray-300 mx-1"></div>
+          
+          {formatButton(<List className="w-4 h-4" />, 'insertUnorderedList', 'Daftar Bullet', null, activeFormats.insertUnorderedList)}
+          {formatButton(<ListOrdered className="w-4 h-4" />, 'insertOrderedList', 'Daftar Nomor', null, activeFormats.insertOrderedList)}
+          
+          <div className="w-px bg-gray-300 mx-1"></div>
+          
+          {formatButton(<Quote className="w-4 h-4" />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
+          
+          <div className="w-px bg-gray-300 mx-1"></div>
+          
+          {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Sisipkan Link/Tautan', null, false, openLinkModal)}
+          
+          <div className="flex-1"></div>
+          
+          {formatButton(<Undo className="w-4 h-4" />, 'undo', 'Undo (Ctrl+Z)')}
+          {formatButton(<Redo className="w-4 h-4" />, 'redo', 'Redo (Ctrl+Y)')}
+        </div>
+
+        {/* Editor */}
+        <div
+          ref={editorRef}
+          contentEditable
+          onInput={handleInput}
+          className="w-full p-4 outline-none min-h-[300px] max-h-[600px] overflow-y-auto bg-[var(--color-bg-card)] text-[var(--color-text-main)] prose prose-teal dark:prose-invert max-w-none"
+          style={{
+            lineHeight: '1.6',
+          }}
+          data-placeholder={placeholder}
+        />
+
+        <style>{`
+          [contentEditable]:empty:before {
+            content: attr(data-placeholder);
+            color: var(--color-text-muted);
+            opacity: 0.6;
+          }
+          
+          [contentEditable] h2 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 0.5em 0;
+          }
+          
+          [contentEditable] h3 {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin: 0.5em 0;
+          }
+          
+          [contentEditable] ul, [contentEditable] ol {
+            margin: 0.5em 0;
+            padding-left: 2em;
+          }
+          
+          [contentEditable] blockquote {
+            border-left: 4px solid var(--color-primary);
+            padding-left: 1em;
+            margin: 0.5em 0;
+            font-style: italic;
+            opacity: 0.9;
+          }
+          
+          [contentEditable] p {
+            margin: 0.5em 0;
+          }
+          
+          [contentEditable] strong {
+            font-weight: bold;
+          }
+          
+          [contentEditable] em {
+            font-style: italic;
+          }
+          
+          [contentEditable] a {
+            color: var(--color-primary);
+            text-decoration: underline;
+          }
+        `}</style>
       </div>
 
-      {/* Editor */}
-      <div
-        ref={editorRef}
-        contentEditable
-        onInput={handleInput}
-        className="w-full p-4 outline-none min-h-[300px] max-h-[600px] overflow-y-auto bg-[var(--color-bg-card)] text-[var(--color-text-main)] prose prose-teal dark:prose-invert max-w-none"
-        style={{
-          lineHeight: '1.6',
-        }}
-        data-placeholder={placeholder}
-      />
+      {/* Custom Link Modal */}
+      {showLinkModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]" onClick={() => setShowLinkModal(false)}>
+          <div className="bg-[var(--color-bg-card)] rounded-xl shadow-2xl border border-[var(--color-border)] p-6 w-full max-w-md mx-4" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-4">Sisipkan Link/Tautan</h3>
+            
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-[var(--color-text-main)] mb-2">
+                URL Alamat
+              </label>
+              <input
+                type="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') insertLink();
+                  if (e.key === 'Escape') setShowLinkModal(false);
+                }}
+                placeholder="https://example.com"
+                className="w-full p-3 border border-[var(--color-border)] bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-lg focus:ring-2 focus:ring-teal-500 outline-none"
+                autoFocus
+              />
+              <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                Pilih teks terlebih dahulu, lalu masukkan URL lengkap (termasuk https://)
+              </p>
+            </div>
 
-      <style>{`
-        [contentEditable]:empty:before {
-          content: attr(data-placeholder);
-          color: var(--color-text-muted);
-          opacity: 0.6;
-        }
-        
-        [contentEditable] h2 {
-          font-size: 1.5em;
-          font-weight: bold;
-          margin: 0.5em 0;
-        }
-        
-        [contentEditable] h3 {
-          font-size: 1.25em;
-          font-weight: bold;
-          margin: 0.5em 0;
-        }
-        
-        [contentEditable] ul, [contentEditable] ol {
-          margin: 0.5em 0;
-          padding-left: 2em;
-        }
-        
-        [contentEditable] blockquote {
-          border-left: 4px solid var(--color-primary);
-          padding-left: 1em;
-          margin: 0.5em 0;
-          font-style: italic;
-          opacity: 0.9;
-        }
-        
-        [contentEditable] p {
-          margin: 0.5em 0;
-        }
-        
-        [contentEditable] strong {
-          font-weight: bold;
-        }
-        
-        [contentEditable] em {
-          font-style: italic;
-        }
-      `}</style>
-    </div>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowLinkModal(false)}
+                className="px-4 py-2 rounded-lg text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={insertLink}
+                className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-medium transition-colors"
+              >
+                Sisipkan Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
