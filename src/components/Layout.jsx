@@ -13,10 +13,10 @@ const Layout = () => {
     const loadFooter = async () => {
       try {
         const config = await contentService.getHomeConfig();
-        setFooterText(config?.footerText || `© ${new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.`);
+        setFooterText(config?.footerText || '');
       } catch (err) {
         console.error('Error loading footer:', err);
-        setFooterText(`© ${new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.`);
+        setFooterText('');
       }
     };
     loadFooter();
