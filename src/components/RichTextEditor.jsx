@@ -126,9 +126,19 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
         [contentEditable] blockquote {
           border-left: 4px solid var(--color-primary);
           padding-left: 1em;
+          padding-top: 0.5em;
+          padding-bottom: 0.5em;
           margin: 0.5em 0;
           font-style: italic;
           opacity: 0.9;
+          min-height: 1.5em;
+        }
+        
+        [contentEditable] blockquote:empty:before {
+          content: 'Ketik kutipan di sini...';
+          color: var(--color-text-muted);
+          opacity: 0.5;
+          font-style: italic;
         }
         
         [contentEditable] p {
