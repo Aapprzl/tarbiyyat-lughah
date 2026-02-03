@@ -20,9 +20,30 @@ const ProfileEditor = () => {
     const loadConfig = async () => {
         try {
             const data = await contentService.getProfileConfig();
-            setConfig(data);
-            setInitialConfig(data); // Capture for GC
-            setPhotoPreview(data.photoUrl);
+            // Ensure socials object exists
+            const configWithDefaults = {
+                name: '',
+                title: '',
+                bio: '',
+                photoUrl: '',
+                email: '',
+                pdfUrl: '',
+                socials: {
+                    instagram: '',
+                    linkedin: '',
+                    website: ''
+                },
+                ...data,
+                socials: {
+                    instagram: '',
+                    linkedin: '',
+                    website: '',
+                    ...(data.socials || {})
+                }
+            };
+            setConfig(configWithDefaults);
+            setInitialConfig(configWithDefaults); // Capture for GC
+            setPhotoPreview(configWithDefaults.photoUrl);
         } catch (err) {
             console.error(err);
         } finally {
