@@ -185,6 +185,15 @@ export const contentService = {
       
       section.topics.push(newTopic);
       await this.saveCurriculum(curr);
+      
+      // Auto-initialize empty lesson document in cloud
+      try {
+          await setDoc(doc(db, 'lessons', newId), { content: "" });
+          console.log(`[Content] Initialized empty lesson doc for: ${newId}`);
+      } catch (e) {
+          console.warn(`[Content] Failed to auto-initialize lesson doc: ${e.message}`);
+      }
+      
       return newTopic;
     }
     return null;
@@ -204,6 +213,15 @@ export const contentService = {
 
     curr.push(newSection);
     await this.saveCurriculum(curr);
+
+    // Auto-initialize category document in lessons collection for console visibility
+    try {
+        await setDoc(doc(db, 'lessons', newId), { content: "" });
+        console.log(`[Content] Initialized category doc: ${newId}`);
+    } catch (e) {
+        console.warn(`[Content] Failed to auto-initialize category doc: ${e.message}`);
+    }
+
     return newSection;
   },
 
@@ -232,6 +250,15 @@ export const contentService = {
 
     const newCurr = curr.filter(s => s.id !== id);
     await this.saveCurriculum(newCurr);
+
+    // Also delete the category document itself from lessons collection
+    try {
+        await deleteDoc(doc(db, 'lessons', id));
+        console.log(`[Content] Deleted category doc: ${id}`);
+    } catch (e) {
+        console.warn(`[Content] Failed to delete category doc: ${e.message}`);
+    }
+
     return true;
   },
 
@@ -399,6 +426,15 @@ export const contentService = {
       };
       progs.push(newCategory);
       await this.saveSpecialPrograms(progs);
+
+      // Auto-initialize category document in lessons collection for console visibility
+      try {
+          await setDoc(doc(db, 'lessons', newId), { content: "" });
+          console.log(`[Content] Initialized special category doc: ${newId}`);
+      } catch (e) {
+          console.warn(`[Content] Failed to auto-initialize category doc: ${e.message}`);
+      }
+
       return newCategory;
   },
 
@@ -429,6 +465,15 @@ export const contentService = {
           
           const newProgs = progs.filter(c => c.id !== categoryId);
           await this.saveSpecialPrograms(newProgs);
+
+          // Also delete the category document itself from lessons collection
+          try {
+              await deleteDoc(doc(db, 'lessons', categoryId));
+              console.log(`[Content] Deleted special category doc: ${categoryId}`);
+          } catch (e) {
+              console.warn(`[Content] Failed to delete category doc: ${e.message}`);
+          }
+
           return true;
       }
       return false;
@@ -444,6 +489,15 @@ export const contentService = {
           if (!category.topics) category.topics = [];
           category.topics.push(newTopic);
           await this.saveSpecialPrograms(progs);
+          
+          // Auto-initialize empty lesson document in cloud
+          try {
+              await setDoc(doc(db, 'lessons', uniqueId), { content: "" });
+              console.log(`[Content] Initialized empty lesson doc for: ${uniqueId}`);
+          } catch (e) {
+              console.warn(`[Content] Failed to auto-initialize lesson doc: ${e.message}`);
+          }
+
           return newTopic;
       }
       return null;
@@ -577,10 +631,8 @@ export const contentService = {
   // --- Content/Lesson Management ---
 
   async getLessonContent(topicId) {
-    // Strategy: Strict Cloud Fetch
-    
+    // Strategy: Cloud-Only Fetch
     try {
-        // Check Cloud
         const docRef = doc(db, 'lessons', topicId);
         const snapshot = await getDoc(docRef);
         
@@ -589,33 +641,15 @@ export const contentService = {
              localStorage.setItem(STORAGE_KEYS.CONTENT_PREFIX + topicId, content);
              return content;
         }
-
-        // If missing in cloud, check Static File (First Load / seed)
-        // Only if cloud is missing (not error)
-        try {
-            const response = await fetch(`/materi/${topicId}.md`);
-            if (response.ok) {
-                const text = await response.text();
-                // Check if we accidentally got the index.html (SPA fallback)
-                if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
-                    console.warn(`[Content] Ignored HTML fallback for ${topicId}`);
-                    return ""; // Treat as empty/missing
-                }
-                
-                // Seed Cloud
-                await setDoc(docRef, { content: text });
-                localStorage.setItem(STORAGE_KEYS.CONTENT_PREFIX + topicId, text);
-                return text;
-            }
-        } catch (fetchErr) {
-            // Ignore fetch errors (404 etc) and just return empty
-        }
+        
+        // If not found in cloud, return empty string.
+        // Legacy local file backup (/materi/*.md) has been removed.
+        console.warn(`[Content] Lesson ${topicId} not found in Firestore.`);
+        return "";
     } catch(e) {
         console.error(`Error loading lesson ${topicId}`, e);
-        throw new Error("Gagal memuat konten materi.");
+        throw new Error("Gagal memuat konten materi dari server.");
     }
-
-    return ""; 
   },
 
   async saveLessonContent(topicId, content) {
