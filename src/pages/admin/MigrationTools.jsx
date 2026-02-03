@@ -249,13 +249,10 @@ const MigrationTools = () => {
     // === CLEANUP HANDLERS ===
     
     const handleClearAllData = async () => {
-        const confirmed = await confirm({
-            title: '⚠️ Hapus Semua Data?',
-            message: 'Ini akan menghapus SEMUA data dari LocalStorage dan Firestore. Tindakan ini TIDAK BISA dibatalkan!',
-            confirmText: 'Ya, Hapus Semua',
-            cancelText: 'Batal',
-            type: 'danger'
-        });
+        const confirmed = await confirm(
+            'Ini akan menghapus SEMUA data dari LocalStorage dan Firestore. Tindakan ini TIDAK BISA dibatalkan!',
+            '⚠️ Hapus Semua Data?'
+        );
         
         if (!confirmed) return;
         
@@ -290,12 +287,10 @@ const MigrationTools = () => {
     };
     
     const handleClearLocalStorage = async () => {
-        const confirmed = await confirm({
-            title: 'Hapus LocalStorage?',
-            message: 'Ini akan menghapus semua data cache dari browser Anda.',
-            confirmText: 'Ya, Hapus',
-            cancelText: 'Batal'
-        });
+        const confirmed = await confirm(
+            'Ini akan menghapus semua data cache dari browser Anda.',
+            'Hapus LocalStorage?'
+        );
         
         if (!confirmed) return;
         
@@ -319,13 +314,10 @@ const MigrationTools = () => {
     };
     
     const handleClearFirestore = async () => {
-        const confirmed = await confirm({
-            title: '⚠️ Hapus Semua Data Firestore?',
-            message: 'Ini akan menghapus SEMUA data dari database cloud. Tindakan ini TIDAK BISA dibatalkan!',
-            confirmText: 'Ya, Hapus Semua',
-            cancelText: 'Batal',
-            type: 'danger'
-        });
+        const confirmed = await confirm(
+            'Ini akan menghapus SEMUA data dari database cloud. Tindakan ini TIDAK BISA dibatalkan!',
+            '⚠️ Hapus Semua Data Firestore?'
+        );
         
         if (!confirmed) return;
         
@@ -357,12 +349,10 @@ const MigrationTools = () => {
     };
     
     const handleClearSettings = async () => {
-        const confirmed = await confirm({
-            title: 'Hapus Data Settings?',
-            message: 'Ini akan menghapus semua konfigurasi (home, about, profile, font, dll).',
-            confirmText: 'Ya, Hapus',
-            cancelText: 'Batal'
-        });
+        const confirmed = await confirm(
+            'Ini akan menghapus semua konfigurasi (home, about, profile, font, dll).',
+            'Hapus Data Settings?'
+        );
         
         if (!confirmed) return;
         
@@ -386,12 +376,10 @@ const MigrationTools = () => {
     };
     
     const handleClearLessons = async () => {
-        const confirmed = await confirm({
-            title: 'Hapus Semua Materi?',
-            message: 'Ini akan menghapus semua konten materi pembelajaran dari database.',
-            confirmText: 'Ya, Hapus',
-            cancelText: 'Batal'
-        });
+        const confirmed = await confirm(
+            'Ini akan menghapus semua konten materi pembelajaran dari database.',
+            'Hapus Semua Materi?'
+        );
         
         if (!confirmed) return;
         
