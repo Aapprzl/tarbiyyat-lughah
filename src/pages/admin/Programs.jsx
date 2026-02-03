@@ -208,9 +208,9 @@ const AdminPrograms = () => {
                   ) : (
                     <div className="space-y-2">
                       {category.topics?.map(topic => (
-                        <div key={topic.id} className="flex items-center justify-between p-3 bg-[var(--color-bg-muted)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors group">
+                        <div key={topic.id} className="flex items-center justify-between p-3 bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors group">
                           <span className="font-medium text-[var(--color-text-main)] font-arabic">{topic.title}</span>
-                          <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center gap-2">
                             <Link
                               to={`/admin/edit/${topic.id}`}
                               className="text-xs bg-teal-500 text-white px-3 py-1 rounded-lg font-bold hover:bg-teal-600 transition-colors"

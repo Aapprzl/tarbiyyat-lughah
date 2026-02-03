@@ -1,5 +1,6 @@
 import { db } from '../firebaseConfig';
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { storageService } from './storageService';
 
 /**
  * Service untuk membersihkan data lama dari LocalStorage dan Firestore
@@ -103,6 +104,28 @@ export const cleanupService = {
    */
   async clearSettingsOnly() {
     try {
+      console.log('[Cleanup] Scanning Settings for storage files...');
+      
+      const collections = ['home_config', 'about_config', 'profile_config', 'copyright_config'];
+      const allUrls = [];
+      
+      for (const docId of collections) {
+          const docRef = doc(db, 'settings', docId);
+          const snap = await getDoc(docRef);
+          if (snap.exists()) {
+              const dataStr = JSON.stringify(snap.data());
+              const urlRegex = /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+/g;
+              const matches = dataStr.match(urlRegex) || [];
+              allUrls.push(...matches);
+          }
+      }
+
+      const uniqueUrls = [...new Set(allUrls)];
+      if (uniqueUrls.length > 0) {
+          console.log(`[Cleanup] Found ${uniqueUrls.length} storage files in Settings. Deleting...`);
+          await Promise.allSettled(uniqueUrls.map(url => storageService.deleteFile(url)));
+      }
+
       const count = await this.clearCollection('settings');
       return { success: true, count };
     } catch (error) {
@@ -115,6 +138,23 @@ export const cleanupService = {
    */
   async clearLessonsOnly() {
     try {
+      console.log('[Cleanup] Scanning Lessons for storage files...');
+      const snapshot = await getDocs(collection(db, 'lessons'));
+      
+      const allUrls = [];
+      snapshot.forEach(doc => {
+          const dataStr = JSON.stringify(doc.data());
+          const urlRegex = /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+/g;
+          const matches = dataStr.match(urlRegex) || [];
+          allUrls.push(...matches);
+      });
+
+      const uniqueUrls = [...new Set(allUrls)];
+      if (uniqueUrls.length > 0) {
+          console.log(`[Cleanup] Found ${uniqueUrls.length} storage files in Lessons. Deleting...`);
+          await Promise.allSettled(uniqueUrls.map(url => storageService.deleteFile(url)));
+      }
+
       const count = await this.clearCollection('lessons');
       return { success: true, count };
     } catch (error) {

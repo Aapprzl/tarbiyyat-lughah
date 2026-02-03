@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Trash2 } from 'lucide-react';
+import { Edit2, Plus, BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 
 const iconMap = {
@@ -156,22 +156,10 @@ const AdminDashboard = () => {
             {/* Add Section Button */}
             <button 
               onClick={openAddSection}
-              className="bg-[var(--color-bg-card)] text-[var(--color-text-muted)] border border-[var(--color-border)] px-4 py-2 rounded-lg flex items-center font-bold hover:bg-[var(--color-bg-hover)] hover:text-[var(--color-text-main)] transition-colors shadow-sm active:scale-95"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Kategori Baru
-            </button>
-
-            {/* Add Topic Button */}
-            <button 
-              onClick={() => {
-                if(curriculum.length > 0) setSelectedSection(curriculum[0].id);
-                setShowAddModal(true);
-              }}
               className="bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center font-bold hover:bg-teal-700 transition-colors shadow-lg active:scale-95"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Tambah Topik
+              Tambah Kategori
             </button>
         </div>
       </div>
@@ -298,6 +286,10 @@ const AdminDashboard = () => {
                 onEdit={() => openEditSection(section)}
                 onDelete={() => handleDeleteSection(section.id)}
                 onDeleteTopic={handleDeleteTopic}
+                onAddTopic={() => {
+                    setSelectedSection(section.id);
+                    setShowAddModal(true);
+                }}
              />
         ))}
       </div>
@@ -308,26 +300,24 @@ const AdminDashboard = () => {
 
 // --- Sub Components ---
 
-const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, isSpecial }) => {
+const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic, isSpecial }) => {
     const [isOpen, setIsOpen] = useState(false);
     const SectionIcon = iconMap[section.icon] || BookOpen;
     const topicCount = section.topics?.length || 0;
 
     return (
-        <div className="bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border)] overflow-hidden transition-all hover:shadow-md">
+        <div className="bg-[var(--color-bg-card)] rounded-xl shadow-sm border border-[var(--color-border)] overflow-hidden transition-all">
             <div 
                 onClick={() => setIsOpen(!isOpen)}
-                className="bg-[var(--color-bg-muted)] px-6 py-4 border-b border-[var(--color-border)] flex items-center justify-between cursor-pointer select-none"
+                className="bg-[var(--color-bg-muted)] px-5 py-4 border-b border-[var(--color-border)] flex items-center justify-between cursor-pointer hover:bg-[var(--color-bg-hover)] transition-colors select-none"
             >
-                <div className="flex items-center gap-4">
-                    <div className={`p-2 rounded-lg ${isOpen ? 'bg-teal-100 text-teal-600' : 'bg-[var(--color-bg-card)] text-[var(--color-text-muted)]'} transition-colors`}>
+                <div className="flex items-center">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mr-4 shadow transition-all ${isOpen ? 'bg-teal-600' : 'bg-teal-500'} text-white`}>
                         <SectionIcon className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-[var(--color-text-main)] text-lg">{section.title}</h3>
-                        <p className="text-xs text-[var(--color-text-muted)] font-medium">
-                            {topicCount} Materi • {isOpen ? 'Klik untuk tutup' : 'Klik untuk lihat materi'}
-                        </p>
+                        <h3 className="font-bold text-[var(--color-text-main)] font-arabic">{section.title}</h3>
+                        <p className="text-xs text-[var(--color-text-muted)]">{topicCount} topik</p>
                     </div>
                 </div>
 
@@ -336,64 +326,64 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         <>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                                className="p-2 text-[var(--color-text-muted)] hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                className="p-2 text-[var(--color-text-muted)] hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/30 rounded-lg transition-colors"
                                 title="Edit Kategori"
                             >
                                 <Edit2 className="w-4 h-4" />
                             </button>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                                className="p-2 text-[var(--color-text-muted)] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                className="p-2 text-[var(--color-text-muted)] hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                                 title="Hapus Kategori"
                             >
                                 <Trash2 className="w-4 h-4" />
                             </button>
                         </>
                     )}
-                    <div className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-                         <div className="p-1 text-[var(--color-text-muted)]">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
-                         </div>
-                    </div>
+                    {isOpen ? <ChevronUp className="w-5 h-5 text-[var(--color-text-muted)]" /> : <ChevronDown className="w-5 h-5 text-[var(--color-text-muted)]" />}
                 </div>
             </div>
 
             {/* Accordion Body */}
             {isOpen && (
-                <div className="p-4 animate-in slide-in-from-top-2">
+                <div className="p-4 bg-[var(--color-bg-card)]">
                     {topicCount > 0 ? (
-                        <div className="grid gap-3">
+                        <div className="space-y-2">
                             {section.topics.map((topic) => (
-                                <div key={topic.id} className="flex items-center justify-between p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-main)] hover:border-teal-500 transition-colors group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-teal-50 flex items-center justify-center text-teal-600 font-bold text-xs">
-                                            {String(topic.id).substring(0, 2).toUpperCase()}
-                                        </div>
+                                    <div key={topic.id} className="flex items-center justify-between p-3 bg-[var(--color-bg-muted)] border border-[var(--color-border)] rounded-lg hover:bg-[var(--color-bg-hover)] transition-colors group">
                                         <span className="font-medium text-[var(--color-text-main)] font-arabic">{topic.title}</span>
+                                        <div className="flex items-center gap-2">
+                                            <Link 
+                                                to={`/admin/edit/${topic.id}`}
+                                                className="text-xs bg-teal-500 text-white px-3 py-1 rounded-lg font-bold hover:bg-teal-600 transition-colors"
+                                            >
+                                                Edit Konten
+                                            </Link>
+                                            <button 
+                                                className="p-1.5 text-[var(--color-text-muted)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                                                title="Hapus Materi"
+                                                onClick={() => onDeleteTopic && onDeleteTopic(topic.id)}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <Link 
-                                            to={`/admin/edit/${topic.id}`}
-                                            className="px-3 py-1.5 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-lg hover:bg-indigo-100"
-                                        >
-                                            Edit Konten
-                                        </Link>
-                                        <button 
-                                            className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
-                                            title="Hapus Materi"
-                                            onClick={() => onDeleteTopic && onDeleteTopic(topic.id)}
-                                        >
-                                            <Trash2 className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </div>
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-8 text-[var(--color-text-muted)] italic">
+                        <div className="text-center py-8 text-[var(--color-text-muted)] text-sm italic">
                             Belum ada materi di kategori ini.
                         </div>
                     )}
+
+                    {/* Add Topic Button */}
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onAddTopic && onAddTopic(); }}
+                        className="mt-4 w-full py-2 border-2 border-dashed border-[var(--color-border)] rounded-lg text-[var(--color-text-muted)] hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/10 transition-colors text-sm font-medium flex items-center justify-center"
+                    >
+                        <Plus className="w-4 h-4 mr-1" />
+                        Tambah Topik
+                    </button>
                 </div>
             )}
         </div>

@@ -46,7 +46,11 @@ const LessonEditor = () => {
       let title = "Unknown Topic";
       for (const s of curr) {
         const found = s.topics.find(t => t.id === topicId);
-        if (found) title = found.title;
+        if (found) {
+          title = found.title;
+          setTopicDesc(found.desc || '');
+          break;
+        }
       }
       // Or check Special Programs (now category-based)
       if (title === "Unknown Topic") {

@@ -251,12 +251,12 @@ export const contentService = {
     const newCurr = curr.filter(s => s.id !== id);
     await this.saveCurriculum(newCurr);
 
-    // Also delete the category document itself from lessons collection
+    // Also delete the category document itself from lessons collection with proper cleanup
     try {
-        await deleteDoc(doc(db, 'lessons', id));
-        console.log(`[Content] Deleted category doc: ${id}`);
+        await this.cleanupLesson(id);
+        console.log(`[Content] Cleaned up category doc: ${id}`);
     } catch (e) {
-        console.warn(`[Content] Failed to delete category doc: ${e.message}`);
+        console.warn(`[Content] Failed to cleanup category doc: ${e.message}`);
     }
 
     return true;
@@ -466,12 +466,12 @@ export const contentService = {
           const newProgs = progs.filter(c => c.id !== categoryId);
           await this.saveSpecialPrograms(newProgs);
 
-          // Also delete the category document itself from lessons collection
+          // Also delete the category document itself from lessons collection with proper cleanup
           try {
-              await deleteDoc(doc(db, 'lessons', categoryId));
-              console.log(`[Content] Deleted special category doc: ${categoryId}`);
+              await this.cleanupLesson(categoryId);
+              console.log(`[Content] Cleaned up special category doc: ${categoryId}`);
           } catch (e) {
-              console.warn(`[Content] Failed to delete category doc: ${e.message}`);
+              console.warn(`[Content] Failed to cleanup category doc: ${e.message}`);
           }
 
           return true;
