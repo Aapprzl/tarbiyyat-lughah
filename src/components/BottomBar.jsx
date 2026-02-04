@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutGrid, Library, Trophy, CircleUser, Sparkles, ShieldHalf } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -7,49 +7,55 @@ import { cn } from '../utils/cn';
 const BottomBar = () => {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
+  const scrollTimeout = useRef(null);
+  const navRef = useRef(null);
 
   useEffect(() => {
-    let scrollTimeout;
-    
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       
-      // Hide on scroll down, show on scroll up
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+      // Ignore bounce interactions (negative scroll)
+      if (currentScrollY < 0) return;
+
+      // Hide on scroll down (> 100px), show on scroll up
+      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
         setIsVisible(false);
-      } else if (currentScrollY < lastScrollY) {
+      } else if (currentScrollY < lastScrollY.current) {
         setIsVisible(true);
       }
       
-      setLastScrollY(currentScrollY);
+      lastScrollY.current = currentScrollY;
       
       // Auto-show after scroll stops (for better UX)
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      scrollTimeout.current = setTimeout(() => {
         setIsVisible(true);
       }, 2000);
     };
 
-    const handleTap = () => {
-      // Show on any tap/click
-      setIsVisible(true);
+    const handleInteraction = (e) => {
+      // Check if click is outside the BottomBar
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        // Toggle visibility on click outside
+        setIsVisible(prev => !prev);
+        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      }
+      // If click is inside the bar, do nothing (let navigation happen)
     };
 
-    // Only add scroll listener on mobile
-    if (window.innerWidth < 768) {
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      window.addEventListener('click', handleTap);
-      window.addEventListener('touchstart', handleTap);
-    }
+    // Add listeners for all viewports (Desktop & Mobile)
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('click', handleTap);
-      window.removeEventListener('touchstart', handleTap);
-      clearTimeout(scrollTimeout);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     };
-  }, [lastScrollY]);
+  }, []);
 
   const navItems = [
     { to: '/', icon: LayoutGrid, label: 'Beranda' },
@@ -62,7 +68,8 @@ const BottomBar = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[100] pb-4 md:pb-6 flex justify-center px-3 md:px-4 pointer-events-none">
       <motion.nav 
-        initial={{ y: 50, opacity: 0 }}
+        ref={navRef}
+        initial={{ y: 0, opacity: 1 }}
         animate={{ 
           y: isVisible ? 0 : 120, 
           opacity: isVisible ? 1 : 0 

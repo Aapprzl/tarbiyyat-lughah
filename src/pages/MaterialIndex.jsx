@@ -98,36 +98,7 @@ const MaterialIndex = () => {
       animate="visible"
       className="container mx-auto px-4 py-12 max-w-5xl space-y-16 pb-32"
     >
-      {/* Page Header */}
-      {/* Page Header - Theme Adaptive */}
-      <div className="relative p-8 md:p-16 rounded-[3rem] bg-white dark:bg-slate-900 overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl transition-colors duration-500">
-         <div className="absolute inset-0 bg-gradient-to-br from-teal-50/50 to-indigo-50/50 dark:from-teal-500/20 dark:to-indigo-500/20 opacity-100 dark:opacity-50 transition-opacity"></div>
-         <div className="absolute -top-24 -right-24 w-96 h-96 bg-teal-500/5 dark:bg-teal-500/20 rounded-full blur-[100px] transition-colors"></div>
-         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/5 dark:bg-indigo-500/20 rounded-full blur-[100px] transition-colors"></div>
-         
-         <div className="relative z-10 text-center max-w-3xl mx-auto">
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/10 text-teal-600 dark:text-teal-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6 transition-colors">
-                <Diamond className="w-3 h-3" />
-                Explorasi Kurikulum
-            </motion.div>
-            
-            {searchQuery ? (
-                <>
-                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 transition-colors">Hasil Pencarian</h1>
-                  <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed transition-colors">
-                    Menampilkan hasil untuk <span className="text-teal-600 dark:text-teal-400 font-bold">"{searchQuery}"</span>
-                  </p>
-                </>
-            ) : (
-                <>
-                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 arabic-title leading-tight transition-colors">Materi Pembelajaran</h1>
-                  <p className="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-medium max-w-xl mx-auto leading-relaxed transition-colors">
-                    Mulailah perjalanan bahasa Arab Anda melalui kurikulum terstruktur yang dirancang untuk kenyamanan belajar tingkat lanjut.
-                  </p>
-                </>
-            )}
-         </div>
-      </div>
+
 
       {searchQuery && sections.length === 0 && (
           <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">

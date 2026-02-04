@@ -42,22 +42,16 @@ const AdminGames = () => {
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [showTopicModal, setShowTopicModal] = useState(false);
-  const [showHeroModal, setShowHeroModal] = useState(false);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   
   const [categoryForm, setCategoryForm] = useState({ title: '', icon: 'Gamepad2', desc: '', isLocked: false });
   const [topicTitle, setTopicTitle] = useState('');
-  const [heroConfig, setHeroConfig] = useState(null);
 
   const loadData = async () => {
     try {
-      const [gamesData, hubConfig] = await Promise.all([
-        contentService.getSpecialPrograms(),
-        contentService.getGameHubConfig()
-      ]);
+      const gamesData = await contentService.getSpecialPrograms();
       setCategories(gamesData);
-      setHeroConfig(hubConfig);
     } catch (err) {
       toast.error('Gagal memuat Data Game.');
     } finally {
@@ -185,25 +179,7 @@ const AdminGames = () => {
     }
   };
 
-  const handleSaveHeroConfig = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      await contentService.saveGameHubConfig(heroConfig);
-      toast.success('Konfigurasi Hero berhasil disimpan!');
-      setShowHeroModal(false);
-    } catch (err) {
-      toast.error('Gagal menyimpan konfigurasi.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const updateHeroStat = (index, field, value) => {
-    const newStats = [...heroConfig.stats];
-    newStats[index] = { ...newStats[index], [field]: value };
-    setHeroConfig({ ...heroConfig, stats: newStats });
-  };
 
   if (loading && categories.length === 0) return (
     <div className="py-24 text-center">
@@ -233,66 +209,6 @@ const AdminGames = () => {
         </button>
       </div>
 
-      {/* Hero Configuration Section */}
-      {heroConfig && (
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/10 dark:to-orange-900/10 rounded-[3rem] p-8 border border-amber-200 dark:border-amber-500/20">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Konfigurasi Hero Hub Game</h2>
-              <p className="text-slate-600 dark:text-slate-400 font-medium">Kelola tampilan banner dan kartu statistik di halaman Permainan</p>
-            </div>
-            <button
-              onClick={() => setShowHeroModal(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-amber-500 text-white rounded-2xl font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all"
-            >
-              <Edit2 className="w-4 h-4" />
-              Edit Hero
-            </button>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-white/10">
-              <h3 className="text-sm font-black text-amber-600 uppercase tracking-widest mb-4">Hero Banner</h3>
-              <div className="space-y-3">
-                <div>
-                  <p className="text-xs font-bold text-slate-400 mb-1">Badge</p>
-                  <p className="text-slate-900 dark:text-white font-bold">{heroConfig.hero.badge}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-400 mb-1">Judul</p>
-                  <p className="text-slate-900 dark:text-white font-bold whitespace-pre-line">{heroConfig.hero.title}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-400 mb-1">Deskripsi</p>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm">{heroConfig.hero.description}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-white/10">
-              <h3 className="text-sm font-black text-amber-600 uppercase tracking-widest mb-4">Kartu Statistik</h3>
-              <div className="space-y-3">
-                {heroConfig.stats.map((stat, idx) => (
-                  <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 dark:bg-black/20 rounded-xl">
-                    <div className={cn(
-                      "w-10 h-10 rounded-xl flex items-center justify-center",
-                      stat.color === 'amber' ? 'bg-amber-500/10 text-amber-600' :
-                      stat.color === 'teal' ? 'bg-teal-500/10 text-teal-600' :
-                      'bg-indigo-500/10 text-indigo-600'
-                    )}>
-                      {React.createElement(iconMap[stat.icon] || Trophy, { className: "w-5 h-5" })}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs font-bold text-slate-400">{stat.label}</p>
-                      <p className="text-sm font-black text-slate-900 dark:text-white">{stat.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Categories List */}
       <div className="grid grid-cols-1 gap-6">
@@ -572,140 +488,6 @@ const AdminGames = () => {
                          </button>
                       </form>
                   </div>
-               </motion.div>
-            </div>
-          )}
-      </AnimatePresence>
-
-      {/* Hero Config Modal */}
-      <AnimatePresence>
-          {showHeroModal && heroConfig && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowHeroModal(false)}>
-               <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-slate-200 dark:border-white/10"
-               >
-                   <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-white/10 p-8 rounded-t-[3rem] z-10">
-                      <div className="flex items-center justify-between">
-                         <div>
-                            <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2">Edit Hero Hub Game</h2>
-                            <p className="text-slate-500 font-medium">Sesuaikan tampilan banner dan kartu statistik</p>
-                         </div>
-                         <button onClick={() => setShowHeroModal(false)} className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
-                            <X className="w-5 h-5" />
-                         </button>
-                      </div>
-                   </div>
-
-                   <form onSubmit={handleSaveHeroConfig} className="p-8 space-y-8">
-                      {/* Hero Banner Section */}
-                      <div className="space-y-6">
-                         <h3 className="text-lg font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
-                            <Diamond className="w-5 h-5" /> Hero Banner
-                         </h3>
-                         
-                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Badge Text</label>
-                            <input 
-                               type="text" 
-                               value={heroConfig.hero.badge} 
-                               onChange={(e) => setHeroConfig({ ...heroConfig, hero: { ...heroConfig.hero, badge: e.target.value }})}
-                               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none" 
-                               placeholder="AREA BERMAIN & BELAJAR"
-                            />
-                         </div>
-
-                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul (gunakan \n untuk baris baru)</label>
-                            <textarea 
-                               value={heroConfig.hero.title} 
-                               onChange={(e) => setHeroConfig({ ...heroConfig, hero: { ...heroConfig.hero, title: e.target.value }})}
-                               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none min-h-[100px]" 
-                               placeholder="Permainan\nBahasa Arab"
-                            />
-                         </div>
-
-                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi</label>
-                            <textarea 
-                               value={heroConfig.hero.description} 
-                               onChange={(e) => setHeroConfig({ ...heroConfig, hero: { ...heroConfig.hero, description: e.target.value }})}
-                               className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none min-h-[120px]" 
-                               placeholder="Belajar mufradat, nahwu, dan shorof..."
-                            />
-                         </div>
-                      </div>
-
-                      {/* Stats Cards Section */}
-                      <div className="space-y-6">
-                         <h3 className="text-lg font-black text-amber-600 uppercase tracking-widest flex items-center gap-2">
-                            <LayoutGrid className="w-5 h-5" /> Kartu Statistik
-                         </h3>
-                         
-                         {heroConfig.stats.map((stat, idx) => (
-                            <div key={idx} className="p-6 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-200 dark:border-white/5 space-y-4">
-                               <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Kartu {idx + 1}</p>
-                               
-                               <div className="grid md:grid-cols-2 gap-4">
-                                  <div className="space-y-2">
-                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Ikon</label>
-                                     <select 
-                                        value={stat.icon} 
-                                        onChange={(e) => updateHeroStat(idx, 'icon', e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 outline-none"
-                                     >
-                                        {Object.keys(iconMap).map(iconName => (
-                                           <option key={iconName} value={iconName}>{iconName}</option>
-                                        ))}
-                                     </select>
-                                  </div>
-
-                                  <div className="space-y-2">
-                                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Warna</label>
-                                     <select 
-                                        value={stat.color} 
-                                        onChange={(e) => updateHeroStat(idx, 'color', e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 outline-none"
-                                     >
-                                        {colorOptions.map(color => (
-                                           <option key={color.value} value={color.value}>{color.label}</option>
-                                        ))}
-                                     </select>
-                                  </div>
-                               </div>
-
-                               <div className="space-y-2">
-                                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Label</label>
-                                  <input 
-                                     type="text" 
-                                     value={stat.label} 
-                                     onChange={(e) => updateHeroStat(idx, 'label', e.target.value)}
-                                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 outline-none" 
-                                     placeholder="Mode Bermain"
-                                  />
-                               </div>
-
-                               <div className="space-y-2">
-                                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Value</label>
-                                  <input 
-                                     type="text" 
-                                     value={stat.value} 
-                                     onChange={(e) => updateHeroStat(idx, 'value', e.target.value)}
-                                     className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 outline-none" 
-                                     placeholder="Interaktif"
-                                  />
-                               </div>
-                            </div>
-                         ))}
-                      </div>
-
-                      <button type="submit" className="w-full py-5 bg-amber-500 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95">
-                         Simpan Konfigurasi Hero
-                      </button>
-                   </form>
                </motion.div>
             </div>
           )}

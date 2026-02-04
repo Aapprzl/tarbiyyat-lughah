@@ -27,18 +27,13 @@ const iconMap = {
 
 const GameIndex = () => {
   const [categories, setCategories] = useState([]);
-  const [hubConfig, setHubConfig] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [gamesData, configData] = await Promise.all([
-          contentService.getSpecialPrograms(),
-          contentService.getGameHubConfig()
-        ]);
+        const gamesData = await contentService.getSpecialPrograms();
         setCategories(gamesData);
-        setHubConfig(configData);
       } catch (err) {
         console.error('Failed to load games:', err);
       } finally {
@@ -61,40 +56,6 @@ const GameIndex = () => {
 
   return (
     <div className="container mx-auto px-6 py-12 max-w-6xl pb-40">
-      {/* Hero Section */}
-      <header className="mb-16 text-center relative overflow-hidden p-12 md:p-20 bg-gradient-to-br from-amber-500 to-orange-600 rounded-[4rem] text-white shadow-2xl shadow-amber-500/20">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-         <div className="absolute bottom-0 left-0 w-64 h-64 bg-black/10 rounded-full blur-3xl -ml-32 -mb-32"></div>
-         
-         <motion.div 
-           initial={{ opacity: 0, scale: 0.9 }}
-           animate={{ opacity: 1, scale: 1 }}
-           className="relative z-10"
-         >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-black uppercase tracking-[0.2em] mb-8 border border-white/20">
-                <Trophy className="w-3 h-3" /> {hubConfig?.hero?.badge || 'AREA BERMAIN & BELAJAR'}
-            </div>
-            <h1 className="text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-none whitespace-pre-line">
-                {hubConfig?.hero?.title || 'Permainan\nBahasa Arab'}
-            </h1>
-            <p className="text-lg md:text-xl font-medium text-white/80 max-w-2xl mx-auto leading-relaxed">
-                {hubConfig?.hero?.description || 'Belajar mufradat, nahwu, dan shorof jadi lebih seru dengan berbagai tantangan interaktif. Siap untuk level berikutnya?'}
-            </p>
-         </motion.div>
-      </header>
-
-      {/* Stats/Badge Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {hubConfig?.stats?.map((stat, idx) => (
-            <StatCard key={idx} icon={stat.icon} label={stat.label} value={stat.value} color={stat.color} />
-          )) || (
-            <>
-              <StatCard icon="Gamepad2" label="Mode Bermain" value="Interaktif" color="amber" />
-              <StatCard icon="Sparkles" label="Konten Baru" value="Mingguan" color="teal" />
-              <StatCard icon="Trophy" label="Tantangan" value="Seru" color="indigo" />
-            </>
-          )}
-      </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence>
