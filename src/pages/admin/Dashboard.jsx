@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Search, Layers, FileText, ArrowRight, Sparkles, FolderPlus, MoreVertical, ExternalLink } from 'lucide-react';
+import { Edit2, Plus, BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Search, Layers, FileText, ArrowRight, Sparkles, FolderPlus, MoreVertical, ExternalLink, Lock, Unlock, X } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -18,19 +18,20 @@ const AdminDashboard = () => {
   const confirm = useConfirm();
   const toast = useToast();
 
+  const loadData = async () => {
+    try {
+      const data = await contentService.getCurriculum();
+      setCurriculum(data);
+      const progs = await contentService.getSpecialPrograms();
+      setSpecialPrograms(progs);
+    } catch (err) {
+        toast.error("Gagal memuat data dashboard.");
+    } finally {
+        setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await contentService.getCurriculum();
-        setCurriculum(data);
-        const progs = await contentService.getSpecialPrograms();
-        setSpecialPrograms(progs);
-      } catch (err) {
-          toast.error("Gagal memuat data dashboard.");
-      } finally {
-          setLoading(false);
-      }
-    };
     loadData();
   }, []);
 
@@ -129,10 +130,12 @@ const AdminDashboard = () => {
       setShowSectionModal(true);
   };
 
-  const filteredCurriculum = curriculum.filter(s => 
-    (s.title || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (s.topics || []).some(t => (t.title || '').toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredCurriculum = (Array.isArray(curriculum) ? curriculum : []).filter(s => {
+    if (!s) return false;
+    const titleMatch = (s.title || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const topicsMatch = (s.topics || []).some(t => t && (t.title || '').toLowerCase().includes(searchTerm.toLowerCase()));
+    return titleMatch || topicsMatch;
+  });
 
   if (loading && curriculum.length === 0) {
       return (
@@ -169,19 +172,33 @@ const AdminDashboard = () => {
            </div>
         </div>
         
-        <div className="flex items-center gap-3 w-full md:w-auto">
-            <button 
+        <div className="flex items-center gap-4 w-full md:w-auto self-end pb-1">
+            <motion.button 
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => {
                 setEditingSectionId(null);
                 setNewSectionTitle('');
                 setSelectedIcon('BookOpen');
                 setShowSectionModal(true);
               }}
-              className="group flex-1 md:flex-none flex items-center justify-center bg-teal-600 text-white px-8 py-4.5 rounded-[2rem] font-black uppercase tracking-widest text-xs shadow-2xl shadow-teal-500/20 hover:bg-teal-700 active:scale-95 transition-all"
+              className="relative group overflow-hidden bg-gradient-to-br from-teal-600 to-teal-700 text-white px-8 py-4 rounded-3xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-teal-500/20 active:shadow-inner transition-all flex items-center justify-center min-w-[180px]"
             >
-              <FolderPlus className="w-5 h-5 mr-3 transition-transform group-hover:scale-125" />
-              Kategori Baru
-            </button>
+              {/* Shine effect */}
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              </div>
+              
+              <div className="relative flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded-xl flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                  <FolderPlus className="w-4 h-4 transition-transform group-hover:scale-110" />
+                </div>
+                <span>Kategori Baru</span>
+              </div>
+              
+              {/* Glow border on hover */}
+              <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/20 rounded-3xl transition-all duration-500"></div>
+            </motion.button>
         </div>
       </div>
 
@@ -205,20 +222,24 @@ const AdminDashboard = () => {
       {/* Grid Content */}
       <div className="grid gap-6">
         {filteredCurriculum.length > 0 ? (
-            filteredCurriculum.map((section) => (
-                 <DashboardSectionItem 
-                    key={section.id} 
-                    section={section} 
-                    iconMap={iconMap}
-                    onEdit={() => openEditSection(section)}
-                    onDelete={() => handleDeleteSection(section.id)}
-                    onDeleteTopic={handleDeleteTopic}
-                    onAddTopic={() => {
-                        setSelectedSection(section.id);
-                        setShowAddModal(true);
-                    }}
-                 />
-            ))
+            (filteredCurriculum || []).map((section) => {
+                  if (!section) return null;
+                  return (
+                    <DashboardSectionItem 
+                        key={section.id || Math.random()} 
+                        section={section} 
+                        iconMap={iconMap}
+                        onEdit={() => openEditSection(section)}
+                        onDelete={() => handleDeleteSection(section.id)}
+                        onDeleteTopic={handleDeleteTopic}
+                        onReload={loadData}
+                        onAddTopic={() => {
+                            setSelectedSection(section.id);
+                            setShowAddModal(true);
+                        }}
+                    />
+                  );
+            })
         ) : (
             <div className="py-24 text-center bg-white dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-white/10">
                 <Search className="w-12 h-12 mx-auto mb-4 text-slate-300" />
@@ -315,10 +336,32 @@ const AdminDashboard = () => {
 
 // --- Sub Components ---
 
-const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic }) => {
+const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic, onReload }) => {
     const [isOpen, setIsOpen] = useState(false);
     const SectionIcon = iconMap[section.icon] || BookOpen;
     const topicCount = section.topics?.length || 0;
+    const [toggling, setToggling] = useState(false);
+
+    const toggleLock = async (e) => {
+        e.stopPropagation();
+        setToggling(true);
+        try {
+            await contentService.updateSection(section.id, null, null, { isLocked: !section.isLocked });
+            onReload();
+        } finally {
+            setToggling(false);
+        }
+    };
+
+    const toggleTopicLock = async (topicId, currentLocked) => {
+        setToggling(true);
+        try {
+            await contentService.updateTopicMetadata(topicId, { isLocked: !currentLocked });
+            onReload();
+        } finally {
+            setToggling(false);
+        }
+    };
 
     return (
         <motion.div 
@@ -342,23 +385,41 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                              <span className="px-3 py-1 bg-slate-100 dark:bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500">
                                  {topicCount} Topik
                              </span>
-                             {topicCount === 0 && (
-                                <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 uppercase tracking-widest">
-                                    <Zap className="w-3 h-3" /> Kosong
-                                </span>
-                             )}
+                                     {topicCount === 0 && (
+                                        <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 uppercase tracking-widest">
+                                            <Zap className="w-3 h-3" /> Kosong
+                                        </span>
+                                     )}
+                                     {section.isLocked && (
+                                        <span className="px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
+                                            <Lock className="w-3 h-3" /> Terkunci
+                                        </span>
+                                     )}
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-                <div className="flex items-center gap-3 md:border-l border-slate-200 dark:border-white/10 md:pl-6">
-                    <button 
-                        onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                        className="p-3 text-slate-400 hover:text-teal-600 hover:bg-white dark:hover:bg-white/10 rounded-2xl transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
-                        title="Edit Kategori"
-                    >
-                        <Edit2 className="w-5 h-5" />
-                    </button>
+                        <div className="flex items-center gap-3 md:border-l border-slate-200 dark:border-white/10 md:pl-6">
+                            <button 
+                                onClick={toggleLock}
+                                disabled={toggling}
+                                className={cn(
+                                    "p-3 rounded-2xl transition-all border shrink-0",
+                                    section.isLocked 
+                                        ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20" 
+                                        : "bg-white dark:bg-white/10 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 border-transparent hover:border-amber-200"
+                                )}
+                                title={section.isLocked ? "Buka Kunci Kategori" : "Kunci Kategori"}
+                            >
+                                {section.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                            </button>
+                            <button 
+                                onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                                className="p-3 text-slate-400 hover:text-teal-600 hover:bg-white dark:hover:bg-white/10 rounded-2xl transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
+                                title="Edit Kategori"
+                            >
+                                <Edit2 className="w-5 h-5" />
+                            </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); onDelete(); }}
                         className="p-3 text-slate-400 hover:text-red-500 hover:bg-white dark:hover:bg-white/10 rounded-2xl transition-all border border-transparent hover:border-slate-200 dark:hover:border-white/10"
@@ -378,21 +439,44 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="p-8 pt-0 bg-slate-50/50 dark:bg-black/20"
+                        transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                        className="overflow-hidden bg-slate-50/50 dark:bg-black/20"
                     >
+                        <div className="p-8 pt-0">
                         <div className="h-px w-full bg-slate-200 dark:bg-white/10 mb-8"></div>
                         
                         {topicCount > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {section.topics.map((topic) => (
-                                    <div key={topic.id} className="group/item flex items-center justify-between p-5 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl hover:border-teal-500/30 hover:shadow-lg transition-all">
+                                { (section.topics || []).map((topic) => (
+                                    <div key={topic.id} className={cn(
+                                        "group/item flex items-center justify-between p-5 bg-white dark:bg-white/5 border rounded-3xl transition-all",
+                                        topic.isLocked ? "border-amber-500/30 opacity-80" : "border-slate-200 dark:border-white/10 hover:border-teal-500/30 hover:shadow-lg"
+                                    )}>
                                         <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center text-slate-400 group-hover/item:bg-teal-500 group-hover/item:text-white transition-all">
-                                                <FileText className="w-5 h-5" />
+                                            <div className={cn(
+                                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
+                                                topic.isLocked ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-white/10 text-slate-400 group-hover/item:bg-teal-500 group-hover/item:text-white"
+                                            )}>
+                                                {topic.isLocked ? <Lock className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
                                             </div>
-                                            <span className="font-bold text-slate-800 dark:text-slate-200 font-arabic text-lg tracking-tight">{topic.title}</span>
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-slate-800 dark:text-slate-200 font-arabic text-lg tracking-tight">{topic.title}</span>
+                                                {topic.isLocked && <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest leading-none mt-0.5">Akses Terbatas</span>}
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-2">
+                                            <button 
+                                                onClick={() => toggleTopicLock(topic.id, topic.isLocked)}
+                                                className={cn(
+                                                    "p-2 rounded-xl transition-all border",
+                                                    topic.isLocked 
+                                                        ? "bg-amber-500/10 text-amber-600 border-amber-500/20" 
+                                                        : "text-slate-300 hover:text-amber-500 hover:bg-amber-500/10 border-transparent hover:border-amber-100"
+                                                )}
+                                                title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
+                                            >
+                                                {topic.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                                            </button>
                                             <Link 
                                                 to={`/admin/edit/${topic.id}`}
                                                 className="flex items-center gap-2 px-4 py-2 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-teal-500 hover:text-white transition-all border border-teal-500/20"
@@ -416,7 +500,6 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Kategori ini masih kosong</p>
                             </div>
                         )}
-
                         <button 
                             onClick={onAddTopic}
                             className="mt-6 w-full group flex items-center justify-center gap-3 py-5 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl text-slate-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-500/5 transition-all text-xs font-black uppercase tracking-widest"
@@ -424,6 +507,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                             <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
                             Tambahkan Materi Ke Sini
                         </button>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -459,10 +543,6 @@ const Modal = ({ title, children, onClose }) => (
     </div>
 );
 
-const X = ({ className }) => (
-    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-    </svg>
-);
+
 
 export default AdminDashboard;

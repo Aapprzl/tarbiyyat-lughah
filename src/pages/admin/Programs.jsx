@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Star, Plus, BookOpen, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Sparkles, FolderPlus, FilePlus, Target, ListChecks, Settings, Globe, MoreVertical, X, LayoutGrid } from 'lucide-react';
+import { Edit2, Star, Plus, BookOpen, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Sparkles, FolderPlus, FilePlus, Target, ListChecks, Settings, Globe, MoreVertical, X, LayoutGrid, Lock, Unlock } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { Link } from 'react-router-dom';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile
+  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Target, ListChecks, Settings, Globe
 };
 
 const AdminPrograms = () => {
@@ -17,84 +17,91 @@ const AdminPrograms = () => {
   const confirm = useConfirm();
   const toast = useToast();
 
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showTopicModal, setShowTopicModal] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  
+  const [categoryForm, setCategoryForm] = useState({ title: '', icon: 'Star', desc: '', isLocked: false });
+  const [topicTitle, setTopicTitle] = useState('');
+
+  const loadData = async () => {
+    try {
+      const data = await contentService.getSpecialPrograms();
+      setSpecialPrograms(data);
+    } catch (err) {
+      toast.error('Gagal memuat Program Khusus.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    try {
-        const progs = await contentService.getSpecialPrograms();
-        setSpecialPrograms(progs);
-    } catch (err) {
-        toast.error("Gagal memuat list program.");
-    } finally {
-        setLoading(false);
-    }
-  };
-
   const toggleCategory = (catId) => {
     setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
-  
-  // --- Category Modal State ---
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [categoryForm, setCategoryForm] = useState({ title: '', icon: 'Star', desc: '' });
-
-  // --- Topic Modal State ---
-  const [showTopicModal, setShowTopicModal] = useState(false);
-  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-  const [topicTitle, setTopicTitle] = useState('');
 
   // Category Actions
   const handleSaveCategory = async (e) => {
     e.preventDefault();
+    if (!categoryForm.title) return;
+
     setLoading(true);
-    
     try {
-        if (editingCategoryId) {
-           await contentService.updateSpecialCategory(editingCategoryId, categoryForm.title, categoryForm.icon, categoryForm.desc);
-           toast.success('Kategori berhasil diperbarui! ✨');
-        } else {
-           await contentService.addSpecialCategory(categoryForm.title, categoryForm.icon, categoryForm.desc);
-           toast.success('Kategori baru ditambahkan! 🚀');
-        }
-    
-        await loadData();
-        setShowCategoryModal(false);
-        setCategoryForm({ title: '', icon: 'Star', desc: '' });
-        setEditingCategoryId(null);
+      if (editingCategoryId) {
+        await contentService.updateSpecialCategory(editingCategoryId, categoryForm.title, categoryForm.icon, categoryForm.desc, { isLocked: categoryForm.isLocked });
+        toast.success('Kategori diperbarui!');
+      } else {
+        await contentService.addSpecialCategory(categoryForm.title, categoryForm.icon, categoryForm.desc);
+        toast.success('Kategori baru dibuat!');
+      }
+      await loadData();
+      setShowCategoryModal(false);
     } catch (err) {
-        toast.error('Gagal menyimpan kategori.');
+      toast.error('Gagal menyimpan kategori.');
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleDeleteCategory = async (categoryId) => {
-    const ok = await confirm('Yakin ingin menghapus Kategori ini? Semua topik di dalamnya juga akan terhapus!', 'Hapus Kategori');
-    if (ok) {
-        setLoading(true);
-        try {
-            await contentService.deleteSpecialCategory(categoryId);
-            await loadData();
-            toast.success('Kategori dihapus.');
-        } catch (err) {
-            toast.error('Gagal menghapus kategori.');
-        } finally {
-            setLoading(false);
-        }
-    }
-  };
-
-  const openEditCategory = (cat) => {
-    setEditingCategoryId(cat.id);
+  const openEditCategory = (category) => {
     setCategoryForm({ 
-      title: cat.title, 
-      icon: cat.icon || 'Star',
-      desc: cat.desc || '' 
+        title: category.title || '', 
+        icon: category.icon || 'Star', 
+        desc: category.desc || '',
+        isLocked: category.isLocked || false
     });
+    setEditingCategoryId(category.id);
     setShowCategoryModal(true);
+  };
+
+  const handleDeleteCategory = async (catId) => {
+    const ok = await confirm('Hapus seluruh kategori ini beserta semua isinya?', 'Hapus Kategori');
+    if (ok) {
+      setLoading(true);
+      try {
+        await contentService.deleteSpecialCategory(catId);
+        await loadData();
+        toast.success('Kategori dihapus.');
+      } catch (err) {
+        toast.error('Gagal menghapus kategori.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
+  const toggleCategoryLock = async (category) => {
+    try {
+        await contentService.updateSpecialCategory(category.id, null, null, null, { isLocked: !category.isLocked });
+        await loadData();
+        toast.success(`Kategori ${!category.isLocked ? 'dikunci' : 'dibuka'}!`);
+    } catch (err) {
+        toast.error('Gagal mengubah status kunci.');
+    }
   };
 
   // Topic Actions
@@ -133,10 +140,22 @@ const AdminPrograms = () => {
     }
   };
 
-  const openAddTopic = (categoryId) => {
-    setSelectedCategoryId(categoryId);
-    setTopicTitle('');
+  const openAddTopic = (catId) => {
+    setSelectedCategoryId(catId);
     setShowTopicModal(true);
+  };
+
+  const toggleTopicLock = async (categoryId, topicId, currentLocked) => {
+    setLoading(true);
+    try {
+        await contentService.updateTopicMetadata(topicId, { isLocked: !currentLocked });
+        await loadData();
+        toast.success(`Topik ${!currentLocked ? 'dikunci' : 'dibuka'}!`);
+    } catch (err) {
+        toast.error('Gagal mengubah status kunci.');
+    } finally {
+        setLoading(false);
+    }
   };
 
   if (loading && specialPrograms.length === 0) return (
@@ -159,7 +178,7 @@ const AdminPrograms = () => {
         </div>
         
         <button 
-          onClick={() => { setCategoryForm({ title: '', icon: 'Star', desc: '' }); setEditingCategoryId(null); setShowCategoryModal(true); }}
+          onClick={() => { setCategoryForm({ title: '', icon: 'Star', desc: '', isLocked: false }); setEditingCategoryId(null); setShowCategoryModal(true); }}
           className="group flex items-center justify-center bg-amber-500 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-600 active:scale-95 transition-all"
         >
           <FolderPlus className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
@@ -170,7 +189,8 @@ const AdminPrograms = () => {
       {/* Categories List */}
       <div className="grid grid-cols-1 gap-6">
         <AnimatePresence mode="popLayout">
-            {specialPrograms.map((category, index) => {
+            {(specialPrograms || []).map((category, index) => {
+              if (!category) return null;
               const IconComp = iconMap[category.icon] || Star;
               const isExpanded = expandedCategories[category.id];
 
@@ -200,12 +220,29 @@ const AdminPrograms = () => {
                       </div>
                       <div>
                         <h3 className="text-xl font-black text-slate-900 dark:text-white font-arabic tracking-tight">{category.title}</h3>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">{category.topics?.length || 0} Materi Terdaftar</p>
+                        <div className="flex items-center gap-2">
+                             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">{category.topics?.length || 0} Materi Terdaftar</p>
+                             {category.isLocked && (
+                                 <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full ring-1 ring-amber-500/20">
+                                     <Lock className="w-2.5 h-2.5" /> Terkunci
+                                 </span>
+                             )}
+                        </div>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-3">
                       <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                         <button 
+                            onClick={(e) => { e.stopPropagation(); toggleCategoryLock(category); }}
+                            className={cn(
+                                "p-3 rounded-2xl transition-all",
+                                category.isLocked ? "text-amber-500 bg-amber-500/10" : "text-slate-400 hover:text-amber-500"
+                            )}
+                            title={category.isLocked ? "Buka Kunci" : "Kunci Kategori"}
+                         >
+                            {category.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                         </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
                             className="p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all"
@@ -235,8 +272,10 @@ const AdminPrograms = () => {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="px-8 pb-8 pt-2"
+                            transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                            className="overflow-hidden"
                         >
+                          <div className="px-8 pb-8 pt-2">
                           <div className="h-px bg-slate-200 dark:bg-white/5 mb-8"></div>
                           
                           {category.topics?.length === 0 ? (
@@ -253,10 +292,29 @@ const AdminPrograms = () => {
                                     className="flex items-center justify-between p-5 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 rounded-[2rem] hover:border-amber-500/30 transition-all group/topic"
                                 >
                                   <div className="flex items-center gap-4">
-                                     <div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>
-                                     <span className="font-bold text-slate-900 dark:text-white font-arabic text-lg leading-tight">{topic.title}</span>
+                                     <div className={cn(
+                                         "w-1.5 h-1.5 rounded-full",
+                                         topic.isLocked ? "bg-amber-500 animate-pulse" : "bg-teal-500"
+                                     )}></div>
+                                     <div className="flex flex-col">
+                                         <span className={cn(
+                                             "font-bold font-arabic text-lg leading-tight",
+                                             topic.isLocked ? "text-slate-400" : "text-slate-900 dark:text-white"
+                                         )}>{topic.title}</span>
+                                         {topic.isLocked && <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Akses Dikunci</span>}
+                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
+                                    <button 
+                                      onClick={() => toggleTopicLock(category.id, topic.id, topic.isLocked)}
+                                      className={cn(
+                                          "p-2 rounded-xl transition-all border",
+                                          topic.isLocked ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "text-slate-300 hover:text-amber-500 border-transparent hover:border-amber-100"
+                                      )}
+                                      title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
+                                    >
+                                      {topic.isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                                    </button>
                                     <Link
                                       to={`/admin/edit/${topic.id}`}
                                       className="text-[10px] font-black uppercase tracking-widest bg-white dark:bg-white/10 text-teal-600 dark:text-teal-400 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-teal-500 hover:text-white hover:border-teal-500 transition-all shadow-sm"
@@ -283,6 +341,7 @@ const AdminPrograms = () => {
                             <FilePlus className="w-4 h-4 group-hover:scale-125 transition-transform" />
                             Tambah Topik Baru
                           </button>
+                          </div>
                         </motion.div>
                       )}
                   </AnimatePresence>
@@ -357,7 +416,7 @@ const AdminPrograms = () => {
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Ikon Visual</label>
                                 <div className="grid grid-cols-5 gap-2 bg-slate-50 dark:bg-black/20 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
                                    {Object.keys(iconMap).map(iconName => {
-                                      const Icon = iconMap[iconName];
+                                      const IconComp = iconMap[iconName];
                                       const isSelected = categoryForm.icon === iconName;
                                       return (
                                          <button
@@ -369,7 +428,7 @@ const AdminPrograms = () => {
                                                 isSelected ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "text-slate-400 hover:bg-white dark:hover:bg-white/5"
                                             )}
                                          >
-                                            <Icon className="w-5 h-5" />
+                                            <IconComp className="w-5 h-5" />
                                          </button>
                                       );
                                    })}
@@ -378,13 +437,35 @@ const AdminPrograms = () => {
                           </div>
 
                           <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Strategis</label>
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Singkat</label>
                             <textarea 
                               value={categoryForm.desc}
                               onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
-                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-[2rem] px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none transition-all min-h-[120px]"
-                              placeholder="Visi atau ringkasan singkat program ini..."
+                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none transition-all h-24 resize-none"
+                              placeholder="Penjelasan singkat tentang program ini..."
                             />
+                          </div>
+
+                          <div className="flex items-center justify-between p-6 bg-amber-500/10 rounded-3xl border border-amber-500/20">
+                             <div className="flex items-center gap-4">
+                               <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
+                                  {categoryForm.isLocked ? <Lock className="w-6 h-6" /> : <Unlock className="w-6 h-6" />}
+                               </div>
+                               <div>
+                                  <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Status Akses</h4>
+                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{categoryForm.isLocked ? 'Hanya Admin (Segera Rilis)' : 'Publik (Dapat Diakses)'}</p>
+                               </div>
+                             </div>
+                             <button 
+                               type="button"
+                               onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })}
+                               className={cn(
+                                   "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
+                                   categoryForm.isLocked ? "bg-amber-500 text-white" : "bg-white dark:bg-white/5 text-slate-400"
+                               )}
+                             >
+                               {categoryForm.isLocked ? 'Terkunci' : 'Publik'}
+                             </button>
                           </div>
 
                           <div className="flex gap-4 pt-6">

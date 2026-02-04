@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle } from 'lucide-react';
+import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle, Lock } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
 import { SplitText } from '../components/animations/SplitText';
@@ -160,27 +160,48 @@ const Home = () => {
           {specialPrograms.map((prog, idx) => {
              const Icon = iconMap[prog.icon] || Star;
              return (
-               <Link key={prog.id} to={`/program/${prog.id}`} className={cn(
-                  idx === 0 ? "md:col-span-2" : "md:col-span-1"
-               )}>
-                 <BentoGridItem
-                   title={prog.title}
-                   description={prog.desc || 'Pelajari program ini untuk meningkatkan kemampuan bahasa Arab Anda secara intensif.'}
-                   header={
-                     <div className={cn(
-                        "flex flex-1 w-full h-full min-h-[6rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[0.98]",
-                        idx === 0 ? "from-teal-500 to-teal-700" : 
-                        idx === 1 ? "from-amber-400 to-amber-600" : 
-                        "from-indigo-500 to-indigo-700"
-                     )}>
-                        <div className="w-full h-full flex items-center justify-center opacity-20 group-hover/bento:opacity-40 transition-opacity">
-                            <Icon className="w-24 h-24 text-white rotate-12" />
-                        </div>
+                <div key={prog.id} className="md:col-span-1">
+                   {prog.isLocked ? (
+                     <div className="opacity-75 cursor-not-allowed h-full">
+                        <BentoGridItem
+                          title={prog.title}
+                          description="Program ini akan segera hadir. Saat ini akses masih terkunci."
+                          header={
+                            <div className="flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-slate-300 dark:bg-slate-800 grayscale items-center justify-center relative overflow-hidden">
+                               <div className="relative z-10 w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/20">
+                                   <Lock className="w-10 h-10" />
+                               </div>
+                               <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg border border-white/10">
+                                  <Lock className="w-3 h-3" /> Terkunci
+                               </div>
+                            </div>
+                          }
+                        />
                      </div>
-                   }
-                   icon={<Icon className="h-4 w-4 text-teal-500" />}
-                 />
-               </Link>
+                   ) : (
+                     <Link to={`/program/${prog.id}`}>
+                        <BentoGridItem
+                          title={prog.title}
+                          description={prog.desc || 'Pelajari program ini untuk meningkatkan kemampuan bahasa Arab Anda secara intensif.'}
+                          header={
+                            <div className={cn(
+                               "flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[1.02] items-center justify-center relative overflow-hidden",
+                               idx % 3 === 0 ? "from-teal-500 to-indigo-600" : 
+                               idx % 3 === 1 ? "from-indigo-600 to-purple-600" : 
+                               "from-amber-400 to-orange-600"
+                            )}>
+                               <div className="relative z-10 w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/30 transition-transform group-hover/bento:scale-110 duration-500">
+                                   <Icon className="w-10 h-10" />
+                               </div>
+                               
+                               {/* Decorative Background Element */}
+                               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500"></div>
+                            </div>
+                          }
+                        />
+                     </Link>
+                   )}
+                </div>
              );
           })}
         </BentoGrid>

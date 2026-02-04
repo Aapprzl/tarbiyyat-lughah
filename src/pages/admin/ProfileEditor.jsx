@@ -4,8 +4,29 @@ import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
 import PdfViewer from '../../components/PdfViewer';
 import { useToast } from '../../components/Toast';
-import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion'; 
 import { cn } from '../../utils/cn';
+import * as LucideIcons from 'lucide-react';
+
+const SOCIAL_PLATFORMS = [
+    { id: 'instagram', icon: 'Instagram', color: 'bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500', patterns: ['instagram.com'] },
+    { id: 'linkedin', icon: 'Linkedin', color: 'bg-[#0077b5]', patterns: ['linkedin.com'] },
+    { id: 'facebook', icon: 'Facebook', color: 'bg-[#1877f2]', patterns: ['facebook.com', 'fb.com'] },
+    { id: 'twitter', icon: 'Twitter', color: 'bg-[#1da1f2]', patterns: ['twitter.com', 'x.com'] },
+    { id: 'github', icon: 'Github', color: 'bg-[#333]', patterns: ['github.com'] },
+    { id: 'youtube', icon: 'Youtube', color: 'bg-[#ff0000]', patterns: ['youtube.com', 'youtu.be'] },
+    { id: 'tiktok', icon: 'Video', color: 'bg-[#000000]', patterns: ['tiktok.com'] },
+    { id: 'whatsapp', icon: 'MessageCircle', color: 'bg-[#25d366]', patterns: ['wa.me', 'whatsapp.com'] },
+    { id: 'threads', icon: 'AtSign', color: 'bg-black', patterns: ['threads.net'] },
+    { id: 'website', icon: 'Globe', color: 'bg-slate-900', patterns: [] }
+];
+
+const detectPlatform = (url) => {
+    if (!url) return SOCIAL_PLATFORMS.find(p => p.id === 'website');
+    const lowerUrl = url.toLowerCase();
+    const platform = SOCIAL_PLATFORMS.find(p => p.patterns.some(pattern => lowerUrl.includes(pattern)));
+    return platform || SOCIAL_PLATFORMS.find(p => p.id === 'website');
+};
 
 const ProfileEditor = () => {
     const [config, setConfig] = useState(null);
@@ -22,11 +43,21 @@ const ProfileEditor = () => {
     const loadConfig = async () => {
         try {
             const data = await contentService.getProfileConfig();
+            
+            // Migration: Transform socials object to dynamic links array if needed
+            let dynamicLinks = data.dynamicLinks || [];
+            if (dynamicLinks.length === 0 && data.socials) {
+                 // Map legacy socials
+                 if (data.socials.instagram) dynamicLinks.push({ url: data.socials.instagram });
+                 if (data.socials.linkedin) dynamicLinks.push({ url: data.socials.linkedin });
+                 if (data.socials.website) dynamicLinks.push({ url: data.socials.website });
+            }
+
             const configWithDefaults = {
                 name: '', title: '', bio: '', photoUrl: '', email: '', pdfUrl: '', location: '',
                 showStats: true,
                 ...data,
-                socials: { instagram: '', linkedin: '', website: '', ...(data.socials || {}) },
+                dynamicLinks,
                 stats: { projects: '0', hours: '0', rating: '0', ...(data.stats || {}) }
             };
             setConfig(configWithDefaults);
@@ -106,10 +137,23 @@ const ProfileEditor = () => {
         }
     };
 
-    const updateSocial = (key, value) => {
+    const addSocialLink = () => {
         setConfig(prev => ({
             ...prev,
-            socials: { ...prev.socials, [key]: value }
+            dynamicLinks: [...(prev.dynamicLinks || []), { url: '' }]
+        }));
+    };
+
+    const updateSocialLink = (index, url) => {
+        const newLinks = [...config.dynamicLinks];
+        newLinks[index].url = url;
+        setConfig(prev => ({ ...prev, dynamicLinks: newLinks }));
+    };
+
+    const removeSocialLink = (index) => {
+        setConfig(prev => ({
+            ...prev,
+            dynamicLinks: prev.dynamicLinks.filter((_, i) => i !== index)
         }));
     };
 
@@ -261,47 +305,66 @@ const ProfileEditor = () => {
                         transition={{ delay: 0.1 }}
                         className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
                     >
-                        <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                            <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600">
-                                <Globe className="w-6 h-6" />
-                            </div>
-                            Jejaring Sosial
-                        </h2>
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
+                                <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600">
+                                    <Globe className="w-6 h-6" />
+                                </div>
+                                Jejaring Sosial Dinamis
+                            </h2>
+                            <button 
+                                onClick={addSocialLink}
+                                className="px-6 py-3 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-2xl font-black uppercase tracking-widest text-[10px] border border-indigo-500/20 hover:bg-indigo-500 hover:text-white transition-all shadow-lg shadow-indigo-500/5"
+                            >
+                                + Tambah Tautan
+                            </button>
+                        </div>
                         
-                        <div className="space-y-5">
-                             <div className="group flex items-center gap-5">
-                                <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-orange-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-500/20 group-hover:scale-110 transition-transform">
-                                    <Instagram className="w-7 h-7" />
-                                </div>
-                                <input 
-                                    className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
-                                    value={config.socials?.instagram || ''}
-                                    onChange={e => updateSocial('instagram', e.target.value)}
-                                    placeholder="https://instagram.com/user"
-                                />
-                             </div>
-                             <div className="group flex items-center gap-5">
-                                <div className="w-14 h-14 bg-[#0077b5] text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform">
-                                    <Linkedin className="w-7 h-7" />
-                                </div>
-                                <input 
-                                    className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
-                                    value={config.socials?.linkedin || ''}
-                                    onChange={e => updateSocial('linkedin', e.target.value)}
-                                    placeholder="https://linkedin.com/in/user"
-                                />
-                             </div>
-                             <div className="group flex items-center gap-5">
-                                <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-500/20 group-hover:scale-110 transition-transform">
-                                    <LinkIcon className="w-7 h-7" />
-                                </div>
-                                <input 
-                                    className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
-                                    value={config.socials?.website || ''}
-                                    onChange={e => updateSocial('website', e.target.value)}
-                                    placeholder="https://yourwebsite.com"
-                                />
-                             </div>
+                        <div className="space-y-4">
+                             <AnimatePresence mode="popLayout">
+                                {config.dynamicLinks?.map((link, idx) => {
+                                    const platform = detectPlatform(link.url);
+                                    const IconComponent = LucideIcons[platform.icon] || LucideIcons.Link2;
+                                    
+                                    return (
+                                        <motion.div 
+                                            key={idx}
+                                            initial={{ opacity: 0, x: -20, scale: 0.95 }}
+                                            animate={{ opacity: 1, x: 0, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.95, x: 20 }}
+                                            className="group flex flex-col md:flex-row items-stretch md:items-center gap-4 p-4 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-[2rem] transition-all hover:border-indigo-500/30"
+                                        >
+                                            <div className={cn(
+                                                "w-14 h-14 text-white rounded-2xl flex items-center justify-center shadow-lg transition-all duration-500 group-hover:scale-110 shrink-0",
+                                                platform.color
+                                            )}>
+                                                <IconComponent className="w-7 h-7" />
+                                            </div>
+                                            
+                                            <div className="flex-1 flex flex-col md:flex-row items-center gap-4">
+                                                <input 
+                                                    className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-6 py-3 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-indigo-500 shadow-sm outline-none transition-all placeholder:text-slate-300"
+                                                    value={link.url}
+                                                    onChange={e => updateSocialLink(idx, e.target.value)}
+                                                    placeholder="Masukkan URL (LinkedIn, IG, GitHub, dll)"
+                                                />
+                                                <button 
+                                                    onClick={() => removeSocialLink(idx)}
+                                                    className="w-full md:w-12 h-12 md:h-12 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl flex items-center justify-center transition-all border border-red-500/20 group/del"
+                                                >
+                                                    <Trash2 className="w-5 h-5 group-hover/del:scale-110" />
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    );
+                                })}
+                             </AnimatePresence>
+                             
+                             {(!config.dynamicLinks || config.dynamicLinks.length === 0) && (
+                                 <div className="text-center py-12 border-2 border-dashed border-slate-100 dark:border-white/5 rounded-[3rem]">
+                                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">Belum ada tautan sosial media</p>
+                                 </div>
+                             )}
                         </div>
                     </motion.div>
 

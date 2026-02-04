@@ -127,17 +127,23 @@ const Sidebar = ({ isOpen, onClose }) => {
               return (
                 <div key={section.id} className="mb-2">
                   <button
-                    onClick={() => toggleSection(section.id)}
+                    onClick={() => !section.isLocked && toggleSection(section.id)}
                     className={cn(
                         "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
-                        isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
+                        section.isLocked 
+                          ? "opacity-50 cursor-not-allowed bg-slate-100/50 dark:bg-white/5" 
+                          : isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
                     )}
                   >
                     <div className="flex items-center">
-                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", isExpanded ? "text-teal-500" : "text-slate-500")} />
-                      <span className="font-bold text-sm">{section.title}</span>
+                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", section.isLocked ? "text-slate-400" : isExpanded ? "text-teal-500" : "text-slate-500")} />
+                      <span className={cn("font-bold text-sm", section.isLocked ? "text-slate-400" : "")}>{section.title}</span>
                     </div>
-                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-teal-500" : "text-slate-400")} />
+                    {section.isLocked ? (
+                      <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
+                    ) : (
+                      <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-teal-500" : "text-slate-400")} />
+                    )}
                   </button>
 
                   <AnimatePresence>
@@ -149,17 +155,25 @@ const Sidebar = ({ isOpen, onClose }) => {
                         className="overflow-hidden bg-slate-50/50 dark:bg-white/[0.02] rounded-b-xl border-l border-slate-100 dark:border-white/5 ml-6 mt-1"
                       >
                         {section.topics.map(topic => (
-                          <NavLink
-                            key={topic.id}
-                            to={`/materi/${topic.id}`}
-                            onClick={onClose}
-                            className={({ isActive }) => cn(
-                                "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
-                                isActive ? "text-teal-600 dark:text-teal-400 font-black border-teal-500 bg-teal-500/5" : "text-slate-500 hover:text-teal-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                          <div key={topic.id} className="relative group/side">
+                            {topic.isLocked ? (
+                              <div className="flex items-center pl-6 pr-4 py-2.5 text-sm transition-all text-slate-400/80 cursor-not-allowed select-none border-l border-slate-100 dark:border-white/5">
+                                <Lock className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
+                                <span className="arabic-sidebar-content opacity-60">{topic.title}</span>
+                              </div>
+                            ) : (
+                              <NavLink
+                                to={`/materi/${topic.id}`}
+                                onClick={onClose}
+                                className={({ isActive }) => cn(
+                                    "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
+                                    isActive ? "text-teal-600 dark:text-teal-400 font-black border-teal-500 bg-teal-500/5" : "text-slate-500 hover:text-teal-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                )}
+                              >
+                                <span className="arabic-sidebar-content">{topic.title}</span>
+                              </NavLink>
                             )}
-                          >
-                            <span className="arabic-sidebar-content">{topic.title}</span>
-                          </NavLink>
+                          </div>
                         ))}
                       </motion.div>
                     )}
@@ -180,17 +194,23 @@ const Sidebar = ({ isOpen, onClose }) => {
               return (
                 <div key={category.id} className="mb-2">
                   <button
-                    onClick={() => toggleSection(category.id)}
+                    onClick={() => !category.isLocked && toggleSection(category.id)}
                     className={cn(
                         "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
-                        isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
+                        category.isLocked 
+                          ? "opacity-50 cursor-not-allowed bg-slate-100/50 dark:bg-white/5"
+                          : isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
                     )}
                   >
                     <div className="flex items-center">
-                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", isExpanded ? "text-amber-500" : "text-slate-500")} />
-                      <span className="font-bold text-sm">{category.title}</span>
+                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", category.isLocked ? "text-slate-400" : isExpanded ? "text-amber-500" : "text-slate-500")} />
+                      <span className={cn("font-bold text-sm", category.isLocked ? "text-slate-400" : "")}>{category.title}</span>
                     </div>
-                    <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-amber-500" : "text-slate-400")} />
+                    {category.isLocked ? (
+                      <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
+                    ) : (
+                      <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-amber-500" : "text-slate-400")} />
+                    )}
                   </button>
 
                   <AnimatePresence>
@@ -202,17 +222,26 @@ const Sidebar = ({ isOpen, onClose }) => {
                         className="overflow-hidden bg-slate-50/50 dark:bg-white/[0.02] rounded-b-xl border-l border-slate-100 dark:border-white/5 ml-6 mt-1"
                       >
                         {category.topics?.map(topic => (
-                          <NavLink
-                            key={topic.id}
-                            to={`/program/${topic.id}`}
-                            onClick={onClose}
-                            className={({ isActive }) => cn(
-                                "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
-                                isActive ? "text-amber-600 dark:text-amber-400 font-black border-amber-500 bg-amber-500/5" : "text-slate-500 hover:text-amber-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                          <div key={topic.id} className="relative group/side">
+                            {topic.isLocked ? (
+                              <div className="flex items-center pl-6 pr-4 py-2.5 text-sm transition-all text-slate-400/80 cursor-not-allowed select-none border-l border-slate-100 dark:border-white/5">
+                                <Lock className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
+                                <span className="arabic-sidebar-content opacity-60">{topic.title}</span>
+                              </div>
+                            ) : (
+                              <NavLink
+                                key={topic.id}
+                                to={`/program/${topic.id}`}
+                                onClick={onClose}
+                                className={({ isActive }) => cn(
+                                    "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
+                                    isActive ? "text-amber-600 dark:text-amber-400 font-black border-amber-500 bg-amber-500/5" : "text-slate-500 hover:text-amber-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                )}
+                              >
+                                <span className="arabic-sidebar-content">{topic.title}</span>
+                              </NavLink>
                             )}
-                          >
-                            <span className="arabic-sidebar-content">{topic.title}</span>
-                          </NavLink>
+                          </div>
                         ))}
                       </motion.div>
                     )}

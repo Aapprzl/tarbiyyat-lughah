@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark } from 'lucide-react';
+import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark, Lock, Sparkles } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -54,6 +54,8 @@ const MaterialDetailContent = () => {
   const [topic, setTopic] = useState(null);
   const [isCategoryView, setIsCategoryView] = useState(false);
   const [categoryTopics, setCategoryTopics] = useState([]);
+  const [isLocked, setIsLocked] = useState(false);
+  const [lockMeta, setLockMeta] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -83,7 +85,7 @@ const MaterialDetailContent = () => {
                     const t = category.topics.find(t => t.id.toLowerCase() === topicId.toLowerCase());
                     if (t) {
                         foundTopic = t;
-                        foundSection = { title: category.title, icon: category.icon };
+                        foundSection = { title: category.title, icon: category.icon, isLocked: category.isLocked };
                         break;
                     }
                 }
@@ -95,13 +97,26 @@ const MaterialDetailContent = () => {
                     foundTopic = foundCategory;
                     setIsCategoryView(true);
                     setCategoryTopics(foundCategory.topics || []);
-                    foundSection = { title: 'Program Unggulan', icon: 'Star' };
+                    foundSection = { title: 'Program Unggulan', icon: 'Star', isLocked: foundCategory.isLocked };
                 }
             }
         }
-
-        setTopic(foundTopic);
-        setParentSection(foundSection);
+        
+        if (foundTopic) {
+            // Check if Topic or Section is Locked
+            if (foundTopic.isLocked || (foundSection && foundSection.isLocked)) {
+                setIsLocked(true);
+                setLockMeta({
+                    title: foundTopic.title,
+                    type: foundTopic.isLocked ? 'Topik' : 'Kategori'
+                });
+                setLoading(false);
+                return;
+            }
+            
+            setTopic(foundTopic);
+            setParentSection(foundSection);
+        }
 
         if (foundTopic && !isCategoryView) {
             const data = await contentService.getLessonContent(topicId);
@@ -146,6 +161,49 @@ const MaterialDetailContent = () => {
     } catch (e) {
       console.error("Failed to parse content JSON", e);
     }
+  }
+
+  if (isLocked) {
+      return (
+          <div className="container mx-auto px-4 py-24 max-w-4xl text-center">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-white dark:bg-slate-900 rounded-[4rem] p-12 md:p-20 shadow-2xl border border-amber-500/20 relative overflow-hidden"
+              >
+                  {/* Decorative Elements */}
+                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl"></div>
+                  <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                  
+                  <div className="relative z-10">
+                      <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-amber-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-amber-500/30">
+                          <Lock className="w-12 h-12" />
+                      </div>
+                      
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+                          <Sparkles className="w-3 h-3" />
+                          Materi Belum Tersedia
+                      </div>
+                      
+                      <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
+                         Ups! Materi ini <br/> Masih Terkunci
+                      </h1>
+                      
+                      <p className="text-slate-500 dark:text-slate-400 text-lg font-medium max-w-md mx-auto leading-relaxed mb-12">
+                          Materi <span className="text-amber-600 font-bold">"{lockMeta?.title}"</span> sedang dalam tahap persiapan atau dijadwalkan untuk rilis mendatang.
+                      </p>
+                      
+                      <button 
+                        onClick={() => navigate('/materi')}
+                        className="group flex items-center gap-3 px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest text-xs transition-all hover:scale-105 active:scale-95 shadow-xl mx-auto"
+                      >
+                          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-2" />
+                          Kembali Ke Kurikulum
+                      </button>
+                  </div>
+              </motion.div>
+          </div>
+      );
   }
 
   return (
@@ -410,25 +468,21 @@ const ContentBlock = ({ block }) => {
                 </div>
             );
         case 'audio':
-            return (
-                <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 shadow-sm">
-                    <AudioPlayer src={block.data?.url} title={block.data?.title || 'Audio Pembelajaran'} />
-                </div>
-            );
+            return <AudioPlayer src={block.data?.url} title={block.data?.title || 'Audio Pembelajaran'} />;
         case 'matchup':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><MatchUpGame pairs={block.data?.pairs} title={block.data?.title} /></div>;
+            return <MatchUpGame pairs={block.data?.pairs} title={block.data?.title} />;
         case 'quiz':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><QuizGame questions={block.data?.questions} title={block.data?.title} /></div>;
+            return <QuizGame questions={block.data?.questions} title={block.data?.title} />;
         case 'flashcard':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><FlashCardGame items={block.data?.items} title={block.data?.title} /></div>;
+            return <FlashCardGame items={block.data?.items} title={block.data?.title} />;
         case 'anagram':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><AnagramGame questions={block.data?.questions} title={block.data?.title} /></div>;
+            return <AnagramGame questions={block.data?.questions} title={block.data?.title} />;
         case 'completesentence':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><CompleteSentenceGame questions={block.data?.questions} title={block.data?.title} /></div>;
+            return <CompleteSentenceGame questions={block.data?.questions} title={block.data?.title} />;
         case 'unjumble':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><UnjumbleGame questions={block.data?.questions} title={block.data?.title} /></div>;
+            return <UnjumbleGame questions={block.data?.questions} title={block.data?.title} />;
         case 'spinwheel':
-            return <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-4"><SpinWheelGame items={block.data?.items} title={block.data?.title} /></div>;
+            return <SpinWheelGame items={block.data?.items} title={block.data?.title} />;
         default:
             return null;
     }

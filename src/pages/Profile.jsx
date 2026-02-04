@@ -2,9 +2,32 @@ import React, { useEffect, useState } from 'react';
 import { User, Mail, Globe, Linkedin, Instagram, FileText, ArrowLeft, Download, Bookmark, Sparkles, MapPin, Layout, Star, Activity, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import PdfViewer from '../components/PdfViewer';
-import { motion, AnimatePresence } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
+import * as LucideIcons from 'lucide-react';
+
+const SOCIAL_PLATFORMS = [
+    { id: 'instagram', icon: 'Instagram', color: 'bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500', patterns: ['instagram.com'] },
+    { id: 'linkedin', icon: 'Linkedin', color: 'bg-[#0077b5]', patterns: ['linkedin.com'] },
+    { id: 'facebook', icon: 'Facebook', color: 'bg-[#1877f2]', patterns: ['facebook.com', 'fb.com'] },
+    { id: 'twitter', icon: 'Twitter', color: 'bg-[#1da1f2]', patterns: ['twitter.com', 'x.com'] },
+    { id: 'github', icon: 'Github', color: 'bg-[#333]', patterns: ['github.com'] },
+    { id: 'youtube', icon: 'Youtube', color: 'bg-[#ff0000]', patterns: ['youtube.com', 'youtu.be'] },
+    { id: 'tiktok', icon: 'Video', color: 'bg-[#000000]', patterns: ['tiktok.com'] },
+    { id: 'whatsapp', icon: 'MessageCircle', color: 'bg-[#25d366]', patterns: ['wa.me', 'whatsapp.com'] },
+    { id: 'threads', icon: 'AtSign', color: 'bg-black', patterns: ['threads.net'] },
+    { id: 'website', icon: 'Globe', color: 'bg-slate-900', patterns: [] }
+];
+
+const detectPlatform = (url) => {
+    if (!url) return SOCIAL_PLATFORMS.find(p => p.id === 'website');
+    const lowerUrl = url.toLowerCase();
+    const platform = SOCIAL_PLATFORMS.find(p => p.patterns.some(pattern => lowerUrl.includes(pattern)));
+    return platform || SOCIAL_PLATFORMS.find(p => p.id === 'website');
+};
+
+// Lazy load heavy components
+const PdfViewer = React.lazy(() => import('../components/PdfViewer'));
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,7 +41,16 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20 } },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      type: 'spring', 
+      stiffness: 80, 
+      damping: 15,
+      mass: 0.8
+    } 
+  },
 };
 
 const Profile = () => {
@@ -69,31 +101,29 @@ const Profile = () => {
              {/* --- Premium Cinematic Hero --- */}
              {/* Header Section (Aurora Hero) - Immersive & Truly Full Width */}
              <div className="relative h-[550px] overflow-hidden bg-slate-50 dark:bg-[#030712] transition-colors duration-500">
-                {/* Advanced Aurora Gradient Overlay - Lighter for Light Mode */}
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-indigo-500/10 to-transparent dark:from-teal-900/40 dark:via-indigo-900/40 dark:to-slate-900/40 animate-aurora"></div>
+                {/* Simplified Aurora Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 via-indigo-500/5 to-transparent dark:from-teal-900/20 dark:via-indigo-900/20 dark:to-slate-900/20"></div>
                 
-                {/* Immersive Floating Elements with Adaptive Opacity */}
+                {/* Optimized Floating Elements - Reduced movement frequency and scale */}
                 <motion.div 
                     animate={{ 
-                        scale: [1, 1.3, 1],
-                        rotate: [0, 90, 0],
-                        opacity: [0.15, 0.3, 0.15]
+                        y: [0, -20, 0],
+                        opacity: [0.1, 0.2, 0.1]
                     }}
-                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    className="absolute -top-1/4 -right-1/4 w-[1000px] h-[1000px] bg-teal-500/20 dark:bg-teal-500/30 rounded-full blur-[140px]"
+                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -top-1/4 -right-1/4 w-[800px] h-[800px] bg-teal-500/10 dark:bg-teal-500/20 rounded-full blur-[120px] will-change-transform"
                 />
                 <motion.div 
                     animate={{ 
-                        scale: [1.3, 1, 1.3],
-                        rotate: [0, -90, 0],
-                        opacity: [0.1, 0.2, 0.1]
+                        y: [0, 20, 0],
+                        opacity: [0.08, 0.15, 0.08]
                     }}
-                    transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-                    className="absolute -bottom-1/4 -left-1/4 w-[1100px] h-[1100px] bg-indigo-500/20 dark:bg-indigo-500/30 rounded-full blur-[140px]"
+                    transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -bottom-1/4 -left-1/4 w-[900px] h-[900px] bg-indigo-500/10 dark:bg-indigo-500/20 rounded-full blur-[120px] will-change-transform"
                 />
 
                 {/* Refined Texture Overlay */}
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 dark:opacity-30 pointer-events-none mix-blend-overlay"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 dark:opacity-20 pointer-events-none mix-blend-overlay"></div>
                 
                 {/* Seamless Transition Gradient */}
                 <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-slate-50 dark:from-[#030712] to-transparent z-[5]"></div>
@@ -123,7 +153,7 @@ const Profile = () => {
                  >
                      {/* --- Left Column: Profile Master Card --- */}
                      <motion.div variants={itemVariants} className="lg:col-span-4 transition-all">
-                        <div className="bg-white/80 dark:bg-white/5 backdrop-blur-3xl rounded-[3.5rem] border border-white dark:border-white/10 shadow-2xl p-10 md:p-12 sticky top-12 border-b-8 border-b-teal-500/50 group overflow-hidden">
+                        <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl rounded-[3.5rem] border border-white dark:border-white/10 shadow-2xl p-10 md:p-12 sticky top-12 border-b-8 border-b-teal-500/50 group overflow-hidden">
                             {/* Accent Background */}
                             <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-500/5 blur-[80px] rounded-full group-hover:bg-teal-500/10 transition-colors"></div>
 
@@ -183,26 +213,27 @@ const Profile = () => {
                                          </a>
                                      )}
                                      
-                                     <div className="flex justify-center gap-4 pt-6">
-                                         {[
-                                             { icon: Instagram, color: 'bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500', url: config.socials?.instagram },
-                                             { icon: Linkedin, color: 'bg-[#0077b5]', url: config.socials?.linkedin },
-                                             { icon: Globe, color: 'bg-slate-900', url: config.socials?.website }
-                                         ].filter(s => s.url).map((social, i) => (
-                                             <motion.a 
-                                                key={i}
-                                                whileHover={{ y: -8, scale: 1.1 }} 
-                                                href={social.url} 
-                                                target="_blank" 
-                                                rel="noreferrer" 
-                                                className={cn(
-                                                    "w-14 h-14 text-white rounded-[1.5rem] flex items-center justify-center shadow-xl transition-all border border-white/10",
-                                                    social.color
-                                                )}
-                                             >
-                                                 <social.icon className="w-6 h-6" />
-                                             </motion.a>
-                                         ))}
+                                     <div className="flex justify-center flex-wrap gap-4 pt-6">
+                                         {config.dynamicLinks?.filter(l => l.url).map((social, i) => {
+                                             const platform = detectPlatform(social.url);
+                                             const IconComponent = LucideIcons[platform.icon] || LucideIcons.Link2;
+                                             
+                                             return (
+                                                 <motion.a 
+                                                    key={i}
+                                                    whileHover={{ y: -8, scale: 1.1 }} 
+                                                    href={social.url} 
+                                                    target="_blank" 
+                                                    rel="noreferrer" 
+                                                    className={cn(
+                                                        "w-14 h-14 text-white rounded-[1.5rem] flex items-center justify-center shadow-xl transition-all border border-white/10",
+                                                        platform.color
+                                                    )}
+                                                 >
+                                                     <IconComponent className="w-6 h-6" />
+                                                 </motion.a>
+                                             );
+                                         })}
                                      </div>
                                 </div>
                             </div>
@@ -212,7 +243,7 @@ const Profile = () => {
                      {/* --- Right Column: Depth Content --- */}
                      <div className="lg:col-span-8 space-y-12">
                          {/* Bio Section */}
-                         <motion.div variants={itemVariants} className="bg-white/60 dark:bg-white/5 backdrop-blur-2xl rounded-[3.5rem] border border-white dark:border-white/10 shadow-2xl p-10 md:p-16 relative overflow-hidden group">
+                         <motion.div variants={itemVariants} className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-[3.5rem] border border-white dark:border-white/10 shadow-2xl p-10 md:p-16 relative overflow-hidden group">
                               {/* Decorative Icon */}
                               <div className="absolute -top-12 -right-12 p-12 opacity-5 scale-[2] rotate-12 transition-transform duration-1000 group-hover:rotate-0">
                                  <Sparkles className="w-48 h-48 text-teal-500" />
@@ -298,10 +329,17 @@ const Profile = () => {
                                                     <div className="w-2.5 h-2.5 rounded-full bg-amber-500/50"></div>
                                                     <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
                                                 </div>
-                                                <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex-1 text-center">Interactive PDF Engine</div>
-                                            </div>
-                                           <PdfViewer src={config.pdfUrl} height={800} />
-                                      </div>
+                                                  <div className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex-1 text-center">Interactive PDF Engine</div>
+                                             </div>
+                                             <React.Suspense fallback={
+                                                 <div className="h-[600px] flex flex-col items-center justify-center gap-4 bg-slate-50 dark:bg-slate-900 animate-pulse">
+                                                     <div className="w-10 h-10 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
+                                                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Menyiapkan Dokumen...</p>
+                                                 </div>
+                                             }>
+                                                <PdfViewer src={config.pdfUrl} height={800} />
+                                             </React.Suspense>
+                                        </div>
                                   </div>
                              </motion.div>
                          )}

@@ -109,16 +109,26 @@ export const contentService = {
         
         if (snapshot.exists()) {
              const val = snapshot.data().items || [];
-             localStorage.setItem(STORAGE_KEYS.CURRICULUM, JSON.stringify(val));
-             return val;
+             // Self-healing check
+             const cleaned = Array.isArray(val) ? val.map(section => ({
+                 ...section,
+                 title: section.title || 'Untitled Category',
+                 icon: section.icon || 'BookOpen',
+                 topics: (Array.isArray(section.topics) ? section.topics : []).map(t => ({
+                     ...t,
+                     title: t?.title || 'Untitled Topic'
+                 }))
+             })) : [];
+             localStorage.setItem(STORAGE_KEYS.CURRICULUM, JSON.stringify(cleaned));
+             return cleaned;
         } else {
-             // If document doesn't exist in cloud yet, we can try to initialize it?
-             // Or return empty array?
-             // Let's check LS for migration ONLY if doc is confirmed missing (not error).
              console.warn("Curriculum doc missing in cloud. Checking local...");
              const local = localStorage.getItem(STORAGE_KEYS.CURRICULUM);
-             if (local) {
-                  return JSON.parse(local);
+             if (local && local !== "null" && local !== "undefined") {
+                  try {
+                    const parsed = JSON.parse(local);
+                    return Array.isArray(parsed) ? parsed : initialCurriculum;
+                  } catch(e) { return initialCurriculum; }
              }
              return initialCurriculum;
         }
@@ -129,16 +139,18 @@ export const contentService = {
       }
   },
 
-  async updateTopicMetadata(topicId, { title, desc }) {
+  async updateTopicMetadata(topicId, metadata) {
     const curr = await this._fetchCurriculum();
+    const { title, desc, isLocked } = metadata;
     let found = false;
     
     // Search in Main Curriculum
     for (const section of curr) {
       const topic = section.topics.find(t => t.id === topicId);
       if (topic) {
-        if (title) topic.title = title;
+        if (title !== undefined && title !== null) topic.title = title;
         if (desc !== undefined) topic.desc = desc; 
+        if (metadata.hasOwnProperty('isLocked')) topic.isLocked = isLocked;
         found = true;
         break;
       }
@@ -154,8 +166,9 @@ export const contentService = {
         if (category.topics) {
             const topic = category.topics.find(t => t.id === topicId);
             if (topic) {
-                if (title) topic.title = title;
+                if (title !== undefined && title !== null) topic.title = title;
                 if (desc !== undefined) topic.desc = desc;
+                if (metadata.hasOwnProperty('isLocked')) topic.isLocked = isLocked;
                 await this.saveSpecialPrograms(progs);
                 return true;
             }
@@ -225,13 +238,14 @@ export const contentService = {
     return newSection;
   },
 
-  async updateSection(id, title, iconName) {
+  async updateSection(id, title, icon, options = {}) {
     const curr = await this._fetchCurriculum();
     const section = curr.find(s => s.id === id);
     
     if (section) {
-      section.title = title;
-      section.icon = iconName;
+      if (title) section.title = title;
+      if (icon) section.icon = icon;
+      if (options.hasOwnProperty('isLocked')) section.isLocked = options.isLocked;
       await this.saveCurriculum(curr);
       return true;
     }
@@ -337,21 +351,33 @@ export const contentService = {
         const snapshot = await getDoc(docRef);
         if (snapshot.exists()) {
              const val = snapshot.data().items || [];
-             localStorage.setItem('arp_special_programs', JSON.stringify(val));
-             return val;
+             // Self-healing: Ensure no null titles/icons from previous bugs
+             const cleaned = Array.isArray(val) ? val.map(cat => ({
+                 ...cat,
+                 title: cat.title || 'Untitled Category',
+                 icon: cat.icon || 'Star',
+                 topics: (Array.isArray(cat.topics) ? cat.topics : []).map(t => ({
+                     ...t,
+                     title: t?.title || 'Untitled Topic'
+                 }))
+             })) : [];
+             localStorage.setItem('arp_special_programs', JSON.stringify(cleaned));
+             return cleaned;
         }
         // If missing in cloud
         console.warn("Special Programs doc missing. checking local...");
         const local = localStorage.getItem('arp_special_programs');
-        if (local) {
-            // Migration opportunity?
-             const parsed = JSON.parse(local);
-             // Ensure it's wrapped
-             let data = parsed;
-              if (data.length > 0 && !data[0].topics) {
-                data = [{ id: 'sp-migrated', title: 'Program Khusus', icon: 'Star', topics: parsed }];
-             }
-             return data;
+        if (local && local !== "null" && local !== "undefined") {
+             try {
+                 const parsed = JSON.parse(local);
+                 if (!Array.isArray(parsed)) return [];
+                 // Migration opportunity?
+                 let data = parsed;
+                 if (data.length > 0 && !data[0].topics) {
+                    data = [{ id: 'sp-migrated', title: 'Program Khusus', icon: 'Star', topics: parsed }];
+                 }
+                 return data;
+             } catch(e) { return []; }
         }
         return [];
       } catch(e) {
@@ -438,13 +464,15 @@ export const contentService = {
       return newCategory;
   },
 
-  async updateSpecialCategory(categoryId, title, iconName, desc) {
+  async updateSpecialCategory(categoryId, title, iconName, desc, options = {}) {
       const progs = await this.getSpecialPrograms();
       const category = progs.find(c => c.id === categoryId);
       if (category) {
-          category.title = title;
+          if (title) category.title = title;
           if (iconName) category.icon = iconName;
-          if (desc !== undefined) category.desc = desc;
+          if (desc !== undefined && desc !== null) category.desc = desc;
+          if (options.hasOwnProperty('isLocked')) category.isLocked = options.isLocked;
+          
           await this.saveSpecialPrograms(progs);
           return true;
       }
