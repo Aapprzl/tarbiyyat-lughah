@@ -61,8 +61,8 @@ const Home = () => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
-            delay: 0.3,
-            duration: 0.8,
+            delay: window.innerWidth < 768 ? 0 : 0.3,
+            duration: window.innerWidth < 768 ? 0.4 : 0.8,
             ease: "easeInOut",
           }}
           className="relative flex flex-col gap-6 items-center justify-center px-4 md:px-0 text-center max-w-4xl z-20"
@@ -190,7 +190,7 @@ const Home = () => {
                          />
                       </div>
                    ) : (
-                      <Link to={`/materi/${prog.id}`}>
+                      <Link to={`/program/${prog.id}`}>
                          <BentoGridItem
                            title={prog.title}
                            description={prog.desc || 'Mainkan game ini untuk melatih kosakata dan pemahaman bahasa Arab secara interaktif.'}

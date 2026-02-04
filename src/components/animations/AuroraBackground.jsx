@@ -12,16 +12,19 @@ export const AuroraBackground = ({
     <main>
       <div
         className={cn(
-          "relative flex flex-col h-[100vh] items-center justify-center bg-zinc-50 dark:bg-zinc-900  text-slate-950 transition-bg",
+          "relative flex flex-col h-[100vh] items-center justify-center bg-zinc-50 dark:bg-zinc-900 text-slate-950 transition-bg",
           className
         )}
         {...props}
       >
         <div className="absolute inset-0 overflow-hidden">
+          {/* Mobile: Simple static gradient (no animation, no blur) */}
+          <div className="md:hidden absolute inset-0 bg-gradient-to-br from-teal-100 via-teal-50 to-amber-50 dark:from-teal-950 dark:via-zinc-900 dark:to-amber-950 opacity-60"></div>
+          
+          {/* Desktop: Full Aurora animation */}
           <div
-            //   I'm using h-full as default, can be modified as per requirement
             className={cn(
-              `
+              `hidden md:block
             [--white-gradient:radial-gradient(at_0%_0%,#ffffff_0%,transparent_50%)]
             [--dark-gradient:radial-gradient(at_0%_0%,#000000_0%,transparent_50%)]
             [--aurora:repeating-linear-gradient(100deg,#0e7065_10%,#14b8a6_15%,#cca352_20%,#0e7065_25%,#095048_30%)]
