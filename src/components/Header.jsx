@@ -10,7 +10,7 @@ const iconMap = {
   BookOpen, Star, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Award, Hexagon, Layers
 };
 
-const Header = ({ onMenuClick }) => {
+const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
@@ -64,16 +64,10 @@ const Header = ({ onMenuClick }) => {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 lg:left-80 h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-40 px-6 flex items-center justify-between transition-all duration-300">
+      <header className="fixed top-0 right-0 left-0 h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-40 px-6 flex items-center justify-between transition-all duration-300">
         <div className="flex items-center">
-          <button 
-            onClick={onMenuClick}
-            className="p-2.5 mr-4 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 lg:hidden text-slate-600 dark:text-white transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
           <Link to="/" className="group flex items-center gap-3">
-             <div className="hidden md:flex flex-col">
+             <div className="flex flex-col">
                 <span className={cn("font-arabic font-black leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors", siteConfig.headerTitleSize || 'text-xl')}>
                     {siteConfig.siteTitle || 'Bahasa Arab Praktis'}
                 </span>

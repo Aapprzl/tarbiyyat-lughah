@@ -751,5 +751,27 @@ export const contentService = {
   saveTheme(theme) {
     localStorage.setItem('arp_theme', theme);
     return theme;
+  },
+
+  // --- Game Hub Configuration ---
+  async getGameHubConfig() {
+    const defaults = {
+      hero: {
+        badge: 'AREA BERMAIN & BELAJAR',
+        title: 'Permainan\nBahasa Arab',
+        description: 'Belajar mufradat, nahwu, dan shorof jadi lebih seru dengan berbagai tantangan interaktif. Siap untuk level berikutnya?'
+      },
+      stats: [
+        { icon: 'Gamepad2', label: 'Mode Bermain', value: 'Interaktif', color: 'amber' },
+        { icon: 'Sparkles', label: 'Konten Baru', value: 'Mingguan', color: 'teal' },
+        { icon: 'Trophy', label: 'Tantangan', value: 'Seru', color: 'indigo' }
+      ]
+    };
+    const stored = await fetchAndCache('settings', 'game_hub_config', 'arp_game_hub_config', defaults);
+    return { ...defaults, ...stored };
+  },
+
+  async saveGameHubConfig(config) {
+    return await saveToCloud('settings', 'game_hub_config', 'arp_game_hub_config', config);
   }
 };

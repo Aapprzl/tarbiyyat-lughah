@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark, Lock, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark, Lock, Sparkles, Gamepad2 } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -53,6 +53,7 @@ const MaterialDetailContent = () => {
   const [parentSection, setParentSection] = useState(null);
   const [topic, setTopic] = useState(null);
   const [isCategoryView, setIsCategoryView] = useState(false);
+  const [isGame, setIsGame] = useState(false);
   const [categoryTopics, setCategoryTopics] = useState([]);
   const [isLocked, setIsLocked] = useState(false);
   const [lockMeta, setLockMeta] = useState(null);
@@ -63,6 +64,7 @@ const MaterialDetailContent = () => {
         setLoading(true);
         window.scrollTo(0, 0);
         setIsCategoryView(false);
+        setIsGame(false);
         setCategoryTopics([]);
 
         const curr = await contentService.getCurriculum();
@@ -86,6 +88,7 @@ const MaterialDetailContent = () => {
                     if (t) {
                         foundTopic = t;
                         foundSection = { title: category.title, icon: category.icon, isLocked: category.isLocked };
+                        setIsGame(true);
                         break;
                     }
                 }
@@ -96,6 +99,7 @@ const MaterialDetailContent = () => {
                 if (foundCategory) {
                     foundTopic = foundCategory;
                     setIsCategoryView(true);
+                    setIsGame(true);
                     setCategoryTopics(foundCategory.topics || []);
                     foundSection = { title: 'Program Unggulan', icon: 'Star', isLocked: foundCategory.isLocked };
                 }
@@ -212,53 +216,108 @@ const MaterialDetailContent = () => {
       <div className="relative mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
          {/* Breadcrumb */}
          <nav className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 px-4 md:px-0">
-            <Link to="/materi" className="hover:text-teal-600 transition-colors">Materi</Link>
-            <ChevronRight className="w-3 h-3 opacity-30" />
-            <span className="text-slate-600 dark:text-slate-200">{parentSection?.title || 'Program'}</span>
+            {isGame ? (
+                <>
+                  <Link to="/permainan" className="hover:text-amber-600 transition-colors">Permainan</Link>
+                  <ChevronRight className="w-3 h-3 opacity-30" />
+                  <span className="text-slate-600 dark:text-slate-200">{isCategoryView ? (topic?.title || 'Area Bermain') : (parentSection?.title || 'Game')}</span>
+                  {!isCategoryView && <ChevronRight className="w-3 h-3 opacity-30" />}
+                  {!isCategoryView && <span className="text-amber-600">{topic?.title}</span>}
+                </>
+            ) : (
+                <>
+                  <Link to="/materi" className="hover:text-teal-600 transition-colors">Materi</Link>
+                  <ChevronRight className="w-3 h-3 opacity-30" />
+                  <span className="text-slate-600 dark:text-slate-200">{parentSection?.title || 'Program'}</span>
+                  {!isCategoryView && <ChevronRight className="w-3 h-3 opacity-30" />}
+                  {!isCategoryView && <span className="text-teal-600">{topic?.title}</span>}
+                </>
+            )}
          </nav>
 
-         {/* Hero Display */}
-         <div className="relative bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px] -mr-40 -mt-40"></div>
-            
-            <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start justify-between">
-               <div className="flex-1">
-                  <motion.div 
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="w-14 h-14 bg-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20 mb-8 text-white"
-                  >
-                     <BookOpen className="w-7 h-7" />
-                  </motion.div>
-                  <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight arabic-title">
-                     {topic?.title || 'Memuat Judul...'}
-                  </h1>
-                  {topic?.desc && (
-                     <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
-                        {topic.desc}
-                     </p>
-                  )}
-               </div>
-
-               {contentService.isAuthenticated() && !isCategoryView && (
-                  <Link to={`/admin/edit/${topicId}`} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:scale-105 active:scale-95">
-                      <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                      <span>Edit Konten</span>
-                  </Link>
-               )}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                   <Clock className="w-4 h-4" />
-                   {isCategoryView ? 'Daftar Modul' : 'Materi Terstruktur'}
+         {/* Hero Display - HIDDEN for Game Categories to keep it streamlined */}
+         {!isCategoryView && (
+            <div className={cn(
+                "relative bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl",
+                isGame && "border-amber-500/20"
+            )}>
+                <div className={cn(
+                    "absolute top-0 right-0 w-80 h-80 rounded-full blur-[100px] -mr-40 -mt-40",
+                    isGame ? "bg-amber-500/10" : "bg-teal-500/10"
+                )}></div>
+                
+                <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start justify-between">
+                <div className="flex-1">
+                    <motion.div 
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        className={cn(
+                            "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg mb-8 text-white",
+                            isGame ? "bg-amber-500 shadow-amber-500/20" : "bg-teal-500 shadow-teal-500/20"
+                        )}
+                    >
+                        {isGame ? <Gamepad2 className="w-7 h-7" /> : <BookOpen className="w-7 h-7" />}
+                    </motion.div>
+                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight arabic-title">
+                        {topic?.title || 'Memuat Judul...'}
+                    </h1>
+                    {topic?.desc && (
+                        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
+                            {topic.desc}
+                        </p>
+                    )}
                 </div>
-                <div className="flex items-center gap-2 text-xs font-bold text-teal-500 uppercase tracking-widest">
-                   <CheckCircle className="w-4 h-4" />
-                   Akses Terjamin
+
+                {contentService.isAuthenticated() && (
+                    <Link to={`/admin/edit/${topicId}`} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:scale-105 active:scale-95">
+                        <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                        <span>Edit Konten</span>
+                    </Link>
+                )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    <Clock className="w-4 h-4" />
+                    {isGame ? 'Tantangan Belajar' : 'Materi Terstruktur'}
+                    </div>
+                    <div className={cn(
+                        "flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
+                        isGame ? "text-amber-500" : "text-teal-500"
+                    )}>
+                    <CheckCircle className="w-4 h-4" />
+                    Akses Terjamin
+                    </div>
                 </div>
             </div>
-         </div>
+         )}
+
+         {/* GAME CATEGORY TITLE - ONLY for streamlined Game View */}
+         {isCategoryView && (
+            <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="px-4 md:px-0"
+            >
+                <div className="flex items-center gap-5 mb-6">
+                    <div className="w-16 h-16 bg-amber-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
+                        <Gamepad2 className="w-8 h-8" />
+                    </div>
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em]">Permainan Bahasa Arab</span>
+                            <Sparkles className="w-3 h-3 text-amber-500" />
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                            {topic?.title}
+                        </h1>
+                    </div>
+                </div>
+                <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl leading-relaxed">
+                    {topic?.desc || 'Pilih level permainan di bawah ini untuk memulai latihan interaktifmu.'}
+                </p>
+            </motion.div>
+         )}
       </div>
 
       {/* Main Content Area */}
@@ -269,38 +328,38 @@ const MaterialDetailContent = () => {
          </div>
       ) : isCategoryView ? (
         /* CATEGORY LANDING PAGE */
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-4 md:px-0">
-            <h3 className="text-sm font-black text-slate-400 uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
-               <div className="h-px w-8 bg-slate-200 dark:bg-white/10"></div>
-               Daftar Modul Pembelajaran
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-4 md:px-0 mt-20">
+            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
+               Pilih Level / Tantangan
+               <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-white/10 dark:to-transparent"></div>
             </h3>
             
             {!Array.isArray(categoryTopics) || categoryTopics.length === 0 ? (
                 <div className="text-center py-20 bg-slate-50 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
-                    <p className="text-slate-400 font-bold">Belum ada topik materi dalam program ini.</p>
+                    <p className="text-slate-400 font-bold">Belum ada tantangan dalam permainan ini.</p>
                 </div>
             ) : (
-                <div className="grid gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {categoryTopics.filter(t => t).map((item, idx) => (
                         <Link  
                             key={item.id || idx} 
                             to={`/program/${item.id}`} 
-                            className="group flex items-center justify-between p-8 bg-white dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 hover:border-teal-500/30 hover:shadow-2xl hover:shadow-teal-500/10 transition-all overflow-hidden relative"
+                            className="group flex items-center justify-between p-8 bg-white dark:bg-white/5 rounded-[2.5rem] border border-slate-200 dark:border-white/10 hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all overflow-hidden relative"
                         >
-                             <div className="absolute inset-0 bg-gradient-to-r from-teal-500/0 to-teal-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-amber-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                              <div className="flex items-center gap-6 relative z-10">
-                                <span className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:bg-teal-500 group-hover:text-white flex items-center justify-center font-black transition-all">
-                                    {String(idx + 1).padStart(2, '0')}
+                                <span className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center font-black transition-all shadow-sm">
+                                    {idx + 1}
                                 </span>
                                 <div>
-                                    <h4 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors arabic-index-topic">
-                                        {item.title || 'Materi Tanpa Judul'}
+                                    <h4 className="text-xl font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors arabic-index-topic">
+                                        {item.title || 'Level Tanpa Judul'}
                                     </h4>
-                                    {item.desc && <p className="text-slate-500 text-sm mt-1 font-medium">{item.desc}</p>}
+                                    <p className="text-amber-600/60 text-[10px] font-black uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-all -translate-y-2 group-hover:translate-y-0">Klik Untuk Bermain</p>
                                 </div>
                              </div>
-                             <div className="hidden md:flex items-center gap-2 text-xs font-black uppercase text-teal-600 tracking-widest opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all relative z-10">
-                                Mulai Belajar <ArrowRight className="w-4 h-4" />
+                             <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1 relative z-10">
+                                <Play className="w-5 h-5 ml-1" />
                              </div>
                         </Link>
                     ))}

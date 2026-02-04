@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { useTheme } from '../components/ThemeProvider';
-import { LayoutDashboard, BookOpen, LogOut, Layout, Star, Info, Shield, Type, User, Home, Menu, Sun, Moon, Database, ChevronRight, Sparkles, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, LogOut, Layout, Star, Info, Shield, Type, User, Home, Menu, Sun, Moon, Database, ChevronRight, Sparkles, X, Gamepad2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -113,7 +113,7 @@ const AdminLayout = () => {
         <nav className="flex-1 p-6 space-y-2 overflow-y-auto custom-scrollbar">
           <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Menu Utama</div>
           <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
-          <NavItem to="/admin/programs" icon={Star} label="Program Khusus" />
+          <NavItem to="/admin/games" icon={Gamepad2} label="Manajemen Game" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
           <NavItem to="/admin/home-editor" icon={Layout} label="Editor Beranda" />

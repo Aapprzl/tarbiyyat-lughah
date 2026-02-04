@@ -11,7 +11,6 @@ const iconMap = {
 
 const MaterialIndex = () => {
   const [sections, setSections] = useState([]);
-  const [specialPrograms, setSpecialPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedSections, setExpandedSections] = useState({});
   const [searchParams] = useSearchParams();
@@ -22,7 +21,6 @@ const MaterialIndex = () => {
         setLoading(true);
         try {
             const curr = await contentService.getCurriculum();
-            const special = await contentService.getSpecialPrograms();
             
             if (searchQuery) {
                 const lowerQuery = searchQuery.toLowerCase();
@@ -31,21 +29,13 @@ const MaterialIndex = () => {
                     topics: section.topics.filter(t => t.title.toLowerCase().includes(lowerQuery))
                 })).filter(section => section.topics.length > 0);
                 
-                const filteredSpecial = special.map(cat => ({
-                    ...cat,
-                    topics: cat.topics ? cat.topics.filter(t => t.title.toLowerCase().includes(lowerQuery)) : []
-                })).filter(cat => cat.topics.length > 0);
-
                 setSections(filteredCurr);
-                setSpecialPrograms(filteredSpecial);
 
                 const expanded = {};
                 filteredCurr.forEach(s => expanded[s.id] = true);
-                filteredSpecial.forEach(s => expanded[s.id] = true);
                 setExpandedSections(expanded);
             } else {
                 setSections(curr);
-                setSpecialPrograms(special);
                 // Default: All closed for manual selection feel
                 setExpandedSections({});
             }
@@ -128,7 +118,7 @@ const MaterialIndex = () => {
          </div>
       </div>
 
-      {searchQuery && sections.length === 0 && specialPrograms.length === 0 && (
+      {searchQuery && sections.length === 0 && (
           <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">
               <Search className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-6" />
               <h3 className="text-2xl font-bold text-slate-400">Tidak ada materi ditemukan</h3>
@@ -136,137 +126,7 @@ const MaterialIndex = () => {
           </motion.div>
       )}
 
-      {/* Special Programs Section */}
-      {specialPrograms.length > 0 && (
-        <section className="space-y-8">
-          <div className="flex items-center gap-4 px-4 md:px-0">
-             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-amber-500/30"></div>
-             <h2 className="text-xs font-black text-amber-500 uppercase tracking-[0.4em] flex items-center gap-3">
-               <Star className="w-4 h-4" />
-               Program Khusus
-             </h2>
-             <div className="h-px flex-1 bg-gradient-to-l from-transparent to-amber-500/30"></div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 px-4 md:px-0 items-start">
-            {specialPrograms.map((category) => {
-              const Icon = iconMap[category.icon] || Star;
-              const isExpanded = expandedSections[category.id];
 
-              return (
-                <motion.div 
-                  key={category.id} 
-                  variants={itemVariants}
-                  className="group bg-white dark:bg-white/5 rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden hover:shadow-2xl hover:shadow-amber-500/10 transition-all border-b-4 border-b-amber-500/50"
-                >
-                  <button 
-                    onClick={() => toggleSection(category)}
-                    className={cn(
-                        "w-full flex items-center justify-between p-8 text-left transition-all relative overflow-hidden",
-                        category.isLocked 
-                          ? "bg-slate-100 dark:bg-slate-900/50 cursor-not-allowed" 
-                          : "hover:bg-amber-500/5"
-                    )}
-                  >
-                    {/* Background Lock Icon Overlay */}
-                    {category.isLocked && (
-                      <div className="absolute -right-6 -bottom-6 opacity-[0.03] dark:opacity-[0.05] pointer-events-none rotate-12">
-                        <Lock className="w-48 h-48" />
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-5 relative z-10">
-                      <div className={cn(
-                          "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-transform",
-                          category.isLocked ? "bg-slate-300 dark:bg-white/10 grayscale" : "bg-amber-500 shadow-amber-500/20 group-hover:scale-110"
-                      )}>
-                        {category.isLocked ? <Lock className="w-8 h-8 text-white" /> : <Icon className="w-8 h-8 text-white" />}
-                      </div>
-                      <div>
-                        <h3 className={cn("text-xl font-extrabold mb-1", category.isLocked ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white")}>
-                            {category.title}
-                        </h3>
-                        <div className="flex items-center gap-2">
-                            <p className="text-xs font-bold text-amber-600 dark:text-amber-400 tracking-widest uppercase">{category.topics?.length || 0} Topik Tersedia</p>
-                            {category.isLocked && <span className="text-[8px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full">Belum Tersedia</span>}
-                        </div>
-                      </div>
-                    </div>
-                    {category.isLocked ? (
-                      <div className="p-2 relative z-10">
-                        <Lock className="w-6 h-6 text-slate-300 dark:text-slate-700" />
-                      </div>
-                    ) : (
-                      <div className={cn("p-2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400 transition-all", isExpanded && "rotate-180")}>
-                        <ChevronDown className="w-6 h-6" />
-                      </div>
-                    )}
-                  </button>
-
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div 
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-8 pb-8 space-y-3">
-                        {category.topics?.length === 0 ? (
-                          <p className="text-slate-400 text-sm italic py-8 text-center bg-slate-50 dark:bg-black/20 rounded-2xl">Belum ada topik materi.</p>
-                        ) : (
-                          category.topics?.map(topic => (
-                            <div 
-                              key={topic.id}
-                              className={cn(
-                                  "group/item flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-black/20 border transition-all",
-                                  topic.isLocked 
-                                    ? "border-slate-100 dark:border-white/5 cursor-not-allowed pointer-events-none" 
-                                    : "border-slate-100 dark:border-white/5 hover:border-amber-500/30 hover:bg-white dark:hover:bg-white/5"
-                              )}
-                            >
-                              <div className="flex-1 flex items-center gap-4">
-                                  {topic.isLocked ? (
-                                    <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
-                                      <Lock className="w-4 h-4" />
-                                    </div>
-                                  ) : null}
-                                  <div>
-                                      <div className={cn(
-                                          "font-bold arabic-index-topic transition-colors",
-                                          topic.isLocked ? "text-slate-400 dark:text-slate-600" : "text-slate-800 dark:text-slate-200 group-hover/item:text-amber-600 dark:group-hover/item:text-amber-400"
-                                      )}>
-                                        {topic.title}
-                                      </div>
-                                      {topic.desc && (
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-1 font-medium">{topic.desc}</p>
-                                      )}
-                                      {topic.isLocked && <p className="text-[8px] font-black text-amber-600 uppercase tracking-widest mt-1">Akses Terkunci</p>}
-                                  </div>
-                              </div>
-                              <div className="w-8 h-8 rounded-full bg-white dark:bg-white/10 flex items-center justify-center transition-all">
-                                {topic.isLocked ? (
-                                    <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
-                                ) : (
-                                    <Link to={`/program/${topic.id}`} className="w-full h-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 translate-x-4 group-hover/item:translate-x-0 transition-all">
-                                        <ArrowRight className="w-4 h-4 text-amber-500" />
-                                    </Link>
-                                )}
-                              </div>
-                            </div>
-                          ))
-                        )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* Curriculum Section */}
       <section className="space-y-8">

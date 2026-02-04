@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle, Lock } from 'lucide-react';
+import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle, Lock, Gamepad2 } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
 import { SplitText } from '../components/animations/SplitText';
@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Star, Sparkles, Globe, Brain, Zap, PlayCircle
+  BookOpen, Star, Sparkles, Globe, Brain, Zap, PlayCircle, Gamepad2
 };
 
 const Home = () => {
@@ -21,16 +21,26 @@ const Home = () => {
 
   useEffect(() => {
     const load = async () => {
-      const progs = await contentService.getSpecialPrograms();
-      setSpecialPrograms(progs);
-
-      const conf = await contentService.getHomeConfig();
-      setConfig(conf);
+      // Parallelize all API calls for faster loading
+      const [progs, conf, cp] = await Promise.all([
+        contentService.getSpecialPrograms(),
+        contentService.getHomeConfig(),
+        contentService.getCopyrightConfig()
+      ]);
       
-      const cp = await contentService.getCopyrightConfig();
+      setSpecialPrograms(progs);
+      setConfig(conf);
       setCopyrightConfig(cp);
     };
     load();
+
+    // Handle scroll to programs if coming from BottomBar on another page
+    const searchParams = new URLSearchParams(window.location.hash.split('?')[1]);
+    if (searchParams.get('scroll') === 'programs') {
+      setTimeout(() => {
+        document.querySelector('#special-programs-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 500);
+    }
   }, []);
 
   if (!config) return (
@@ -64,7 +74,7 @@ const Home = () => {
 
           <div className="space-y-4">
             <h1 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white arabic-title leading-tight drop-shadow-sm">
-                <SplitText text={config.heroTitleArabic} />
+                {config.heroTitleArabic}
             </h1>
             <h2 className="text-2xl md:text-5xl font-extrabold text-[var(--color-primary-dark)] dark:text-teal-400 font-sans tracking-tight">
                 {config.heroTitleLatin}
@@ -134,72 +144,73 @@ const Home = () => {
           </div>
        )}
 
-      {/* Bento Grid Header */}
-      <div className="container mx-auto px-4 max-w-6xl mb-12">
+      <div id="special-programs-section" className="container mx-auto px-4 max-w-6xl mb-12 scroll-mt-32">
         <motion.div 
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5 }}
             className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
         >
           <div className="max-w-xl">
-             <div className="h-1.5 w-20 bg-teal-500 rounded-full mb-6"></div>
+             <div className="h-1.5 w-20 bg-amber-500 rounded-full mb-6"></div>
              <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] mb-6">
-                 {config.programsSectionTitle || 'Program Unggulan Kami'}
+                 {config.programsSectionTitle?.replace('Program', 'Game') || 'Area Permainan'}
              </h2>
              <p className="text-slate-600 dark:text-slate-400 text-lg font-medium leading-relaxed">
-                 Pilih program yang sesuai dengan kebutuhan dan level kemampuan Anda. Mulai dari dasar hingga mahir.
+                 Tantang kemampuan bahasa Arabmu dengan berbagai permainan interaktif yang seru dan menyenangkan.
              </p>
           </div>
-          <Link to="/materi" className="hidden md:flex items-center gap-2 text-teal-600 font-bold hover:gap-4 transition-all pb-2 border-b-2 border-teal-500/20 hover:border-teal-500">
-              Lihat Materi Lainnya <ArrowRight className="w-5 h-5" />
+          <Link to="/permainan" className="hidden md:flex items-center gap-2 text-amber-600 font-bold hover:gap-4 transition-all pb-2 border-b-2 border-amber-500/20 hover:border-amber-500">
+              Masuk Arena Game <ArrowRight className="w-5 h-5" />
           </Link>
         </motion.div>
         
-        {/* Bento Grid Layout */}
+        {/* Bento Grid Layout - Enhanced for Games */}
         <BentoGrid>
           {specialPrograms.map((prog, idx) => {
-             const Icon = iconMap[prog.icon] || Star;
+             const Icon = iconMap[prog.icon] || Gamepad2;
              return (
                 <div key={prog.id} className="md:col-span-1">
                    {prog.isLocked ? (
-                     <div className="opacity-75 cursor-not-allowed h-full">
-                        <BentoGridItem
-                          title={prog.title}
-                          description="Program ini akan segera hadir. Saat ini akses masih terkunci."
-                          header={
-                            <div className="flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-slate-300 dark:bg-slate-800 grayscale items-center justify-center relative overflow-hidden">
-                               <div className="relative z-10 w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/20">
-                                   <Lock className="w-10 h-10" />
-                               </div>
-                               <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg border border-white/10">
-                                  <Lock className="w-3 h-3" /> Terkunci
-                               </div>
-                            </div>
-                          }
-                        />
-                     </div>
+                      <div className="opacity-75 cursor-not-allowed h-full">
+                         <BentoGridItem
+                           title={prog.title}
+                           description="Game ini akan segera hadir. Saat ini akses masih terkunci."
+                           header={
+                             <div className="flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-slate-300 dark:bg-slate-800 grayscale items-center justify-center relative overflow-hidden">
+                                <div className="relative z-10 w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/20">
+                                    <Lock className="w-10 h-10" />
+                                </div>
+                                <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg border border-white/10">
+                                   <Lock className="w-3 h-3" /> Terkunci
+                                </div>
+                             </div>
+                           }
+                         />
+                      </div>
                    ) : (
-                     <Link to={`/program/${prog.id}`}>
-                        <BentoGridItem
-                          title={prog.title}
-                          description={prog.desc || 'Pelajari program ini untuk meningkatkan kemampuan bahasa Arab Anda secara intensif.'}
-                          header={
-                            <div className={cn(
-                               "flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[1.02] items-center justify-center relative overflow-hidden",
-                               idx % 3 === 0 ? "from-teal-500 to-indigo-600" : 
-                               idx % 3 === 1 ? "from-indigo-600 to-purple-600" : 
-                               "from-amber-400 to-orange-600"
-                            )}>
-                               <div className="relative z-10 w-20 h-20 bg-white/20 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/30 transition-transform group-hover/bento:scale-110 duration-500">
-                                   <Icon className="w-10 h-10" />
-                               </div>
-                               
-                               {/* Decorative Background Element */}
-                               <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500"></div>
-                            </div>
-                          }
-                        />
-                     </Link>
+                      <Link to={`/materi/${prog.id}`}>
+                         <BentoGridItem
+                           title={prog.title}
+                           description={prog.desc || 'Mainkan game ini untuk melatih kosakata dan pemahaman bahasa Arab secara interaktif.'}
+                           header={
+                             <div className={cn(
+                                "flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[1.02] items-center justify-center relative overflow-hidden shadow-lg",
+                                idx % 3 === 0 ? "from-amber-400 to-orange-500" : 
+                                idx % 3 === 1 ? "from-pink-500 to-rose-600" : 
+                                "from-indigo-500 to-blue-600"
+                             )}>
+                                <div className="relative z-10 w-20 h-20 bg-white/30 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/40 transition-transform group-hover/bento:scale-110 duration-500">
+                                    <Icon className="w-10 h-10" />
+                                </div>
+                                
+                                {/* Dynamic Overlay */}
+                                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500"></div>
+                             </div>
+                           }
+                         />
+                      </Link>
                    )}
                 </div>
              );
@@ -208,8 +219,8 @@ const Home = () => {
 
         {/* Mobile View More */}
         <div className="md:hidden mt-12 flex justify-center">
-             <Link to="/materi" className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 px-8 py-4 rounded-2xl font-bold flex items-center">
-                Lihat Materi Lainnya <ArrowRight className="ml-2 w-5 h-5" />
+             <Link to="/permainan" className="bg-amber-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center shadow-lg shadow-amber-500/20">
+                Semua Game <ArrowRight className="ml-2 w-5 h-5" />
              </Link>
         </div>
       </div>

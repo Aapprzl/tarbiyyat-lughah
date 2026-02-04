@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import MaterialIndex from './pages/MaterialIndex';
+import GameIndex from './pages/GameIndex';
 import MaterialDetail from './pages/MaterialDetail';
 import Profile from './pages/Profile';
 import About from './pages/About';
@@ -12,6 +13,7 @@ const AdminLayout = lazy(() => import('./components/AdminLayout'));
 const LoginPage = lazy(() => import('./pages/admin/Login'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminPrograms = lazy(() => import('./pages/admin/Programs'));
+const AdminGames = lazy(() => import('./pages/admin/Games'));
 const AdminHomeEditor = lazy(() => import('./pages/admin/HomeEditor'));
 const AdminAboutEditor = lazy(() => import('./pages/admin/AboutEditor'));
 const LessonEditor = lazy(() => import('./pages/admin/LessonEditor'));
@@ -38,6 +40,7 @@ function App() {
                   <Route index element={<Home />} />
                   <Route path="about" element={<About />} />
                   <Route path="materi" element={<MaterialIndex />} />
+                  <Route path="permainan" element={<GameIndex />} /> {/* Added public route for games */}
                   <Route path="materi/:topicId" element={<MaterialDetail />} />
                   <Route path="program/:topicId" element={<MaterialDetail />} />
                   <Route path="profil" element={<Profile />} />
@@ -49,6 +52,7 @@ function App() {
                   <Route index element={<Navigate to="dashboard" replace />} />
                   <Route path="dashboard" element={<AdminDashboard />} />
                   <Route path="programs" element={<AdminPrograms />} />
+                  <Route path="games" element={<AdminGames />} /> {/* Added admin route for games */}
                   <Route path="home-editor" element={<AdminHomeEditor />} />
                   <Route path="about-cms" element={<AdminAboutEditor />} />
                   <Route path="profile-editor" element={<ProfileEditor />} />
