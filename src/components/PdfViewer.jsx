@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FileText, AlertCircle } from 'lucide-react';
+import { ClipboardList, AlertCircle } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 // Helper: Convert base64 data URL to Blob URL
@@ -54,7 +54,7 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
     return (
       <div className="flex items-center justify-center bg-[var(--color-bg-main)] rounded-xl text-[var(--color-text-muted)] border border-[var(--color-border)]" style={{ height }}>
         <div className="text-center">
-          <FileText className="w-12 h-12 mx-auto mb-2 opacity-30" />
+          <ClipboardList className="w-12 h-12 mx-auto mb-2 opacity-30" />
           <p className="text-sm font-medium">Tidak ada file PDF</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
       return (
         <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-8 flex flex-col items-center justify-center text-center shadow-sm" style={{ minHeight: 300 }}>
              <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
-                  <FileText className="w-10 h-10" />
+                  <ClipboardList className="w-10 h-10" />
              </div>
              <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-2">Materi PDF</h3>
              <p className="text-[var(--color-text-muted)] mb-6 max-w-xs text-sm">

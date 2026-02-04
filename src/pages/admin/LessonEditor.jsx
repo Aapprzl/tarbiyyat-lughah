@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, ArrowLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, FileText, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle } from 'lucide-react';
 import PdfViewer from '../../components/PdfViewer';
 import AudioPlayer from '../../components/AudioPlayer';
 import MatchUpGame from '../../components/MatchUpGame';
@@ -302,7 +302,7 @@ const LessonEditor = () => {
                 onClick={() => navigate(isSpecialProgram ? '/admin/programs' : '/admin/dashboard')} 
                 className="mr-6 p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex-shrink-0 text-slate-400 hover:text-teal-500 transition-all hover:shadow-lg"
             >
-                <ArrowLeft className="w-5 h-5" />
+                <MoveLeft className="w-5 h-5" />
             </button>
             <div className="w-full space-y-2">
                 <div className="flex items-center gap-2">
@@ -425,13 +425,13 @@ const LessonEditor = () => {
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={FileText} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={ClipboardList} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Card" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={ArrowLeft} label="Unjumble" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Unjumble" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
                           </div>
                       </div>
                   </div>
@@ -485,13 +485,13 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'alert': return { icon: AlertCircle, label: 'Info', color: 'text-amber-600', bg: 'bg-amber-50' };
             case 'youtube': return { icon: Youtube, label: 'Video', color: 'text-red-600', bg: 'bg-red-50' };
             case 'audio': return { icon: Music, label: 'Audio', color: 'text-violet-600', bg: 'bg-violet-50' };
-            case 'pdf': return { icon: FileText, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
+            case 'pdf': return { icon: ClipboardList, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
             case 'matchup': return { icon: Puzzle, label: 'Match Up', color: 'text-pink-600', bg: 'bg-pink-50' };
             case 'quiz': return { icon: HelpCircle, label: 'Quiz', color: 'text-teal-600', bg: 'bg-teal-50' };
             case 'flashcard': return { icon: Layers, label: 'Flash Card', color: 'text-indigo-600', bg: 'bg-indigo-50' };
             case 'anagram': return { icon: GripVertical, label: 'Anagram', color: 'text-orange-600', bg: 'bg-orange-50' };
             case 'completesentence': return { icon: Type, label: 'Lengkapi Kalimat', color: 'text-blue-600', bg: 'bg-blue-50' };
-            case 'unjumble': return { icon: ArrowLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
+            case 'unjumble': return { icon: MoveLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
             case 'spinwheel': return { icon: RefreshCcw, label: 'Spin Wheel', color: 'text-pink-600', bg: 'bg-pink-50' };
             default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
         }
@@ -1260,7 +1260,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
               {block.type === 'unjumble' && (
                 <div className="space-y-4">
                      <div className="flex items-center gap-2 mb-2">
-                        <ArrowLeft className="w-5 h-5 text-purple-500" />
+                        <MoveLeft className="w-5 h-5 text-purple-500" />
                         <input 
                             type="text" 
                             className="font-bold text-[var(--color-text-main)] bg-transparent border-none outline-none focus:ring-0 placeholder-[var(--color-text-muted)] w-full"

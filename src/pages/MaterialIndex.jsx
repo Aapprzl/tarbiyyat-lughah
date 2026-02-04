@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { BookOpen, Box, Activity, Hash, ArrowRight, Star, ChevronDown, Zap, Bookmark, Layout, Flag, Smile, Search, Sparkles, Lock } from 'lucide-react';
+import { Library, Package, LineChart, Link2, MoveRight, Award, ChevronDown, Rocket, Pocket, LayoutGrid, Milestone, Heart, Telescope, Diamond, ShieldCheck } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart,
+  PlayCircle: Gamepad,
+  Play: Gamepad
 };
 
 const MaterialIndex = () => {
@@ -96,7 +107,7 @@ const MaterialIndex = () => {
          
          <div className="relative z-10 text-center max-w-3xl mx-auto">
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 backdrop-blur-md border border-slate-200 dark:border-white/10 text-teal-600 dark:text-teal-400 text-[10px] font-black uppercase tracking-[0.2em] mb-6 transition-colors">
-                <Sparkles className="w-3 h-3" />
+                <Diamond className="w-3 h-3" />
                 Explorasi Kurikulum
             </motion.div>
             
@@ -120,7 +131,7 @@ const MaterialIndex = () => {
 
       {searchQuery && sections.length === 0 && (
           <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">
-              <Search className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-6" />
+              <Telescope className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-6" />
               <h3 className="text-2xl font-bold text-slate-400">Tidak ada materi ditemukan</h3>
               <p className="text-slate-500 mt-2">Coba kata kunci lain atau telusuri kurikulum utama</p>
           </motion.div>
@@ -133,7 +144,7 @@ const MaterialIndex = () => {
         <div className="flex items-center gap-4 px-4 md:px-0">
            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-teal-500/30"></div>
            <h2 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.4em] flex items-center gap-3">
-             <BookOpen className="w-4 h-4" />
+             <Library className="w-4 h-4" />
              Kurikulum Utama
            </h2>
            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-teal-500/30"></div>
@@ -141,7 +152,7 @@ const MaterialIndex = () => {
 
         <div className="grid md:grid-cols-2 gap-8 px-4 md:px-0 items-start">
           {sections.map((section) => {
-            const Icon = iconMap[section.icon] || BookOpen;
+            const Icon = iconMap[section.icon] || Library;
             const isExpanded = expandedSections[section.id];
             
             return (
@@ -162,7 +173,7 @@ const MaterialIndex = () => {
                   {/* Background Lock Icon Overlay */}
                   {section.isLocked && (
                     <div className="absolute -right-6 -bottom-6 opacity-[0.03] dark:opacity-[0.05] pointer-events-none rotate-12">
-                      <Lock className="w-48 h-48" />
+                      <ShieldCheck className="w-48 h-48" />
                     </div>
                   )}
 
@@ -171,7 +182,7 @@ const MaterialIndex = () => {
                         "w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg transition-transform",
                         section.isLocked ? "bg-slate-300 dark:bg-white/10 grayscale" : "bg-teal-500 shadow-teal-500/20 group-hover:scale-110"
                     )}>
-                      {section.isLocked ? <Lock className="w-8 h-8 text-white" /> : <Icon className="w-8 h-8 text-white" />}
+                      {section.isLocked ? <ShieldCheck className="w-8 h-8 text-white" /> : <Icon className="w-8 h-8 text-white" />}
                     </div>
                     <div>
                       <h3 className={cn("text-xl font-extrabold mb-1", section.isLocked ? "text-slate-400 dark:text-slate-500" : "text-slate-900 dark:text-white")}>
@@ -186,7 +197,7 @@ const MaterialIndex = () => {
 
                   {section.isLocked ? (
                     <div className="p-2 relative z-10">
-                      <Lock className="w-6 h-6 text-slate-300 dark:text-slate-700" />
+                      <ShieldCheck className="w-6 h-6 text-slate-300 dark:text-slate-700" />
                     </div>
                   ) : (
                     <div className={cn("p-2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-400 transition-all", isExpanded && "rotate-180")}>
@@ -221,7 +232,7 @@ const MaterialIndex = () => {
                           <div className="flex-1 flex items-center gap-4">
                               {topic.isLocked ? (
                                 <div className="w-10 h-10 rounded-xl bg-slate-200 dark:bg-white/5 flex items-center justify-center text-slate-400">
-                                  <Lock className="w-4 h-4" />
+                                  <ShieldCheck className="w-4 h-4" />
                                 </div>
                               ) : null}
                               <div>
@@ -239,10 +250,10 @@ const MaterialIndex = () => {
                           </div>
                           <div className="w-8 h-8 rounded-full bg-white dark:bg-white/10 flex items-center justify-center transition-all">
                              {topic.isLocked ? (
-                                 <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
+                                 <ShieldCheck className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
                              ) : (
                                  <Link to={`/materi/${topic.id}`} className="w-full h-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 translate-x-4 group-hover/item:translate-x-0 transition-all">
-                                    <ArrowRight className="w-4 h-4 text-teal-500" />
+                                    <MoveRight className="w-4 h-4 text-teal-500" />
                                  </Link>
                              )}
                           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Star, ArrowRight, Shield, X, Sparkles, Globe, Brain, Zap, PlayCircle, Lock, Gamepad2 } from 'lucide-react';
+import { Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad, Shield, Trophy } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
 import { SplitText } from '../components/animations/SplitText';
@@ -10,7 +10,15 @@ import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Star, Sparkles, Globe, Brain, Zap, PlayCircle, Gamepad2
+  BookOpen: Library, 
+  Star: Award, 
+  Sparkles: Diamond, 
+  Globe: Orbit, 
+  Brain: Cpu, 
+  Zap: Rocket, 
+  PlayCircle: Gamepad, 
+  Play: Gamepad, 
+  Gamepad2: Trophy
 };
 
 const Home = () => {
@@ -91,7 +99,7 @@ const Home = () => {
               className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-5 rounded-2xl font-bold transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center overflow-hidden"
             >
               <span className="relative z-10">{config.heroButtonText}</span>
-              <ArrowRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
+              <MoveRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </Link>
 
@@ -109,7 +117,7 @@ const Home = () => {
                     onClick={() => setShowCopyright(true)}
                     className="flex items-center gap-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors text-sm font-medium"
                 >
-                    <Shield className="w-4 h-4" />
+                    <ShieldCheck className="w-4 h-4" />
                     Hak Cipta Terdaftar
                 </button>
             )}
@@ -162,14 +170,14 @@ const Home = () => {
              </p>
           </div>
           <Link to="/permainan" className="hidden md:flex items-center gap-2 text-amber-600 font-bold hover:gap-4 transition-all pb-2 border-b-2 border-amber-500/20 hover:border-amber-500">
-              Masuk Arena Game <ArrowRight className="w-5 h-5" />
+              Masuk Arena Game <MoveRight className="w-5 h-5" />
           </Link>
         </motion.div>
         
         {/* Bento Grid Layout - Enhanced for Games */}
         <BentoGrid>
           {specialPrograms.map((prog, idx) => {
-             const Icon = iconMap[prog.icon] || Gamepad2;
+             const Icon = iconMap[prog.icon] || Trophy;
              return (
                 <div key={prog.id} className="md:col-span-1">
                    {prog.isLocked ? (
@@ -180,10 +188,10 @@ const Home = () => {
                            header={
                              <div className="flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-slate-300 dark:bg-slate-800 grayscale items-center justify-center relative overflow-hidden">
                                 <div className="relative z-10 w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/20">
-                                    <Lock className="w-10 h-10" />
+                                    <ShieldCheck className="w-10 h-10" />
                                 </div>
                                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg border border-white/10">
-                                   <Lock className="w-3 h-3" /> Terkunci
+                                   <ShieldCheck className="w-3 h-3" /> Terkunci
                                 </div>
                              </div>
                            }
@@ -220,7 +228,7 @@ const Home = () => {
         {/* Mobile View More */}
         <div className="md:hidden mt-12 flex justify-center">
              <Link to="/permainan" className="bg-amber-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center shadow-lg shadow-amber-500/20">
-                Semua Game <ArrowRight className="ml-2 w-5 h-5" />
+                Semua Game <MoveRight className="ml-2 w-5 h-5" />
              </Link>
         </div>
       </div>

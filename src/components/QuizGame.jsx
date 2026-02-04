@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, X, Trophy, RefreshCcw, ArrowRight, HelpCircle } from 'lucide-react';
+import { Check, X, Trophy, RefreshCcw, MoveRight, HelpCircle } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
@@ -168,7 +168,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
                  className="px-6 py-2 bg-[var(--color-primary)] text-white rounded-lg font-bold hover:bg-teal-700 transition-all shadow-md flex items-center"
                >
                  {currentIndex < questions.length - 1 ? 'Pertanyaan Selanjutnya' : 'Lihat Hasil'}
-                 <ArrowRight className="w-4 h-4 ml-2" />
+                 <MoveRight className="w-4 h-4 ml-2" />
                </button>
             </div>
          )}

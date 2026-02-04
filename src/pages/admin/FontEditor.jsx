@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Type, Save, Eye, Sparkles, CheckCircle, ChevronRight, Monitor, Languages, Hash } from 'lucide-react';
+import { Type, Save, Eye, Sparkles, CircleCheckBig, ChevronRight, Monitor, Languages, Hash, Diamond } from 'lucide-react';
 import { useToast } from '../../components/Toast';
 import { useFont } from '../../components/FontProvider';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -126,7 +126,7 @@ const FontEditor = () => {
                                 )}>
                                     {font.label}
                                 </span>
-                                {localConfig.fontFamily === font.name && <CheckCircle className="w-4 h-4 text-white" />}
+                                {localConfig.fontFamily === font.name && <CircleCheckBig className="w-4 h-4 text-white" />}
                             </div>
                             <p 
                                 className={cn(
@@ -265,7 +265,7 @@ const FontEditor = () => {
 
                 <div className="pt-4 px-2">
                     <div className="flex items-center gap-3 text-amber-500 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
-                        <Sparkles className="w-10 h-10 shrink-0" />
+                        <Diamond className="w-10 h-10 shrink-0" />
                         <p className="text-[10px] font-bold leading-relaxed">Preview mencerminkan tampilan di berbagai bagian portal secara real-time.</p>
                     </div>
                 </div>

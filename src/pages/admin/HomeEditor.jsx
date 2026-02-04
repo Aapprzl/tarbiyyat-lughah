@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, Layout, Type, MousePointer, Image, Upload, Trash2, Target, BookOpen, Star, Zap, Activity, Box, Award, Hexagon, Layers, Smile, Sparkles, ChevronRight, CheckCircle, Globe, Monitor } from 'lucide-react';
+import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor } from 'lucide-react';
 import { useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
 // Helper to render icon by name
 const IconPreview = ({ name, className }) => {
-    const icons = { BookOpen, Layout, Star, Zap, Activity, Box, Award, Hexagon, Layers, Smile };
-    const Icon = icons[name] || BookOpen;
+    const icons = { BookOpen: Library, Layout: LayoutGrid, Star: Award, Zap: Rocket, Activity: LineChart, Box: Package, Award: Medal, Hexagon, Layers, Smile: Heart };
+    const Icon = icons[name] || Library;
     return <Icon className={cn("w-6 h-6", className)} />;
 };
 
@@ -97,7 +97,7 @@ const HomeEditor = () => {
         >
             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                 <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
-                    <Globe className="w-6 h-6" />
+                    <Orbit className="w-6 h-6" />
                 </div>
                 Identitas Website
             </h2>
@@ -181,10 +181,10 @@ const HomeEditor = () => {
                                 )}
                          >
                             <div className="flex items-center gap-3">
-                                <Star className={cn("w-5 h-5", config.siteLogoType === 'icon' ? "text-white" : "text-slate-400 group-hover:text-teal-500")} />
+                                <Award className={cn("w-5 h-5", config.siteLogoType === 'icon' ? "text-white" : "text-slate-400 group-hover:text-teal-500")} />
                                 <span className="text-xs font-black uppercase tracking-widest">Gunakan Ikon</span>
                             </div>
-                            {config.siteLogoType === 'icon' && <CheckCircle className="w-4 h-4" />}
+                            {config.siteLogoType === 'icon' && <CircleCheckBig className="w-4 h-4" />}
                          </button>
                          <button
                                 type="button" 
@@ -200,7 +200,7 @@ const HomeEditor = () => {
                                 <Image className={cn("w-5 h-5", config.siteLogoType === 'image' ? "text-white" : "text-slate-400 group-hover:text-teal-500")} />
                                 <span className="text-xs font-black uppercase tracking-widest">Upload Gambar</span>
                             </div>
-                            {config.siteLogoType === 'image' && <CheckCircle className="w-4 h-4" />}
+                            {config.siteLogoType === 'image' && <CircleCheckBig className="w-4 h-4" />}
                          </button>
                     </div>
 
@@ -364,7 +364,7 @@ const HomeEditor = () => {
         >
             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                 <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
-                    <Sparkles className="w-6 h-6" />
+                    <Diamond className="w-6 h-6" />
                 </div>
                 Informasi Pelengkap
             </h2>

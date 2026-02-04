@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Search, BookOpen, Star, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Sun, Moon, Award, Hexagon, Layers, ArrowRight, X } from 'lucide-react';
+import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { useTheme } from './ThemeProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Star, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Award, Hexagon, Layers
+  BookOpen: Library, 
+  Star: Award, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart, 
+  Award: Medal, 
+  Hexagon, 
+  Layers
 };
 
 const Header = () => {
@@ -85,7 +97,7 @@ const Header = () => {
                onClick={() => setShowSearch(true)}
                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-slate-300 dark:hover:border-white/10 transition-all min-w-[240px]"
              >
-                <Search className="w-4 h-4" />
+                <Telescope className="w-4 h-4" />
                 <span className="text-sm font-medium">Cari materi...</span>
                 <span className="ml-auto text-[10px] bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 rounded uppercase font-bold text-slate-500 dark:text-slate-400">Ctrl K</span>
              </button>
@@ -114,12 +126,12 @@ const Header = () => {
             className="group relative hidden sm:flex items-center bg-slate-900 dark:bg-white text-white dark:text-slate-900 h-12 px-6 rounded-2xl font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all overflow-hidden"
           >
             <span className="relative z-10">Mulai Belajar</span>
-            <ArrowRight className="ml-2 w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+            <MoveRight className="ml-2 w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
             <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           </Link>
           
           <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-slate-400 hover:text-white bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5">
-             <Search className="w-5 h-5" />
+             <Telescope className="w-5 h-5" />
           </button>
         </div>
       </header>
@@ -137,7 +149,7 @@ const Header = () => {
                   <div className="flex items-center justify-between mb-8">
                      <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20">
-                           <Search className="w-6 h-6 text-white" />
+                           <Telescope className="w-6 h-6 text-white" />
                         </div>
                         <div>
                            <h2 className="text-xl font-bold text-white">Pencarian Imersif</h2>
@@ -169,7 +181,7 @@ const Header = () => {
                   <div className="mt-8 grid gap-3 overflow-y-auto max-h-[60vh] custom-scrollbar pr-2">
                      {searchResults.length > 0 ? (
                         searchResults.map((result, idx) => {
-                           const Icon = iconMap[result.icon] || BookOpen;
+                           const Icon = iconMap[result.icon] || Library;
                            return (
                               <motion.button 
                                  key={idx}
@@ -190,14 +202,14 @@ const Header = () => {
                                     <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{result.desc || "Akses materi pembelajaran ini sekarang."}</div>
                                     {result.sectionTitle && <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{result.sectionTitle}</div>}
                                  </div>
-                                 <ArrowRight className="w-5 h-5 text-slate-700 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+                                 <MoveRight className="w-5 h-5 text-slate-700 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
                               </motion.button>
                            );
                         })
                      ) : searchQuery ? (
                         <div className="text-center py-20">
                            <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                              <Search className="w-10 h-10 text-slate-600" />
+                              <Telescope className="w-10 h-10 text-slate-600" />
                            </div>
                            <h3 className="text-xl font-bold text-slate-400">Tidak ada hasil ditemukan</h3>
                            <p className="text-slate-600">Coba gunakan kata kunci lain</p>
@@ -205,12 +217,12 @@ const Header = () => {
                      ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
                            <div className="p-6 rounded-3xl bg-teal-500/5 border border-teal-500/10">
-                              <Zap className="w-6 h-6 text-teal-400 mb-4" />
+                              <Rocket className="w-6 h-6 text-teal-400 mb-4" />
                               <h3 className="text-white font-bold mb-2">Pencarian Cepat</h3>
                               <p className="text-sm text-slate-400 leading-relaxed">Gunakan kata kunci singkat untuk menemukan topik secara instan di seluruh kurikulum.</p>
                            </div>
                            <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/10">
-                              <Star className="w-6 h-6 text-amber-400 mb-4" />
+                              <Award className="w-6 h-6 text-amber-400 mb-4" />
                               <h3 className="text-white font-bold mb-2">Program Unggulan</h3>
                               <p className="text-sm text-slate-400 leading-relaxed">Anda bisa mencari berdasarkan nama program khusus seperti "Kitabah" atau "Nahwu".</p>
                            </div>

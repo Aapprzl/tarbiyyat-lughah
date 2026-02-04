@@ -1,13 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Search, Layers, FileText, ArrowRight, Sparkles, FolderPlus, MoreVertical, ExternalLink, Lock, Unlock, X } from 'lucide-react';
+import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Telescope, Layers, ClipboardList, MoveRight, Diamond, FolderPlus, MoreVertical, ExternalLink, ShieldCheck, DoorOpen, X, Trophy, Gamepad } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart,
+  PlayCircle: Gamepad,
+  Play: Gamepad
 };
 
 const AdminDashboard = () => {
@@ -205,7 +216,7 @@ const AdminDashboard = () => {
       {/* Control Bar */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white dark:bg-white/5 p-4 rounded-[2rem] border border-slate-200 dark:border-white/10 shadow-sm">
           <div className="relative w-full md:w-96">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Telescope className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                  type="text" 
                  placeholder="Cari kategori atau materi..."
@@ -242,7 +253,7 @@ const AdminDashboard = () => {
             })
         ) : (
             <div className="py-24 text-center bg-white dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-white/10">
-                <Search className="w-12 h-12 mx-auto mb-4 text-slate-300" />
+                <Telescope className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2 text-center">Tidak ada hasil</h3>
                 <p className="text-slate-500">Coba kata kunci lain atau buat kategori baru.</p>
             </div>
@@ -338,7 +349,7 @@ const AdminDashboard = () => {
 
 const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic, onReload }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const SectionIcon = iconMap[section.icon] || BookOpen;
+    const SectionIcon = iconMap[section.icon] || Library;
     const topicCount = section.topics?.length || 0;
     const [toggling, setToggling] = useState(false);
 
@@ -387,12 +398,12 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                              </span>
                                      {topicCount === 0 && (
                                         <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 uppercase tracking-widest">
-                                            <Zap className="w-3 h-3" /> Kosong
+                                            <Rocket className="w-3 h-3" /> Kosong
                                         </span>
                                      )}
                                      {section.isLocked && (
                                         <span className="px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                                            <Lock className="w-3 h-3" /> Terkunci
+                                            <ShieldCheck className="w-3 h-3" /> Terkunci
                                         </span>
                                      )}
                                 </div>
@@ -411,7 +422,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                 )}
                                 title={section.isLocked ? "Buka Kunci Kategori" : "Kunci Kategori"}
                             >
-                                {section.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                                {section.isLocked ? <ShieldCheck className="w-5 h-5" /> : <DoorOpen className="w-5 h-5" />}
                             </button>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); onEdit(); }}
@@ -457,7 +468,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                                 "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
                                                 topic.isLocked ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-white/10 text-slate-400 group-hover/item:bg-teal-500 group-hover/item:text-white"
                                             )}>
-                                                {topic.isLocked ? <Lock className="w-5 h-5" /> : <FileText className="w-5 h-5" />}
+                                                {topic.isLocked ? <ShieldCheck className="w-5 h-5" /> : <ClipboardList className="w-5 h-5" />}
                                             </div>
                                             <div className="flex flex-col">
                                                 <span className="font-bold text-slate-800 dark:text-slate-200 font-arabic text-lg tracking-tight">{topic.title}</span>
@@ -475,13 +486,13 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                                 )}
                                                 title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
                                             >
-                                                {topic.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                                                {topic.isLocked ? <ShieldCheck className="w-4 h-4" /> : <DoorOpen className="w-4 h-4" />}
                                             </button>
                                             <Link 
                                                 to={`/admin/edit/${topic.id}`}
                                                 className="flex items-center gap-2 px-4 py-2 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-teal-500 hover:text-white transition-all border border-teal-500/20"
                                             >
-                                                Edit <ArrowRight className="w-3 h-3" />
+                                                Edit <MoveRight className="w-3 h-3" />
                                             </Link>
                                             <button 
                                                 className="p-2 text-slate-400 hover:text-red-500 transition-colors"
@@ -496,7 +507,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                             </div>
                         ) : (
                             <div className="text-center py-12 bg-white/50 dark:bg-black/10 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-white/5">
-                                <Sparkles className="w-10 h-10 mx-auto mb-4 text-slate-300 opacity-50" />
+                                <Diamond className="w-10 h-10 mx-auto mb-4 text-slate-300 opacity-50" />
                                 <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Kategori ini masih kosong</p>
                             </div>
                         )}

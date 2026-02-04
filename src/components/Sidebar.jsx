@@ -1,12 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { BookOpen, Box, Activity, Hash, ChevronDown, GraduationCap, Lock, Star, Zap, Bookmark, Layout, Flag, Smile, Home, User, Award, Hexagon, Layers, X } from 'lucide-react';
+import { Library, Package, LineChart, Link2, ChevronDown, GraduationCap, ShieldCheck, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Compass, CircleUser, Medal, Hexagon, Layers, X, Gamepad } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, GraduationCap, Award, Hexagon, Layers
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart, 
+  PlayCircle: Gamepad, 
+  Play: Gamepad, 
+  GraduationCap, 
+  Award: Medal, 
+  Hexagon, 
+  Layers
 };
 
 const Sidebar = ({ isOpen, onClose }) => {
@@ -110,7 +125,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     isActive ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
-                <User className="w-5 h-5 mr-3" />
+                <CircleUser className="w-5 h-5 mr-3" />
                 <span className="font-bold text-sm">Profil</span>
               </NavLink>
             </div>
@@ -121,7 +136,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               Kurikulum
             </h2>
             {curriculum.map((section) => {
-              const Icon = iconMap[section.icon] || BookOpen;
+              const Icon = iconMap[section.icon] || Library;
               const isExpanded = expandedSection === section.id;
 
               return (
@@ -140,7 +155,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <span className={cn("font-bold text-sm", section.isLocked ? "text-slate-400" : "")}>{section.title}</span>
                     </div>
                     {section.isLocked ? (
-                      <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
+            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                     ) : (
                       <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-teal-500" : "text-slate-400")} />
                     )}
@@ -158,7 +173,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           <div key={topic.id} className="relative group/side">
                             {topic.isLocked ? (
                               <div className="flex items-center pl-6 pr-4 py-2.5 text-sm transition-all text-slate-400/80 cursor-not-allowed select-none border-l border-slate-100 dark:border-white/5">
-                                <Lock className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
+                                <ShieldCheck className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
                                 <span className="arabic-sidebar-content opacity-60">{topic.title}</span>
                               </div>
                             ) : (
@@ -207,7 +222,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                       <span className={cn("font-bold text-sm", category.isLocked ? "text-slate-400" : "")}>{category.title}</span>
                     </div>
                     {category.isLocked ? (
-                      <Lock className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
+            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
                     ) : (
                       <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-amber-500" : "text-slate-400")} />
                     )}
@@ -225,7 +240,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                           <div key={topic.id} className="relative group/side">
                             {topic.isLocked ? (
                               <div className="flex items-center pl-6 pr-4 py-2.5 text-sm transition-all text-slate-400/80 cursor-not-allowed select-none border-l border-slate-100 dark:border-white/5">
-                                <Lock className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
+                                <ShieldCheck className="w-3 h-3 mr-2 text-slate-300 dark:text-slate-700 shrink-0" />
                                 <span className="arabic-sidebar-content opacity-60">{topic.title}</span>
                               </div>
                             ) : (
@@ -258,7 +273,7 @@ const Sidebar = ({ isOpen, onClose }) => {
             to="/admin/login"
             className="group flex items-center justify-center gap-2 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-all border border-slate-100 dark:border-white/5"
           >
-            <Lock className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             <span className="font-bold text-xs tracking-widest uppercase">Admin Panel</span>
           </NavLink>
         </div>

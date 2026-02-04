@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowLeft, ArrowRight, RotateCw, Layers } from 'lucide-react';
+import { MoveLeft, MoveRight, RotateCw, Layers } from 'lucide-react';
 const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
   
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -95,7 +95,7 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
                 disabled={currentIndex === 0}
                 className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
             >
-                <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
+                <MoveLeft className="w-5 h-5 md:w-6 md:h-6" />
             </button>
 
             <button 
@@ -111,7 +111,7 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
                 disabled={currentIndex === items.length - 1}
                 className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
             >
-                <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
+                <MoveRight className="w-5 h-5 md:w-6 md:h-6" />
             </button>
          </div>
 

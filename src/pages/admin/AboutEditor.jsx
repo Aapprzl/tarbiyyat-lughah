@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
-import { Save, Info, Mail, Phone, Sparkles, ChevronRight, CheckCircle, FileText, Globe } from 'lucide-react';
+import { Save, Info, Mail, Phone, Sparkles, ChevronRight, CheckCircle, ClipboardList, Globe, Orbit } from 'lucide-react';
 import { useToast } from '../../components/Toast';
 import RichTextEditor from '../../components/RichTextEditor';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -79,7 +79,7 @@ const AboutEditor = () => {
            >
                 <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                     <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                        <FileText className="w-6 h-6" />
+                        <ClipboardList className="w-6 h-6" />
                     </div>
                     Informasi Utama
                 </h2>
@@ -127,7 +127,7 @@ const AboutEditor = () => {
            >
                 <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                     <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600">
-                        <Globe className="w-6 h-6" />
+                        <Orbit className="w-6 h-6" />
                     </div>
                     Kontak Publik
                 </h2>

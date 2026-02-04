@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { User, Mail, Globe, Linkedin, Instagram, FileText, ArrowLeft, Download, Bookmark, Sparkles, MapPin, Layout, Star, Activity, ArrowRight } from 'lucide-react';
+import { CircleUser, Mail, Orbit, Linkedin, Instagram, ClipboardList, MoveLeft, Download, Pocket, Diamond, MapPin, LayoutGrid, Award, LineChart, MoveRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -72,7 +72,7 @@ const Profile = () => {
                 <div className="relative">
                     <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
                     <div className="absolute inset-0 flex items-center justify-center text-teal-500">
-                        <User className="w-6 h-6 animate-pulse" />
+                                           <CircleUser className="w-8 h-8 text-teal-600" />
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@ const Profile = () => {
                     animate={{ scale: 1, opacity: 1 }}
                     className="w-24 h-24 bg-white dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center shadow-2xl border border-slate-200 dark:border-white/10 mb-8"
                  >
-                    <User className="w-12 h-12 text-slate-300" />
+                    <CircleUser className="w-12 h-12 text-slate-300" />
                  </motion.div>
                  <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 tracking-tighter">Profil Belum Tersedia</h2>
                  <p className="text-slate-500 dark:text-slate-400 mb-10 max-w-sm">Informasi profil pembuat belum ditambahkan ke database.</p>
@@ -136,7 +136,7 @@ const Profile = () => {
                         className="flex items-center gap-4 text-slate-400 dark:text-white/50 mb-2"
                     >
                         <Link to="/" className="hover:text-teal-600 transition-colors flex items-center gap-2 font-black uppercase tracking-[0.3em] text-[10px]">
-                           <ArrowLeft className="w-3 h-3" /> Beranda
+                           <MoveLeft className="w-3 h-3" /> Beranda
                         </Link>
                         <div className="w-1.5 h-1.5 bg-slate-300 dark:bg-white/20 rounded-full"></div>
                         <span className="font-black uppercase tracking-[0.3em] text-[10px] text-teal-600 dark:text-teal-400">Verifikasi Registry Publik</span>
@@ -169,13 +169,13 @@ const Profile = () => {
                                          <img src={config.photoUrl} alt={config.name} className="w-full h-full rounded-[2.5rem] object-cover bg-slate-100 transition-transform duration-700 group-hover:scale-110" />
                                      ) : (
                                          <div className="w-full h-full rounded-[2.5rem] bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-300">
-                                             <User className="w-24 h-24" />
+                                             <CircleUser className="w-24 h-24" />
                                          </div>
                                      )}
                                      
                                      {/* Floating Badge */}
                                      <div className="absolute -bottom-2 -right-2 w-16 h-16 bg-white dark:bg-slate-900 rounded-3xl flex items-center justify-center shadow-2xl border border-slate-100 dark:border-white/10 rotate-12 transition-transform group-hover:rotate-0">
-                                        <Sparkles className="w-8 h-8 text-teal-500 drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]" />
+                                        <Diamond className="w-8 h-8 text-teal-500 drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]" />
                                      </div>
                                 </div>
                             </div>
@@ -184,7 +184,7 @@ const Profile = () => {
                                 <div className="space-y-2">
                                     <h1 className="text-4xl font-black text-slate-900 dark:text-white leading-[1.1] tracking-tighter">{config.name}</h1>
                                     <div className="inline-flex items-center gap-2 px-5 py-2 bg-teal-500/10 text-teal-600 dark:text-teal-400 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-teal-500/20 shadow-sm animate-pulse">
-                                        <Bookmark className="w-3 h-3" /> {config.title || 'Master Architect'}
+                                        <Pocket className="w-3 h-3" /> {config.title || 'Master Architect'}
                                     </div>
                                 </div>
                                 
@@ -209,7 +209,7 @@ const Profile = () => {
                                                      <span className="text-xs font-black">Kirim Pesan</span>
                                                  </div>
                                              </div>
-                                             <ArrowRight className="w-4 h-4 text-slate-300 group-hover/link:text-teal-500 group-hover/link:translate-x-1 transition-all" />
+                                             <MoveRight className="w-4 h-4 text-slate-300 group-hover/link:text-teal-500 group-hover/link:translate-x-1 transition-all" />
                                          </a>
                                      )}
                                      
@@ -246,13 +246,13 @@ const Profile = () => {
                          <motion.div variants={itemVariants} className="bg-white/70 dark:bg-white/5 backdrop-blur-xl rounded-[3.5rem] border border-white dark:border-white/10 shadow-2xl p-10 md:p-16 relative overflow-hidden group">
                               {/* Decorative Icon */}
                               <div className="absolute -top-12 -right-12 p-12 opacity-5 scale-[2] rotate-12 transition-transform duration-1000 group-hover:rotate-0">
-                                 <Sparkles className="w-48 h-48 text-teal-500" />
+                                 <Diamond className="w-48 h-48 text-teal-500" />
                               </div>
 
                               <div className="relative z-10">
                                   <div className="flex items-center gap-5 mb-12">
                                        <div className="w-16 h-16 bg-teal-500/10 rounded-[1.75rem] flex items-center justify-center shadow-inner border border-teal-500/20">
-                                           <User className="w-8 h-8 text-teal-600" />
+                                           <CircleUser className="w-8 h-8 text-teal-600" />
                                        </div>
                                        <div>
                                            <div className="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] mb-1">Inspirasi & Visi</div>
@@ -300,7 +300,7 @@ const Profile = () => {
                                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
                                           <div className="flex items-center gap-5">
                                                <div className="w-16 h-16 bg-red-500/10 rounded-[1.75rem] flex items-center justify-center text-red-600 dark:text-red-400 border border-red-500/20">
-                                                   <FileText className="w-8 h-8" />
+                                                   <ClipboardList className="w-8 h-8" />
                                                </div>
                                                <div>
                                                     <div className="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-[0.3em] mb-1">Dokumen Resmi</div>

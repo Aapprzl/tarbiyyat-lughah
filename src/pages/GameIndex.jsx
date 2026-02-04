@@ -1,13 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Gamepad2, Star, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Target, ListChecks, Settings, Globe, ArrowRight, Lock, Sparkles, Trophy, Play } from 'lucide-react';
+import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen: Star, // Fallback
-  Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Target, ListChecks, Settings, Globe, Gamepad2
+  BookOpen: Award, // Fallback
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart, 
+  Target: Crosshair, 
+  ListChecks: CheckSquare, 
+  Settings: Sliders, 
+  Globe: Orbit, 
+  PlayCircle: Gamepad, 
+  Play: Gamepad, 
+  Gamepad2: Trophy
 };
 
 const GameIndex = () => {
@@ -38,7 +53,7 @@ const GameIndex = () => {
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="relative">
             <div className="w-20 h-20 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-            <Gamepad2 className="absolute inset-0 m-auto w-8 h-8 text-amber-500 animate-pulse" />
+            <Trophy className="absolute inset-0 m-auto w-8 h-8 text-amber-500 animate-pulse" />
         </div>
       </div>
     );
@@ -81,11 +96,10 @@ const GameIndex = () => {
           )}
       </div>
 
-      {/* Grid of Games */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <AnimatePresence>
           {categories.map((category, idx) => {
-            const IconComp = iconMap[category.icon] || Gamepad2;
+            const IconComp = iconMap[category.icon] || Trophy;
             return (
               <motion.div
                 key={category.id}
@@ -125,11 +139,11 @@ const GameIndex = () => {
                         <div className="flex items-center gap-2">
                            {category.isLocked ? (
                               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-widest border border-slate-200 dark:border-white/10">
-                                 <Lock className="w-2.5 h-2.5" /> Terkunci
+                                 <ShieldCheck className="w-2.5 h-2.5" /> Terkunci
                               </div>
                            ) : (
                               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[9px] font-black uppercase tracking-widest border border-teal-500/20">
-                                 <Play className="w-2.5 h-2.5" /> Main Sekarang
+                                 <Gamepad className="w-2.5 h-2.5" /> Main Sekarang
                               </div>
                            )}
                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
@@ -139,7 +153,7 @@ const GameIndex = () => {
                         
                         {!category.isLocked && (
                            <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1">
-                              <ArrowRight className="w-5 h-5" />
+                              <MoveRight className="w-5 h-5" />
                            </div>
                         )}
                      </div>
@@ -153,7 +167,7 @@ const GameIndex = () => {
 
       {categories.length === 0 && (
          <div className="text-center py-32 bg-white dark:bg-white/5 rounded-[4rem] border border-dashed border-slate-300 dark:border-white/10">
-            <Gamepad2 className="w-20 h-20 text-slate-200 mx-auto mb-6" />
+            <Trophy className="w-20 h-20 text-slate-200 mx-auto mb-6" />
             <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Belum ada Permainan</h3>
             <p className="text-slate-500 font-medium">Instruktur sedang menyiapkan tantangan baru untukmu.</p>
          </div>
@@ -164,7 +178,7 @@ const GameIndex = () => {
 
 const StatCard = ({ icon, label, value, color }) => {
     const iconName = typeof icon === 'string' ? icon : null;
-    const IconComp = iconName ? (iconMap[iconName] || Gamepad2) : icon;
+    const IconComp = iconName ? (iconMap[iconName] || Trophy) : icon;
     
     return (
         <div className="flex items-center gap-5 p-6 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-sm">

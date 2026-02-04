@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { ArrowLeft, BookOpen, AlertCircle, Edit, Youtube, FileText, Download, ExternalLink, ArrowRight, Play, CheckCircle, Clock, ChevronRight, Share2, Printer, Bookmark, Lock, Sparkles, Gamepad2 } from 'lucide-react';
+import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -144,7 +144,7 @@ const MaterialDetailContent = () => {
         <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Konten Hilang dari Radar</h2>
         <p className="text-slate-500 max-w-sm mb-10 leading-relaxed font-medium">Maaf, materi yang Anda cari tidak dapat ditemukan. Mungkin telah dipindahkan atau dihapus.</p>
         <button onClick={() => navigate('/materi')} className="flex items-center gap-3 px-10 py-5 bg-teal-500 text-white rounded-[2rem] font-bold shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all">
-          <ArrowLeft className="w-5 h-5" />
+          <MoveLeft className="w-5 h-5" />
           Kembali ke Kurikulum
         </button>
       </div>
@@ -181,11 +181,11 @@ const MaterialDetailContent = () => {
                   
                   <div className="relative z-10">
                       <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-amber-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-amber-500/30">
-                          <Lock className="w-12 h-12" />
+                          <ShieldCheck className="w-12 h-12" />
                       </div>
                       
                       <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
-                          <Sparkles className="w-3 h-3" />
+                          <Diamond className="w-3 h-3" />
                           Materi Belum Tersedia
                       </div>
                       
@@ -201,7 +201,7 @@ const MaterialDetailContent = () => {
                         onClick={() => navigate('/materi')}
                         className="group flex items-center gap-3 px-10 py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest text-xs transition-all hover:scale-105 active:scale-95 shadow-xl mx-auto"
                       >
-                          <ArrowLeft className="w-5 h-5 transition-transform group-hover:-translate-x-2" />
+                          <MoveLeft className="w-5 h-5 transition-transform group-hover:-translate-x-2" />
                           Kembali Ke Kurikulum
                       </button>
                   </div>
@@ -256,7 +256,7 @@ const MaterialDetailContent = () => {
                             isGame ? "bg-amber-500 shadow-amber-500/20" : "bg-teal-500 shadow-teal-500/20"
                         )}
                     >
-                        {isGame ? <Gamepad2 className="w-7 h-7" /> : <BookOpen className="w-7 h-7" />}
+                        {isGame ? <Trophy className="w-7 h-7" /> : <Library className="w-7 h-7" />}
                     </motion.div>
                     <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight arabic-title">
                         {topic?.title || 'Memuat Judul...'}
@@ -285,7 +285,7 @@ const MaterialDetailContent = () => {
                         "flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
                         isGame ? "text-amber-500" : "text-teal-500"
                     )}>
-                    <CheckCircle className="w-4 h-4" />
+                    <CircleCheckBig className="w-4 h-4" />
                     Akses Terjamin
                     </div>
                 </div>
@@ -301,12 +301,12 @@ const MaterialDetailContent = () => {
             >
                 <div className="flex items-center gap-5 mb-6">
                     <div className="w-16 h-16 bg-amber-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
-                        <Gamepad2 className="w-8 h-8" />
+                        <Trophy className="w-8 h-8" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <span className="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em]">Permainan Bahasa Arab</span>
-                            <Sparkles className="w-3 h-3 text-amber-500" />
+                            <Diamond className="w-3 h-3 text-amber-500" />
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                             {topic?.title}
@@ -359,7 +359,7 @@ const MaterialDetailContent = () => {
                                 </div>
                              </div>
                              <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1 relative z-10">
-                                <Play className="w-5 h-5 ml-1" />
+                                 <Gamepad className="w-5 h-5 ml-1" />
                              </div>
                         </Link>
                     ))}
@@ -410,7 +410,7 @@ const MaterialDetailContent = () => {
           {/* Finish Section */}
           <div className="pt-20 text-center">
               <div className="inline-block p-4 rounded-3xl bg-teal-500/10 mb-8">
-                 <CheckCircle className="w-12 h-12 text-teal-500" />
+                 <CircleCheckBig className="w-12 h-12 text-teal-500" />
               </div>
               <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-widest">Selesai Membaca?</h3>
               <p className="text-slate-500 font-medium mb-10">Anda telah menyelesaikan sesi pembelajaran ini. Bagus!</p>
@@ -439,7 +439,7 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
                     {block.data?.title && <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
-                       <FileText className="w-6 h-6 text-teal-500" /> 
+                       <ClipboardList className="w-6 h-6 text-teal-500" /> 
                        {block.data.title}
                     </h3>}
                     <div className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap">
@@ -451,7 +451,7 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="space-y-6">
                     <h4 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] font-sans flex items-center gap-3">
-                       <Bookmark className="w-4 h-4" /> Kosakata Baru
+                       <Pocket className="w-4 h-4" /> Kosakata Baru
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {block.data?.items?.map((item, idx) => (
@@ -513,7 +513,7 @@ const ContentBlock = ({ block }) => {
                 <div className="space-y-6">
                     <div className="flex items-center justify-between px-4 md:px-0">
                         <h4 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] flex items-center gap-3">
-                           <FileText className="w-4 h-4" /> {block.data?.title || 'Dokumen Materi'}
+                           <ClipboardList className="w-4 h-4" /> {block.data?.title || 'Dokumen Materi'}
                         </h4>
                         {block.data?.allowDownload !== false && block.data?.url && (
                             <a href={block.data.url} download className="flex items-center gap-2 text-xs font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-widest hover:underline transition-all">

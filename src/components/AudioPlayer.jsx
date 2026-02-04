@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause } from 'lucide-react';
+import { CirclePlay, CirclePause } from 'lucide-react';
 
 const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
   const audioRef = useRef(null);
@@ -116,7 +116,7 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
                   onClick={togglePlay}
                   className="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center hover:bg-teal-700 hover:scale-105 active:scale-95 transition-all shadow-lg shadow-teal-500/30"
                 >
-                    {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-1" />}
+                    {isPlaying ? <CirclePause className="w-5 h-5 fill-current" /> : <CirclePlay className="w-5 h-5 fill-current ml-1" />}
                 </button>
 
                 <button 

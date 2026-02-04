@@ -1,13 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { contentService } from '../../services/contentService';
-import { Edit2, Star, Plus, BookOpen, Box, Activity, Hash, Zap, Bookmark, Layout, Flag, Smile, Trash2, ChevronDown, ChevronUp, Sparkles, FolderPlus, FilePlus, Target, ListChecks, Settings, Globe, MoreVertical, X, LayoutGrid, Lock, Unlock } from 'lucide-react';
+import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Diamond, FolderPlus, FilePlus, Crosshair, CheckSquare, Sliders, Orbit, MoreVertical, X, ShieldCheck, DoorOpen, Gamepad } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { Link } from 'react-router-dom';
 
 const iconMap = {
-  BookOpen, Box, Activity, Hash, Star, Zap, Bookmark, Layout, Flag, Smile, Target, ListChecks, Settings, Globe
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Target: Crosshair, 
+  ListChecks: CheckSquare, 
+  Settings: Sliders, 
+  Globe: Orbit,
+  PlayCircle: Gamepad,
+  Play: Gamepad
 };
 
 const AdminPrograms = () => {
@@ -171,7 +185,7 @@ const AdminPrograms = () => {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
            <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-              <Target className="w-3 h-3" /> Kurikulum Unggulan
+              <Crosshair className="w-3 h-3" /> Kurikulum Unggulan
            </div>
            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Program Khusus</h1>
            <p className="text-slate-500 dark:text-slate-400 font-medium">Kelola kategori dan topik program pembelajaran khusus.</p>
@@ -224,7 +238,7 @@ const AdminPrograms = () => {
                              <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">{category.topics?.length || 0} Materi Terdaftar</p>
                              {category.isLocked && (
                                  <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full ring-1 ring-amber-500/20">
-                                     <Lock className="w-2.5 h-2.5" /> Terkunci
+                                     <ShieldCheck className="w-2.5 h-2.5" /> Terkunci
                                  </span>
                              )}
                         </div>
@@ -241,7 +255,7 @@ const AdminPrograms = () => {
                             )}
                             title={category.isLocked ? "Buka Kunci" : "Kunci Kategori"}
                          >
-                            {category.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                            {category.isLocked ? <ShieldCheck className="w-4 h-4" /> : <DoorOpen className="w-4 h-4" />}
                          </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
@@ -280,7 +294,7 @@ const AdminPrograms = () => {
                           
                           {category.topics?.length === 0 ? (
                             <div className="text-center py-12 bg-slate-50 dark:bg-black/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-white/5">
-                              <Sparkles className="w-10 h-10 text-slate-300 mx-auto mb-4" />
+                              <Diamond className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                               <p className="text-slate-400 font-bold text-sm">Belum ada topik yang ditambahkan.</p>
                             </div>
                           ) : (
@@ -313,7 +327,7 @@ const AdminPrograms = () => {
                                       )}
                                       title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
                                     >
-                                      {topic.isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                                      {topic.isLocked ? <ShieldCheck className="w-3.5 h-3.5" /> : <DoorOpen className="w-3.5 h-3.5" />}
                                     </button>
                                     <Link
                                       to={`/admin/edit/${topic.id}`}
@@ -449,7 +463,7 @@ const AdminPrograms = () => {
                           <div className="flex items-center justify-between p-6 bg-amber-500/10 rounded-3xl border border-amber-500/20">
                              <div className="flex items-center gap-4">
                                <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
-                                  {categoryForm.isLocked ? <Lock className="w-6 h-6" /> : <Unlock className="w-6 h-6" />}
+                                  {categoryForm.isLocked ? <ShieldCheck className="w-6 h-6" /> : <DoorOpen className="w-6 h-6" />}
                                </div>
                                <div>
                                   <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Status Akses</h4>

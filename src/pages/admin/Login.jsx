@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { Lock, Mail, Key, ArrowLeft, ShieldCheck, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Mail, Key, MoveLeft, Diamond, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { useEffect } from 'react';
@@ -70,13 +70,13 @@ const LoginPage = () => {
                 <div className="absolute inset-0 bg-teal-500 blur-2xl opacity-20 animate-pulse"></div>
                 <div className="relative bg-gradient-to-br from-teal-400 to-indigo-600 w-24 h-24 rounded-[2rem] mx-auto flex items-center justify-center text-white shadow-2xl overflow-hidden group">
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <Lock className="w-10 h-10 group-hover:scale-110 transition-transform" />
+                    <ShieldCheck className="w-10 h-10 group-hover:scale-110 transition-transform" />
                 </div>
             </motion.div>
             
             <div className="space-y-2">
                 <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
-                   Admin Portal <Sparkles className="w-5 h-5 text-amber-500" />
+                   Admin Portal <Diamond className="w-5 h-5 text-amber-500" />
                 </h1>
                 <p className="text-slate-500 dark:text-slate-400 font-medium">Autentikasi diperlukan untuk akses kontrol.</p>
             </div>
@@ -165,7 +165,7 @@ const LoginPage = () => {
                             animate={{ x: 0 }}
                             whileHover={{ x: 5 }}
                         >
-                            Masuk Dashboard <Sparkles className="w-4 h-4" />
+                            Masuk Dashboard <Diamond className="w-4 h-4" />
                         </motion.div>
                     )}
                 </div>
@@ -175,7 +175,7 @@ const LoginPage = () => {
           {/* Footer */}
           <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <Link to="/" className="group flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors text-sm font-bold">
-               <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+               <MoveLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                Website Utama
             </Link>
             <span className="text-slate-400 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, BookOpen, Gamepad2, User, Sparkles } from 'lucide-react';
+import { LayoutGrid, Library, Trophy, CircleUser, Sparkles, ShieldHalf } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -52,10 +52,11 @@ const BottomBar = () => {
   }, [lastScrollY]);
 
   const navItems = [
-    { to: '/', icon: Home, label: 'Beranda' },
-    { to: '/materi', icon: BookOpen, label: 'Materi' },
-    { to: '/permainan', icon: Gamepad2, label: 'Permainan' },
-    { to: '/profil', icon: User, label: 'Profil' },
+    { to: '/', icon: LayoutGrid, label: 'Beranda' },
+    { to: '/materi', icon: Library, label: 'Materi' },
+    { to: '/permainan', icon: Trophy, label: 'Permainan' },
+    { to: '/profil', icon: CircleUser, label: 'Profil' },
+    { to: '/admin/login', icon: ShieldHalf, label: 'Admin' },
   ];
 
   return (

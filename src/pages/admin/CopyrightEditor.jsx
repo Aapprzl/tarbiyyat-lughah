@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { FileText, Upload, Save, AlertCircle, Eye, Trash2, Shield, Info, FileCheck, XCircle, ChevronRight, CheckCircle, Sparkles } from 'lucide-react';
+import { ClipboardList, Upload, Save, AlertCircle, Eye, Trash2, Shield, Info, FileCheck, XCircle, ChevronRight, CircleCheckBig, Sparkles, Diamond } from 'lucide-react';
 import PdfViewer from '../../components/PdfViewer';
 import { useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -218,7 +218,7 @@ const CopyrightEditor = () => {
                                         >
                                             <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-white/5">
                                                 <div className="flex items-center gap-3">
-                                                    <Sparkles className="w-5 h-5 text-indigo-500" />
+                                                    <Diamond className="w-5 h-5 text-indigo-500" />
                                                     <span className="text-sm font-black uppercase tracking-widest text-slate-500">Immersive PDF Reader</span>
                                                 </div>
                                                 <XCircle className="w-6 h-6 text-slate-400 cursor-pointer hover:text-red-500 transition-colors" onClick={() => setPreviewMode(false)} />

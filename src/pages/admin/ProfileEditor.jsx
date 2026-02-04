@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Save, User, FileText, Upload, Trash2, Mail, Globe, Linkedin, Instagram, Link as LinkIcon, Sparkles, MapPin, ChevronRight, CheckCircle, AlertCircle, Layout, Activity, Star } from 'lucide-react';
+import { Save, CircleUser, ClipboardList, Upload, Trash2, Mail, Orbit, Linkedin, Instagram, Link as LinkIcon, Diamond, MapPin, ChevronRight, CircleCheckBig, AlertCircle, LayoutGrid, LineChart, Award } from 'lucide-react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
 import PdfViewer from '../../components/PdfViewer';
@@ -177,7 +177,7 @@ const ProfileEditor = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
                    <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-                      <User className="w-3 h-3" /> Identitas Kreator
+                      <CircleUser className="w-3 h-3" /> Identitas Kreator
                    </div>
                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Editor Profil</h1>
                    <p className="text-slate-500 dark:text-slate-400 font-medium">Informasi ini akan muncul di halaman publik.</p>
@@ -204,7 +204,7 @@ const ProfileEditor = () => {
                                      <img src={photoPreview} alt="Preview" className="w-full h-full rounded-[2rem] object-cover bg-slate-100" />
                                  ) : (
                                      <div className="w-full h-full rounded-[2rem] bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-300">
-                                         <User className="w-16 h-16" />
+                                         <CircleUser className="w-16 h-16" />
                                      </div>
                                  )}
                                  <label className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all cursor-pointer">
@@ -241,7 +241,7 @@ const ProfileEditor = () => {
                     >
                         <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                             <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                                <User className="w-6 h-6" />
+                                <CircleUser className="w-6 h-6" />
                             </div>
                             Informasi Utama
                         </h2>
@@ -308,7 +308,7 @@ const ProfileEditor = () => {
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                                 <div className="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600">
-                                    <Globe className="w-6 h-6" />
+                                    <Orbit className="w-6 h-6" />
                                 </div>
                                 Jejaring Sosial Dinamis
                             </h2>
@@ -378,7 +378,7 @@ const ProfileEditor = () => {
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                                 <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
-                                    <Sparkles className="w-6 h-6" />
+                                    <Diamond className="w-6 h-6" />
                                 </div>
                                 Statistik Profil
                             </h2>
@@ -405,7 +405,7 @@ const ProfileEditor = () => {
                              <div className="space-y-3">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Proyek Selesai</label>
                                 <div className="relative">
-                                    <Layout className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <LayoutGrid className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input 
                                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
                                         value={config.stats?.projects || ''}
@@ -417,7 +417,7 @@ const ProfileEditor = () => {
                              <div className="space-y-3">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Jam Pengabdian</label>
                                 <div className="relative">
-                                    <Activity className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <LineChart className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input 
                                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
                                         value={config.stats?.hours || ''}
@@ -429,7 +429,7 @@ const ProfileEditor = () => {
                              <div className="space-y-3">
                                 <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Rating Kepuasan</label>
                                 <div className="relative">
-                                    <Star className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <Award className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                     <input 
                                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
                                         value={config.stats?.rating || ''}
@@ -451,7 +451,7 @@ const ProfileEditor = () => {
                         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                                 <div className="w-12 h-12 bg-red-500/10 rounded-2xl flex items-center justify-center text-red-600">
-                                    <FileText className="w-6 h-6" />
+                                    <ClipboardList className="w-6 h-6" />
                                 </div>
                                 Berkas Portofolio (PDF)
                             </h2>
@@ -480,7 +480,7 @@ const ProfileEditor = () => {
                         ) : (
                             <div className="space-y-6">
                                 <div className="inline-flex items-center gap-3 px-6 py-3 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full border border-green-500/20">
-                                    <CheckCircle className="w-5 h-5" />
+                                    <CircleCheckBig className="w-5 h-5" />
                                     <span className="text-xs font-black uppercase tracking-widest leading-none">Status: Terunggah</span>
                                 </div>
                                 <div className="rounded-[2.5rem] overflow-hidden border-4 border-slate-50 dark:border-white/5 shadow-2xl h-[400px]">

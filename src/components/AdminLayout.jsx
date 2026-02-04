@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { useTheme } from '../components/ThemeProvider';
-import { LayoutDashboard, BookOpen, LogOut, Layout, Star, Info, Shield, Type, User, Home, Menu, Sun, Moon, Database, ChevronRight, Sparkles, X, Gamepad2 } from 'lucide-react';
+import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -98,7 +98,7 @@ const AdminLayout = () => {
         <div className="p-8 pb-6">
           <div className="flex items-center gap-4 mb-8">
             <div className="w-12 h-12 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20">
-               <Sparkles className="w-6 h-6 text-white" />
+               <Diamond className="w-6 h-6 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-black text-slate-900 dark:text-white leading-none mb-1">Admin Panel</h2>
@@ -113,17 +113,17 @@ const AdminLayout = () => {
         <nav className="flex-1 p-6 space-y-2 overflow-y-auto custom-scrollbar">
           <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Menu Utama</div>
           <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
-          <NavItem to="/admin/games" icon={Gamepad2} label="Manajemen Game" />
+          <NavItem to="/admin/games" icon={Trophy} label="Manajemen Game" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
-          <NavItem to="/admin/home-editor" icon={Layout} label="Editor Beranda" />
+          <NavItem to="/admin/home-editor" icon={LayoutGrid} label="Editor Beranda" />
           <NavItem to="/admin/about-cms" icon={Info} label="Editor Tentang" />
-          <NavItem to="/admin/profile-editor" icon={User} label="Editor Profil" />
+          <NavItem to="/admin/profile-editor" icon={CircleUser} label="Editor Profil" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
           <NavItem to="/admin/db-migration" icon={Database} label="Migrasi DB" />
-          <NavItem to="/admin/copyright" icon={Shield} label="Hak Cipta" />
+          <NavItem to="/admin/copyright" icon={ShieldCheck} label="Hak Cipta" />
           
           <div className="pt-8 px-4">
              <Link to="/" target="_blank" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
@@ -141,7 +141,7 @@ const AdminLayout = () => {
               <div className="flex items-center justify-between mb-4">
                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center">
-                       <User className="w-4 h-4 text-slate-400" />
+                       <CircleUser className="w-4 h-4 text-slate-400" />
                     </div>
                     <span className="text-xs font-bold text-slate-900 dark:text-white">Admin Utama</span>
                  </div>
@@ -171,7 +171,7 @@ const AdminLayout = () => {
              <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
            </button>
            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-teal-500" />
+              <Diamond className="w-5 h-5 text-teal-500" />
               <span className="font-black text-slate-900 dark:text-white tracking-tight">ADMIN PANEL</span>
            </div>
            <div className="w-10"></div> {/* Spacer */}

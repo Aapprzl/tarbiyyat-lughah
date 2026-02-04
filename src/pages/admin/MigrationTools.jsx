@@ -4,7 +4,7 @@ import { storageService } from '../../services/storageService';
 import { cleanupService } from '../../services/cleanupService';
 import { db } from '../../firebaseConfig';
 import { doc, setDoc, writeBatch, collection } from 'firebase/firestore';
-import { Database, UploadCloud, CheckCircle, AlertTriangle, Play, FileText, Image as ImageIcon, Trash2, RefreshCw, BookOpen, ShieldAlert, Activity, Cpu, Sparkles, Terminal } from 'lucide-react';
+import { Database, UploadCloud, AlertTriangle, CirclePlay, ClipboardList, Image as ImageIcon, Trash2, RefreshCw, Library, ShieldAlert, Activity, Cpu, Diamond, Terminal } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -472,7 +472,7 @@ const MigrationTools = () => {
                                         <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         <UploadCloud className="w-6 h-6 relative z-10" />
                                         <span className="relative z-10">Eksekusi Migrasi</span>
-                                        <Sparkles className="w-5 h-5 relative z-10 text-amber-300" />
+                                        <Diamond className="w-5 h-5 relative z-10 text-amber-300" />
                                     </>
                                 )}
                             </button>
@@ -512,7 +512,7 @@ const MigrationTools = () => {
                             <div className="h-[300px] overflow-y-auto custom-scrollbar space-y-2">
                                 {logs.length === 0 ? (
                                     <div className="h-full flex flex-col items-center justify-center text-slate-700">
-                                        <Play className="w-12 h-12 mb-4 opacity-10" />
+                                        <CirclePlay className="w-12 h-12 mb-4 opacity-10" />
                                         <p className="text-xs uppercase tracking-[0.3em] font-black">Waiting for Command...</p>
                                     </div>
                                 ) : (
@@ -620,7 +620,7 @@ const MigrationTools = () => {
                         className="p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-amber-500 hover:bg-amber-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-col items-center gap-4 text-center"
                     >
                         <div className="w-14 h-14 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-amber-500 group-hover:scale-110 transition-all">
-                            <FileText className="w-7 h-7" />
+                            <ClipboardList className="w-7 h-7" />
                         </div>
                         <div>
                             <div className="text-xs font-black uppercase text-slate-500 group-hover:text-amber-500 tracking-widest mb-1">Config Reset</div>
@@ -635,7 +635,7 @@ const MigrationTools = () => {
                         className="sm:col-span-2 lg:col-span-2 p-8 rounded-[2.5rem] border-2 border-slate-100 dark:border-white/5 hover:border-teal-500 hover:bg-teal-500/5 group transition-all disabled:opacity-50 disabled:cursor-not-allowed flex flex-row items-center justify-center gap-6"
                     >
                         <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center text-slate-400 group-hover:text-teal-500 group-hover:scale-110 transition-all">
-                            <BookOpen className="w-8 h-8" />
+                            <Library className="w-8 h-8" />
                         </div>
                         <div className="text-left">
                             <div className="text-xs font-black uppercase text-slate-500 group-hover:text-teal-600 tracking-widest mb-1">Curriculum Wipe</div>
