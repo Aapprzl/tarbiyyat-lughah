@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Bold, Italic, List, ListOrdered, Heading, Quote, Link as LinkIcon, Undo, Redo } from 'lucide-react';
+import DOMPurify from 'dompurify';
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
   const editorRef = useRef(null);
@@ -7,13 +8,15 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value || '';
+      // Sanitize incoming value as well to be safe, though mainly we care about output
+      editorRef.current.innerHTML = value ? DOMPurify.sanitize(value) : '';
     }
   }, [value]);
 
   const handleInput = () => {
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const cleanHTML = DOMPurify.sanitize(editorRef.current.innerHTML);
+      onChange(cleanHTML);
       updateActiveFormats();
     }
   };
