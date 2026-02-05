@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { useTheme } from '../components/ThemeProvider';
-import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy } from 'lucide-react';
+import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -76,7 +76,7 @@ const AdminLayout = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex font-sans">
+    <div className="flex flex-col md:flex-row gap-6">
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
@@ -89,9 +89,9 @@ const AdminLayout = () => {
         )}
       </AnimatePresence>
 
-      {/* Admin Sidebar */}
+      {/* Admin Sidebar - Integrated into Layout flow */}
       <aside className={`
-        fixed inset-y-4 left-4 z-50 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:static md:m-4 md:h-[calc(100vh-2rem)]
+        fixed inset-y-4 left-4 z-[60] w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:sticky md:top-28 md:m-0 md:h-[calc(100vh-8rem)]
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)]'}
       `}>
         {/* Profile Header */}
@@ -117,19 +117,19 @@ const AdminLayout = () => {
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
           <NavItem to="/admin/home-editor" icon={LayoutGrid} label="Editor Beranda" />
-          <NavItem to="/admin/profile-editor" icon={CircleUser} label="Editor Profil" />
+          <NavItem to="/admin/library-manager" icon={Library} label="Manajemen Perpustakaan" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
-          <NavItem to="/admin/db-migration" icon={Database} label="Migrasi DB" />
+          <NavItem to="/admin/db-migration" icon={Hash} label="Migrasi DB" />
           <NavItem to="/admin/copyright" icon={ShieldCheck} label="Hak Cipta" />
           
           <div className="pt-8 px-4">
-             <Link to="/" target="_blank" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
+             <Link to="/" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
                <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-teal-500/10 transition-colors">
                   <Home className="w-4 h-4" />
                </div>
-               <span className="text-xs font-bold uppercase tracking-widest">Lihat Website</span>
+               <span className="text-xs font-bold uppercase tracking-widest">Lihat Beranda</span>
              </Link>
           </div>
         </nav>
@@ -162,32 +162,22 @@ const AdminLayout = () => {
         </div>
       </aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Sticky Header (Mobile Only) */}
-        <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-white/5 sticky top-0 z-30">
-           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 bg-slate-100 dark:bg-white/5 rounded-xl">
-             <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
-           </button>
-           <div className="flex items-center gap-2">
-              <Diamond className="w-5 h-5 text-teal-500" />
-              <span className="font-black text-slate-900 dark:text-white tracking-tight">ADMIN PANEL</span>
-           </div>
-           <div className="w-10"></div> {/* Spacer */}
-        </header>
+      {/* Admin Content Area - Now just a flex child */}
+      <div className="flex-1 min-w-0 p-4 md:p-8">
+        {/* Toggle Mobile Sidebar (Since original Header is fixed) */}
+        {!isMobileMenuOpen && (
+          <button 
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="md:hidden fixed bottom-24 right-6 z-40 w-12 h-12 bg-teal-600 text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
         
-        {/* Content Wrapper */}
-        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 md:p-12 custom-scrollbar">
-           <motion.div 
-             initial={{ opacity: 0, y: 10 }}
-             animate={{ opacity: 1, y: 0 }}
-             transition={{ duration: 0.4 }}
-             className="max-w-6xl mx-auto"
-           >
-              <Outlet />
-           </motion.div>
+        <div className="max-w-6xl mx-auto">
+          <Outlet />
         </div>
-      </main>
+      </div>
     </div>
   );
 };

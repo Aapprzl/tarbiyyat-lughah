@@ -1,59 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutGrid, Library, Trophy, CircleUser, Sparkles, ShieldHalf } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { LayoutGrid, Library, Trophy, CircleUser, ShieldHalf } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const BottomBar = () => {
   const location = useLocation();
   const [isVisible, setIsVisible] = useState(true);
-  const lastScrollY = useRef(0);
-  const scrollTimeout = useRef(null);
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(min-width: 768px)').matches;
+    }
+    return true;
+  });
   const navRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      
-      // Ignore bounce interactions (negative scroll)
-      if (currentScrollY < 0) return;
-
-      // Hide on scroll down (> 100px), show on scroll up
-      if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-        setIsVisible(false);
-      } else if (currentScrollY < lastScrollY.current) {
-        setIsVisible(true);
-      }
-      
-      lastScrollY.current = currentScrollY;
-      
-      // Auto-show after scroll stops (for better UX)
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-      scrollTimeout.current = setTimeout(() => {
-        setIsVisible(true);
-      }, 2000);
-    };
-
-    const handleInteraction = (e) => {
-      // Check if click is outside the BottomBar
-      if (navRef.current && !navRef.current.contains(e.target)) {
-        // Toggle visibility on click outside
-        setIsVisible(prev => !prev);
-        if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
-      }
-      // If click is inside the bar, do nothing (let navigation happen)
-    };
-
-    // Add listeners for all viewports (Desktop & Mobile)
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    window.addEventListener('click', handleInteraction);
-    window.addEventListener('touchstart', handleInteraction);
+    // 1. Media Query Listener for Responsiveness
+    const mql = window.matchMedia('(min-width: 768px)');
+    const handleMediaChange = (e) => setIsDesktop(e.matches);
+    setIsDesktop(mql.matches);
+    mql.addEventListener('change', handleMediaChange);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('click', handleInteraction);
-      window.removeEventListener('touchstart', handleInteraction);
-      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+      mql.removeEventListener('change', handleMediaChange);
     };
   }, []);
 
@@ -61,86 +31,127 @@ const BottomBar = () => {
     { to: '/', icon: LayoutGrid, label: 'Beranda' },
     { to: '/materi', icon: Library, label: 'Materi' },
     { to: '/permainan', icon: Trophy, label: 'Permainan' },
-    { to: '/profil', icon: CircleUser, label: 'Profil' },
+    { to: '/perpustakaan', icon: Library, label: 'Perpustakaan' },
     { to: '/admin/login', icon: ShieldHalf, label: 'Admin' },
   ];
 
+  // Configurable Scales based on User Feedback
+  const config = isDesktop ? {
+    padX: 1.2,
+    padY: 0.8,
+    gap: 0, 
+    baseScale: '1' 
+  } : {
+    iconScale: 1.2, 
+    textScale: 0,
+    padX: 0.8,
+    padY: 0.7,
+    gap: 0, 
+    baseScale: 'var(--mobile-nav-scale, 0.8)' 
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] pb-4 md:pb-6 flex justify-center px-3 md:px-4 pointer-events-none">
-      <motion.nav 
-        ref={navRef}
-        initial={{ y: 0, opacity: 1 }}
-        animate={{ 
-          y: isVisible ? 0 : 120, 
-          opacity: isVisible ? 1 : 0 
-        }}
-        transition={{ 
-          type: 'spring', 
-          damping: 25, 
-          stiffness: 200,
-          mass: 0.8
-        }}
-        className="flex items-center gap-0.5 md:gap-1 p-1.5 md:p-2 bg-white/90 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200 dark:border-white/10 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] pointer-events-auto"
-      >
-        {navItems.map((item) => {
-          // Special handling for Permainan vs Materi
-          let isActive;
-          if (item.to === '/permainan') {
-            // Permainan is active for /permainan or /program/* paths
-            isActive = location.pathname === '/permainan' || location.pathname.startsWith('/program/');
-          } else if (item.to === '/materi') {
-            // Materi is active only for /materi paths (not /program)
-            isActive = location.pathname === '/materi' || (location.pathname.startsWith('/materi/') && !location.pathname.startsWith('/program/'));
-          } else {
-            // Default behavior for other items
-            isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
-          }
-          
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={cn(
-                "relative flex flex-col items-center justify-center px-4 md:px-6 py-2.5 md:py-3 rounded-[1.5rem] md:rounded-[2rem] transition-all duration-500 group",
-                isActive ? "text-teal-600 dark:text-teal-400" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-              )}
-            >
-              {isActive && (
-                <motion.div
-                  layoutId="activeDock"
-                  className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-[1.3rem] md:rounded-[1.8rem]"
-                  transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                />
-              )}
+    <div className="fixed bottom-0 left-0 right-0 z-[100] pb-4 md:pb-8 flex justify-center px-4 pointer-events-none">
+      <AnimatePresence mode="wait">
+        {isVisible ? (
+          <motion.nav 
+            key="full-bar"
+            initial={{ y: 100, opacity: 0, scale: 0.8 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: 100, opacity: 0, scale: 0.8 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+            className="flex items-center gap-0.5 md:gap-1 p-1.5 md:p-2 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-auto relative group"
+          >
+            {navItems.map((item) => {
+              let isActive;
+              if (item.to === '/permainan') {
+                isActive = location.pathname === '/permainan' || location.pathname.startsWith('/program/');
+              } else if (item.to === '/materi') {
+                isActive = location.pathname === '/materi' || (location.pathname.startsWith('/materi/') && !location.pathname.startsWith('/program/'));
+              } else {
+                isActive = location.pathname === item.to || (item.to !== '/' && location.pathname.startsWith(item.to));
+              }
               
-              <div className="relative z-10 flex flex-col items-center gap-0.5 md:gap-1">
-                <Icon className={cn(
-                  "w-5 h-5 md:w-6 md:h-6 transition-transform duration-300",
-                  isActive ? "scale-110" : "group-hover:scale-110"
-                )} />
-                <span 
-                  className={cn(
-                    "font-black uppercase tracking-widest leading-none transition-all",
-                    isActive ? "opacity-100 mt-0.5 md:mt-1" : "opacity-0 h-0 overflow-hidden group-hover:opacity-100 group-hover:h-auto group-hover:mt-0.5 md:group-hover:mt-1"
-                  )}
-                  style={{ fontSize: 'var(--font-arabic-sidebar-content-size)' }}
-                >
-                  {item.label}
-                </span>
-              </div>
+              const Icon = item.icon;
 
-              {isActive && (
-                <motion.div 
-                  layoutId="activeDot"
-                  className="absolute -bottom-0.5 md:-bottom-1 w-1 h-1 bg-teal-500 rounded-full"
-                />
-              )}
-            </NavLink>
-          );
-        })}
-      </motion.nav>
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center rounded-[2rem] transition-all duration-500",
+                    isActive ? "text-teal-600 dark:text-teal-400" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  )}
+                  style={{
+                    paddingLeft: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padX})`,
+                    paddingRight: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padX})`,
+                    paddingTop: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padY})`,
+                    paddingBottom: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padY})`
+                  }}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeDock"
+                      className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-[1.8rem]"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                    />
+                  )}
+                  
+                  <div 
+                    className="relative z-10 flex flex-col items-center transition-all"
+                    style={{ gap: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.gap})` }}
+                  >
+                    <Icon 
+                      className={cn(
+                        "transition-transform duration-300",
+                        isActive ? "scale-110" : "hover:scale-110"
+                      )} 
+                      style={{ 
+                        width: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale})`, 
+                        height: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale})` 
+                      }}
+                    />
+                  </div>
+                </NavLink>
+              );
+            })}
+
+            {/* Manual Hide Button */}
+            <div className="w-px h-8 bg-slate-200 dark:bg-white/10 mx-1 hidden md:block" />
+            <button 
+              onClick={() => setIsVisible(false)}
+              className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/5 rounded-full transition-all ml-1"
+              title="Sembunyikan Navigasi"
+            >
+              <motion.div whileHover={{ rotate: 90 }} transition={{ type: 'spring' }}>
+                <LayoutGrid className="w-5 h-5" />
+              </motion.div>
+            </button>
+          </motion.nav>
+        ) : (
+          <motion.div 
+            key="pill-launcher"
+            initial={{ x: 100, opacity: 0, scale: 0.5 }}
+            animate={{ x: 0, opacity: 1, scale: 1 }}
+            exit={{ x: 100, opacity: 0, scale: 0.5 }}
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => setIsVisible(true)}
+            className={cn(
+              "fixed bottom-6 right-6 z-[110] bg-teal-600 text-white shadow-2xl shadow-teal-500/30 rounded-full flex items-center justify-center cursor-pointer pointer-events-auto",
+              isDesktop ? "w-16 h-16" : "w-14 h-14"
+            )}
+          >
+            <LayoutGrid className={isDesktop ? "w-7 h-7" : "w-6 h-6"} />
+            <motion.div 
+              className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white dark:border-slate-900"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5 }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

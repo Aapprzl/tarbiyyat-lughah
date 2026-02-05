@@ -72,7 +72,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                <div className="flex items-center gap-5 overflow-hidden">
                    {/* Icon Badge */}
                    <div className={cn(
-                       "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all shadow-sm",
+                       "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all shadow-sm",
                        isOpen ? `${info.bg} ${info.color} scale-110 shadow-lg shadow-current/10` : "bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:scale-110"
                    )}>
                        <Icon className="w-5 h-5" />
@@ -89,11 +89,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
 
                <div className="flex items-center gap-3">
                  {/* Move Buttons */}
-                 <div className="flex bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 p-1" onClick={(e) => e.stopPropagation()}>
+                 <div className="flex bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 p-1" onClick={(e) => e.stopPropagation()}>
                    <button 
                      onClick={onMoveUp} 
                      disabled={isFirst}
-                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-lg disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke atas"
                    >
                      <ChevronUp className="w-4 h-4" />
@@ -101,7 +101,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                    <button 
                      onClick={onMoveDown} 
                      disabled={isLast}
-                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-lg disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
                      title="Pindah ke bawah"
                    >
                      <ChevronDown className="w-4 h-4" />
@@ -114,7 +114,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                          e.stopPropagation();
                          onRemove();
                      }} 
-                     className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                     className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
                      title="Hapus Blok"
                  >
                      <Trash2 className="w-5 h-5" />
@@ -342,12 +342,425 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                 </div>
               )}
 
-              {/* --- GAME EDITORS ARE OMITTED TO KEEP EXAMPLE SHORT - BUT WOULD BE HERE --- */}
-              {/* This is a truncated version for the artifact demonstration. Real implementation would include all the game inputs */}
-              {['matchup', 'quiz', 'flashcard', 'anagram', 'completesentence', 'unjumble', 'spinwheel'].includes(block.type) && (
-                  <div className="p-4 bg-slate-100 dark:bg-white/5 rounded-xl text-center">
-                      <p className="text-xs text-slate-500 font-bold uppercase">Editor Game {block.type} belum direfaktor penuh di artifact ini.</p>
+              {/* --- GAME EDITORS --- */}
+              
+              {/* --- MATCHUP BLOCK --- */}
+              {block.type === 'matchup' && (
+                <div className="space-y-4">
+                  <input 
+                    type="text" 
+                    placeholder="Judul Permainan..."
+                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 outline-none text-sm"
+                    value={block.data.title || ''}
+                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                  />
+                  <div className="space-y-2">
+                    {block.data.pairs?.map((pair, idx) => (
+                      <div key={idx} className="flex gap-2 items-center bg-slate-100 dark:bg-white/5 p-3 rounded-2xl border border-slate-200 dark:border-white/10">
+                        <input 
+                          type="text" 
+                          placeholder="Pertanyaan"
+                          className="w-1/2 bg-transparent text-sm outline-none font-medium"
+                          value={pair.question}
+                          onChange={(e) => {
+                            const newPairs = [...block.data.pairs];
+                            newPairs[idx].question = e.target.value;
+                            onUpdate({ ...block.data, pairs: newPairs });
+                          }}
+                        />
+                        <div className="h-4 w-px bg-slate-300 dark:bg-white/10" />
+                        <input 
+                          type="text" 
+                          placeholder="Jawaban"
+                          className="w-1/2 bg-transparent text-sm outline-none font-medium text-teal-600 dark:text-teal-400"
+                          value={pair.answer}
+                          onChange={(e) => {
+                            const newPairs = [...block.data.pairs];
+                            newPairs[idx].answer = e.target.value;
+                            onUpdate({ ...block.data, pairs: newPairs });
+                          }}
+                        />
+                        <button 
+                          onClick={() => {
+                            const newPairs = block.data.pairs.filter((_, i) => i !== idx);
+                            onUpdate({ ...block.data, pairs: newPairs });
+                          }}
+                          className="p-2 text-slate-400 hover:text-red-500 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, pairs: [...(block.data.pairs || []), { id: Date.now(), question: '', answer: '' }] })}
+                    className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:border-teal-500 hover:text-teal-500 transition-all"
+                  >
+                    + Tambah Pasangan
+                  </button>
+                </div>
+              )}
+
+              {/* --- QUIZ BLOCK --- */}
+              {block.type === 'quiz' && (
+                <div className="space-y-6">
+                  <input 
+                    type="text" 
+                    placeholder="Judul Kuis..."
+                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 outline-none text-sm"
+                    value={block.data.title || ''}
+                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                  />
+                  <div className="space-y-4">
+                    {block.data.questions?.map((q, qIdx) => (
+                      <div key={qIdx} className="bg-slate-100 dark:bg-white/5 p-5 rounded-[2rem] border border-slate-200 dark:border-white/10 space-y-4">
+                        <div className="flex justify-between items-start gap-4">
+                          <textarea 
+                            placeholder="Tulis pertanyaan di sini..."
+                            className="w-full bg-transparent text-sm font-bold outline-none resize-none h-12"
+                            value={q.text}
+                            onChange={(e) => {
+                              const newQs = [...block.data.questions];
+                              newQs[qIdx].text = e.target.value;
+                              onUpdate({ ...block.data, questions: newQs });
+                            }}
+                          />
+                          <button 
+                            onClick={() => {
+                              const newQs = block.data.questions.filter((_, i) => i !== qIdx);
+                              onUpdate({ ...block.data, questions: newQs });
+                            }}
+                            className="p-2 text-slate-400 hover:text-red-500 transition-all"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          {q.options.map((opt, oIdx) => (
+                            <div key={oIdx} className="flex items-center gap-3">
+                              <button 
+                                onClick={() => {
+                                  const newQs = [...block.data.questions];
+                                  newQs[qIdx].options = q.options.map((o, idx) => ({ ...o, isCorrect: idx === oIdx }));
+                                  onUpdate({ ...block.data, questions: newQs });
+                                }}
+                                className={cn(
+                                  "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                                  opt.isCorrect ? "bg-teal-500 border-teal-500 text-white" : "border-slate-300 dark:border-white/10"
+                                )}
+                              >
+                                {opt.isCorrect && <div className="w-2 h-2 bg-white rounded-full" />}
+                              </button>
+                              <input 
+                                type="text" 
+                                placeholder="Pilihan jawaban..."
+                                className="flex-1 bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50"
+                                value={opt.text}
+                                onChange={(e) => {
+                                  const newQs = [...block.data.questions];
+                                  newQs[qIdx].options[oIdx].text = e.target.value;
+                                  onUpdate({ ...block.data, questions: newQs });
+                                }}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), text: '', options: [{ id: 1, text: '', isCorrect: true }, { id: 2, text: '', isCorrect: false }] }] })}
+                    className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:border-teal-500 hover:text-teal-500 transition-all"
+                  >
+                    + Tambah Pertanyaan
+                  </button>
+                </div>
+              )}
+
+              {/* --- FLASHCARD BLOCK --- */}
+              {block.type === 'flashcard' && (
+                <div className="space-y-4">
+                  <input 
+                    type="text" 
+                    placeholder="Judul Flash Card..."
+                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 outline-none text-sm"
+                    value={block.data.title || ''}
+                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {block.data.items?.map((item, idx) => (
+                      <div key={idx} className="bg-slate-100 dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10 space-y-3">
+                         <div className="flex justify-between items-center mb-1">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kartu #{idx + 1}</span>
+                            <button 
+                                onClick={() => {
+                                    const newItems = block.data.items.filter((_, i) => i !== idx);
+                                    onUpdate({ ...block.data, items: newItems });
+                                }}
+                                className="text-slate-400 hover:text-red-500 p-1"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                         </div>
+                         <div className="space-y-2">
+                             <input 
+                                type="text" 
+                                placeholder="Sisi Depan"
+                                className="w-full bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 font-black tracking-tight"
+                                value={item.front}
+                                onChange={(e) => {
+                                    const newItems = [...block.data.items];
+                                    newItems[idx].front = e.target.value;
+                                    onUpdate({ ...block.data, items: newItems });
+                                }}
+                             />
+                             <input 
+                                type="text" 
+                                placeholder="Sisi Belakang"
+                                className="w-full bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 text-slate-500"
+                                value={item.back}
+                                onChange={(e) => {
+                                    const newItems = [...block.data.items];
+                                    newItems[idx].back = e.target.value;
+                                    onUpdate({ ...block.data, items: newItems });
+                                }}
+                             />
+                         </div>
+                      </div>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, items: [...(block.data.items || []), { id: Date.now(), front: '', back: '' }] })}
+                    className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:border-teal-500 hover:text-teal-500 transition-all"
+                  >
+                    + Tambah Kartu
+                  </button>
+                </div>
+              )}
+
+              {/* --- ANAGRAM BLOCK --- */}
+              {block.type === 'anagram' && (
+                <div className="bg-slate-100 dark:bg-white/5 p-6 rounded-[2.5rem] border border-slate-200 dark:border-white/10 space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Permainan Anagram</label>
+                    <input 
+                      type="text" 
+                      placeholder="Judul..."
+                      className="w-full bg-white dark:bg-white/10 px-5 py-3 rounded-2xl text-sm outline-none border border-transparent focus:border-orange-500"
+                      value={block.data.title || ''}
+                      onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-4">
+                     {block.data.questions?.map((item, idx) => (
+                        <div key={idx} className="bg-white dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4">
+                           <div className="flex justify-between items-center">
+                              <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Anagram #{idx+1}</span>
+                              <button 
+                                onClick={() => {
+                                    const newQs = block.data.questions.filter((_, i) => i !== idx);
+                                    onUpdate({ ...block.data, questions: newQs });
+                                }}
+                                className="text-slate-400 hover:text-red-500 p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                           </div>
+                           <div className="grid md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 px-1">Kata Target (Akan diacak)</label>
+                                    <input 
+                                        type="text" 
+                                        className="w-full bg-slate-50 dark:bg-black/20 p-3 rounded-xl text-lg font-black tracking-widest uppercase outline-none focus:ring-1 focus:ring-orange-500"
+                                        value={item.answer}
+                                        onChange={(e) => {
+                                            const newQs = [...block.data.questions];
+                                            newQs[idx].answer = e.target.value;
+                                            onUpdate({ ...block.data, questions: newQs });
+                                        }}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 px-1">Clue / Petunjuk</label>
+                                    <input 
+                                        type="text" 
+                                        className="w-full bg-slate-50 dark:bg-black/20 p-3 rounded-xl text-sm outline-none focus:ring-1 focus:ring-orange-500"
+                                        placeholder="Tulis clue..."
+                                        value={item.clue}
+                                        onChange={(e) => {
+                                            const newQs = [...block.data.questions];
+                                            newQs[idx].clue = e.target.value;
+                                            onUpdate({ ...block.data, questions: newQs });
+                                        }}
+                                    />
+                                </div>
+                           </div>
+                        </div>
+                     ))}
+                  </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), answer: '', clue: '' }] })}
+                    className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-orange-200 dark:border-orange-500/20 rounded-2xl text-xs font-black uppercase tracking-widest text-orange-400 hover:border-orange-500 hover:text-orange-500 transition-all"
+                  >
+                    + Tambah Kata
+                  </button>
+                </div>
+              )}
+
+              {/* --- COMPLETE SENTENCE BLOCK --- */}
+              {block.type === 'completesentence' && (
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul Permainan</label>
+                     <input 
+                        type="text" 
+                        placeholder="Lengkapi Kalimat..."
+                        className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none"
+                        value={block.data.title || ''}
+                        onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                     />
+                  </div>
+                  <div className="space-y-4">
+                     {block.data.questions?.map((item, idx) => (
+                        <div key={idx} className="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10">
+                           <div className="flex justify-between items-center mb-3">
+                              <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Kalimat #{idx+1}</span>
+                              <button 
+                                onClick={() => {
+                                    const newQs = block.data.questions.filter((_, i) => i !== idx);
+                                    onUpdate({ ...block.data, questions: newQs });
+                                }}
+                                className="text-slate-400 hover:text-red-500 p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                           </div>
+                           <textarea 
+                              className="w-full bg-white dark:bg-black/20 p-4 rounded-2xl text-base font-medium outline-none border border-transparent focus:border-blue-500 resize-none h-24 font-arabic leading-relaxed"
+                              placeholder="Ketik kalimat di sini. Gunakan kurung siku [ ] untuk menentukan kata yang harus diisi. Contoh: Menanam [pohon] di taman."
+                              value={item.text}
+                              onChange={(e) => {
+                                 const newQs = [...block.data.questions];
+                                 newQs[idx].text = e.target.value;
+                                 onUpdate({ ...block.data, questions: newQs });
+                              }}
+                           />
+                           <div className="mt-2 text-[10px] text-slate-400 font-bold bg-blue-500/5 px-3 py-1 rounded-full w-fit">
+                              TIP: Gunakan [kata] untuk membuat kata tersebut menjadi rumpang.
+                           </div>
+                        </div>
+                     ))}
+                  </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), text: '' }] })}
+                    className="w-full py-4 bg-white dark:bg-white/5 border-2 border-dashed border-blue-200 dark:border-blue-500/20 rounded-3xl text-xs font-black uppercase tracking-widest text-blue-400 hover:border-blue-500 hover:text-blue-500 transition-all shadow-sm"
+                  >
+                    + Tambah Kalimat Baru
+                  </button>
+                </div>
+              )}
+
+              {/* --- UNJUMBLE BLOCK --- */}
+              {block.type === 'unjumble' && (
+                <div className="space-y-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Judul Susun Kalimat</label>
+                     <input 
+                        type="text" 
+                        placeholder="Judul..."
+                        className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none"
+                        value={block.data.title || ''}
+                        onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                     />
+                  </div>
+                  <div className="space-y-4">
+                     {block.data.questions?.map((item, idx) => (
+                        <div key={idx} className="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10">
+                           <div className="flex justify-between items-center mb-3">
+                              <span className="text-[10px] font-black text-purple-500 uppercase tracking-widest">Susun Kalimat #{idx+1}</span>
+                              <button 
+                                onClick={() => {
+                                    const newQs = block.data.questions.filter((_, i) => i !== idx);
+                                    onUpdate({ ...block.data, questions: newQs });
+                                }}
+                                className="text-slate-400 hover:text-red-500 p-1"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                           </div>
+                           <textarea 
+                              className="w-full bg-white dark:bg-black/20 p-4 rounded-2xl text-base font-medium outline-none border border-transparent focus:border-purple-500 resize-none h-20 font-arabic leading-relaxed"
+                              placeholder="Ketik kalimat lengkap di sini. Sistem akan mengacak kata-kata di dalamnya secara otomatis."
+                              value={item.text}
+                              onChange={(e) => {
+                                 const newQs = [...block.data.questions];
+                                 newQs[idx].text = e.target.value;
+                                 onUpdate({ ...block.data, questions: newQs });
+                              }}
+                           />
+                        </div>
+                     ))}
+                  </div>
+                  <button 
+                    onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), text: '' }] })}
+                    className="w-full py-4 bg-white dark:bg-white/5 border-2 border-dashed border-purple-200 dark:border-purple-500/20 rounded-3xl text-xs font-black uppercase tracking-widest text-purple-400 hover:border-purple-500 hover:text-purple-500 transition-all"
+                  >
+                    + Tambah Kalimat Baru
+                  </button>
+                </div>
+              )}
+
+              {/* --- SPIN WHEEL BLOCK --- */}
+              {block.type === 'spinwheel' && (
+                <div className="space-y-6">
+                   <div className="space-y-2">
+                     <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Roda Keberuntungan</label>
+                     <input 
+                        type="text" 
+                        placeholder="Spin the Wheel..."
+                        className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none px-1"
+                        value={block.data.title || ''}
+                        onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                     />
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                     {block.data.items?.map((item, idx) => (
+                        <div key={idx} className="bg-slate-50 dark:bg-white/5 p-3 rounded-2xl border border-slate-200 dark:border-white/10 group/item relative">
+                           <input 
+                              type="text" 
+                              className="w-full bg-transparent text-xs font-bold outline-none text-center"
+                              placeholder={`Item ${idx+1}`}
+                              value={item.text}
+                              onChange={(e) => {
+                                 const newItems = [...block.data.items];
+                                 newItems[idx].text = e.target.value;
+                                 onUpdate({ ...block.data, items: newItems });
+                              }}
+                           />
+                           <button 
+                             onClick={() => {
+                                const newItems = block.data.items.filter((_, i) => i !== idx);
+                                onUpdate({ ...block.data, items: newItems });
+                             }}
+                             className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover/item:opacity-100 transition-all shadow-lg flex items-center justify-center scale-75 group-hover/item:scale-100"
+                           >
+                             <Trash2 className="w-3 h-3" />
+                           </button>
+                        </div>
+                     ))}
+                     <button 
+                        onClick={() => onUpdate({ ...block.data, items: [...(block.data.items || []), { id: Date.now(), text: '' }] })}
+                        className="aspect-video bg-white dark:bg-white/5 border-2 border-dashed border-pink-200 dark:border-pink-500/20 rounded-2xl flex items-center justify-center text-pink-400 hover:border-pink-500 hover:text-pink-500 transition-all p-2"
+                     >
+                        <Plus className="w-4 h-4" />
+                     </button>
+                  </div>
+                  <div className="p-4 bg-pink-500/5 rounded-2xl flex items-center gap-3">
+                     <AlertCircle className="w-5 h-5 text-pink-500 flex-shrink-0" />
+                     <p className="text-[10px] font-medium text-pink-600 dark:text-pink-400">Roda ini dapat digunakan untuk menentukan kuis atau aktivitas secara acak di kelas.</p>
+                  </div>
+                </div>
               )}
 
                         </div>

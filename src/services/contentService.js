@@ -1,6 +1,6 @@
 import { curriculum as initialCurriculum, specialPrograms } from '../data/curriculum';
 import { db } from '../firebaseConfig';
-import { doc, getDoc, setDoc, getDocs, collection, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection, deleteDoc, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth'; // Added import
 import { storageService } from './storageService';
 import { auth } from '../firebaseConfig'; // Ensure auth is imported
@@ -661,17 +661,41 @@ export const contentService = {
       return await saveToCloud('settings', 'about_config', 'arp_about_config', config);
   },
 
-  // --- Profile Config ---
+  // --- Library Management ---
+  async getLibraryConfig() {
+    const defaults = { categories: ['Umum', 'Nahwu', 'Shorof', 'Lughah'] };
+    const stored = await fetchAndCache('settings', 'library_config', 'arp_library_config', defaults);
+    return { ...defaults, ...stored };
+  },
 
-    async getProfileConfig() {
-        const defaults = { name: '', title: '', bio: '', photoUrl: '', email: '', socials: {}, pdfUrl: '' };
-        const stored = await fetchAndCache('settings', 'profile_config', 'arp_profile_config', defaults);
-        return { ...defaults, ...stored };
-    },
+  async saveLibraryConfig(config) {
+    return await saveToCloud('settings', 'library_config', 'arp_library_config', config);
+  },
 
-    async saveProfileConfig(config) {
-        return await saveToCloud('settings', 'profile_config', 'arp_profile_config', config);
-    },
+  async getBooks() {
+    const q = query(collection(db, 'lessons'), where('type', '==', 'library_book'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  },
+
+  async addBook(bookData) {
+    const docRef = doc(collection(db, 'lessons'));
+    const finalData = { ...bookData, type: 'library_book' };
+    await setDoc(docRef, finalData);
+    return { id: docRef.id, ...finalData };
+  },
+
+  async deleteBook(bookId) {
+    const bookDoc = await getDoc(doc(db, 'lessons', bookId));
+    if (bookDoc.exists()) {
+      const { pdfUrl, coverUrl } = bookDoc.data();
+      if (pdfUrl) await storageService.deleteFile(pdfUrl);
+      if (coverUrl) await storageService.deleteFile(coverUrl);
+      await deleteDoc(doc(db, 'lessons', bookId));
+      return true;
+    }
+    return false;
+  },
 
   // --- Copyright Config ---
 

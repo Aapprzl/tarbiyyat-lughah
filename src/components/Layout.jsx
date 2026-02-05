@@ -23,7 +23,7 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-main)] relative overflow-hidden">
+    <div className="min-h-screen bg-[var(--color-bg-main)] relative">
       {/* Global Background Blobs */}
       <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob"></div>
       <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-teal-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob animation-delay-2000"></div>
@@ -121,7 +121,7 @@ const Layout = () => {
         </footer>
       </main>
 
-      <BottomBar />
+      {(!location.pathname.startsWith('/admin') || location.pathname === '/admin/login') && <BottomBar />}
     </div>
   );
 };

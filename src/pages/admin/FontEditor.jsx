@@ -200,22 +200,35 @@ const FontEditor = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {[
-                        { id: 'titleSize', label: 'Judul Halaman (Page Title)', icon: Type },
-                        { id: 'contentSize', label: 'Konten Materi (Arabic)', icon: Languages },
-                        { id: 'sidebarSize', label: 'Logo Sidebar (Admin)', icon: Monitor },
-                        { id: 'sidebarLinkSize', label: 'Menu Navigasi (Mobile/Admin)', icon: ChevronRight },
-                        { id: 'indexTopicSize', label: 'Topik Halaman Depan', icon: Sparkles }
+                        { id: 'titleSize', label: 'Judul Halaman (Page Title)', icon: Type, options: FONT_SIZES },
+                        { id: 'contentSize', label: 'Konten Materi (Arabic)', icon: Languages, options: FONT_SIZES },
+                        { id: 'sidebarSize', label: 'Logo Sidebar (Admin)', icon: Monitor, options: FONT_SIZES },
+                        { id: 'sidebarLinkSize', label: 'Menu Navigasi (Mobile/Admin)', icon: ChevronRight, options: FONT_SIZES },
+                        { id: 'indexTopicSize', label: 'Topik Halaman Depan', icon: Sparkles, options: FONT_SIZES },
+                        { 
+                            id: 'mobileNavScale', 
+                            label: 'Skala Menu Mobile (Bottom Bar)', 
+                            icon: Monitor,
+                            options: [
+                                { value: '0.6', label: 'Compact (60%)' },
+                                { value: '0.7', label: 'Kecil (70%)' },
+                                { value: '0.75', label: 'Sedang (75%)' },
+                                { value: '0.8', label: 'Proporsional (80%) [Default]' },
+                                { value: '0.9', label: 'Besar (90%)' },
+                                { value: '1.0', label: 'Penuh (100%)' }
+                            ]
+                        }
                     ].map(field => (
                         <div key={field.id} className="space-y-3">
                             <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">{field.label}</label>
                             <div className="relative">
                                 <field.icon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <select
-                                    value={localConfig[field.id] || 'text-lg'}
+                                    value={localConfig[field.id] || (field.id === 'mobileNavScale' ? '0.8' : 'text-lg')}
                                     onChange={(e) => setLocalConfig({ ...localConfig, [field.id]: e.target.value })}
                                     className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none appearance-none transition-all cursor-pointer"
                                 >
-                                    {FONT_SIZES.map(size => (
+                                    {field.options.map(size => (
                                         <option key={size.value} value={size.value} className="bg-white dark:bg-slate-900">{size.label}</option>
                                     ))}
                                 </select>

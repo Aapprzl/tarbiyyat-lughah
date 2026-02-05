@@ -1,35 +1,49 @@
 import { storage } from '../firebaseConfig';
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
 
 export const storageService = {
     /**
-     * Uploads a file to Firebase Storage and returns the download URL.
+     * Uploads a file to Firebase Storage with progress reporting.
      * @param {File} file - The file object to upload
-     * @param {string} path - The folder path (e.g., 'images' or 'pdfs')
+     * @param {string} path - The folder path
+     * @param {function} onProgress - Callback for upload progress (0-100)
      * @returns {Promise<string>} - The public download URL
      */
-    async uploadFile(file, path = 'uploads') {
-        try {
-            // Create a unique filename to prevent overwrites
-            const timestamp = Date.now();
-            const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-            const uniqueName = `${timestamp}_${safeName}`;
-            
-            const storageRef = ref(storage, `${path}/${uniqueName}`);
-            
-            // Upload with Metadata
-            const metadata = {
-                contentType: file.type || 'application/octet-stream' // Ensure type is set
-            };
-            const snapshot = await uploadBytes(storageRef, file, metadata);
-            
-            // Get URL
-            const url = await getDownloadURL(snapshot.ref);
-            return url;
-        } catch (error) {
-            console.error("Error uploading file:", error);
-            throw error;
-        }
+    async uploadFile(file, path = 'uploads', onProgress = null) {
+        return new Promise((resolve, reject) => {
+            try {
+                const timestamp = Date.now();
+                const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+                const uniqueName = `${timestamp}_${safeName}`;
+                const storageRef = ref(storage, `${path}/${uniqueName}`);
+                
+                const metadata = {
+                    contentType: file.type || 'application/octet-stream'
+                };
+
+                const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        if (onProgress) {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            onProgress(progress);
+                        }
+                    }, 
+                    (error) => {
+                        console.error("Error uploading file:", error);
+                        reject(error);
+                    }, 
+                    async () => {
+                        const url = await getDownloadURL(uploadTask.snapshot.ref);
+                        resolve(url);
+                    }
+                );
+            } catch (error) {
+                console.error("Error in uploadFile setup:", error);
+                reject(error);
+            }
+        });
     },
 
     /**

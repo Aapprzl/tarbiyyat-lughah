@@ -297,7 +297,7 @@ const LessonEditor = () => {
   return (
     <div className="max-w-6xl mx-auto pb-32">
        {/* Premium Canvas Header */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 sticky top-0 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-2xl z-20 py-8 border-b border-slate-200 dark:border-white/10 px-6 md:px-0 -mx-6 md:mx-0">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 sticky top-24 bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl z-20 py-4 px-8 rounded-[2.5rem] border border-slate-200/50 dark:border-white/10 shadow-xl shadow-teal-500/5 transition-all mx-4 md:mx-0">
         <div className="flex items-center flex-1 mr-8 w-full md:w-auto">
             <button 
                 onClick={() => navigate(isSpecialProgram ? '/admin/programs' : '/admin/dashboard')} 
@@ -356,7 +356,7 @@ const LessonEditor = () => {
                   {/* Stage Header Card */}
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
                       <div className="flex items-center gap-4 flex-1">
-                          <div className="w-14 h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex items-center justify-center text-teal-500 font-black text-xl shadow-sm">
+                          <div className="w-14 h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full flex items-center justify-center text-teal-500 font-black text-xl shadow-sm transition-all">
                              {stageIndex + 1}
                           </div>
                           <div className="flex-1">

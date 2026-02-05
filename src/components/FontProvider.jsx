@@ -43,7 +43,8 @@ export const FontProvider = ({ children }) => {
        contentSize: 'text-xl',
        sidebarSize: 'text-2xl',
        sidebarLinkSize: 'text-lg',
-       indexTopicSize: 'text-xl'
+       indexTopicSize: 'text-xl',
+       mobileNavScale: '0.8' // Default 80%
     };
 
     const arabicStyle = ARABIC_FAMILIES.find(f => f.name === effectiveConfig.fontFamily)?.style || "'Cairo', sans-serif";
@@ -71,6 +72,7 @@ export const FontProvider = ({ children }) => {
     document.documentElement.style.setProperty('--font-arabic-sidebar-size', sizeMap[effectiveConfig.sidebarSize] || effectiveConfig.sidebarSize);
     document.documentElement.style.setProperty('--font-arabic-sidebar-content-size', sizeMap[effectiveConfig.sidebarLinkSize] || effectiveConfig.sidebarLinkSize);
     document.documentElement.style.setProperty('--font-arabic-index-topic-size', sizeMap[effectiveConfig.indexTopicSize] || effectiveConfig.indexTopicSize);
+    document.documentElement.style.setProperty('--mobile-nav-scale', effectiveConfig.mobileNavScale || '0.8');
   };
 
   const updateFontConfig = async (newConfig) => {

@@ -143,7 +143,7 @@ const Header = () => {
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
-               className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-xl p-4 md:p-20"
+               className="fixed inset-0 z-[100] bg-slate-50/70 dark:bg-slate-950/60 backdrop-blur-2xl p-4 md:p-20 transition-colors duration-500"
             >
                <div className="max-w-3xl mx-auto w-full">
                   <div className="flex items-center justify-between mb-8">
@@ -152,13 +152,13 @@ const Header = () => {
                            <Telescope className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                           <h2 className="text-xl font-bold text-white">Pencarian Imersif</h2>
-                           <p className="text-sm text-slate-400 font-medium">Temukan apa saja yang ingin Anda pelajari</p>
+                           <h2 className="text-xl font-bold text-slate-900 dark:text-white">Pencarian Imersif</h2>
+                           <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Temukan apa saja yang ingin Anda pelajari</p>
                         </div>
                      </div>
                      <button 
                         onClick={() => setShowSearch(false)}
-                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-all"
+                        className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-200/50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
                      >
                         <X className="w-6 h-6" />
                      </button>
@@ -166,7 +166,7 @@ const Header = () => {
 
                   <form onSubmit={handleSearchSubmit} className="relative">
                      <input 
-                        className="w-full bg-white/5 border border-white/10 rounded-3xl px-8 py-6 text-2xl text-white outline-none focus:border-teal-500/50 focus:bg-white/10 transition-all font-medium placeholder-slate-600"
+                        className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-3xl px-8 py-6 text-2xl text-slate-900 dark:text-white outline-none focus:border-teal-500/50 focus:bg-slate-50 dark:focus:bg-white/10 transition-all font-medium placeholder-slate-400 dark:placeholder-slate-600 shadow-sm dark:shadow-none"
                         placeholder="Ketik topik materi..."
                         autoFocus
                         value={searchQuery}
@@ -189,7 +189,7 @@ const Header = () => {
                                  animate={{ opacity: 1, y: 0 }}
                                  transition={{ delay: idx * 0.05 }}
                                  onClick={() => handleResultClick(result.path)}
-                                 className="w-full text-left p-5 rounded-3xl bg-white/5 border border-white/5 hover:border-teal-500/30 hover:bg-white/10 transition-all flex items-center group gap-5"
+                                 className="w-full text-left p-5 rounded-3xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-teal-500/30 hover:bg-slate-50 dark:hover:bg-white/10 transition-all flex items-center group gap-5 shadow-sm dark:shadow-none"
                               >
                                  <div className={cn(
                                     "w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform",
@@ -198,33 +198,32 @@ const Header = () => {
                                     <Icon className="w-7 h-7" />
                                  </div>
                                  <div className="flex-1">
-                                    <div className="text-lg font-bold text-white group-hover:text-teal-400 transition-colors">{result.title}</div>
-                                    <div className="text-sm text-slate-400 line-clamp-1 mt-0.5">{result.desc || "Akses materi pembelajaran ini sekarang."}</div>
-                                    {result.sectionTitle && <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">{result.sectionTitle}</div>}
+                                    <div className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{result.title}</div>
+                                    <div className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">{result.desc || "Akses materi pembelajaran ini sekarang."}</div>
+                                    {result.sectionTitle && <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1">{result.sectionTitle}</div>}
                                  </div>
-                                 <MoveRight className="w-5 h-5 text-slate-700 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
+                                 <MoveRight className="w-5 h-5 text-slate-300 dark:text-slate-700 group-hover:text-teal-500 group-hover:translate-x-1 transition-all" />
                               </motion.button>
                            );
                         })
                      ) : searchQuery ? (
                         <div className="text-center py-20">
-                           <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
-                              <Telescope className="w-10 h-10 text-slate-600" />
+                           <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
+                              <Telescope className="w-10 h-10 text-slate-300 dark:text-slate-600" />
                            </div>
-                           <h3 className="text-xl font-bold text-slate-400">Tidak ada hasil ditemukan</h3>
-                           <p className="text-slate-600">Coba gunakan kata kunci lain</p>
+                           <h3 className="text-xl font-bold text-slate-400 dark:text-slate-500">Tidak ada hasil ditemukan</h3>
+                           <p className="text-slate-500 dark:text-slate-600">Coba gunakan kata kunci lain</p>
                         </div>
                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                           <div className="p-6 rounded-3xl bg-teal-500/5 border border-teal-500/10">
-                              <Rocket className="w-6 h-6 text-teal-400 mb-4" />
-                              <h3 className="text-white font-bold mb-2">Pencarian Cepat</h3>
-                              <p className="text-sm text-slate-400 leading-relaxed">Gunakan kata kunci singkat untuk menemukan topik secara instan di seluruh kurikulum.</p>
-                           </div>
-                           <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/10">
-                              <Award className="w-6 h-6 text-amber-400 mb-4" />
-                              <h3 className="text-white font-bold mb-2">Program Unggulan</h3>
-                              <p className="text-sm text-slate-400 leading-relaxed">Anda bisa mencari berdasarkan nama program khusus seperti "Kitabah" atau "Nahwu".</p>
+                        <div className="grid grid-cols-1 gap-4 mt-6">
+                           <div className="p-8 rounded-[2.5rem] bg-white dark:bg-teal-500/5 border border-slate-200 dark:border-teal-500/10 shadow-xl shadow-slate-200/50 dark:shadow-none flex flex-col md:flex-row items-center gap-6 text-center md:text-left transition-all">
+                              <div className="w-16 h-16 bg-teal-500/10 dark:bg-teal-500/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                                 <Rocket className="w-8 h-8 text-teal-600 dark:text-teal-400" />
+                              </div>
+                              <div>
+                                 <h3 className="text-slate-900 dark:text-white font-bold text-xl mb-2">Pencarian Cepat</h3>
+                                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">Gunakan kata kunci singkat untuk menemukan topik secara instan di seluruh kurikulum pembelajaran Anda.</p>
+                              </div>
                            </div>
                         </div>
                      )}
