@@ -17,10 +17,8 @@ const AdminGames = lazy(() => import('./pages/admin/Games'));
 const AdminHomeEditor = lazy(() => import('./pages/admin/HomeEditor'));
 const LessonEditor = lazy(() => import('./pages/admin/LessonEditor'));
 const FontEditor = lazy(() => import('./pages/admin/FontEditor'));
-const CopyrightEditor = lazy(() => import('./pages/admin/CopyrightEditor'));
 const LibraryManager = lazy(() => import('./pages/admin/LibraryManager'));
 const IntroEditor = lazy(() => import('./pages/admin/IntroEditor'));
-const MigrationTools = lazy(() => import('./pages/admin/MigrationTools'));
 
 import { contentService } from './services/contentService';
 import { ToastProvider, ConfirmProvider } from './components/Toast';
@@ -105,9 +103,7 @@ function App() {
                     <Route path="home-editor" element={<AdminHomeEditor />} />
                     <Route path="library-manager" element={<LibraryManager />} />
                     <Route path="intro-editor" element={<IntroEditor />} />
-                    <Route path="db-migration" element={<MigrationTools />} />
                     <Route path="font-editor" element={<FontEditor />} />
-                    <Route path="copyright" element={<CopyrightEditor />} />
                     <Route path="edit/:topicId" element={<LessonEditor />} />
                   </Route>
                 </Route>

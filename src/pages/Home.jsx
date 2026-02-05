@@ -25,21 +25,17 @@ const iconMap = {
 const Home = () => {
   const [specialPrograms, setSpecialPrograms] = useState([]);
   const [config, setConfig] = useState(null);
-  const [copyrightConfig, setCopyrightConfig] = useState(null);
-  const [showCopyright, setShowCopyright] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       // Parallelize all API calls for faster loading
-      const [progs, conf, cp] = await Promise.all([
+      const [progs, conf] = await Promise.all([
         contentService.getSpecialPrograms(),
-        contentService.getHomeConfig(),
-        contentService.getCopyrightConfig()
+        contentService.getHomeConfig()
       ]);
       
       setSpecialPrograms(progs);
       setConfig(conf);
-      setCopyrightConfig(cp);
     };
     load();
 
@@ -104,46 +100,10 @@ const Home = () => {
               <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </Link>
 
-             {/* Copyright Button */}
-             {copyrightConfig?.pdfUrl && (
-                <button 
-                    onClick={() => setShowCopyright(true)}
-                    className="flex items-center gap-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors text-sm font-medium"
-                >
-                    <ShieldCheck className="w-4 h-4" />
-                    Hak Cipta Terdaftar
-                </button>
-            )}
           </div>
         </motion.div>
       </AuroraBackground>
 
-       {/* Copyright Modal */}
-       {showCopyright && copyrightConfig?.pdfUrl && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-300">
-             <motion.div 
-               initial={{ scale: 0.9, opacity: 0 }}
-               animate={{ scale: 1, opacity: 1 }}
-               className="bg-[var(--color-bg-card)] w-full max-w-4xl h-[85vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative border border-[var(--color-border)]"
-             >
-                <div className="flex items-center justify-between p-6 border-b border-[var(--color-border)] bg-[var(--color-bg-muted)]">
-                   <h3 className="font-bold text-[var(--color-text-main)] flex items-center text-lg">
-                      <Shield className="w-6 h-6 mr-3 text-teal-600" />
-                      Dokumen Hak Cipta
-                   </h3>
-                   <button 
-                      onClick={() => setShowCopyright(false)}
-                      className="w-10 h-10 flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 rounded-xl transition-all"
-                   >
-                      <X className="w-6 h-6" />
-                   </button>
-                </div>
-                <div className="flex-1 bg-slate-100 dark:bg-slate-900 relative">
-                   <PdfViewer fileUrl={copyrightConfig.pdfUrl} />
-                </div>
-             </motion.div>
-          </div>
-       )}
 
       <div id="special-programs-section" className="container mx-auto px-4 max-w-6xl mb-12 scroll-mt-32">
         <motion.div 

@@ -149,8 +149,6 @@ const AdminLayout = () => {
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
-          <NavItem to="/admin/db-migration" icon={Hash} label="Migrasi DB" />
-          <NavItem to="/admin/copyright" icon={ShieldCheck} label="Hak Cipta" />
           
           <div className="pt-8 px-4">
              <Link to="/" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">

@@ -721,15 +721,7 @@ export const contentService = {
     return false;
   },
 
-  // --- Copyright Config ---
 
-  async getCopyrightConfig() {
-      return await fetchAndCache('settings', 'copyright_config', 'arp_copyright_config', { pdfUrl: '' });
-  },
-
-  async saveCopyrightConfig(config) {
-      return await saveToCloud('settings', 'copyright_config', 'arp_copyright_config', config);
-  },
 
   // --- Content/Lesson Management ---
 
