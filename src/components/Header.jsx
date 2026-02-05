@@ -76,15 +76,24 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 h-20 bg-white/70 dark:bg-slate-900/70 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-40 px-6 flex items-center justify-between transition-all duration-300">
+      <header className="fixed top-0 right-0 left-0 h-20 bg-teal-700/95 backdrop-blur-xl border-b border-white/10 z-40 px-6 flex items-center justify-between transition-all duration-300 shadow-lg shadow-teal-900/20">
         <div className="flex items-center">
-          <Link to="/" className="group flex items-center gap-3">
+          <Link to="/" className="group flex items-center gap-4">
+             {/* Dynamic Logo */}
+             {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
+                 <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+             ) : (
+                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white shadow-inner border border-white/10 group-hover:bg-white/20 transition-all">
+                     {React.createElement(iconMap[siteConfig.siteLogoIcon] || Library, { className: "w-5 h-5" })}
+                 </div>
+             )}
+
              <div className="flex flex-col">
-                <span className={cn("font-arabic font-black leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-teal-600 transition-colors", siteConfig.headerTitleSize || 'text-xl')}>
+                <span className={cn("font-bold leading-tight tracking-tight text-white group-hover:text-amber-300 transition-colors", siteConfig.headerTitleSize || 'text-xl')} style={{ fontFamily: 'var(--font-arabic), var(--font-latin)' }}>
                     {siteConfig.siteTitle || 'Bahasa Arab Praktis'}
                 </span>
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-none mt-0.5">
-                    Platform Pembelajaran Modern
+                <span className={cn("font-bold text-teal-100 uppercase tracking-widest leading-none mt-0.5 group-hover:text-white transition-colors", siteConfig.sidebarTitleSize || 'text-xs')} style={{ fontFamily: 'var(--font-latin)' }}>
+                    {siteConfig.sidebarTitle || 'Platform Pembelajaran Modern'}
                 </span>
              </div>
           </Link>
@@ -95,18 +104,18 @@ const Header = () => {
           <div className="hidden md:block relative">
              <button 
                onClick={() => setShowSearch(true)}
-               className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:border-slate-300 dark:hover:border-white/10 transition-all min-w-[240px]"
+               className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-white hover:bg-white/20 transition-all min-w-[240px]"
              >
                 <Telescope className="w-4 h-4" />
                 <span className="text-sm font-medium">Cari materi...</span>
-                <span className="ml-auto text-[10px] bg-slate-200 dark:bg-white/10 px-1.5 py-0.5 rounded uppercase font-bold text-slate-500 dark:text-slate-400">Ctrl K</span>
+                <span className="ml-auto text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-bold text-white">Ctrl K</span>
              </button>
           </div>
 
           {/* Theme Toggle */}
           <button 
             onClick={toggleTheme}
-            className="p-3 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-all active:scale-95 shadow-sm"
+            className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-amber-300 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
           >
             <AnimatePresence mode="wait">
               {theme === 'light' ? (
@@ -120,17 +129,8 @@ const Header = () => {
               )}
             </AnimatePresence>
           </button>
-
-          <Link 
-            to="/materi" 
-            className="group relative hidden sm:flex items-center bg-slate-900 dark:bg-white text-white dark:text-slate-900 h-12 px-6 rounded-2xl font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all overflow-hidden"
-          >
-            <span className="relative z-10">Mulai Belajar</span>
-            <MoveRight className="ml-2 w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
-            <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-          </Link>
           
-          <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-slate-400 hover:text-white bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+          <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-blue-100 hover:text-white bg-white/10 border border-white/10">
              <Telescope className="w-5 h-5" />
           </button>
         </div>

@@ -117,7 +117,6 @@ const AdminLayout = () => {
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
           <NavItem to="/admin/home-editor" icon={LayoutGrid} label="Editor Beranda" />
-          <NavItem to="/admin/about-cms" icon={Info} label="Editor Tentang" />
           <NavItem to="/admin/profile-editor" icon={CircleUser} label="Editor Profil" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>

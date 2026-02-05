@@ -89,7 +89,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                     <LogoIcon className="w-6 h-6 text-white" />
                 )}
              </div>
-            <h1 className={cn("font-bold text-slate-900 dark:text-white font-arabic leading-none truncate pt-1", siteConfig.sidebarTitleSize || 'text-xl')}>
+            <h1 className={cn("font-bold text-slate-900 dark:text-white leading-none truncate pt-1", siteConfig.sidebarTitleSize || 'text-xl')}>
                 {siteConfig.sidebarTitle}
             </h1>
           </Link>

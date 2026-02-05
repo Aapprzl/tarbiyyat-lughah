@@ -6,7 +6,7 @@ import MaterialIndex from './pages/MaterialIndex';
 import GameIndex from './pages/GameIndex';
 import MaterialDetail from './pages/MaterialDetail';
 import Profile from './pages/Profile';
-import About from './pages/About';
+import Profile from './pages/Profile';
 
 // Lazy Load Admin Components to improve performance
 const AdminLayout = lazy(() => import('./components/AdminLayout'));
@@ -15,7 +15,6 @@ const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminPrograms = lazy(() => import('./pages/admin/Programs'));
 const AdminGames = lazy(() => import('./pages/admin/Games'));
 const AdminHomeEditor = lazy(() => import('./pages/admin/HomeEditor'));
-const AdminAboutEditor = lazy(() => import('./pages/admin/AboutEditor'));
 const LessonEditor = lazy(() => import('./pages/admin/LessonEditor'));
 const FontEditor = lazy(() => import('./pages/admin/FontEditor'));
 const CopyrightEditor = lazy(() => import('./pages/admin/CopyrightEditor'));
@@ -26,19 +25,30 @@ import { ToastProvider, ConfirmProvider } from './components/Toast';
 import { FontProvider } from './components/FontProvider';
 import { ThemeProvider } from './components/ThemeProvider';
 
+import Intro from './components/Intro';
+
 function App() {
+  const [showIntro, setShowIntro] = React.useState(() => {
+    return !sessionStorage.getItem('introShown');
+  });
+
+  const handleEnterWebsite = () => {
+    sessionStorage.setItem('introShown', 'true');
+    setShowIntro(false);
+  };
+
   return (
     <ThemeProvider>
       <ToastProvider>
       <ConfirmProvider>
         <FontProvider>
+          {showIntro && <Intro onEnter={handleEnterWebsite} />}
           <Router>
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Memuat...</div>}>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Layout />}>
                   <Route index element={<Home />} />
-                  <Route path="about" element={<About />} />
                   <Route path="materi" element={<MaterialIndex />} />
                   <Route path="permainan" element={<GameIndex />} /> {/* Added public route for games */}
                   <Route path="materi/:topicId" element={<MaterialDetail />} />
@@ -54,7 +64,6 @@ function App() {
                   <Route path="programs" element={<AdminPrograms />} />
                   <Route path="games" element={<AdminGames />} /> {/* Added admin route for games */}
                   <Route path="home-editor" element={<AdminHomeEditor />} />
-                  <Route path="about-cms" element={<AdminAboutEditor />} />
                   <Route path="profile-editor" element={<ProfileEditor />} />
                   <Route path="db-migration" element={<MigrationTools />} />
                   <Route path="font-editor" element={<FontEditor />} />

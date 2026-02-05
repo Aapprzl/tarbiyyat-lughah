@@ -24,7 +24,9 @@ const LATIN_FAMILIES = [
 ];
 
 const FONT_SIZES = [
-  { value: 'text-base', label: 'Kecil (16px)' },
+  { value: 'text-xs', label: 'Ekstra Kecil (12px)' },
+  { value: 'text-sm', label: 'Kecil (14px)' },
+  { value: 'text-base', label: 'Standar (16px)' },
   { value: 'text-lg', label: 'Normal (18px)' },
   { value: 'text-xl', label: 'Sedang (20px)' },
   { value: 'text-2xl', label: 'Besar (24px)' },
@@ -198,10 +200,10 @@ const FontEditor = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {[
-                        { id: 'titleSize', label: 'Judul Halaman', icon: Type },
-                        { id: 'contentSize', label: 'Konten Materi (Arab)', icon: Languages },
-                        { id: 'sidebarSize', label: 'Logo Sidebar', icon: Monitor },
-                        { id: 'sidebarLinkSize', label: 'Menu Sidebar', icon: ChevronRight },
+                        { id: 'titleSize', label: 'Judul Halaman (Page Title)', icon: Type },
+                        { id: 'contentSize', label: 'Konten Materi (Arabic)', icon: Languages },
+                        { id: 'sidebarSize', label: 'Logo Sidebar (Admin)', icon: Monitor },
+                        { id: 'sidebarLinkSize', label: 'Menu Navigasi (Mobile/Admin)', icon: ChevronRight },
                         { id: 'indexTopicSize', label: 'Topik Halaman Depan', icon: Sparkles }
                     ].map(field => (
                         <div key={field.id} className="space-y-3">
@@ -230,6 +232,7 @@ const FontEditor = () => {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-white dark:bg-white/5 p-8 rounded-[3rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-8 overflow-hidden relative"
+                style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}
             >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-3xl -mr-16 -mt-16"></div>
                 
@@ -246,19 +249,21 @@ const FontEditor = () => {
                     <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Konten {localConfig.contentSize}</p>
                         <p className={cn(localConfig.contentSize, "text-slate-900 dark:text-white leading-relaxed dir-rtl arabic-content")} style={{ fontFamily: fontStyle }}>
-                            بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
+                           التَّرْبِيَّةُ اللُّغَوِيَّةُ
                         </p>
                     </div>
                     
                     <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Identity {localConfig.sidebarSize}</p>
-                        <p className={cn(localConfig.sidebarSize, "text-slate-900 dark:text-white font-black")} style={{ fontFamily: fontStyle }}>اللغة العربية</p>
+                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Navigasi {localConfig.sidebarLinkSize}</p>
+                        <p className={cn(localConfig.sidebarLinkSize, "text-slate-900 dark:text-white text-center")} style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
+                           Beranda &nbsp; Materi &nbsp; Profil
+                        </p>
                     </div>
 
                     <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Latin Style</p>
                         <p className="text-xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
-                            The Arabic Language
+                            Tarbiyyat Al-Lughah
                         </p>
                     </div>
                 </div>

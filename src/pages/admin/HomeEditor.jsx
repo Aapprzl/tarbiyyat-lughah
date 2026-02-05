@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor } from 'lucide-react';
+import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor, Info, MapPin } from 'lucide-react';
 import { useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -109,13 +109,13 @@ const HomeEditor = () => {
                         type="text" 
                         value={config.siteTitle || ''}
                         onChange={(e) => setConfig({...config, siteTitle: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
+                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all font-arabic"
                         placeholder="Bahasa Arab Praktis"
                     />
-                    <div className="flex items-center gap-3 px-4">
+                    <div className="flex items-center gap-3 px-4 justify-end">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ukuran:</span>
                         <div className="flex gap-1">
-                            {['text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl'].map(size => (
+                            {['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl'].map(size => (
                                 <button
                                     key={size}
                                     type="button"
@@ -127,7 +127,7 @@ const HomeEditor = () => {
                                             : "bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-600"
                                     )}
                                 >
-                                    {size.split('-')[1].toUpperCase()}
+                                    {size === 'text-xs' ? 'XS' : size.split('-')[1].toUpperCase()}
                                 </button>
                             ))}
                         </div>
@@ -135,17 +135,18 @@ const HomeEditor = () => {
                 </div>
 
                 <div className="space-y-4">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Sidebar (Mobile/Admin)</label>
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Sub-Judul Header (Juga Judul Sidebar)</label>
                     <input 
                         type="text" 
                         value={config.sidebarTitle || ''}
                         onChange={(e) => setConfig({...config, sidebarTitle: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all text-right font-arabic"
-                        placeholder="اللغة العربية"
+                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
+                        style={{ fontFamily: 'var(--font-latin)' }}
+                        placeholder="Platform Pembelajaran Modern"
                     />
                     <div className="flex items-center gap-3 px-4 justify-end">
                         <div className="flex gap-1">
-                            {['text-base', 'text-lg', 'text-xl', 'text-2xl', 'text-3xl'].map(size => (
+                            {['text-[10px]', 'text-xs', 'text-sm', 'text-base', 'text-lg'].map(size => (
                                 <button
                                     key={size}
                                     type="button"
@@ -157,7 +158,7 @@ const HomeEditor = () => {
                                             : "bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-600"
                                     )}
                                 >
-                                    {size.split('-')[1].toUpperCase()}
+                                    {size === 'text-[10px]' ? 'MINI' : size.split('-')[1].toUpperCase()}
                                 </button>
                             ))}
                         </div>
@@ -302,8 +303,8 @@ const HomeEditor = () => {
                         type="text" 
                         value={config.heroTitleArabic}
                         onChange={(e) => setConfig({...config, heroTitleArabic: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white font-black text-2xl focus:ring-2 focus:ring-teal-500 shadow-sm outline-none text-right font-arabic"
-                        placeholder="Contoh: تَعَلَّمِ اللُّغَةَ الْعَرَبِيَّةَ"
+                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-black text-right text-2xl focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all dir-rtl font-arabic"
+                        placeholder="تَعَلَّمِ اللُّغَةَ الْعَرَبِيَّةَ"
                     />
                 </div>
                 <div className="space-y-3">
@@ -313,6 +314,7 @@ const HomeEditor = () => {
                         value={config.heroTitleLatin}
                         onChange={(e) => setConfig({...config, heroTitleLatin: e.target.value})}
                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-8 py-5 text-slate-900 dark:text-white font-black text-xl focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        style={{ fontFamily: 'var(--font-latin)' }}
                         placeholder="Belajar Bahasa Arab dengan Mudah"
                     />
                 </div>
@@ -323,6 +325,7 @@ const HomeEditor = () => {
                         onChange={(e) => setConfig({...config, heroDescription: e.target.value})}
                         rows="3"
                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-[2.5rem] px-8 py-6 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none leading-relaxed"
+                        style={{ fontFamily: 'var(--font-latin)' }}
                         placeholder="Jelaskan secara singkat tentang website Anda..."
                     />
                 </div>
@@ -356,6 +359,7 @@ const HomeEditor = () => {
         </motion.div>
 
         {/* --- Branding & Footer --- */}
+        {/* --- Vision Section --- */}
         <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -363,22 +367,166 @@ const HomeEditor = () => {
             className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
         >
             <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
-                    <Diamond className="w-6 h-6" />
+                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
+                    <Info className="w-6 h-6" />
                 </div>
-                Informasi Pelengkap
+                Visi & Misi
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Seksi Program</label>
+            <div className="space-y-6">
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Seksi</label>
                     <input 
                       type="text" 
-                      value={config.programsSectionTitle || 'Program Unggulan'}
-                      onChange={(e) => setConfig({...config, programsSectionTitle: e.target.value})}
+                      value={config.visionTitle || ''}
+                      onChange={(e) => setConfig({...config, visionTitle: e.target.value})}
                       className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                      placeholder="Visi Tarbiyyat Al-Lughah"
                     />
                 </div>
+                <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Utama</label>
+                    <textarea 
+                        value={config.visionDesc || ''}
+                        onChange={(e) => setConfig({...config, visionDesc: e.target.value})}
+                        rows="3"
+                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-[2.5rem] px-8 py-6 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none leading-relaxed"
+                        placeholder="Deskripsi visi..."
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 1</label>
+                        <input
+                            type="text"
+                            value={config.visionStep1Title || ''}
+                            onChange={(e) => setConfig({...config, visionStep1Title: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            placeholder="Judul Step 1"
+                        />
+                        <textarea
+                            value={config.visionStep1Desc || ''}
+                            onChange={(e) => setConfig({...config, visionStep1Desc: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            placeholder="Deskripsi Step 1"
+                        />
+                     </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 2</label>
+                        <input
+                            type="text"
+                            value={config.visionStep2Title || ''}
+                            onChange={(e) => setConfig({...config, visionStep2Title: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            placeholder="Judul Step 2"
+                        />
+                         <textarea
+                            value={config.visionStep2Desc || ''}
+                            onChange={(e) => setConfig({...config, visionStep2Desc: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            placeholder="Deskripsi Step 2"
+                        />
+                     </div>
+                     <div className="space-y-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 3</label>
+                        <input
+                            type="text"
+                            value={config.visionStep3Title || ''}
+                            onChange={(e) => setConfig({...config, visionStep3Title: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            placeholder="Judul Step 3"
+                        />
+                        <textarea
+                            value={config.visionStep3Desc || ''}
+                            onChange={(e) => setConfig({...config, visionStep3Desc: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            placeholder="Deskripsi Step 3"
+                        />
+                     </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-slate-100 dark:border-white/5">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Developer Name</label>
+                        <input
+                            type="text"
+                            value={config.devName || ''}
+                            onChange={(e) => setConfig({...config, devName: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                            placeholder="Muh. Aprizal"
+                        />
+                    </div>
+                    <div className="space-y-3">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Role & Campus</label>
+                         <div className="flex gap-2">
+                            <input
+                                type="text"
+                                value={config.devRole || ''}
+                                onChange={(e) => setConfig({...config, devRole: e.target.value})}
+                                className="w-1/2 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-4 text-sm font-bold outline-none"
+                                placeholder="Developer"
+                            />
+                            <input
+                                type="text"
+                                value={config.devCampus || ''}
+                                onChange={(e) => setConfig({...config, devCampus: e.target.value})}
+                                className="w-1/2 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-4 py-4 text-sm font-bold outline-none"
+                                placeholder="PBA IAIN BONE"
+                            />
+                         </div>
+                    </div>
+                    <div className="md:col-span-2 space-y-3">
+                         <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Badge Text Override</label>
+                         <input
+                            type="text"
+                            value={config.visionBadgeText || 'Skripsi Original Project'}
+                            onChange={(e) => setConfig({...config, visionBadgeText: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                            placeholder="Skripsi Original Project"
+                        />
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+
+        {/* --- Footer & Contact --- */}
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
+        >
+            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
+                    <MapPin className="w-6 h-6" />
+                </div>
+                Informasi Kontak & Footer
+            </h2>
+            
+            <div className="space-y-8">
+                {/* General Footer Text */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Seksi Program</label>
+                        <input 
+                          type="text" 
+                          value={config.programsSectionTitle || 'Program Unggulan'}
+                          onChange={(e) => setConfig({...config, programsSectionTitle: e.target.value})}
+                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        />
+                    </div>
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Teks Pojok Kanan Bawah</label>
+                        <input 
+                          type="text" 
+                          value={config.footerRightText || 'PBA IAIN Bone'}
+                          onChange={(e) => setConfig({...config, footerRightText: e.target.value})}
+                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        />
+                    </div>
+                </div>
+
                 <div className="space-y-3">
                     <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Teks Hak Cipta (Footer)</label>
                     <input 
@@ -388,6 +536,102 @@ const HomeEditor = () => {
                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
                         placeholder="© 2024 Bahasa Arab Praktis"
                     />
+                </div>
+
+                {/* Development Stack Configuration */}
+                <div className="bg-slate-50 dark:bg-black/20 p-6 rounded-3xl space-y-6 border border-slate-100 dark:border-white/5">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-indigo-500/10 rounded-lg flex items-center justify-center text-indigo-600">
+                            <Layers className="w-4 h-4" />
+                        </div>
+                        <h3 className="text-sm font-black uppercase tracking-widest text-slate-600 dark:text-slate-300">Konfigurasi Development Stack</h3>
+                    </div>
+
+                    <div className="space-y-3">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Judul Kolom</label>
+                        <input 
+                            type="text" 
+                            value={config.footerStackTitle || 'Development Stack'}
+                            onChange={(e) => setConfig({...config, footerStackTitle: e.target.value})}
+                            className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-teal-500 outline-none"
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Sub-Judul 1 (Tools)</label>
+                            <input 
+                                type="text" 
+                                value={config.footerToolsTitle || 'Tools & Editors'}
+                                onChange={(e) => setConfig({...config, footerToolsTitle: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-bold outline-none mb-2"
+                            />
+                            <textarea
+                                value={config.footerToolsList || 'VS Code • Google Antigravity • Sublime Text'}
+                                onChange={(e) => setConfig({...config, footerToolsList: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-medium outline-none h-20 resize-none"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Sub-Judul 2 (Backend)</label>
+                             <input 
+                                type="text" 
+                                value={config.footerBackendTitle || 'Backend & Infrastructure'}
+                                onChange={(e) => setConfig({...config, footerBackendTitle: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-bold outline-none mb-2"
+                            />
+                            <textarea
+                                value={config.footerBackendList || 'Firebase Backend • Google Cloud Console • Git • Node.js'}
+                                onChange={(e) => setConfig({...config, footerBackendList: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-medium outline-none h-20 resize-none"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2">Sub-Judul 3 (AI)</label>
+                             <input 
+                                type="text" 
+                                value={config.footerAiTitle || 'Powered by AI Technology'}
+                                onChange={(e) => setConfig({...config, footerAiTitle: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-bold outline-none mb-2"
+                            />
+                            <textarea
+                                value={config.footerAiList || 'ChatGPT • Gemini • GitHub Copilot'}
+                                onChange={(e) => setConfig({...config, footerAiList: e.target.value})}
+                                className="w-full bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-medium outline-none h-20 resize-none"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Contact Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nomor WhatsApp</label>
+                        <input
+                            type="text"
+                            value={config.contactPhone || ''}
+                            onChange={(e) => setConfig({...config, contactPhone: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        />
+                    </div>
+                     <div className="space-y-3">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Email</label>
+                        <input
+                            type="text"
+                            value={config.contactEmail || ''}
+                            onChange={(e) => setConfig({...config, contactEmail: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        />
+                    </div>
+                     <div className="space-y-3 md:col-span-2">
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Alamat</label>
+                        <input
+                            type="text"
+                            value={config.contactAddress || ''}
+                            onChange={(e) => setConfig({...config, contactAddress: e.target.value})}
+                            className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        />
+                    </div>
                 </div>
             </div>
         </motion.div>

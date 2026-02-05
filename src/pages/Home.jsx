@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad, Shield, Trophy } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
+import { VisionSection } from '../components/VisionSection';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
 import { SplitText } from '../components/animations/SplitText';
 import { BentoGrid, BentoGridItem } from '../components/animations/BentoGrid';
@@ -84,7 +85,7 @@ const Home = () => {
             <h1 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white arabic-title leading-tight drop-shadow-sm">
                 {config.heroTitleArabic}
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extrabold text-[var(--color-primary-dark)] dark:text-teal-400 font-sans tracking-tight">
+            <h2 className="text-2xl md:text-5xl font-extrabold font-sans tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-teal-500 to-indigo-600 animate-gradient bg-300% pb-2">
                 {config.heroTitleLatin}
             </h2>
           </div>
@@ -101,14 +102,6 @@ const Home = () => {
               <span className="relative z-10">{config.heroButtonText}</span>
               <MoveRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-            </Link>
-
-            <Link 
-              to="/about" 
-              className="text-slate-600 dark:text-slate-300 font-bold hover:text-[var(--color-primary)] transition-colors flex items-center group px-4 py-2"
-            >
-              {config.heroButtonSecondaryText || 'Tentang Kami'}
-              <div className="w-1.5 h-1.5 bg-[var(--color-primary)] rounded-full ml-2 opacity-0 group-hover:opacity-100 transition-all scale-0 group-hover:scale-100"></div>
             </Link>
 
              {/* Copyright Button */}
@@ -232,6 +225,9 @@ const Home = () => {
              </Link>
         </div>
       </div>
+
+      {/* Vision Section */}
+      <VisionSection config={config} />
 
     </div>
   );

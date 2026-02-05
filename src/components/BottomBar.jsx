@@ -120,10 +120,13 @@ const BottomBar = () => {
                   "w-5 h-5 md:w-6 md:h-6 transition-transform duration-300",
                   isActive ? "scale-110" : "group-hover:scale-110"
                 )} />
-                <span className={cn(
-                  "text-[9px] md:text-[10px] font-black uppercase tracking-widest leading-none transition-all",
-                  isActive ? "opacity-100 mt-0.5 md:mt-1" : "opacity-0 h-0 overflow-hidden group-hover:opacity-100 group-hover:h-auto group-hover:mt-0.5 md:group-hover:mt-1"
-                )}>
+                <span 
+                  className={cn(
+                    "font-black uppercase tracking-widest leading-none transition-all",
+                    isActive ? "opacity-100 mt-0.5 md:mt-1" : "opacity-0 h-0 overflow-hidden group-hover:opacity-100 group-hover:h-auto group-hover:mt-0.5 md:group-hover:mt-1"
+                  )}
+                  style={{ fontSize: 'var(--font-arabic-sidebar-content-size)' }}
+                >
                   {item.label}
                 </span>
               </div>

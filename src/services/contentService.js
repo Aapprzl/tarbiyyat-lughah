@@ -593,9 +593,36 @@ export const contentService = {
         siteLogoType: 'icon', 
         siteLogoIcon: 'BookOpen',
         siteLogoUrl: '',
-        sidebarTitle: 'اللغة العربية',
+        sidebarTitle: 'Platform Pembelajaran Modern',
         headerTitleSize: 'text-lg',
-        sidebarTitleSize: 'text-xl'
+        sidebarTitleSize: 'text-[10px]',
+        // Vision Section Defaults
+        visionTitle: 'Visi Tarbiyyat Al-Lughah',
+        visionDesc: 'Tarbiyyat al-Lughah adalah ekosistem Next-Gen Interactive Learning yang dirancang khusus untuk merevolusi cara siswa MTs menguasai Maharah Qira\'ah (Kemampuan Membaca).',
+        visionStep1Title: 'Kosakata Visual',
+        visionStep1Desc: 'Penguasaan mufradat melalui kartu kosakata 3D yang interaktif.',
+        visionStep2Title: 'Qira\'ah Digital',
+        visionStep2Desc: 'Praktik membaca teks terstruktur dengan dukungan multimedia.',
+        visionStep3Title: 'Game Edukasi',
+        visionStep3Desc: 'Evaluasi pemahaman melalui tantangan gamifikasi yang seru.',
+        // Contact Defaults
+        contactPhone: '0822 6686 2306',
+        contactEmail: 'icalafrizal550790@gmail.com',
+        contactAddress: '(Alamat akan segera diperbarui)',
+        devName: 'Muh. Aprizal',
+        devRole: 'Developer',
+        devCampus: 'PBA IAIN BONE',
+        visionBadgeText: 'Skripsi Original Project',
+        // Footer Stack Defaults
+        footerStackTitle: 'Development Stack',
+        footerToolsTitle: 'Tools & Editors',
+        footerToolsList: 'VS Code • Google Antigravity • Sublime Text',
+        footerBackendTitle: 'Backend & Infrastructure',
+        footerBackendList: 'Firebase Backend • Google Cloud Console • Git • Node.js',
+        footerAiTitle: 'Powered by AI Technology',
+        footerAiList: 'ChatGPT • Gemini • GitHub Copilot',
+        // Footer Bottom Right
+        footerRightText: 'PBA IAIN Bone'
       };
       
       const stored = await fetchAndCache('settings', 'home_config', 'arp_home_config', defaults);
