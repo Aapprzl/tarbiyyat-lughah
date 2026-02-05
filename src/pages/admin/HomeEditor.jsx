@@ -112,16 +112,16 @@ const HomeEditor = () => {
                         className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all font-arabic"
                         placeholder="Bahasa Arab Praktis"
                     />
-                    <div className="flex items-center gap-3 px-4 justify-end">
+                    <div className="flex flex-wrap items-center gap-3 px-2 md:px-4 justify-between sm:justify-end">
                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Ukuran:</span>
-                        <div className="flex gap-1">
+                        <div className="flex flex-wrap gap-1">
                             {['text-xs', 'text-sm', 'text-base', 'text-lg', 'text-xl', 'text-2xl'].map(size => (
                                 <button
                                     key={size}
                                     type="button"
                                     onClick={() => setConfig({...config, headerTitleSize: size})}
                                     className={cn(
-                                        "px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all",
+                                        "px-2 sm:px-3 py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase transition-all",
                                         config.headerTitleSize === size 
                                             ? "bg-teal-500 text-white shadow-md shadow-teal-500/20" 
                                             : "bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-600"
@@ -144,15 +144,15 @@ const HomeEditor = () => {
                         style={{ fontFamily: 'var(--font-latin)' }}
                         placeholder="Platform Pembelajaran Modern"
                     />
-                    <div className="flex items-center gap-3 px-4 justify-end">
-                        <div className="flex gap-1">
+                    <div className="flex flex-wrap items-center gap-3 px-2 md:px-4 justify-between sm:justify-end">
+                        <div className="flex flex-wrap gap-1">
                             {['text-[10px]', 'text-xs', 'text-sm', 'text-base', 'text-lg'].map(size => (
                                 <button
                                     key={size}
                                     type="button"
                                     onClick={() => setConfig({...config, sidebarTitleSize: size})}
                                     className={cn(
-                                        "px-3 py-1 rounded-lg text-[10px] font-black uppercase transition-all",
+                                        "px-2 sm:px-3 py-1 rounded-lg text-[9px] sm:text-[10px] font-black uppercase transition-all",
                                         config.sidebarTitleSize === size 
                                             ? "bg-teal-500 text-white shadow-md shadow-teal-500/20" 
                                             : "bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-slate-600"

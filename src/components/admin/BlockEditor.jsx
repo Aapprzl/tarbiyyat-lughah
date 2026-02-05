@@ -10,11 +10,11 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
         onClick={onClick}
         className={cn(
             bg, color, 
-            "px-4 py-3 rounded-2xl flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest hover:brightness-95 active:scale-95 transition-all border border-transparent hover:border-current shadow-sm"
+            "px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:brightness-95 active:scale-95 transition-all border border-transparent hover:border-current shadow-sm"
         )}
     >
-        <Icon className="w-3.5 h-3.5" />
-        {label}
+        <Icon className="w-3 md:w-3.5 h-3 md:h-3.5" />
+        <span className="truncate">{label}</span>
     </button>
 );
 
@@ -59,75 +59,106 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white dark:bg-white/5 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 overflow-hidden group hover:shadow-xl transition-all"
+            className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 border-b-4 border-b-teal-500/50 overflow-hidden group hover:shadow-xl transition-all -ml-11 md:-ml-15"
         >
             {/* Header / Accordion Trigger */}
             <div 
-                onClick={() => setIsOpen(!isOpen)}
                 className={cn(
-                    "px-6 py-4 flex justify-between items-center cursor-pointer select-none transition-all",
+                    "flex flex-col transition-all",
                     isOpen ? "bg-slate-50 dark:bg-white/[0.02]" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.01]"
                 )}
             >
-               <div className="flex items-center gap-5 overflow-hidden">
-                   {/* Icon Badge */}
-                   <div className={cn(
-                       "w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-all shadow-sm",
-                       isOpen ? `${info.bg} ${info.color} scale-110 shadow-lg shadow-current/10` : "bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:scale-110"
-                   )}>
-                       <Icon className="w-5 h-5" />
+                <div 
+                    onClick={() => setIsOpen(!isOpen)}
+                    className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center cursor-pointer select-none"
+                >
+                   <div className="flex items-center gap-3 md:gap-5 flex-1 min-w-0 overflow-hidden">
+                       {/* Icon Badge */}
+                       <div className={cn(
+                           "w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-sm",
+                           isOpen ? `${info.bg} ${info.color} scale-110 rotate-3 shadow-lg shadow-current/10` : "bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:scale-110"
+                       )}>
+                           <Icon className="w-5 h-5 md:w-7 md:h-7" />
+                       </div>
+                       
+                       {/* Title/Label */}
+                       <div className="flex flex-col flex-1 min-w-0">
+                           <span className="text-[7px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{info.label}</span>
+                           <span className="text-sm md:text-base font-black text-slate-900 dark:text-white truncate block tracking-tight font-arabic">
+                                {getTitlePreview()}
+                           </span>
+                       </div>
                    </div>
-                   
-                   {/* Title/Label */}
-                   <div className="flex flex-col min-w-0">
-                       <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{info.label}</span>
-                       <span className="text-base font-black text-slate-900 dark:text-white truncate max-w-[200px] md:max-w-md block tracking-tight font-arabic">
-                            {getTitlePreview()}
-                       </span>
+
+                   <div className="flex items-center gap-3">
+                      {/* Desktop Move Buttons */}
+                      <div className="hidden md:flex bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 p-1" onClick={(e) => e.stopPropagation()}>
+                        <button 
+                          onClick={onMoveUp} 
+                          disabled={isFirst}
+                          className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                          title="Pindah ke atas"
+                        >
+                          <ChevronUp className="w-4 h-4" />
+                        </button>
+                        <button 
+                          onClick={onMoveDown} 
+                          disabled={isLast}
+                          className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
+                          title="Pindah ke bawah"
+                        >
+                          <ChevronDown className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      {/* Desktop Delete Button */}
+                      <button 
+                          onClick={(e) => {
+                              e.stopPropagation();
+                              onRemove();
+                          }} 
+                          className="hidden md:flex p-3 text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
+                          title="Hapus Blok"
+                      >
+                          <Trash2 className="w-5 h-5" />
+                      </button>
+                      
+                      {/* Toggle Chevron */}
+                      <div className={cn(
+                          "w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center transition-all",
+                          isOpen ? "bg-teal-500 text-white rotate-180" : "bg-slate-100 dark:bg-white/5 text-slate-400"
+                      )}>
+                         <ChevronDown className="w-4 h-4 md:w-5 md:h-5" />
+                      </div>
                    </div>
-               </div>
+                </div>
 
-               <div className="flex items-center gap-3">
-                 {/* Move Buttons */}
-                 <div className="flex bg-slate-100 dark:bg-white/5 rounded-full border border-slate-200 dark:border-white/10 p-1" onClick={(e) => e.stopPropagation()}>
-                   <button 
-                     onClick={onMoveUp} 
-                     disabled={isFirst}
-                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-                     title="Pindah ke atas"
-                   >
-                     <ChevronUp className="w-4 h-4" />
-                   </button>
-                   <button 
-                     onClick={onMoveDown} 
-                     disabled={isLast}
-                     className="p-2 text-slate-400 hover:text-teal-500 hover:bg-white dark:hover:bg-white/10 rounded-full disabled:opacity-20 disabled:cursor-not-allowed transition-all"
-                     title="Pindah ke bawah"
-                   >
-                     <ChevronDown className="w-4 h-4" />
-                   </button>
-                 </div>
-
-                 {/* Delete Button */}
-                 <button 
-                     onClick={(e) => {
-                         e.stopPropagation();
-                         onRemove();
-                     }} 
-                     className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-500/10 rounded-full transition-all"
-                     title="Hapus Blok"
-                 >
-                     <Trash2 className="w-5 h-5" />
-                 </button>
-                 
-                 {/* Toggle Chevron */}
-                 <div className={cn(
-                     "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                     isOpen ? "bg-teal-500 text-white rotate-180" : "bg-slate-100 dark:bg-white/5 text-slate-400"
-                 )}>
-                    <ChevronDown className="w-5 h-5" />
-                 </div>
-               </div>
+                {/* Mobile Action Bar - Shown only on mobile and when relevant */}
+                <div className="md:hidden flex items-center justify-between px-4 pb-3 gap-2">
+                    <div className="flex bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 p-0.5 shadow-inner">
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onMoveUp(); }} 
+                            disabled={isFirst}
+                            className="flex items-center gap-2 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-500 disabled:opacity-20 transition-all"
+                        >
+                            <ChevronUp className="w-3.5 h-3.5" /> Up
+                        </button>
+                        <div className="w-px h-4 bg-slate-200 dark:bg-white/10 self-center"></div>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onMoveDown(); }} 
+                            disabled={isLast}
+                            className="flex items-center gap-2 px-3 py-1.5 text-[9px] font-black uppercase tracking-widest text-slate-500 disabled:opacity-20 transition-all"
+                        >
+                            Down <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); onRemove(); }} 
+                        className="flex items-center gap-2 px-4 py-1.5 bg-red-500/10 text-red-500 rounded-2xl text-[9px] font-black uppercase tracking-widest border border-red-500/20 shadow-sm"
+                    >
+                        <Trash2 className="w-3.5 h-3.5" /> Hapus
+                    </button>
+                </div>
             </div>
 
             {/* Content Body */}
@@ -139,7 +170,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="px-8 pb-8 pt-4 border-t border-slate-100 dark:border-white/5">
+                        <div className="px-4 md:px-8 pb-6 md:pb-8 pt-4 border-t border-slate-100 dark:border-white/5">
               
               {/* --- TEXT BLOCK --- */}
               {block.type === 'text' && (

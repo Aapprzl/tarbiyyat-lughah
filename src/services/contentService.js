@@ -643,6 +643,30 @@ export const contentService = {
     return await saveToCloud('settings', 'home_config', 'arp_home_config', config);
   },
 
+  // --- Intro Page Config ---
+
+  async getIntroConfig() {
+      const defaults = {
+          intro_active: true,
+          intro_title_ar: 'تربية اللغة',
+          intro_title_en: 'Tarbiyyat Lughah',
+          intro_typing_texts: [
+              "Menghubungkan Hati dengan Bahasa Al-Qur'an",
+              "Media Pembelajaran Interaktif & Terstruktur",
+              "Kuasai Maharah Qira'ah dengan Menyenangkan",
+              "Teknologi Digital untuk Pendidikan Bahasa"
+          ],
+          intro_button_text: 'Mulai Belajar'
+      };
+      
+      const stored = await fetchAndCache('settings', 'intro_config', 'arp_intro_config', defaults);
+      return { ...defaults, ...stored };
+  },
+
+  async saveIntroConfig(config) {
+      return await saveToCloud('settings', 'intro_config', 'arp_intro_config', config);
+  },
+
   // --- About Page Config ---
 
   async getAboutConfig() {

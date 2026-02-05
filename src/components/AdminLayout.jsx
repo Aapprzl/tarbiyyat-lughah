@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../services/contentService';
 import { useTheme } from '../components/ThemeProvider';
-import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash } from 'lucide-react';
+import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash, Monitor } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -12,6 +12,31 @@ const AdminLayout = () => {
 
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleToggle = () => setIsMobileMenuOpen(prev => !prev);
+    window.addEventListener('toggle-admin-sidebar', handleToggle);
+    return () => window.removeEventListener('toggle-admin-sidebar', handleToggle);
+  }, []);
+
+  // Floating Toggle Button (Replaces Header)
+  const FloatingToggle = () => (
+    <AnimatePresence>
+      {!isMobileMenuOpen && (
+        <motion.button
+          initial={{ scale: 0, rotate: -180 }}
+          animate={{ scale: 1, rotate: 0 }}
+          exit={{ scale: 0, rotate: 180 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="fixed bottom-6 right-6 z-[100] w-14 h-14 bg-teal-600 text-white rounded-full shadow-2xl shadow-teal-500/30 flex items-center justify-center border-2 border-white/20 backdrop-blur-md md:hidden"
+        >
+          <Menu className="w-7 h-7" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
 
   useEffect(() => {
     const unsubscribe = contentService.onAuthStateChange((user) => {
@@ -88,11 +113,13 @@ const AdminLayout = () => {
           />
         )}
       </AnimatePresence>
+      
+      <FloatingToggle />
 
       {/* Admin Sidebar - Integrated into Layout flow */}
       <aside className={`
-        fixed inset-y-4 left-4 z-[60] w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-[2.5rem] flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:sticky md:top-28 md:m-0 md:h-[calc(100vh-8rem)]
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-[calc(100%+2rem)]'}
+        fixed inset-y-0 left-0 z-[100] w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-white/10 flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:sticky md:top-8 md:m-0 md:h-[calc(100vh-4rem)] md:rounded-[2.5rem] md:border
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Profile Header */}
         <div className="p-8 pb-6">
@@ -118,6 +145,7 @@ const AdminLayout = () => {
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
           <NavItem to="/admin/home-editor" icon={LayoutGrid} label="Editor Beranda" />
           <NavItem to="/admin/library-manager" icon={Library} label="Manajemen Perpustakaan" />
+          <NavItem to="/admin/intro-editor" icon={Monitor} label="Manajemen Intro" />
           
           <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
@@ -164,17 +192,7 @@ const AdminLayout = () => {
 
       {/* Admin Content Area - Now just a flex child */}
       <div className="flex-1 min-w-0 p-4 md:p-8">
-        {/* Toggle Mobile Sidebar (Since original Header is fixed) */}
-        {!isMobileMenuOpen && (
-          <button 
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="md:hidden fixed bottom-24 right-6 z-40 w-12 h-12 bg-teal-600 text-white rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-all"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-        )}
-        
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <Outlet />
         </div>
       </div>

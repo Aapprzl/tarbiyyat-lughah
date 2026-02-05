@@ -253,33 +253,35 @@ const AdminGames = () => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-3">
-                      <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+                      <div className="flex items-center gap-1 sm:gap-2">
                          <button 
                             onClick={(e) => { e.stopPropagation(); toggleCategoryLock(category); }}
                             className={cn(
-                                "p-3 rounded-2xl transition-all",
-                                category.isLocked ? "text-amber-500 bg-amber-500/10" : "text-slate-400 hover:text-amber-500"
+                                "p-2.5 md:p-3 rounded-2xl transition-all border",
+                                category.isLocked 
+                                  ? "text-amber-500 bg-amber-500/10 border-amber-500/20 shadow-sm" 
+                                  : "bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-amber-500 border-slate-100 dark:border-white/5"
                             )}
                          >
                             {category.isLocked ? <ShieldCheck className="w-4 h-4" /> : <DoorOpen className="w-4 h-4" />}
                          </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
-                            className="p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all"
+                            className="p-2.5 md:p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5"
                          >
                             <Edit2 className="w-4 h-4" />
                          </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); handleDeleteCategory(category.id); }}
-                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                            className="p-2.5 md:p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5"
                          >
                             <Trash2 className="w-4 h-4" />
                          </button>
                       </div>
                       <div className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                          isExpanded ? "bg-amber-500 text-white rotate-180" : "bg-slate-100 dark:bg-white/5 text-slate-400"
+                          "w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0",
+                          isExpanded ? "bg-amber-500 text-white rotate-180 shadow-lg shadow-amber-500/20" : "bg-slate-100 dark:bg-white/5 text-slate-400"
                       )}>
                         <ChevronDown className="w-5 h-5" />
                       </div>
@@ -307,27 +309,27 @@ const AdminGames = () => {
                               {category.topics?.map(topic => (
                                 <div 
                                     key={topic.id} 
-                                    className="flex items-center justify-between p-5 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 rounded-[2rem] hover:border-amber-500/30 transition-all group/topic"
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 rounded-3xl md:rounded-[2rem] hover:border-amber-500/30 transition-all group/topic gap-4"
                                 >
-                                  <div className="flex items-center gap-4">
+                                  <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
                                      <div className={cn(
-                                         "w-1.5 h-1.5 rounded-full",
+                                         "w-1.5 h-1.5 rounded-full shrink-0",
                                          topic.isLocked ? "bg-amber-500 animate-pulse" : "bg-teal-500"
                                      )}></div>
-                                     <div className="flex flex-col">
+                                     <div className="flex flex-col min-w-0">
                                          <span className={cn(
-                                             "font-bold font-arabic text-lg leading-tight",
+                                             "font-bold font-arabic text-lg leading-tight truncate",
                                              topic.isLocked ? "text-slate-400" : "text-slate-900 dark:text-white"
                                          )}>{topic.title}</span>
-                                         {topic.isLocked && <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Akses Unit Dikunci</span>}
+                                         {topic.isLocked && <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest leading-none mt-0.5">Akses Unit Dikunci</span>}
                                      </div>
                                   </div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 justify-end">
                                     <button 
                                       onClick={() => toggleTopicLock(category.id, topic.id, topic.isLocked)}
                                       className={cn(
                                           "p-2 rounded-xl transition-all border",
-                                          topic.isLocked ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "text-slate-300 hover:text-amber-500 border-transparent hover:border-amber-100"
+                                          topic.isLocked ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "bg-white dark:bg-white/10 text-slate-300 hover:text-amber-500 border-slate-200 dark:border-white/5 hover:border-amber-100 shadow-sm"
                                       )}
                                     >
                                       {topic.isLocked ? <ShieldCheck className="w-3.5 h-3.5" /> : <DoorOpen className="w-3.5 h-3.5" />}
@@ -336,11 +338,11 @@ const AdminGames = () => {
                                       to={`/admin/edit/${topic.id}`}
                                       className="text-[10px] font-black uppercase tracking-widest bg-white dark:bg-white/10 text-teal-600 dark:text-teal-400 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-teal-500 hover:text-white hover:border-teal-500 transition-all shadow-sm"
                                     >
-                                      Edit Tantangan
+                                      Edit Unit
                                     </Link>
                                     <button 
                                       onClick={() => handleDeleteTopic(category.id, topic.id)}
-                                      className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
+                                      className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-500/10 bg-white dark:bg-white/10 border border-slate-200 dark:border-white/5 rounded-xl transition-all"
                                     >
                                       <Trash2 className="w-4 h-4" />
                                     </button>
@@ -372,19 +374,19 @@ const AdminGames = () => {
           {showCategoryModal && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
-               <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/10">
-                  <div className="p-10">
-                      <div className="flex items-center justify-between mb-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
-                                <Plus className="w-6 h-6" />
+                <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/10">
+                  <div className="p-6 md:p-10">
+                      <div className="flex items-center justify-between mb-8 md:mb-10">
+                        <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
+                                <Plus className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{editingCategoryId ? 'Edit Kategori Game' : 'Kategori Game Baru'}</h2>
-                                <p className="text-sm text-slate-500 font-medium">Pengelompokan jenis tantangan belajar.</p>
+                            <div className="min-w-0">
+                                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingCategoryId ? 'Edit Kategori Game' : 'Kategori Game Baru'}</h2>
+                                <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengelompokan jenis tantangan belajar.</p>
                             </div>
                         </div>
-                        <button onClick={() => setShowCategoryModal(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                        <button onClick={() => setShowCategoryModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
                             <X className="w-5 h-5" />
                         </button>
                       </div>
@@ -464,16 +466,16 @@ const AdminGames = () => {
           {showTopicModal && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowTopicModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
-               <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl relative border border-white/10">
-                  <div className="p-10">
-                      <div className="flex items-center justify-between mb-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                                <Trophy className="w-6 h-6" />
+                <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl relative border border-white/10">
+                  <div className="p-6 md:p-10">
+                      <div className="flex items-center justify-between mb-8 md:mb-10">
+                        <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-teal-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-teal-600 shrink-0">
+                                <Trophy className="w-5 h-5 md:w-6 md:h-6" />
                             </div>
-                            <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Unit Game Baru</h2>
+                            <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">Unit Game Baru</h2>
                         </div>
-                        <button onClick={() => setShowTopicModal(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                        <button onClick={() => setShowTopicModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
                             <X className="w-5 h-5" />
                         </button>
                       </div>

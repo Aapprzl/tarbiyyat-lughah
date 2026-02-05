@@ -22,7 +22,7 @@ const iconMap = {
   Layers
 };
 
-const Header = () => {
+const Header = ({ minimal = false }) => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
@@ -76,8 +76,20 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 right-0 left-0 h-20 bg-teal-700/95 backdrop-blur-xl border-b border-white/10 z-40 px-6 flex items-center justify-between transition-all duration-300 shadow-lg shadow-teal-900/20">
-        <div className="flex items-center">
+      <header className={cn(
+          "fixed top-0 right-0 left-0 h-20 bg-teal-700/95 backdrop-blur-xl border-b border-white/10 z-40 px-6 flex items-center justify-between transition-all duration-300 shadow-lg shadow-teal-900/20"
+      )}>
+        {/* Mobile Toggle (Minimal Mode) */}
+        {minimal && (
+          <button 
+            onClick={() => window.dispatchEvent(new CustomEvent('toggle-admin-sidebar'))}
+            className="md:hidden w-11 h-11 bg-white text-teal-600 rounded-xl shadow-xl flex items-center justify-center active:scale-90 transition-all border border-teal-500/10"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
+
+        <div className={cn("flex items-center", minimal && "ml-auto")}>
           <Link to="/" className="group flex items-center gap-4">
              {/* Dynamic Logo */}
              {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
@@ -88,52 +100,56 @@ const Header = () => {
                  </div>
              )}
 
-             <div className="flex flex-col">
-                <span className={cn("font-bold leading-tight tracking-tight text-white group-hover:text-amber-300 transition-colors", siteConfig.headerTitleSize || 'text-xl')} style={{ fontFamily: 'var(--font-arabic), var(--font-latin)' }}>
-                    {siteConfig.siteTitle || 'Bahasa Arab Praktis'}
-                </span>
-                <span className={cn("font-bold text-teal-100 uppercase tracking-widest leading-none mt-0.5 group-hover:text-white transition-colors", siteConfig.sidebarTitleSize || 'text-xs')} style={{ fontFamily: 'var(--font-latin)' }}>
-                    {siteConfig.sidebarTitle || 'Platform Pembelajaran Modern'}
-                </span>
-             </div>
+             {!minimal && (
+               <div className="flex flex-col">
+                  <span className={cn("font-bold leading-tight tracking-tight text-white group-hover:text-amber-300 transition-colors", siteConfig.headerTitleSize || 'text-xl')} style={{ fontFamily: 'var(--font-arabic), var(--font-latin)' }}>
+                      {siteConfig.siteTitle || 'Bahasa Arab Praktis'}
+                  </span>
+                  <span className={cn("font-bold text-teal-100 uppercase tracking-widest leading-none mt-0.5 group-hover:text-white transition-colors", siteConfig.sidebarTitleSize || 'text-xs')} style={{ fontFamily: 'var(--font-latin)' }}>
+                      {siteConfig.sidebarTitle || 'Platform Pembelajaran Modern'}
+                  </span>
+               </div>
+             )}
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 md:gap-4">
-          {/* Search Trigger (Desktop) */}
-          <div className="hidden md:block relative">
-             <button 
-               onClick={() => setShowSearch(true)}
-               className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-white hover:bg-white/20 transition-all min-w-[240px]"
-             >
-                <Telescope className="w-4 h-4" />
-                <span className="text-sm font-medium">Cari materi...</span>
-                <span className="ml-auto text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-bold text-white">Ctrl K</span>
-             </button>
-          </div>
+        {!minimal && (
+          <div className="flex items-center gap-2 md:gap-4">
+            {/* Search Trigger (Desktop) */}
+            <div className="hidden md:block relative">
+              <button 
+                onClick={() => setShowSearch(true)}
+                className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-white hover:bg-white/20 transition-all min-w-[240px]"
+              >
+                  <Telescope className="w-4 h-4" />
+                  <span className="text-sm font-medium">Cari materi...</span>
+                  <span className="ml-auto text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-bold text-white">Ctrl K</span>
+              </button>
+            </div>
 
-          {/* Theme Toggle */}
-          <button 
-            onClick={toggleTheme}
-            className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-amber-300 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
-          >
-            <AnimatePresence mode="wait">
-              {theme === 'light' ? (
-                <motion.div key="moon" initial={{ rotate: -45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 45, opacity: 0 }}>
-                  <Moon className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <motion.div key="sun" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
-                  <Sun className="w-5 h-5" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
-          
-          <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-blue-100 hover:text-white bg-white/10 border border-white/10">
-             <Telescope className="w-5 h-5" />
-          </button>
-        </div>
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-amber-300 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
+            >
+              <AnimatePresence mode="wait">
+                {theme === 'light' ? (
+                  <motion.div key="moon" initial={{ rotate: -45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 45, opacity: 0 }}>
+                    <Moon className="w-5 h-5" />
+                  </motion.div>
+                ) : (
+                  <motion.div key="sun" initial={{ rotate: 45, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -45, opacity: 0 }}>
+                    <Sun className="w-5 h-5" />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </button>
+            
+            <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-blue-100 hover:text-white bg-white/10 border border-white/10">
+              <Telescope className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </header>
       
       {/* Immersive Search Overlay */}

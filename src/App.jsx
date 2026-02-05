@@ -19,8 +19,10 @@ const LessonEditor = lazy(() => import('./pages/admin/LessonEditor'));
 const FontEditor = lazy(() => import('./pages/admin/FontEditor'));
 const CopyrightEditor = lazy(() => import('./pages/admin/CopyrightEditor'));
 const LibraryManager = lazy(() => import('./pages/admin/LibraryManager'));
+const IntroEditor = lazy(() => import('./pages/admin/IntroEditor'));
 const MigrationTools = lazy(() => import('./pages/admin/MigrationTools'));
 
+import { contentService } from './services/contentService';
 import { ToastProvider, ConfirmProvider } from './components/Toast';
 import { FontProvider } from './components/FontProvider';
 import { ThemeProvider } from './components/ThemeProvider';
@@ -29,21 +31,57 @@ import Intro from './components/Intro';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
-  const [showIntro, setShowIntro] = React.useState(() => {
-    return !sessionStorage.getItem('introShown');
-  });
+  const [loading, setLoading] = React.useState(true);
+  const [introConfig, setIntroConfig] = React.useState(null);
+  const [homeConfig, setHomeConfig] = React.useState(null);
+  const [showIntro, setShowIntro] = React.useState(false);
+
+  React.useEffect(() => {
+    const initApp = async () => {
+      try {
+        const [config, hConfig] = await Promise.all([
+          contentService.getIntroConfig(),
+          contentService.getHomeConfig()
+        ]);
+        
+        setIntroConfig(config);
+        setHomeConfig(hConfig);
+        
+        const introShown = sessionStorage.getItem('introShown');
+        if (config.intro_active && !introShown) {
+          setShowIntro(true);
+        }
+      } catch (err) {
+        console.error("Failed to init app config:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    initApp();
+  }, []);
 
   const handleEnterWebsite = () => {
     sessionStorage.setItem('introShown', 'true');
     setShowIntro(false);
   };
 
+  if (loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-slate-950 z-[10000]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Memuat...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <ThemeProvider>
       <ToastProvider>
       <ConfirmProvider>
         <FontProvider>
-          {showIntro && <Intro onEnter={handleEnterWebsite} />}
+          {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
           <Router>
             <ScrollToTop />
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Memuat...</div>}>
@@ -66,6 +104,7 @@ function App() {
                     <Route path="games" element={<AdminGames />} /> {/* Added admin route for games */}
                     <Route path="home-editor" element={<AdminHomeEditor />} />
                     <Route path="library-manager" element={<LibraryManager />} />
+                    <Route path="intro-editor" element={<IntroEditor />} />
                     <Route path="db-migration" element={<MigrationTools />} />
                     <Route path="font-editor" element={<FontEditor />} />
                     <Route path="copyright" element={<CopyrightEditor />} />
