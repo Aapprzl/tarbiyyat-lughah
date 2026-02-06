@@ -101,7 +101,7 @@ const MaterialIndex = () => {
 
 
       {searchQuery && sections.length === 0 && (
-          <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">
+          <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-700">
               <Telescope className="w-16 h-16 text-slate-300 dark:text-slate-700 mx-auto mb-6" />
               <h3 className="text-2xl font-bold text-slate-400">Tidak ada materi ditemukan</h3>
               <p className="text-slate-500 mt-2">Coba kata kunci lain atau telusuri kurikulum utama</p>
@@ -130,14 +130,14 @@ const MaterialIndex = () => {
               <motion.div 
                 key={section.id} 
                 variants={itemVariants}
-                className="group bg-white dark:bg-white/5 rounded-[2.5rem] border border-slate-200 dark:border-white/10 overflow-hidden hover:shadow-2xl hover:shadow-teal-500/10 transition-all border-b-4 border-b-teal-500/50"
+                className="group bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-2xl hover:shadow-teal-500/10 transition-all border-b-4 border-b-teal-500/50"
               >
                 <button 
                   onClick={() => toggleSection(section)}
                   className={cn(
                       "w-full flex items-center justify-between p-8 text-left transition-all relative overflow-hidden",
                       section.isLocked 
-                        ? "bg-slate-100 dark:bg-slate-900/50 cursor-not-allowed" 
+                        ? "bg-slate-100 dark:bg-slate-900 cursor-not-allowed" 
                         : "hover:bg-teal-500/5"
                   )}
                 >
@@ -194,10 +194,10 @@ const MaterialIndex = () => {
                         <div 
                           key={topic.id}
                           className={cn(
-                              "group/item flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-black/20 border transition-all",
+                              "group/item flex items-center justify-between p-5 rounded-2xl bg-slate-50 dark:bg-slate-900 border transition-all",
                               topic.isLocked 
-                                ? "border-slate-100 dark:border-white/5 cursor-not-allowed pointer-events-none" 
-                                : "border-slate-100 dark:border-white/5 hover:border-teal-500/30 hover:bg-white dark:hover:bg-white/5"
+                                ? "border-slate-100 dark:border-slate-800 cursor-not-allowed pointer-events-none" 
+                                : "border-slate-100 dark:border-slate-800 hover:border-teal-500/30 hover:bg-white dark:hover:bg-slate-800/80"
                           )}
                         >
                           <div className="flex-1 flex items-center gap-4">

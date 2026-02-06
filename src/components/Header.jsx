@@ -77,7 +77,7 @@ const Header = ({ minimal = false }) => {
   return (
     <>
       <header className={cn(
-          "fixed top-0 right-0 left-0 h-20 bg-teal-700/95 backdrop-blur-xl border-b border-white/10 z-40 px-6 flex items-center justify-between transition-all duration-300 shadow-lg shadow-teal-900/20"
+          "fixed top-0 right-0 left-0 h-20 bg-teal-700/85 dark:bg-slate-950/80 backdrop-blur-md border-b border-white/10 z-40 px-6 flex items-center justify-between transition-all duration-300 shadow-lg shadow-teal-900/10"
       )}>
         {/* Mobile Toggle (Minimal Mode) */}
         {minimal && (

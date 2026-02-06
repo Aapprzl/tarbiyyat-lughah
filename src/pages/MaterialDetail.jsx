@@ -238,7 +238,7 @@ const MaterialDetailContent = () => {
          {/* Hero Display - HIDDEN for Game Categories to keep it streamlined */}
          {!isCategoryView && (
             <div className={cn(
-                "relative bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl",
+                "relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl",
                 isGame && "border-amber-500/20"
             )}>
                 <div className={cn(
@@ -276,7 +276,7 @@ const MaterialDetailContent = () => {
                 )}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-white/5">
+                <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-slate-700">
                     <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
                     <Clock className="w-4 h-4" />
                     {isGame ? 'Tantangan Belajar' : 'Materi Terstruktur'}
@@ -335,7 +335,7 @@ const MaterialDetailContent = () => {
             </h3>
             
             {!Array.isArray(categoryTopics) || categoryTopics.length === 0 ? (
-                <div className="text-center py-20 bg-slate-50 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+                <div className="text-center py-20 bg-slate-50 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
                     <p className="text-slate-400 font-bold">Belum ada tantangan dalam permainan ini.</p>
                 </div>
             ) : (
@@ -344,11 +344,11 @@ const MaterialDetailContent = () => {
                         <Link  
                             key={item.id || idx} 
                             to={`/program/${item.id}`} 
-                            className="group flex items-center justify-between p-8 bg-white dark:bg-white/5 rounded-[2.5rem] border border-slate-200 dark:border-white/10 hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all overflow-hidden relative"
+                            className="group flex items-center justify-between p-8 bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all overflow-hidden relative"
                         >
                              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-amber-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity"></div>
                              <div className="flex items-center gap-6 relative z-10">
-                                <span className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center font-black transition-all shadow-sm">
+                                <span className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-900 text-slate-400 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center font-black transition-all shadow-sm">
                                     {idx + 1}
                                 </span>
                                 <div>
@@ -358,7 +358,7 @@ const MaterialDetailContent = () => {
                                     <p className="text-amber-600/60 text-[10px] font-black uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-all -translate-y-2 group-hover:translate-y-0">Klik Untuk Bermain</p>
                                 </div>
                              </div>
-                             <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1 relative z-10">
+                             <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1 relative z-10">
                                  <Gamepad className="w-5 h-5 ml-1" />
                              </div>
                         </Link>
@@ -399,7 +399,7 @@ const MaterialDetailContent = () => {
                         <ContentBlock key={block.id || bIdx} block={block} />
                     ))}
                     {stage.items.length === 0 && (
-                        <div className="text-center py-20 bg-slate-100 dark:bg-white/5 rounded-[3rem] border border-dashed border-slate-300 dark:border-white/10">
+                        <div className="text-center py-20 bg-slate-100 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-700">
                            <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Konten Belum Tersedia</p>
                         </div>
                     )}
@@ -422,7 +422,7 @@ const MaterialDetailContent = () => {
         </div>
       ) : (
         /* LEGACY MARKDOWN CONTENT */
-        <article className="mx-4 md:mx-0 bg-white dark:bg-white/5 rounded-[3.5rem] p-10 md:p-20 border border-slate-200 dark:border-white/10 shadow-2xl prose prose-xl prose-teal dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:font-medium prose-p:leading-relaxed">
+        <article className="mx-4 md:mx-0 bg-white dark:bg-slate-800 rounded-[3.5rem] p-10 md:p-20 border border-slate-200 dark:border-slate-700 shadow-2xl prose prose-xl prose-teal dark:prose-invert max-w-none prose-headings:font-black prose-headings:tracking-tight prose-p:font-medium prose-p:leading-relaxed">
           <ReactMarkdown>{content}</ReactMarkdown>
         </article>
       )}
@@ -437,7 +437,7 @@ const ContentBlock = ({ block }) => {
     switch (block.type) {
         case 'text':
             return (
-                <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
                     {block.data?.title && <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
                        <ClipboardList className="w-6 h-6 text-teal-500" /> 
                        {block.data.title}
@@ -458,13 +458,13 @@ const ContentBlock = ({ block }) => {
                             <motion.div 
                               key={idx} 
                               whileHover={{ scale: 1.02 }}
-                              className="group flex flex-col items-center justify-center p-8 bg-white dark:bg-white/5 rounded-[2rem] border border-slate-200 dark:border-white/10 hover:border-teal-500/30 transition-all text-center relative overflow-hidden"
+                              className="group flex flex-col items-center justify-center p-8 bg-white dark:bg-slate-800 rounded-[2rem] border border-slate-200 dark:border-slate-700 hover:border-teal-500/30 transition-all text-center relative overflow-hidden"
                             >
                                 <div className="absolute top-0 left-0 w-20 h-20 bg-teal-500/5 rounded-full -ml-10 -mt-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                 <span className="text-3xl font-black text-slate-900 dark:text-white mb-4 dir-rtl arabic-content leading-relaxed">
                                    {item.arab}
                                 </span>
-                                <div className="h-px w-12 bg-slate-200 dark:bg-white/10 mx-auto mb-4"></div>
+                                <div className="h-px w-12 bg-slate-200 dark:bg-slate-700 mx-auto mb-4"></div>
                                 <span className="text-sm font-bold text-slate-500 dark:text-slate-400 tracking-wide">
                                    {item.indo}
                                 </span>
@@ -476,7 +476,7 @@ const ContentBlock = ({ block }) => {
         case 'alert':
             return (
                 <div className="bg-teal-50 dark:bg-teal-900/10 border-l-8 border-teal-500 p-8 rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
-                    <div className="w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
                        <AlertCircle className="w-6 h-6 text-teal-500" />
                     </div>
                     <div className="flex-1">
@@ -489,7 +489,7 @@ const ContentBlock = ({ block }) => {
             return (
                 <div className="space-y-6">
                     {block.data?.title && <h4 className="text-xs font-black text-red-500 uppercase tracking-[0.3em] flex items-center gap-3"><Youtube className="w-4 h-4" /> {block.data.title}</h4>}
-                    <div className="aspect-video bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/5 relative group">
+                    <div className="aspect-video bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-slate-200 dark:border-slate-700/50 relative group">
                         {(() => {
                             const url = block.data?.url || '';
                             let videoId = '';
@@ -521,7 +521,7 @@ const ContentBlock = ({ block }) => {
                             </a>
                         )}
                     </div>
-                    <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-xl bg-white dark:bg-white/5">
+                    <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-800">
                         <PdfViewer fileUrl={block.data?.url} height={600} />
                     </div>
                 </div>

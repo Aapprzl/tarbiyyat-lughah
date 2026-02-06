@@ -211,7 +211,7 @@ const LibraryManager = () => {
   return (
     <div className="max-w-7xl mx-auto space-y-12 pb-20">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-500/5 blur-[100px] rounded-full"></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
@@ -228,7 +228,7 @@ const LibraryManager = () => {
           className={cn(
             "flex items-center justify-center gap-3 px-8 py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl active:scale-95 relative z-10",
             isAdding 
-              ? "bg-slate-100 dark:bg-white/5 text-slate-500" 
+              ? "bg-slate-100 dark:bg-slate-800 text-slate-500" 
               : "bg-teal-500 text-white shadow-teal-500/20 hover:bg-teal-600"
           )}
         >
@@ -240,7 +240,7 @@ const LibraryManager = () => {
       <div className="grid lg:grid-cols-12 gap-10">
         {/* Sidebar: Category Management (Always Visible) */}
         <div className="lg:col-span-4 lg:sticky lg:top-28 lg:h-fit">
-          <div className="bg-slate-50 dark:bg-white/5 rounded-[3rem] p-8 border border-slate-200 dark:border-white/10 shadow-sm">
+          <div className="bg-slate-50 dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-10 h-10 bg-teal-500/10 rounded-xl flex items-center justify-center text-teal-600">
                 <Plus className="w-5 h-5" />
@@ -253,7 +253,7 @@ const LibraryManager = () => {
                 <input 
                   type="text"
                   placeholder="Nama kategori..."
-                  className="w-full bg-white dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all"
+                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all"
                   value={newCategory}
                   onChange={e => setNewCategory(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
@@ -268,7 +268,7 @@ const LibraryManager = () => {
 
               <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
                 {categories.map(cat => (
-                  <div key={cat} className="group flex items-center justify-between bg-white dark:bg-white/5 px-5 py-4 rounded-2xl border border-slate-100 dark:border-white/5 hover:border-teal-500/30 transition-all shadow-sm">
+                  <div key={cat} className="group flex items-center justify-between bg-white dark:bg-slate-800 px-5 py-4 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-teal-500/30 transition-all shadow-sm">
                     <span className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">{cat}</span>
                     <button 
                       onClick={() => handleDeleteCategory(cat)}
@@ -311,7 +311,7 @@ const LibraryManager = () => {
                       <input 
                         type="text"
                         dir="rtl"
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[1.5rem] px-6 py-5 text-2xl font-black font-arabic text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-inner"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[1.5rem] px-6 py-5 text-2xl font-black font-arabic text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-inner"
                         placeholder="...كتاب"
                         value={formData.titleAr}
                         onChange={e => setFormData({ ...formData, titleAr: e.target.value })}
@@ -323,7 +323,7 @@ const LibraryManager = () => {
                       </label>
                       <input 
                         type="text"
-                        className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[1.5rem] px-6 py-5 text-lg font-bold text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all shadow-inner"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[1.5rem] px-6 py-5 text-lg font-bold text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all shadow-inner"
                         placeholder="Masukkan judul buku..."
                         value={formData.titleId}
                         onChange={e => setFormData({ ...formData, titleId: e.target.value })}
@@ -345,7 +345,7 @@ const LibraryManager = () => {
                               "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95",
                               formData.category === cat 
                                 ? "bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/20" 
-                                : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-white"
                             )}
                           >
                             {cat}
@@ -366,8 +366,8 @@ const LibraryManager = () => {
                       <label 
                         htmlFor="pdf-upload"
                         className={cn(
-                          "w-full bg-slate-50 dark:bg-white/5 border-2 border-dashed rounded-[1.5rem] px-6 py-5 flex items-center gap-5 cursor-pointer transition-all shadow-inner",
-                          formData.pdfFile ? "border-teal-500/50 bg-teal-500/5" : "border-slate-200 dark:border-white/10 hover:border-teal-500/50"
+                          "w-full bg-slate-50 dark:bg-slate-800 border-2 border-dashed rounded-[1.5rem] px-6 py-5 flex items-center gap-5 cursor-pointer transition-all shadow-inner",
+                          formData.pdfFile ? "border-teal-500/50 bg-teal-500/5" : "border-slate-200 dark:border-slate-700 hover:border-teal-500/50"
                         )}
                       >
                         <div className={cn(
@@ -425,10 +425,10 @@ const LibraryManager = () => {
               <motion.div 
                 layout
                 key={book.id}
-                className="group bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200 dark:border-white/10 shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="group bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-2xl transition-all duration-500"
               >
                 <div className="flex items-start gap-6 mb-8">
-                  <div className="w-28 h-40 rounded-[2rem] overflow-hidden shadow-2xl flex-shrink-0 group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-500 border border-slate-100 dark:border-white/5">
+                  <div className="w-28 h-40 rounded-[2rem] overflow-hidden shadow-2xl flex-shrink-0 group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-500 border border-slate-100 dark:border-slate-800">
                     <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0 py-2">
@@ -442,12 +442,12 @@ const LibraryManager = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-50 dark:border-white/5">
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
                   <a 
                     href={book.pdfUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-3 py-4 bg-slate-50 dark:bg-white/5 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all group/btn shadow-inner"
+                    className="flex-1 flex items-center justify-center gap-3 py-4 bg-slate-50 dark:bg-slate-800 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all group/btn shadow-inner"
                   >
                     <FileText className="w-4 h-4 group-hover/btn:scale-110" /> Buka PDF
                   </a>
@@ -463,7 +463,7 @@ const LibraryManager = () => {
           </div>
 
           {books.length === 0 && !loading && (
-            <div className="py-24 text-center bg-slate-50 dark:bg-white/5 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-white/10">
+            <div className="py-24 text-center bg-slate-50 dark:bg-slate-900 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
               <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl">
                 <BookOpen className="w-12 h-12 text-slate-300" />
               </div>

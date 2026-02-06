@@ -52,28 +52,8 @@ const Library = () => {
 
   return (
     <div className="min-h-screen pt-24 pb-32 px-4 md:px-6 overflow-hidden">
-      {/* Hero Header */}
-      <div className="max-w-7xl mx-auto mb-16 relative">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-black uppercase tracking-[0.2em] mb-6">
-            <Sparkles className="w-3.5 h-3.5" /> Koleksi Digital
-          </div>
-          <h1 className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
-            Perpustakaan <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-indigo-500 italic">Digital</span>
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-lg md:text-xl font-medium leading-relaxed">
-            Perdalam pemahaman bahasa Arab Anda melalui koleksi e-book PDF pilihan yang telah disusun secara sistematis.
-          </p>
-        </motion.div>
+      {/* Hero Header Removed as per user request */}
 
-        {/* Decorative elements */}
-        <div className="absolute -top-10 -left-10 w-64 h-64 bg-teal-500/10 dark:bg-teal-500/5 rounded-full blur-3xl -z-10 animate-pulse"></div>
-        <div className="absolute -bottom-20 -right-10 w-72 h-72 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl -z-10 animate-pulse transition-all" style={{ animationDelay: '1s' }}></div>
-      </div>
 
       {/* Control Bar */}
       <div className="max-w-7xl mx-auto mb-12 flex flex-col lg:flex-row items-center gap-6">
@@ -83,7 +63,7 @@ const Library = () => {
           <input 
             type="text"
             placeholder="Cari judul buku..."
-            className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white outline-none focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/5 transition-all shadow-sm"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white outline-none focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/5 transition-all shadow-sm"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -99,7 +79,7 @@ const Library = () => {
                 "px-6 py-4 rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[10px] transition-all",
                 activeCategory === cat 
                   ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" 
-                  : "bg-white dark:bg-white/5 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-white/5"
+                  : "bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-slate-700"
               )}
             >
               {cat}
@@ -108,7 +88,7 @@ const Library = () => {
         </div>
 
         {/* View Switcher */}
-        <div className="flex bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
+        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
           <button 
             onClick={() => setViewMode('shelf')}
             className={cn("p-2 rounded-xl transition-all", viewMode === 'shelf' ? "bg-white dark:bg-slate-800 shadow-sm text-teal-500" : "text-slate-400")}
@@ -139,7 +119,7 @@ const Library = () => {
                 transition={{ delay: idx * 0.05 }}
                 className={cn(
                   "group relative",
-                  viewMode === 'shelf' ? "flex flex-col items-center" : "flex items-center bg-white dark:bg-slate-900/50 p-6 rounded-[2rem] border border-slate-200 dark:border-white/10"
+                  viewMode === 'shelf' ? "flex flex-col items-center" : "flex items-center bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-700"
                 )}
               >
                 {/* Book Representation */}
@@ -188,7 +168,7 @@ const Library = () => {
             ))}
           </div>
         ) : (
-          <div className="py-32 text-center bg-slate-50 dark:bg-white/5 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-white/10">
+          <div className="py-32 text-center bg-slate-50 dark:bg-slate-800 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
             <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl">
               <BookOpen className="w-12 h-12 text-slate-300" />
             </div>

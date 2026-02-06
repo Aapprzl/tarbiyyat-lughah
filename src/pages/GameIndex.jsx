@@ -71,7 +71,7 @@ const GameIndex = () => {
                 <Link 
                   to={category.isLocked ? '#' : `/materi/${category.id}`}
                   className={cn(
-                    "group block relative bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[3rem] p-8 h-full transition-all duration-500 overflow-hidden",
+                    "group block relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3rem] p-8 h-full transition-all duration-500 overflow-hidden",
                     category.isLocked 
                       ? "opacity-80 grayscale cursor-not-allowed" 
                       : "hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-2 hover:border-amber-500/30"
@@ -83,7 +83,7 @@ const GameIndex = () => {
                   <div className="relative z-10">
                      <div className={cn(
                         "w-16 h-16 rounded-[1.5rem] flex items-center justify-center mb-8 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12 shadow-lg",
-                        category.isLocked ? "bg-slate-200 dark:bg-white/5 text-slate-400" : "bg-amber-500 text-white shadow-amber-500/20"
+                        category.isLocked ? "bg-slate-200 dark:bg-slate-900 text-slate-400" : "bg-amber-500 text-white shadow-amber-500/20"
                      )}>
                         <IconComp className="w-8 h-8" />
                      </div>
@@ -99,7 +99,7 @@ const GameIndex = () => {
                      <div className="flex items-center justify-between mt-auto">
                         <div className="flex items-center gap-2">
                            {category.isLocked ? (
-                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 text-[9px] font-black uppercase tracking-widest border border-slate-200 dark:border-white/10">
+                              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-500 text-[9px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-800">
                                  <ShieldCheck className="w-2.5 h-2.5" /> Terkunci
                               </div>
                            ) : (
@@ -113,7 +113,7 @@ const GameIndex = () => {
                         </div>
                         
                         {!category.isLocked && (
-                           <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1">
+                           <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1">
                               <MoveRight className="w-5 h-5" />
                            </div>
                         )}
@@ -127,7 +127,7 @@ const GameIndex = () => {
       </div>
 
       {categories.length === 0 && (
-         <div className="text-center py-32 bg-white dark:bg-white/5 rounded-[4rem] border border-dashed border-slate-300 dark:border-white/10">
+         <div className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700">
             <Trophy className="w-20 h-20 text-slate-200 mx-auto mb-6" />
             <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Belum ada Permainan</h3>
             <p className="text-slate-500 font-medium">Instruktur sedang menyiapkan tantangan baru untukmu.</p>
@@ -142,7 +142,7 @@ const StatCard = ({ icon, label, value, color }) => {
     const IconComp = iconName ? (iconMap[iconName] || Trophy) : icon;
     
     return (
-        <div className="flex items-center gap-5 p-6 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-sm">
+        <div className="flex items-center gap-5 p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2.5rem] shadow-sm">
             <div className={cn(
                 "w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg",
                 color === 'amber' ? "bg-amber-500/10 text-amber-600 shadow-amber-500/5" :

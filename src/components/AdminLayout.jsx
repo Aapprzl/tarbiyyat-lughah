@@ -83,7 +83,7 @@ const AdminLayout = () => {
         <>
           <div className={cn(
               "w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-colors duration-500",
-              isActive ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500 group-hover:text-teal-400 group-hover:bg-teal-500/10"
+              isActive ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-teal-400 group-hover:bg-teal-500/10"
           )}>
             <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
           </div>
@@ -152,7 +152,7 @@ const AdminLayout = () => {
           
           <div className="pt-8 px-4">
              <Link to="/" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
-               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:bg-teal-500/10 transition-colors">
+               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-teal-500/10 transition-colors">
                   <Home className="w-4 h-4" />
                </div>
                <span className="text-xs font-bold uppercase tracking-widest">Lihat Beranda</span>
@@ -162,7 +162,7 @@ const AdminLayout = () => {
 
         {/* Footer Actions */}
         <div className="p-6 mt-auto">
-           <div className="bg-slate-50 dark:bg-white/5 rounded-3xl p-4 border border-slate-200 dark:border-white/5">
+           <div className="bg-slate-50 dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-white/5">
               <div className="flex items-center justify-between mb-4">
                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center">
@@ -172,7 +172,7 @@ const AdminLayout = () => {
                  </div>
                  <button 
                   onClick={toggleTheme}
-                  className="p-2 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-white/10 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
+                  className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-white/10 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
                  >
                    {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                  </button>

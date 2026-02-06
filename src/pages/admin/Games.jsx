@@ -224,19 +224,19 @@ const AdminGames = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     key={category.id} 
-                    className="bg-white dark:bg-white/5 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+                    className="bg-white dark:bg-slate-800 rounded-[3rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div 
                     className={cn(
                         "flex items-center justify-between px-8 py-6 cursor-pointer transition-colors group",
-                        isExpanded ? "bg-slate-50 dark:bg-white/5" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.02]"
+                        isExpanded ? "bg-slate-50 dark:bg-slate-700/50" : "hover:bg-slate-50/50 dark:hover:bg-slate-700/30"
                     )}
                     onClick={() => toggleCategory(category.id)}
                   >
                     <div className="flex items-center gap-6">
                       <div className={cn(
                           "w-14 h-14 rounded-[1.5rem] flex items-center justify-center transition-all group-hover:scale-110 shadow-lg",
-                          isExpanded ? "bg-amber-500 text-white shadow-amber-500/20" : "bg-white dark:bg-white/10 text-amber-600 border border-amber-500/20"
+                          isExpanded ? "bg-amber-500 text-white shadow-amber-500/20" : "bg-white dark:bg-slate-900 text-amber-600 border border-amber-500/20"
                       )}>
                         <IconComp className="w-6 h-6" />
                       </div>
@@ -261,27 +261,27 @@ const AdminGames = () => {
                                 "p-2.5 md:p-3 rounded-2xl transition-all border",
                                 category.isLocked 
                                   ? "text-amber-500 bg-amber-500/10 border-amber-500/20 shadow-sm" 
-                                  : "bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-amber-500 border-slate-100 dark:border-white/5"
+                                  : "bg-slate-50 dark:bg-slate-900 text-slate-400 hover:text-amber-500 border-slate-100 dark:border-slate-700"
                             )}
                          >
                             {category.isLocked ? <ShieldCheck className="w-4 h-4" /> : <DoorOpen className="w-4 h-4" />}
                          </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
-                            className="p-2.5 md:p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5"
+                            className="p-2.5 md:p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700"
                          >
                             <Edit2 className="w-4 h-4" />
                          </button>
                          <button 
                             onClick={(e) => { e.stopPropagation(); handleDeleteCategory(category.id); }}
-                            className="p-2.5 md:p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/5"
+                            className="p-2.5 md:p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700"
                          >
                             <Trash2 className="w-4 h-4" />
                          </button>
                       </div>
                       <div className={cn(
                           "w-10 h-10 rounded-full flex items-center justify-center transition-all shrink-0",
-                          isExpanded ? "bg-amber-500 text-white rotate-180 shadow-lg shadow-amber-500/20" : "bg-slate-100 dark:bg-white/5 text-slate-400"
+                          isExpanded ? "bg-amber-500 text-white rotate-180 shadow-lg shadow-amber-500/20" : "bg-slate-100 dark:bg-slate-900 text-slate-400"
                       )}>
                         <ChevronDown className="w-5 h-5" />
                       </div>
@@ -297,10 +297,10 @@ const AdminGames = () => {
                             className="overflow-hidden"
                         >
                           <div className="px-8 pb-8 pt-2">
-                          <div className="h-px bg-slate-200 dark:bg-white/5 mb-8"></div>
+                          <div className="h-px bg-slate-200 dark:bg-slate-700 mb-8"></div>
                           
                           {category.topics?.length === 0 ? (
-                            <div className="text-center py-12 bg-slate-50 dark:bg-black/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-white/5">
+                            <div className="text-center py-12 bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-slate-700">
                               <Diamond className="w-10 h-10 text-slate-300 mx-auto mb-4" />
                               <p className="text-slate-400 font-bold text-sm">Belum ada unit game yang ditambahkan.</p>
                             </div>
@@ -309,7 +309,7 @@ const AdminGames = () => {
                               {category.topics?.map(topic => (
                                 <div 
                                     key={topic.id} 
-                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 rounded-3xl md:rounded-[2rem] hover:border-amber-500/30 transition-all group/topic gap-4"
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-3xl md:rounded-[2rem] hover:border-amber-500/30 transition-all group/topic gap-4"
                                 >
                                   <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
                                      <div className={cn(

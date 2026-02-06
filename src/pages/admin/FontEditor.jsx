@@ -98,7 +98,7 @@ const FontEditor = () => {
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
+                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
             >
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
@@ -118,13 +118,13 @@ const FontEditor = () => {
                                 "p-6 rounded-[2rem] border-2 text-right transition-all group relative overflow-hidden",
                                 localConfig.fontFamily === font.name 
                                     ? "bg-teal-500 border-teal-500 text-white shadow-xl shadow-teal-500/20 scale-[1.02]" 
-                                    : "bg-white dark:bg-black/20 border-slate-100 dark:border-white/5 text-slate-400 hover:border-teal-500/30"
+                                    : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 hover:border-teal-500/30"
                             )}
                         >
                             <div className="flex flex-row-reverse justify-between items-start mb-4">
                                 <span className={cn(
                                     "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
-                                    localConfig.fontFamily === font.name ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-white/5 text-slate-500"
+                                    localConfig.fontFamily === font.name ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                 )}>
                                     {font.label}
                                 </span>
@@ -149,7 +149,7 @@ const FontEditor = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
+                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
             >
                 <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
@@ -167,7 +167,7 @@ const FontEditor = () => {
                                 "p-6 rounded-[2rem] border-2 transition-all group text-center",
                                 localConfig.latinFontFamily === font.name 
                                     ? "bg-blue-500 border-blue-500 text-white shadow-xl shadow-blue-500/20 scale-[1.05]" 
-                                    : "bg-white dark:bg-black/20 border-slate-100 dark:border-white/5 text-slate-400 hover:border-blue-500/30"
+                                    : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 hover:border-blue-500/30"
                             )}
                             style={{ fontFamily: font.name === 'System Default' ? 'sans-serif' : font.name }}
                         >
@@ -189,7 +189,7 @@ const FontEditor = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-white dark:bg-white/5 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-10"
+                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
             >
                 <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
                     <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
@@ -226,7 +226,7 @@ const FontEditor = () => {
                                 <select
                                     value={localConfig[field.id] || (field.id === 'mobileNavScale' ? '0.8' : 'text-lg')}
                                     onChange={(e) => setLocalConfig({ ...localConfig, [field.id]: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none appearance-none transition-all cursor-pointer"
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none appearance-none transition-all cursor-pointer"
                                 >
                                     {field.options.map(size => (
                                         <option key={size.value} value={size.value} className="bg-white dark:bg-slate-900">{size.label}</option>
@@ -244,7 +244,7 @@ const FontEditor = () => {
             <motion.div 
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-white/5 p-8 rounded-[3rem] border border-slate-200 dark:border-white/10 shadow-sm space-y-8 overflow-hidden relative"
+                className="bg-white dark:bg-slate-800 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-8 overflow-hidden relative"
                 style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}
             >
                 <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-3xl -mr-16 -mt-16"></div>
@@ -254,26 +254,26 @@ const FontEditor = () => {
                 </h2>
                 
                 <div className="space-y-8 relative">
-                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Judul {localConfig.titleSize}</p>
                         <p className={cn(localConfig.titleSize, "text-slate-900 dark:text-white leading-tight")} style={{ fontFamily: fontStyle }}>الدرس الأول</p>
                     </div>
                     
-                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Konten {localConfig.contentSize}</p>
                         <p className={cn(localConfig.contentSize, "text-slate-900 dark:text-white leading-relaxed dir-rtl arabic-content")} style={{ fontFamily: fontStyle }}>
                            التَّرْبِيَّةُ اللُّغَوِيَّةُ
                         </p>
                     </div>
                     
-                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Navigasi {localConfig.sidebarLinkSize}</p>
                         <p className={cn(localConfig.sidebarLinkSize, "text-slate-900 dark:text-white text-center")} style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
                            Beranda &nbsp; Materi &nbsp; Profil
                         </p>
                     </div>
 
-                    <div className="p-6 bg-slate-50 dark:bg-white/5 rounded-[2rem] border border-slate-100 dark:border-white/5 transition-all">
+                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
                         <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Latin Style</p>
                         <p className="text-xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
                             Tarbiyyat Al-Lughah
