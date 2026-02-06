@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Diamond, FolderPlus, FilePlus, Crosshair, CheckSquare, Sliders, Orbit, MoreVertical, X, ShieldCheck, DoorOpen, Gamepad } from 'lucide-react';
+import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Diamond, FolderPlus, FilePlus, Crosshair, CheckSquare, Sliders, Orbit, MoreVertical, X, ShieldCheck, DoorOpen, Gamepad as GamepadIcon } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -20,8 +20,8 @@ const iconMap = {
   ListChecks: CheckSquare, 
   Settings: Sliders, 
   Globe: Orbit,
-  PlayCircle: Gamepad,
-  Play: Gamepad
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon
 };
 
 const AdminPrograms = () => {

@@ -106,7 +106,7 @@ const HarakatGame = ({ data }) => {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#f97316', '#fb923c', '#fdba74']
+        colors: ['#0d9488', '#14b8a6', '#5eead4']
       });
 
       setTimeout(() => {
@@ -141,20 +141,20 @@ const HarakatGame = ({ data }) => {
   if (gameState === 'finished') {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-center shadow-xl border border-slate-200 dark:border-white/10 max-w-2xl mx-auto">
-        <div className="w-20 h-20 bg-orange-100 dark:bg-orange-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
-          <CheckCircle2 className="w-10 h-10 text-orange-500" />
+        <div className="w-20 h-20 bg-teal-100 dark:bg-teal-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+          <CheckCircle2 className="w-10 h-10 text-teal-500" />
         </div>
         <h2 className="text-3xl font-black text-slate-900 dark:text-white mb-2 uppercase tracking-tight">Misi Selesai!</h2>
         <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium">Luar biasa! Kamu telah melengkapi semua harakat dengan benar.</p>
         
         <div className="bg-slate-50 dark:bg-white/5 rounded-3xl p-6 mb-8 border border-slate-100 dark:border-white/5">
            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Skor Akhir</div>
-           <div className="text-5xl font-black text-orange-500">{score}/{questions.length}</div>
+           <div className="text-5xl font-black text-teal-500">{score}/{questions.length}</div>
         </div>
 
         <button 
           onClick={handleReset}
-          className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-orange-500/25 flex items-center justify-center gap-3 active:scale-95"
+          className="w-full py-4 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl font-black uppercase tracking-widest transition-all shadow-lg shadow-teal-500/25 flex items-center justify-center gap-3 active:scale-95"
         >
           <RefreshCcw className="w-5 h-5" /> Main Lagi
         </button>
@@ -166,7 +166,7 @@ const HarakatGame = ({ data }) => {
     <div className="max-w-4xl mx-auto">
       <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-white/10 flex flex-col overflow-hidden">
         {/* Animated Top Bar */}
-        <div className="h-2 bg-gradient-to-r from-orange-400 via-red-500 to-orange-400 animate-gradient-x" />
+        <div className="h-2 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-400 animate-gradient-x" />
 
         <div className={cn(
           "flex-1 p-6 md:p-10 transition-all duration-500",
@@ -175,13 +175,13 @@ const HarakatGame = ({ data }) => {
           {/* Header */}
           <div className="flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-white/5 p-4 md:p-8 gap-4 bg-slate-50/50 dark:bg-black/10">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl md:rounded-3xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+                <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-teal-400 to-teal-600 rounded-2xl md:rounded-3xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
                   <Keyboard className="w-6 h-6 md:w-8 md:h-8" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-0.5 md:mb-1">
                     <span className="text-[8px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Misi Harakat</span>
-                    <Sparkles className="w-2 md:w-3 h-2 md:h-3 text-orange-400" />
+                    <Sparkles className="w-2 md:w-3 h-2 md:h-3 text-teal-400" />
                   </div>
                   <h2 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                     Lengkapi Harakat
@@ -203,11 +203,11 @@ const HarakatGame = ({ data }) => {
 
             <div className="p-6 md:p-12">
               <div className="mb-8 md:mb-12 text-center max-w-xl mx-auto">
-                <div className="inline-block px-3 md:px-4 py-1.5 bg-orange-500/10 dark:bg-orange-500/20 rounded-full mb-3 md:mb-4">
-                  <span className="text-[8px] md:text-[10px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-[0.2em]">{data.category || 'Misi Utama'}</span>
+                <div className="inline-block px-3 md:px-4 py-1.5 bg-teal-500/10 dark:bg-teal-500/20 rounded-full mb-3 md:mb-4">
+                  <span className="text-[8px] md:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.2em]">{data.category || 'Misi Utama'}</span>
                 </div>
                 <h1 className="text-2xl md:text-5xl font-black text-slate-900 dark:text-white uppercase leading-tight tracking-tighter">
-                  Lengkapi <span className="text-orange-500 italic">Harakat</span>
+                  Lengkapi <span className="text-teal-500 italic">Harakat</span>
                 </h1>
               </div>
             {!showKeyboard && (
@@ -321,7 +321,7 @@ const HarakatGame = ({ data }) => {
               <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-3">
                 <div className="flex items-center justify-between mb-1">
                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                      <div className="w-1 px-0.5 h-3 bg-orange-500 rounded-full" />
+                      <div className="w-1 px-0.5 h-3 bg-teal-500 rounded-full" />
                       Arabic Keyboard
                    </div>
                    <button onClick={() => {

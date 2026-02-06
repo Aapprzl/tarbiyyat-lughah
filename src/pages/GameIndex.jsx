@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall } from 'lucide-react';
+import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
@@ -20,8 +20,8 @@ const iconMap = {
   ListChecks: CheckSquare, 
   Settings: Sliders, 
   Globe: Orbit, 
-  PlayCircle: Gamepad, 
-  Play: Gamepad, 
+  PlayCircle: GamepadIcon, 
+  Play: GamepadIcon, 
   Gamepad2: Trophy
 };
 
@@ -29,7 +29,7 @@ const getTypeInfo = (type) => {
     switch (type) {
         case 'matchup': return { label: 'Cocokkan', color: 'pink', icon: Shuffle, gradientItems: 'from-pink-500/10 to-rose-500/10' };
         case 'quiz': return { label: 'Kuis', color: 'emerald', icon: BrainCircuit, gradientItems: 'from-emerald-500/10 to-teal-500/10' };
-        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradientItems: 'from-orange-500/10 to-amber-500/10' }; // Keeping GripVertical as Tile metaphor
+        case 'anagram': return { label: 'Anagram', color: 'teal', icon: GripVertical, gradientItems: 'from-teal-500/10 to-emerald-500/10' }; // Keeping GripVertical as Tile metaphor
         case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: CaseSensitive, gradientItems: 'from-blue-500/10 to-indigo-500/10' };
         case 'unjumble': return { label: 'Susun', color: 'purple', icon: StretchHorizontal, gradientItems: 'from-purple-500/10 to-violet-500/10' };
         case 'spinwheel': return { label: 'Putar', color: 'indigo', icon: RefreshCcw, gradientItems: 'from-indigo-500/10 to-cyan-500/10' };
@@ -39,7 +39,7 @@ const getTypeInfo = (type) => {
         case 'vocab': return { label: 'Kosakata', color: 'slate', icon: Table, gradientItems: 'from-slate-500/10 to-gray-500/10' }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: BookOpen, gradientItems: 'from-teal-500/10 to-emerald-500/10' };
         case 'wordclassification': return { label: 'Pilahan', color: 'rose', icon: ALargeSmall, gradientItems: 'from-rose-500/10 to-pink-500/10' };
-        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Vibrate, gradientItems: 'from-orange-500/10 to-yellow-500/10' };
+        case 'harakat': return { label: 'Harakat', color: 'teal', icon: Vibrate, gradientItems: 'from-teal-500/10 to-emerald-500/10' };
         default: return { label: 'Materi', color: 'slate', icon: FileText, gradientItems: 'from-slate-500/10 to-gray-500/10' };
     }
 };
@@ -84,8 +84,8 @@ const GameIndex = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="relative">
-            <div className="w-20 h-20 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin"></div>
-            <Trophy className="absolute inset-0 m-auto w-8 h-8 text-amber-500 animate-pulse" />
+            <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
+            <Trophy className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
         </div>
       </div>
     );
@@ -96,8 +96,8 @@ const GameIndex = () => {
         
         {/* Header */}
         <div className="mb-20 text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-xs font-black uppercase tracking-widest mb-6">
-                <Gamepad className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-black uppercase tracking-widest mb-6">
+                <GamepadIcon className="w-4 h-4" />
                 Zona Permainan
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
@@ -119,7 +119,7 @@ const GameIndex = () => {
               <section key={category.id} className="relative">
                   {/* Category Header */}
                   <div className="flex items-center gap-6 mb-10">
-                      <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-amber-500/20 flex-shrink-0">
+                      <div className="w-16 h-16 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-teal-500/20 flex-shrink-0">
                           <IconComp className="w-8 h-8" />
                       </div>
                       <div>

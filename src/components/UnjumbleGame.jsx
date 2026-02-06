@@ -253,7 +253,7 @@ const UnjumbleGame = ({ data }) => {
                     {/* Hints & Actions */}
                     <div className="flex flex-col items-center gap-6">
                         {currentQ.clue && (
-                            <div className="flex items-center gap-2 text-amber-500 text-sm font-medium bg-amber-50 dark:bg-amber-900/10 px-4 py-2 rounded-full">
+                            <div className="flex items-center gap-2 text-teal-500 text-sm font-medium bg-teal-50 dark:bg-teal-900/10 px-4 py-2 rounded-full">
                                 <Lightbulb className="w-4 h-4" />
                                 <span>Tips: {currentQ.clue}</span>
                             </div>
@@ -289,7 +289,7 @@ const UnjumbleGame = ({ data }) => {
                    animate={{ opacity: 1, scale: 1 }}
                    className="flex-1 flex flex-col items-center justify-center p-8 text-center"
                 >
-                    <Trophy className="w-24 h-24 text-amber-500 mb-6 animate-bounce" />
+                    <Trophy className="w-24 h-24 text-teal-500 mb-6 animate-bounce" />
                     <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-2">Permainan Selesai!</h2>
                     <p className="text-slate-500 dark:text-slate-400 font-medium mb-8">Kamu berhasil menyelesaikan semua tantangan.</p>
                     

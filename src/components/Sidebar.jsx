@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { Library, Package, LineChart, Link2, ChevronDown, GraduationCap, ShieldCheck, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Compass, CircleUser, Medal, Hexagon, Layers, X, Gamepad } from 'lucide-react';
+import { Library, Package, LineChart, Link2, ChevronDown, GraduationCap, ShieldCheck, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Compass, CircleUser, Medal, Hexagon, Layers, X, Gamepad as GamepadIcon } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
@@ -16,8 +16,8 @@ const iconMap = {
   Layout: LayoutGrid, 
   Flag: Milestone, 
   Smile: Heart, 
-  PlayCircle: Gamepad, 
-  Play: Gamepad, 
+  PlayCircle: GamepadIcon, 
+  Play: GamepadIcon, 
   GraduationCap, 
   Award: Medal, 
   Hexagon, 

@@ -285,7 +285,7 @@ const WordClassificationGame = ({ data }) => {
                         <span className="block text-[7px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">Combo</span>
                         <span className={cn(
                             "text-lg md:text-2xl font-black font-mono transition-colors tracking-tighter tabular-nums",
-                            combo > 2 ? "text-amber-500 drop-shadow-[0_0_6px_rgba(245,158,11,0.3)]" : "text-slate-300 dark:text-slate-700"
+                            combo > 2 ? "text-teal-500 drop-shadow-[0_0_6px_rgba(20,184,166,0.3)]" : "text-slate-300 dark:text-slate-700"
                         )}>x{combo}</span>
                      </div>
                   </div>

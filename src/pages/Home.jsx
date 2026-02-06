@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad, Shield, Trophy } from 'lucide-react';
+import { Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
 import { VisionSection } from '../components/VisionSection';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
@@ -17,8 +17,8 @@ const iconMap = {
   Globe: Orbit, 
   Brain: Cpu, 
   Zap: Rocket, 
-  PlayCircle: Gamepad, 
-  Play: Gamepad, 
+  PlayCircle: GamepadIcon, 
+  Play: GamepadIcon, 
   Gamepad2: Trophy
 };
 
@@ -108,7 +108,7 @@ const Home = () => {
               {/* Animated Border Gradient */}
               <div className="absolute inset-0 rounded-2xl border-2 border-teal-500/30 group-hover:border-transparent transition-colors"></div>
               
-              <Gamepad className="w-5 h-5 relative z-10 text-teal-400 group-hover:text-white transition-colors group-hover:animate-bounce" />
+              <GamepadIcon className="w-5 h-5 relative z-10 text-teal-400 group-hover:text-white transition-colors group-hover:animate-bounce" />
               <span className="relative z-10 text-teal-100 group-hover:text-white transition-colors">Masuk Arena Game</span>
             </Link>
           </div>

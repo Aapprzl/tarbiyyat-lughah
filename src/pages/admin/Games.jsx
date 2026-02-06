@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, Diamond, FolderPlus, Crosshair, CheckSquare, Sliders, Orbit, X, ShieldCheck, DoorOpen, Trophy, Gamepad, PlayCircle } from 'lucide-react';
+import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, Diamond, FolderPlus, Crosshair, CheckSquare, Sliders, Orbit, X, ShieldCheck, DoorOpen, Trophy, Gamepad as GamepadIcon, PlayCircle } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -22,8 +22,8 @@ const iconMap = {
   Settings: Sliders, 
   Globe: Orbit, 
   Sparkles: Diamond,
-  PlayCircle: Gamepad,
-  Play: Gamepad
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon
 };
 
 const AdminGames = () => {
@@ -114,7 +114,7 @@ const AdminGames = () => {
 
   if (loading && categories.length === 0) return (
     <div className="py-24 text-center">
-        <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Memuat Data Permainan...</p>
     </div>
   );
@@ -124,7 +124,7 @@ const AdminGames = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-           <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
+           <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
               <Trophy className="w-3 h-3" /> Dashboard Edukasi
            </div>
            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Manajemen Game</h1>
@@ -133,7 +133,7 @@ const AdminGames = () => {
         
         <button 
           onClick={() => { setCategoryForm({ title: '', icon: 'Gamepad2', desc: '', isLocked: false }); setEditingCategoryId(null); setShowCategoryModal(true); }}
-          className="group flex items-center justify-center bg-amber-500 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-600 active:scale-95 transition-all"
+          className="group flex items-center justify-center bg-teal-500 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-teal-500/20 hover:bg-teal-600 active:scale-95 transition-all"
         >
           <Plus className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
           Buat Kategori Baru
@@ -159,7 +159,7 @@ const AdminGames = () => {
                   <div className="flex flex-col md:flex-row items-center gap-6 p-6 md:p-8">
                       {/* Icon */}
                       <div className={cn(
-                          "w-20 h-20 md:w-24 md:h-24 rounded-[2rem] flex items-center justify-center transition-all bg-amber-500 text-white shadow-xl shadow-amber-500/20 shrink-0"
+                          "w-20 h-20 md:w-24 md:h-24 rounded-[2rem] flex items-center justify-center transition-all bg-teal-500 text-white shadow-xl shadow-teal-500/20 shrink-0"
                       )}>
                         <IconComp className="w-8 h-8 md:w-10 md:h-10" />
                       </div>
@@ -174,7 +174,7 @@ const AdminGames = () => {
                                  {category.items?.length || 0} Konten
                              </div>
                              {category.isLocked && (
-                                 <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-3 py-1.5 rounded-full ring-1 ring-amber-500/20">
+                                 <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest bg-teal-500/10 text-teal-600 px-3 py-1.5 rounded-full ring-1 ring-teal-500/20">
                                      <ShieldCheck className="w-3 h-3" /> Terkunci
                                  </span>
                              )}
@@ -206,7 +206,7 @@ const AdminGames = () => {
                                 </button>
                                 <button 
                                     onClick={() => openEditCategory(category)}
-                                    className="p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
+                                    className="p-3 text-slate-400 hover:text-teal-500 hover:bg-teal-500/10 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
                                     title="Edit Info"
                                 >
                                     <Sliders className="w-5 h-5" />
@@ -237,7 +237,7 @@ const AdminGames = () => {
                     <div className="p-4 md:p-10 overflow-y-auto custom-scrollbar">
                         <div className="flex items-center justify-between mb-5 md:mb-10">
                           <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-                              <div className="w-9 h-9 md:w-12 md:h-12 bg-amber-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
+                              <div className="w-9 h-9 md:w-12 md:h-12 bg-teal-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-teal-600 shrink-0">
                                   <Plus className="w-4 h-4 md:w-6 md:h-6" />
                               </div>
                               <div className="min-w-0">
@@ -260,7 +260,7 @@ const AdminGames = () => {
                                         type="text" 
                                         value={categoryForm.title}
                                         onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none"
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
                                         placeholder="Contoh: Level 1"
                                         required
                                       />
@@ -271,7 +271,7 @@ const AdminGames = () => {
                                       <textarea 
                                         value={categoryForm.desc}
                                         onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
-                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none h-20 md:h-32 resize-none leading-relaxed"
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none h-20 md:h-32 resize-none leading-relaxed"
                                         placeholder="Deskripsi singkat..."
                                       />
                                     </div>
@@ -318,7 +318,7 @@ const AdminGames = () => {
                             </div>
   
                             <div className="pt-2 md:pt-4 border-t border-slate-100 dark:border-white/5">
-                              <button type="submit" className="w-full py-3 md:py-4 bg-amber-500 text-white rounded-xl md:rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95 text-[10px] md:text-sm">
+                              <button type="submit" className="w-full py-3 md:py-4 bg-teal-500 text-white rounded-xl md:rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-600 transition-all active:scale-95 text-[10px] md:text-sm">
                                   {editingCategoryId ? 'Simpan' : 'Buat'}
                               </button>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad } from 'lucide-react';
+import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad as GamepadIcon } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { useTheme } from './ThemeProvider';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -102,7 +102,7 @@ const Header = ({ minimal = false }) => {
 
              {!minimal && (
                <div className="flex flex-col">
-                  <span className={cn("font-bold leading-tight tracking-tight text-white group-hover:text-amber-300 transition-colors", siteConfig.headerTitleSize || 'text-xl')} style={{ fontFamily: 'var(--font-arabic), var(--font-latin)' }}>
+                  <span className={cn("font-bold leading-tight tracking-tight text-white group-hover:text-teal-200 transition-colors", siteConfig.headerTitleSize || 'text-xl')} style={{ fontFamily: 'var(--font-arabic), var(--font-latin)' }}>
                       {siteConfig.siteTitle || 'Bahasa Arab Praktis'}
                   </span>
                   <span className={cn("font-bold text-teal-100 uppercase tracking-widest leading-none mt-0.5 group-hover:text-white transition-colors", siteConfig.sidebarTitleSize || 'text-xs')} style={{ fontFamily: 'var(--font-latin)' }}>
@@ -130,7 +130,7 @@ const Header = ({ minimal = false }) => {
             {/* Theme Toggle */}
             <button 
               onClick={toggleTheme}
-              className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-amber-300 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
+              className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-teal-200 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
             >
               <AnimatePresence mode="wait">
                 {theme === 'light' ? (
@@ -209,7 +209,7 @@ const Header = ({ minimal = false }) => {
                               >
                                  <div className={cn(
                                     "w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform",
-                                    result.type === 'special' ? 'bg-amber-500/20 text-amber-500' : 'bg-teal-500/20 text-teal-500'
+                                    'bg-teal-500/20 text-teal-500'
                                  )}>
                                     <Icon className="w-7 h-7" />
                                  </div>

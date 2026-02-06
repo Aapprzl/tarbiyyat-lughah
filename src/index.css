@@ -6,7 +6,7 @@
   /* Vibrant Emerald & Amber Palette */
   --color-primary: #10b981; /* Emerald-500 */
   --color-primary-dark: #047857; /* Emerald-700 */
-  --color-secondary: #f59e0b; /* Amber-500 */
+  --color-secondary: #14b8a6; /* Teal-500 */
 
   /* Backgrounds */
   --color-bg-main: #fcfbf9; /* Warm Paper */
@@ -44,7 +44,7 @@
 [data-theme="dark"] {
   --color-primary: #34d399; /* Emerald-400 */
   --color-primary-dark: #10b981; /* Emerald-500 */
-  --color-secondary: #fbbf24; /* Amber-400 */
+  --color-secondary: #2dd4bf; /* Teal-400 */
 
   --color-bg-main: #131f24; /* Duolingo Midnight */
   --color-bg-sidebar: #202f36; /* Lighter Midnight */

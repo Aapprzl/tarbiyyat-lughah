@@ -164,14 +164,14 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-center shadow-2xl border-4 border-orange-500/20 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden"
+        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-center shadow-2xl border-4 border-teal-500/20 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-amber-500" />
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-emerald-500" />
         <motion.div 
           initial={{ rotate: -15, scale: 0.5 }}
           animate={{ rotate: 12, scale: 1 }}
           transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-          className="w-28 h-28 bg-gradient-to-br from-orange-500 to-amber-600 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-orange-500/20 transform"
+          className="w-28 h-28 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-teal-500/20 transform"
         >
            <Trophy className="w-14 h-14 text-white" />
         </motion.div>
@@ -182,8 +182,8 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
         </p>
         
         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] p-10 mb-10 border border-slate-100 dark:border-white/5 w-full max-w-sm shadow-inner group">
-            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 group-hover:text-orange-500 transition-colors">Total Poin</div>
-            <div className="text-7xl font-black text-orange-600 dark:text-orange-400 tracking-tighter tabular-nums">
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 group-hover:text-teal-500 transition-colors">Total Poin</div>
+            <div className="text-7xl font-black text-teal-600 dark:text-teal-400 tracking-tighter tabular-nums">
               {score}
             </div>
         </div>
@@ -209,18 +209,18 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
     <div className="w-full max-w-4xl mx-auto px-2 md:px-0 py-6">
       <div className="relative bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden select-none">
         {/* Decorative Top Bar */}
-        <div className="h-2 w-full bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600" />
+        <div className="h-2 w-full bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-600" />
 
         {/* Header Context */}
         <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800/50 gap-6 bg-slate-50/50 dark:bg-black/10">
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+            <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
               <Shuffle className="w-8 h-8" />
             </div>
             <div className="text-center md:text-left">
               <div className="flex items-center gap-2 mb-1 justify-center md:justify-start">
                  <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Misi Anagram</span>
-                 <Sparkles className="w-3 h-3 text-orange-500" />
+                 <Sparkles className="w-3 h-3 text-teal-500" />
               </div>
               <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
                 {title}
@@ -231,7 +231,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
           <div className="flex items-center gap-3">
             <button 
               onClick={toggleMute}
-              className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 text-slate-500 hover:text-orange-500 transition-colors"
+              className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 text-slate-500 hover:text-teal-500 transition-colors"
             >
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
@@ -246,7 +246,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
            <motion.div 
              initial={{ width: 0 }}
              animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
-             className="bg-gradient-to-r from-orange-400 to-amber-500 h-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+             className="bg-gradient-to-r from-teal-400 to-emerald-500 h-full shadow-[0_0_10px_rgba(20,184,166,0.5)]"
            />
         </div>
 
@@ -258,8 +258,8 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                animate={{ opacity: 1, y: 0 }}
                className="mb-12 text-center max-w-xl"
             >
-                <div className="inline-block px-4 py-1.5 bg-orange-500/10 dark:bg-orange-500/20 rounded-full mb-4">
-                  <span className="text-[10px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-[0.2em]">Petunjuk</span>
+                <div className="inline-block px-4 py-1.5 bg-teal-500/10 dark:bg-teal-500/20 rounded-full mb-4">
+                  <span className="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.2em]">Petunjuk</span>
                 </div>
                 <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white leading-relaxed">
                     {currentQuestion.clue || "Susun huruf menjadi kata yang benar"}
@@ -284,7 +284,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                                 letter 
                                     ? isCorrect 
                                         ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/30 scale-105' 
-                                        : 'bg-orange-50 dark:bg-orange-500/10 border-2 border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 shadow-lg'
+                                        : 'bg-teal-50 dark:bg-teal-500/10 border-2 border-teal-200 dark:border-teal-500/30 text-teal-600 dark:text-teal-400 shadow-lg'
                                     : 'bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 shadow-inner'
                             )}
                         >

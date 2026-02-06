@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music, Keyboard } from 'lucide-react';
+import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad as GamepadIcon, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music, Keyboard } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -22,7 +22,7 @@ const getTypeInfo = (type) => {
         case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle, gradient: 'from-pink-500 to-rose-600' };
         case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle, gradient: 'from-emerald-400 to-teal-600' };
 
-        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradient: 'from-orange-400 to-amber-600' };
+        case 'anagram': return { label: 'Anagram', color: 'teal', icon: GripVertical, gradient: 'from-teal-400 to-teal-600' };
         case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type, gradient: 'from-blue-400 to-indigo-600' };
         case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle, gradient: 'from-emerald-400 to-indigo-600' };
         case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw, gradient: 'from-indigo-500 to-purple-600' };
@@ -32,7 +32,7 @@ const getTypeInfo = (type) => {
         case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table, gradient: 'from-indigo-500 to-slate-800' }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: Type, gradient: 'from-teal-400 to-emerald-600' };
         case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle, gradient: 'from-rose-500 to-pink-600' };
-        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard, gradient: 'from-amber-400 to-orange-600' };
+        case 'harakat': return { label: 'Harakat', color: 'teal', icon: Keyboard, gradient: 'from-teal-400 to-emerald-600' };
         default: return { label: 'Materi', color: 'slate', icon: ClipboardList, gradient: 'from-slate-400 to-slate-600' };
     }
 };
@@ -177,7 +177,7 @@ const MaterialDetailContent = () => {
   if (loading) {
       return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
-            <div className="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mb-4"></div>
+            <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-800 border-t-teal-500 rounded-full animate-spin mb-4"></div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">
                 {targetItemId ? 'Memuat Permainan...' : 'Memuat Materi...'}
             </p>
@@ -223,18 +223,18 @@ const MaterialDetailContent = () => {
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-slate-900 rounded-[4rem] p-12 md:p-20 shadow-2xl border border-amber-500/20 relative overflow-hidden"
+                className="bg-white dark:bg-slate-900 rounded-[4rem] p-12 md:p-20 shadow-2xl border border-teal-500/20 relative overflow-hidden"
               >
                   {/* Decorative Elements */}
-                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl"></div>
+                  <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-500/10 rounded-full blur-3xl"></div>
                   <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl"></div>
                   
                   <div className="relative z-10">
-                      <div className="w-24 h-24 bg-gradient-to-br from-amber-400 to-amber-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-amber-500/30">
+                      <div className="w-24 h-24 bg-gradient-to-br from-teal-400 to-teal-600 text-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-xl shadow-teal-500/30">
                           <ShieldCheck className="w-12 h-12" />
                       </div>
                       
-                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+                      <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-500/10 text-teal-600 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
                           <Diamond className="w-3 h-3" />
                           Materi Belum Tersedia
                       </div>
@@ -244,7 +244,7 @@ const MaterialDetailContent = () => {
                       </h1>
                       
                       <p className="text-slate-500 dark:text-slate-400 text-lg font-medium max-w-md mx-auto leading-relaxed mb-12">
-                          Materi <span className="text-amber-600 font-bold">"{lockMeta?.title}"</span> sedang dalam tahap persiapan atau dijadwalkan untuk rilis mendatang.
+                          Materi <span className="text-teal-600 font-bold">"{lockMeta?.title}"</span> sedang dalam tahap persiapan atau dijadwalkan untuk rilis mendatang.
                       </p>
                       
                       <button 
@@ -304,82 +304,11 @@ const MaterialDetailContent = () => {
       {/* Navigation & Header */}
       <div className="relative mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
          {/* Breadcrumb */}
-         <nav className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.2em] text-slate-400 mb-8 px-4 md:px-0">
-            {isGame ? (
-                <>
-                  <Link to="/permainan" className="hover:text-amber-600 transition-colors">Permainan</Link>
-                  <ChevronRight className="w-3 h-3 opacity-30" />
-                  <span className="text-slate-600 dark:text-slate-200">{isCategoryView ? (topic?.title || 'Area Bermain') : (parentSection?.title || 'Game')}</span>
-                  {!isCategoryView && <ChevronRight className="w-3 h-3 opacity-30" />}
-                  {!isCategoryView && <span className="text-amber-600">{topic?.title}</span>}
-                </>
-            ) : (
-                <>
-                  <Link to="/materi" className="hover:text-teal-600 transition-colors">Materi</Link>
-                  <ChevronRight className="w-3 h-3 opacity-30" />
-                  <span className="text-slate-600 dark:text-slate-200">{parentSection?.title || 'Program'}</span>
-                  {!isCategoryView && <ChevronRight className="w-3 h-3 opacity-30" />}
-                  {!isCategoryView && <span className="text-teal-600">{topic?.title}</span>}
-                </>
-            )}
-         </nav>
 
-         {/* Hero Display - HIDDEN for Game Categories to keep it streamlined */}
-         {!isCategoryView && (
-            <div className={cn(
-                "relative bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl",
-                isGame && "border-amber-500/20"
-            )}>
-                <div className={cn(
-                    "absolute top-0 right-0 w-80 h-80 rounded-full blur-[100px] -mr-40 -mt-40",
-                    isGame ? "bg-amber-500/10" : "bg-teal-500/10"
-                )}></div>
-                
-                <div className="relative z-10 flex flex-col md:flex-row gap-10 items-start justify-between">
-                <div className="flex-1">
-                    <motion.div 
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className={cn(
-                            "w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg mb-8 text-white",
-                            isGame ? "bg-amber-500 shadow-amber-500/20" : "bg-teal-500 shadow-teal-500/20"
-                        )}
-                    >
-                        {isGame ? <Trophy className="w-7 h-7" /> : <Library className="w-7 h-7" />}
-                    </motion.div>
-                    <h1 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-[1.1] tracking-tight arabic-title">
-                        {topic?.title || 'Memuat Judul...'}
-                    </h1>
-                    {topic?.desc && (
-                        <p className="text-lg md:text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-2xl">
-                            {topic.desc}
-                        </p>
-                    )}
-                </div>
 
-                {contentService.isAuthenticated() && (
-                    <Link to={`/admin/edit/${topicId}`} className="group flex items-center gap-3 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:scale-105 active:scale-95">
-                        <Edit className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                        <span>Edit Konten</span>
-                    </Link>
-                )}
-                </div>
 
-                <div className="flex flex-wrap items-center gap-6 mt-12 pt-12 border-t border-slate-100 dark:border-slate-700">
-                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-                    <Clock className="w-4 h-4" />
-                    {isGame ? 'Tantangan Belajar' : 'Materi Terstruktur'}
-                    </div>
-                    <div className={cn(
-                        "flex items-center gap-2 text-xs font-bold uppercase tracking-widest",
-                        isGame ? "text-amber-500" : "text-teal-500"
-                    )}>
-                    <CircleCheckBig className="w-4 h-4" />
-                    Akses Terjamin
-                    </div>
-                </div>
-            </div>
-         )}
+
+
 
          {/* GAME CATEGORY TITLE - ONLY for streamlined Game View */}
          {isCategoryView && (
@@ -389,13 +318,13 @@ const MaterialDetailContent = () => {
                 className="px-4 md:px-0"
             >
                 <div className="flex items-center gap-5 mb-6">
-                    <div className="w-16 h-16 bg-amber-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-amber-500/20">
+                    <div className="w-16 h-16 bg-teal-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-teal-500/20">
                         <Trophy className="w-8 h-8" />
                     </div>
                     <div>
                         <div className="flex items-center gap-2 mb-1">
-                            <span className="text-[10px] font-black text-amber-600 uppercase tracking-[0.3em]">Permainan Bahasa Arab</span>
-                            <Diamond className="w-3 h-3 text-amber-500" />
+                            <span className="text-[10px] font-black text-teal-600 uppercase tracking-[0.3em]">Permainan Bahasa Arab</span>
+                            <Diamond className="w-3 h-3 text-teal-500" />
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
                             {topic?.title}
@@ -433,7 +362,7 @@ const MaterialDetailContent = () => {
                               <Link 
                                   key={item.id} 
                                   to={`/program/${topic.id}?item=${item.id}`} // Link to Focused Item
-                                  className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1"
+                                  className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-teal-500/10 hover:-translate-y-1"
                               >
                                   {/* Thumbnail Area */}
                                   <div className="aspect-square relative overflow-hidden">
@@ -464,8 +393,8 @@ const MaterialDetailContent = () => {
                                       
                                       {/* Play Overlay */}
                                       <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-amber-500 transform scale-50 group-hover:scale-100 transition-transform">
-                                                <Gamepad className="w-5 h-5 ml-1" />
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-teal-500 transform scale-50 group-hover:scale-100 transition-transform">
+                                                <GamepadIcon className="w-5 h-5 ml-1" />
                                             </div>
                                       </div>
                                   </div>
@@ -491,10 +420,10 @@ const MaterialDetailContent = () => {
         </motion.div>
       ) : !content ? (
         /* NO CONTENT FALLBACK */
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mx-4 md:mx-0 p-12 md:p-20 text-center bg-amber-50 dark:bg-amber-900/10 rounded-[3rem] border border-amber-100 dark:border-amber-900/30">
-          <AlertCircle className="w-16 h-16 text-amber-400 mx-auto mb-8" />
-          <h4 className="text-3xl font-black text-amber-900 dark:text-amber-100 mb-4 tracking-tight">Materi Sedang Disiapkan</h4>
-          <p className="text-lg text-amber-800/70 dark:text-amber-400/70 max-w-lg mx-auto leading-relaxed font-medium">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mx-4 md:mx-0 p-12 md:p-20 text-center bg-teal-50 dark:bg-teal-900/10 rounded-[3rem] border border-teal-100 dark:border-teal-900/30">
+          <AlertCircle className="w-16 h-16 text-teal-400 mx-auto mb-8" />
+          <h4 className="text-3xl font-black text-teal-900 dark:text-teal-100 mb-4 tracking-tight">Materi Sedang Disiapkan</h4>
+          <p className="text-lg text-teal-800/70 dark:text-teal-400/70 max-w-lg mx-auto leading-relaxed font-medium">
             Kami sedang meracik konten terbaik untuk modul ini. Silakan kunjungi kembali dalam waktu dekat atau hubungi instruktur Anda.
           </p>
         </motion.div>

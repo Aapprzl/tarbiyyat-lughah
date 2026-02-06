@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Telescope, Layers, ClipboardList, MoveRight, Diamond, FolderPlus, MoreVertical, ExternalLink, ShieldCheck, DoorOpen, X, Trophy, Gamepad } from 'lucide-react';
+import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Telescope, Layers, ClipboardList, MoveRight, Diamond, FolderPlus, MoreVertical, ExternalLink, ShieldCheck, DoorOpen, X, Trophy, Gamepad as GamepadIcon } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -18,8 +18,8 @@ const iconMap = {
   Layout: LayoutGrid, 
   Flag: Milestone, 
   Smile: Heart,
-  PlayCircle: Gamepad,
-  Play: Gamepad
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon
 };
 
 const AdminDashboard = () => {

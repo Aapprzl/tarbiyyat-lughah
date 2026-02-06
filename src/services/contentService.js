@@ -853,7 +853,7 @@ export const contentService = {
         description: 'Belajar mufradat, nahwu, dan shorof jadi lebih seru dengan berbagai tantangan interaktif. Siap untuk level berikutnya?'
       },
       stats: [
-        { icon: 'Gamepad2', label: 'Mode Bermain', value: 'Interaktif', color: 'amber' },
+        { icon: 'Gamepad2', label: 'Mode Bermain', value: 'Interaktif', color: 'teal' },
         { icon: 'Sparkles', label: 'Konten Baru', value: 'Mingguan', color: 'teal' },
         { icon: 'Trophy', label: 'Tantangan', value: 'Seru', color: 'indigo' }
       ]
