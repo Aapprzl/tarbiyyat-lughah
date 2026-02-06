@@ -24,6 +24,7 @@ const WordClassificationGame = ({ data }) => {
   const [combo, setCombo] = useState(0);
   const [feedback, setFeedback] = useState(null); // { type: 'correct' | 'wrong' }
   const [isMuted, setIsMuted] = useState(false);
+  const [isTimerActive, setIsTimerActive] = useState(false);
 
   useEffect(() => {
      const muted = window.localStorage.getItem('gameMuted') === 'true';
@@ -32,7 +33,7 @@ const WordClassificationGame = ({ data }) => {
   
   // Audio Refs
   const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-mask.mp3').replace('mask', 'preview')); // Fixing potential accidental mask
+  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
   const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
 
   const playSound = (soundRef) => {
@@ -72,7 +73,7 @@ const WordClassificationGame = ({ data }) => {
   // Timer Logic
   useEffect(() => {
     let timer;
-    if (gameState === 'playing' && timeLeft > 0) {
+    if (gameState === 'playing' && isTimerActive && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -94,6 +95,7 @@ const WordClassificationGame = ({ data }) => {
     setTimeLeft(data?.timeLimit || 60);
     setCombo(0);
     setCurrentQuestionIndex(0);
+    setIsTimerActive(false);
   };
 
   const handleFinish = () => {
@@ -112,6 +114,7 @@ const WordClassificationGame = ({ data }) => {
   const handleAnswer = (selectedType) => {
     if (!currentQuestion || feedback) return;
     playSound(clickSound);
+    if (!isTimerActive) setIsTimerActive(true);
 
     if (currentQuestion.type === selectedType) {
       // CORRECT
