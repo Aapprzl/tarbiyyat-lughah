@@ -100,91 +100,16 @@ const Home = () => {
               <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             </Link>
 
+            <Link 
+              to="/permainan" 
+              className="group relative px-10 py-5 rounded-2xl font-bold transition-all border-2 border-slate-200 dark:border-white/10 hover:border-teal-500 dark:hover:border-teal-400 text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-white/5"
+            >
+              <Gamepad className="w-5 h-5" />
+              <span>Masuk Arena Game</span>
+            </Link>
           </div>
         </motion.div>
       </AuroraBackground>
-
-
-      <div id="special-programs-section" className="container mx-auto px-4 max-w-6xl mb-12 scroll-mt-32">
-        <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.5 }}
-            className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16"
-        >
-          <div className="max-w-xl">
-             <div className="h-1.5 w-20 bg-amber-500 rounded-full mb-6"></div>
-             <h2 className="text-4xl md:text-6xl font-black text-slate-900 dark:text-white leading-[1.1] mb-6">
-                 {config.programsSectionTitle?.replace('Program', 'Game') || 'Area Permainan'}
-             </h2>
-             <p className="text-slate-600 dark:text-slate-400 text-lg font-medium leading-relaxed">
-                 Tantang kemampuan bahasa Arabmu dengan berbagai permainan interaktif yang seru dan menyenangkan.
-             </p>
-          </div>
-          <Link to="/permainan" className="hidden md:flex items-center gap-2 text-amber-600 font-bold hover:gap-4 transition-all pb-2 border-b-2 border-amber-500/20 hover:border-amber-500">
-              Masuk Arena Game <MoveRight className="w-5 h-5" />
-          </Link>
-        </motion.div>
-        
-        {/* Bento Grid Layout - Enhanced for Games */}
-        <BentoGrid>
-          {specialPrograms.map((prog, idx) => {
-             const Icon = iconMap[prog.icon] || Trophy;
-             return (
-                <div key={prog.id} className="md:col-span-1">
-                   {prog.isLocked ? (
-                      <div className="opacity-75 cursor-not-allowed h-full">
-                         <BentoGridItem
-                           title={prog.title}
-                           description="Game ini akan segera hadir. Saat ini akses masih terkunci."
-                           header={
-                             <div className="flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-slate-300 dark:bg-slate-800 grayscale items-center justify-center relative overflow-hidden">
-                                <div className="relative z-10 w-20 h-20 bg-white/10 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/20">
-                                    <ShieldCheck className="w-10 h-10" />
-                                </div>
-                                <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/20 backdrop-blur-md px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-white shadow-lg border border-white/10">
-                                   <ShieldCheck className="w-3 h-3" /> Terkunci
-                                </div>
-                             </div>
-                           }
-                         />
-                      </div>
-                   ) : (
-                      <Link to={`/permainan#${prog.id}`}>
-                         <BentoGridItem
-                           title={prog.title}
-                           description={prog.desc || 'Mainkan game ini untuk melatih kosakata dan pemahaman bahasa Arab secara interaktif.'}
-                           header={
-                             <div className={cn(
-                                "flex flex-1 w-full h-full min-h-[10rem] rounded-2xl bg-gradient-to-br transition-all group-hover/bento:scale-[1.02] items-center justify-center relative overflow-hidden shadow-lg",
-                                idx % 3 === 0 ? "from-amber-400 to-orange-500" : 
-                                idx % 3 === 1 ? "from-pink-500 to-rose-600" : 
-                                "from-indigo-500 to-blue-600"
-                             )}>
-                                <div className="relative z-10 w-20 h-20 bg-white/30 backdrop-blur-xl rounded-[1.5rem] flex items-center justify-center text-white shadow-2xl border border-white/40 transition-transform group-hover/bento:scale-110 duration-500">
-                                    <Icon className="w-10 h-10" />
-                                </div>
-                                
-                                {/* Dynamic Overlay */}
-                                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover/bento:opacity-100 transition-opacity duration-500"></div>
-                             </div>
-                           }
-                         />
-                      </Link>
-                   )}
-                </div>
-             );
-          })}
-        </BentoGrid>
-
-        {/* Mobile View More */}
-        <div className="md:hidden mt-12 flex justify-center">
-             <Link to="/permainan" className="bg-amber-500 text-white px-8 py-4 rounded-2xl font-bold flex items-center shadow-lg shadow-amber-500/20">
-                Semua Game <MoveRight className="ml-2 w-5 h-5" />
-             </Link>
-        </div>
-      </div>
 
       {/* Vision Section */}
       <VisionSection config={config} />

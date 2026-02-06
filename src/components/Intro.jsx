@@ -5,55 +5,30 @@ import { ArrowRight, Sun, Moon, Sparkles } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { cn } from '../utils/cn';
 
-const TypingText = ({ texts, speed = 80, wait = 2500 }) => {
-  const [displayText, setDisplayText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
+const FadeText = ({ texts, duration = 5000 }) => {
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (!texts || texts.length === 0) return;
-    
-    const currentFullText = texts[currentIndex];
-    
-    const timeout = setTimeout(() => {
-      if (!isDeleting) {
-        // Forward typing
-        const nextText = currentFullText.slice(0, displayText.length + 1);
-        setDisplayText(nextText);
-        
-        if (nextText === currentFullText) {
-          setTimeout(() => setIsDeleting(true), wait);
-        }
-      } else {
-        // Backward deleting
-        const nextText = currentFullText.slice(0, displayText.length - 1);
-        setDisplayText(nextText);
-        
-        if (nextText === '') {
-          setIsDeleting(false);
-          setCurrentIndex((prev) => (prev + 1) % texts.length);
-        }
-      }
-    }, isDeleting ? speed / 1.5 : speed);
-
-    return () => clearTimeout(timeout);
-  }, [displayText, isDeleting, currentIndex, texts, speed, wait]);
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % texts.length);
+    }, duration);
+    return () => clearInterval(interval);
+  }, [texts, duration]);
 
   return (
-    <div className="flex items-center justify-center min-h-[1.5em]">
-      <motion.span 
-        key={currentIndex} 
-        initial={{ opacity: 0.8 }}
-        animate={{ opacity: 1 }}
-        className="text-slate-500 dark:text-slate-400 font-medium inline-block"
-      >
-        {displayText}
-      </motion.span>
-      <motion.span 
-        animate={{ opacity: [0, 1, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity }}
-        className="inline-block ml-1 w-0.5 h-5 bg-teal-500"
-      />
+    <div className="flex items-center justify-center min-h-[3em]">
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={index}
+          initial={{ opacity: 0, y: 10, filter: 'blur(5px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
+          transition={{ duration: 0.8, ease: "easeInOut" }}
+          className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl text-center px-4"
+        >
+          {texts[index]}
+        </motion.p>
+      </AnimatePresence>
     </div>
   );
 };
@@ -199,9 +174,9 @@ const Intro = ({ onEnter, config, homeConfig }) => {
               <span className="w-8 h-px bg-slate-200 dark:bg-white/5" />
             </motion.p>
             
-            {/* Animated Description (Typing) */}
-            <div className="h-16 mb-16 px-4">
-              <TypingText texts={introData.typingTexts} />
+            {/* Animated Description (Fade) */}
+            <div className="h-20 mb-12 flex items-center justify-center">
+              <FadeText texts={introData.typingTexts} />
             </div>
 
             {/* Enter Button */}
