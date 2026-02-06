@@ -39,6 +39,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'completesentence': return { icon: Type, label: 'Lengkapi Kalimat', color: 'text-blue-600', bg: 'bg-blue-50' };
             case 'unjumble': return { icon: MoveLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
             case 'spinwheel': return { icon: RefreshCcw, label: 'Spin Wheel', color: 'text-pink-600', bg: 'bg-pink-50' };
+            case 'wordclassification': return { icon: Puzzle, label: 'Tebak Kata', color: 'text-rose-600', bg: 'bg-rose-50' };
             default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
         }
     };
@@ -839,6 +840,104 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                   <div className="p-4 bg-pink-500/5 rounded-2xl flex items-center gap-3">
                      <AlertCircle className="w-5 h-5 text-pink-500 flex-shrink-0" />
                      <p className="text-[10px] font-medium text-pink-600 dark:text-pink-400">Roda ini dapat digunakan untuk menentukan kuis atau aktivitas secara acak di kelas.</p>
+                  </div>
+                </div>
+              )}
+
+              {/* --- WORD CLASSIFICATION BLOCK --- */}
+              {block.type === 'wordclassification' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Permainan</label>
+                       <input 
+                          type="text" 
+                          placeholder="Judul Game..."
+                          className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none"
+                          value={block.data.title || ''}
+                          onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Durasi Waktu (Detik)</label>
+                       <div className="flex items-center gap-2 border-b border-slate-200 dark:border-white/10 pb-2">
+                          <input 
+                             type="number" 
+                             min="10"
+                             max="300"
+                             className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent outline-none"
+                             value={block.data.timeLimit || 60}
+                             onChange={(e) => onUpdate({ ...block.data, timeLimit: parseInt(e.target.value) || 60 })}
+                          />
+                          <span className="text-xs font-bold text-slate-400 uppercase">Detik</span>
+                       </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-slate-50 dark:bg-white/5 p-6 rounded-[2rem] border border-slate-200 dark:border-white/10 space-y-4">
+                     <div className="flex justify-between items-center mb-2">
+                         <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest">Daftar Kata</label>
+                         <span className="text-[10px] font-bold text-slate-400">{block.data.questions?.length || 0} Kata</span>
+                     </div>
+                     
+                     {block.data.questions?.map((item, idx) => (
+                        <div key={idx} className="bg-white dark:bg-black/20 p-4 rounded-2xl border border-slate-200 dark:border-white/5 space-y-3">
+                           <div className="flex items-center gap-3">
+                               <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black text-xs">
+                                  {idx + 1}
+                               </div>
+                               <input 
+                                  type="text"
+                                  className="flex-1 bg-transparent text-lg font-bold outline-none font-arabic dir-rtl text-right placeholder-slate-300"
+                                  placeholder="Kata Arab..."
+                                  value={item.text}
+                                  onChange={(e) => {
+                                     const newQs = [...(block.data.questions || [])];
+                                     newQs[idx].text = e.target.value;
+                                     onUpdate({ ...block.data, questions: newQs });
+                                  }}
+                               />
+                               <button 
+                                 onClick={() => {
+                                     const newQs = block.data.questions.filter((_, i) => i !== idx);
+                                     onUpdate({ ...block.data, questions: newQs });
+                                 }}
+                                 className="text-slate-400 hover:text-red-500 p-2 bg-slate-50 dark:bg-white/5 rounded-full"
+                               >
+                                 <Trash2 className="w-4 h-4" />
+                               </button>
+                           </div>
+                           
+                           {/* Type Selection */}
+                           <div className="flex gap-2">
+                               {['isim', 'fiil', 'harf'].map(type => (
+                                   <button
+                                     key={type}
+                                     onClick={() => {
+                                         const newQs = [...(block.data.questions || [])];
+                                         newQs[idx].type = type;
+                                         onUpdate({ ...block.data, questions: newQs });
+                                     }}
+                                     className={cn(
+                                         "flex-1 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                         item.type === type 
+                                            ? (type === 'isim' ? "bg-cyan-500 text-white" : type === 'fiil' ? "bg-pink-500 text-white" : "bg-emerald-500 text-white")
+                                            : "bg-slate-100 dark:bg-white/10 text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20"
+                                     )}
+                                   >
+                                      {type === 'isim' ? 'Isim (Benda)' : type === 'fiil' ? "Fi'il (Kerja)" : 'Harf (Huruf)'}
+                                   </button>
+                               ))}
+                           </div>
+                        </div>
+                     ))}
+
+                     <button 
+                        onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), text: '', type: 'isim' }] })}
+                        className="w-full py-4 bg-white dark:bg-white/5 border-2 border-dashed border-rose-200 dark:border-rose-500/20 rounded-2xl text-xs font-black uppercase tracking-widest text-rose-400 hover:border-rose-500 hover:text-rose-500 transition-all"
+                     >
+                        + Tambah Kata Baru
+                     </button>
                   </div>
                 </div>
               )}

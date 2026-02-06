@@ -3,6 +3,18 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown';
 import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music } from 'lucide-react';
 import { contentService } from '../services/contentService';
+import PdfViewer from '../components/PdfViewer';
+import AudioPlayer from '../components/AudioPlayer';
+import MatchUpGame from '../components/MatchUpGame';
+import QuizGame from '../components/QuizGame';
+import FlashCardGame from '../components/FlashCardGame';
+import AnagramGame from '../components/AnagramGame';
+import CompleteSentenceGame from '../components/CompleteSentenceGame';
+import UnjumbleGame from '../components/UnjumbleGame';
+import SpinWheelGame from '../components/SpinWheelGame';
+import WordClassificationGame from '../components/games/WordClassificationGame';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '../utils/cn';
 
 const getTypeInfo = (type) => {
     switch (type) {
@@ -18,20 +30,10 @@ const getTypeInfo = (type) => {
         case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList };
         case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
+        case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle };
         default: return { label: 'Materi', color: 'slate', icon: ClipboardList };
     }
 };
-import PdfViewer from '../components/PdfViewer';
-import AudioPlayer from '../components/AudioPlayer';
-import MatchUpGame from '../components/MatchUpGame';
-import QuizGame from '../components/QuizGame';
-import FlashCardGame from '../components/FlashCardGame';
-import AnagramGame from '../components/AnagramGame';
-import CompleteSentenceGame from '../components/CompleteSentenceGame';
-import UnjumbleGame from '../components/UnjumbleGame';
-import SpinWheelGame from '../components/SpinWheelGame';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
 
 // Simple Error Boundary
 class ErrorBoundary extends React.Component {
@@ -647,6 +649,8 @@ const ContentBlock = ({ block }) => {
             return <UnjumbleGame questions={block.data?.questions} title={block.data?.title} />;
         case 'spinwheel':
             return <SpinWheelGame items={block.data?.items} title={block.data?.title} />;
+        case 'wordclassification':
+            return <WordClassificationGame data={block.data} />;
         default:
             return null;
     }

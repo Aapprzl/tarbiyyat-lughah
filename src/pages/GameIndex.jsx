@@ -39,6 +39,7 @@ const getTypeInfo = (type) => {
         case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList };
         case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
+        case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle };
         default: return { label: 'Materi', color: 'slate', icon: FileText };
     }
 };
