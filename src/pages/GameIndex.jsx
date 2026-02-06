@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon } from 'lucide-react';
+import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
@@ -40,12 +40,12 @@ const getTypeInfo = (type) => {
         case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
         case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle };
+        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard };
         default: return { label: 'Materi', color: 'slate', icon: FileText };
     }
 };
 
 // Fallback Icons
-import { RefreshCcw, Type, Table, FileText } from 'lucide-react';
 
 const GameIndex = () => {
   const [categories, setCategories] = useState([]);

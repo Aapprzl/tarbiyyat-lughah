@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music } from 'lucide-react';
+import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music, Keyboard } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
@@ -13,6 +13,7 @@ import CompleteSentenceGame from '../components/CompleteSentenceGame';
 import UnjumbleGame from '../components/UnjumbleGame';
 import SpinWheelGame from '../components/SpinWheelGame';
 import WordClassificationGame from '../components/games/WordClassificationGame';
+import HarakatGame from '../components/games/HarakatGame';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -31,6 +32,7 @@ const getTypeInfo = (type) => {
         case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
         case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
         case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle };
+        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard };
         default: return { label: 'Materi', color: 'slate', icon: ClipboardList };
     }
 };
@@ -651,6 +653,8 @@ const ContentBlock = ({ block }) => {
             return <SpinWheelGame items={block.data?.items} title={block.data?.title} />;
         case 'wordclassification':
             return <WordClassificationGame data={block.data} />;
+        case 'harakat':
+            return <HarakatGame data={block.data} />;
         default:
             return null;
     }

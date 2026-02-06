@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard } from 'lucide-react';
 import PdfViewer from '../../components/PdfViewer';
 import AudioPlayer from '../../components/AudioPlayer';
 import MatchUpGame from '../../components/MatchUpGame';
@@ -181,6 +181,7 @@ const LessonEditor = () => {
             : type === 'unjumble' ? { title: 'Susun Kalimat', subtitle: 'Susunlah Kalimat Arab', questions: [{ id: 1, text: '', pattern: 'Kerja + Pelaku + Objek', clue: '' }] }
             : type === 'spinwheel' ? { title: 'Spin the Wheel', items: [{ id: 1, text: '' }, { id: 2, text: '' }] }
             : type === 'wordclassification' ? { title: 'Tebak Jenis Kata', timeLimit: 60, questions: [{ id: 1, text: 'كتاب', type: 'isim' }] }
+            : type === 'harakat' ? { title: 'Lengkapi Harakat', subtitle: 'Lengkapi harakat pada kata berikut...', questions: [{ id: 1, text: 'يَأْكُلُ' }] }
             : { title: '', content: '' }
     };
 
@@ -450,6 +451,7 @@ const LessonEditor = () => {
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Susun Kata" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
                                <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordclassification')} icon={Puzzle} label="Tebak Kata" color="text-rose-600" bg="bg-rose-50 dark:bg-rose-500/10" />
+                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'harakat')} icon={Keyboard} label="Harakat" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
                           </div>
                       </div>
                   </div>
