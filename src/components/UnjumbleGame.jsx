@@ -17,8 +17,8 @@ const UnjumbleGame = ({ data }) => {
   const [isMuted, setIsMuted] = useState(false);
 
   // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2003/2003-preview.mp3'));
+  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
+  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
   const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
 
   useEffect(() => {
@@ -119,14 +119,20 @@ const UnjumbleGame = ({ data }) => {
   };
 
   const handleReset = () => {
+      playSound(clickSound);
       loadQuestion(currentQuestionIndex);
   };
 
   const toggleMute = () => {
       const newState = !isMuted;
       setIsMuted(newState);
-      if (newState) window.localStorage.setItem('gameMuted', 'true');
-      else window.localStorage.removeItem('gameMuted');
+      if (newState) {
+          window.localStorage.setItem('gameMuted', 'true');
+      } else {
+          window.localStorage.removeItem('gameMuted');
+          clickSound.current.currentTime = 0;
+          clickSound.current.play().catch(() => {});
+      }
   };
 
   if (!data || questions.length === 0) return null;
@@ -262,8 +268,11 @@ const UnjumbleGame = ({ data }) => {
                                 <RotateCcw className="w-5 h-5" />
                             </button>
                             <button 
-                               onClick={checkAnswer}
-                               disabled={selectedWords.length === 0}
+                                onClick={() => {
+                                    playSound(clickSound);
+                                    checkAnswer();
+                                }}
+                                disabled={selectedWords.length === 0}
                                className="px-10 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                                 <Check className="w-5 h-5" /> Cek Jawaban

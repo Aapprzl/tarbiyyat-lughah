@@ -1,5 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCcw, Check, HelpCircle, Shuffle } from 'lucide-react';
+import { 
+  RotateCcw, 
+  Check, 
+  HelpCircle, 
+  Shuffle, 
+  Sparkles, 
+  MoveRight, 
+  Trophy,
+  RefreshCcw,
+  Undo2,
+  Volume2,
+  VolumeX
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useRef } from 'react';
+import { cn } from '../utils/cn';
+import confetti from 'canvas-confetti';
 
 const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -9,6 +25,17 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [score, setScore] = useState(0);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    const muted = window.localStorage.getItem('gameMuted') === 'true';
+    setIsMuted(muted);
+  }, []);
+
+  // Audio Refs
+  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
+  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
+  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
 
   useEffect(() => {
     if (questions && questions.length > 0) {
@@ -16,21 +43,46 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
     }
   }, [questions]);
 
+  const playSound = (soundRef) => {
+    if (isMuted) return;
+    soundRef.current.currentTime = 0;
+    soundRef.current.play().catch(() => {});
+  }
+
+  const toggleMute = () => {
+    const newState = !isMuted;
+    setIsMuted(newState);
+    window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
+    if (!newState) {
+      clickSound.current.currentTime = 0;
+      clickSound.current.play().catch(() => {});
+    }
+  };
+
   // Helper to detect Arabic
-  const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
+  const isArabic = (text) => text && /[\u0600-\u06FF]/.test(text);
 
   const loadQuestion = (index) => {
     if (index >= questions.length) {
       setShowCelebration(true);
+      if (score >= (questions.length * 10) * 0.7) {
+        playSound(successSound);
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#0d9488', '#14b8a6', '#5eead4']
+        });
+      }
       return;
     }
     const q = questions[index];
-    // Allow all chars, just remove spaces. uppercase is fine for latin, no-op for arabic
     const answer = q.answer.replace(/\s/g, '').toUpperCase(); 
-    const letters = answer.split('').map((char, i) => ({ id: i, char }));
+    const letters = answer.split('').map((char, i) => ({ id: `${index}-${i}`, char }));
     
     // Scramble
     let scrambled = [...letters].sort(() => Math.random() - 0.5);
+    // Ensure it's actually scrambled
     if (scrambled.map(l => l.char).join('') === answer && answer.length > 1) {
        scrambled = [...letters].sort(() => Math.random() - 0.5);
     }
@@ -44,6 +96,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
 
   const handleLetterClick = (letter, source) => {
     if (isCorrect) return;
+    playSound(clickSound);
 
     if (source === 'pool') {
       const firstEmptyIndex = selectedLetters.findIndex(l => l === null);
@@ -62,7 +115,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
       if (index !== -1) {
         newSelected[index] = null;
         setSelectedLetters(newSelected);
-        setScrambledLetters([...scrambledLetters, letter]);
+        setScrambledLetters(prev => [...prev, letter]);
       }
     }
   };
@@ -75,148 +128,262 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
 
     if (userAnswer === correctAnswer) {
       setIsCorrect(true);
+      playSound(successSound);
+    } else {
+      playSound(errorSound);
     }
   };
 
   const handleNext = () => {
+    playSound(clickSound);
     setScore(s => s + 10);
     loadQuestion(currentIndex + 1);
   };
 
   const handleReset = () => {
+     playSound(clickSound);
      if (!currentQuestion) return;
      const answer = currentQuestion.answer.replace(/\s/g, '').toUpperCase();
-     const letters = answer.split('').map((char, i) => ({ id: i, char }));
+     const letters = answer.split('').map((char, i) => ({ id: `${currentIndex}-${i}`, char }));
      setScrambledLetters(letters.sort(() => Math.random() - 0.5));
      setSelectedLetters(Array(answer.length).fill(null));
      setIsCorrect(false);
   };
 
   if (!questions || questions.length === 0) {
-     return <div className="text-center p-4 text-gray-500">Belum ada pertanyaan anagram.</div>;
+     return (
+        <div className="p-12 text-center bg-white/50 dark:bg-slate-800/50 backdrop-blur-lg rounded-[2.5rem] border-4 border-dashed border-slate-200 dark:border-slate-700">
+          <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Belum ada pertanyaan anagram.</p>
+        </div>
+     );
   }
 
   if (showCelebration) {
-      return (
-          <div className="bg-[var(--color-bg-card)] p-8 rounded-xl border border-[var(--color-border)] text-center">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-4xl">🏆</span>
-              </div>
-              <h3 className="text-2xl font-bold text-[var(--color-text-main)] mb-2">Selamat!</h3>
-              <p className="text-[var(--color-text-muted)] mb-6">Kamu telah menyelesaikan semua kata!</p>
-              <div className="font-bold text-lg text-teal-600 mb-6">Skor Akhir: {score}</div>
-              <button 
-                  onClick={() => {
-                      setScore(0);
-                      setShowCelebration(false);
-                      loadQuestion(0);
-                  }}
-                  className="px-6 py-2 bg-teal-600 text-white rounded-lg font-bold hover:bg-teal-700 transition"
-              >
-                  Main Lagi
-              </button>
-          </div>
-      );
+    return (
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white dark:bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-center shadow-2xl border-4 border-orange-500/20 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden"
+      >
+        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-orange-400 to-amber-500" />
+        <motion.div 
+          initial={{ rotate: -15, scale: 0.5 }}
+          animate={{ rotate: 12, scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+          className="w-28 h-28 bg-gradient-to-br from-orange-500 to-amber-600 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-orange-500/20 transform"
+        >
+           <Trophy className="w-14 h-14 text-white" />
+        </motion.div>
+        
+        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">Luar Biasa! 🎉</h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-10 font-medium text-lg leading-relaxed">
+          Kamu telah berhasil menyusun semua kata dengan sempurna!
+        </p>
+        
+        <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] p-10 mb-10 border border-slate-100 dark:border-white/5 w-full max-w-sm shadow-inner group">
+            <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 group-hover:text-orange-500 transition-colors">Total Poin</div>
+            <div className="text-7xl font-black text-orange-600 dark:text-orange-400 tracking-tighter tabular-nums">
+              {score}
+            </div>
+        </div>
+
+        <button 
+          onClick={() => {
+            setScore(0);
+            setShowCelebration(false);
+            loadQuestion(0);
+          }}
+          className="w-full max-w-sm py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 overflow-hidden group"
+        >
+          <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
+          <span>Main Lagi</span>
+        </button>
+      </motion.div>
+    );
   }
 
-  if (!currentQuestion) return <div>Loading...</div>;
+  if (!currentQuestion) return null;
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden">
-        {/* Header */}
-        <div className="bg-[var(--color-bg-muted)] px-6 py-4 flex justify-between items-center border-b border-[var(--color-border)]">
-            <div className="flex items-center gap-2">
-                <Shuffle className="w-5 h-5 text-orange-500" />
-                <span className="font-bold text-[var(--color-text-main)]">{title}</span>
+    <div className="w-full max-w-4xl mx-auto px-2 md:px-0 py-6">
+      <div className="relative bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden select-none">
+        {/* Decorative Top Bar */}
+        <div className="h-2 w-full bg-gradient-to-r from-orange-400 via-amber-500 to-orange-600" />
+
+        {/* Header Context */}
+        <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800/50 gap-6 bg-slate-50/50 dark:bg-black/10">
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-orange-500/30">
+              <Shuffle className="w-8 h-8" />
             </div>
-            <div className="text-xs font-bold text-[var(--color-text-muted)] bg-[var(--color-bg-main)] px-3 py-1 rounded-full border border-[var(--color-border)]">
-                {currentIndex + 1} / {questions.length}
+            <div className="text-center md:text-left">
+              <div className="flex items-center gap-2 mb-1 justify-center md:justify-start">
+                 <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em]">Misi Anagram</span>
+                 <Sparkles className="w-3 h-3 text-orange-500" />
+              </div>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">
+                {title}
+              </h2>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={toggleMute}
+              className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 text-slate-500 hover:text-orange-500 transition-colors"
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+            <div className="px-6 py-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 font-black text-xs text-slate-500 uppercase tracking-widest">
+               Kata {currentIndex + 1} <span className="text-slate-300 mx-1">/</span> {questions.length}
+            </div>
+          </div>
         </div>
 
-        {/* Game Area */}
-        <div className="p-6 md:p-10 flex flex-col items-center">
-            
-            {/* Clue */}
-            <div className="mb-8 text-center">
-                <span className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-widest mb-2 block">Petunjuk</span>
-                <p className="text-lg md:text-xl font-medium text-[var(--color-text-main)]">
-                    {currentQuestion.clue || "Susun huruf menjadi kata yang benar"}
-                </p>
-            </div>
+        {/* Progress Bar */}
+        <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 overflow-hidden">
+           <motion.div 
+             initial={{ width: 0 }}
+             animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+             className="bg-gradient-to-r from-orange-400 to-amber-500 h-full shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+           />
+        </div>
 
-            {/* Slots (Answer Area) */}
-            <div className={`flex flex-wrap gap-2 justify-center mb-12 min-h-[64px] ${currentQuestion && isArabic(currentQuestion.answer) ? 'flex-row-reverse' : ''}`}>
+        <div className="p-8 md:p-14 flex flex-col items-center">
+            
+            {/* Clue Area */}
+            <motion.div 
+               initial={{ opacity: 0, y: -10 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="mb-12 text-center max-w-xl"
+            >
+                <div className="inline-block px-4 py-1.5 bg-orange-500/10 dark:bg-orange-500/20 rounded-full mb-4">
+                  <span className="text-[10px] font-black text-orange-600 dark:text-orange-400 uppercase tracking-[0.2em]">Petunjuk</span>
+                </div>
+                <h3 className="text-xl md:text-3xl font-bold text-slate-800 dark:text-white leading-relaxed">
+                    {currentQuestion.clue || "Susun huruf menjadi kata yang benar"}
+                </h3>
+            </motion.div>
+
+            {/* Answer Slots */}
+            <div 
+               className={cn(
+                  "flex flex-wrap gap-2 md:gap-4 justify-center mb-10 md:mb-16 min-h-[60px] md:min-h-[80px] w-full",
+                  isArabic(currentQuestion.answer) ? 'flex-row-reverse' : ''
+               )}
+            >
                 {selectedLetters.map((letter, idx) => (
-                    <button
-                        key={idx}
-                        onClick={() => letter && handleLetterClick(letter, 'slot')}
-                        disabled={!letter || isCorrect}
-                        className={`w-12 h-14 md:w-14 md:h-16 rounded-lg text-2xl font-bold flex items-center justify-center border-b-4 transition-all
-                            ${letter 
-                                ? isCorrect 
-                                    ? 'bg-green-500 border-green-700 text-white transform scale-110 shadow-lg' 
-                                    : 'bg-orange-100 border-orange-300 text-orange-800 hover:bg-orange-200'
-                                : 'bg-[var(--color-bg-muted)] border-[var(--color-border)] border-dashed border-2'
-                            }
-                            ${letter && isArabic(letter.char) ? 'font-arabic' : ''}
-                        `}
-                    >
-                        {letter ? letter.char : ''}
-                    </button>
+                    <div key={`slot-${idx}`} className="relative">
+                        <motion.button
+                            onClick={() => letter && handleLetterClick(letter, 'slot')}
+                            disabled={!letter || isCorrect}
+                            layoutId={letter ? letter.id : `empty-${idx}`}
+                            className={cn(
+                                "w-[clamp(3rem,11vw,4rem)] h-[clamp(3.5rem,14vw,5rem)] rounded-xl md:rounded-2xl text-xl md:text-3xl font-black flex items-center justify-center transition-all duration-300",
+                                letter 
+                                    ? isCorrect 
+                                        ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-500/30 scale-105' 
+                                        : 'bg-orange-50 dark:bg-orange-500/10 border-2 border-orange-200 dark:border-orange-500/30 text-orange-600 dark:text-orange-400 shadow-lg'
+                                    : 'bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 shadow-inner'
+                            )}
+                        >
+                            <span className={cn(letter && isArabic(letter.char) ? 'font-arabic' : 'tracking-tighter')}>
+                               {letter ? letter.char : ''}
+                            </span>
+                        </motion.button>
+                        {isCorrect && idx === 0 && (
+                           <motion.div 
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              className="absolute -top-2 -right-2 w-6 h-6 md:w-8 md:h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg border-2 md:border-4 border-white dark:border-slate-900 z-10"
+                           >
+                              <Check className="w-3 h-3 md:w-4 md:h-4" strokeWidth={4} />
+                           </motion.div>
+                        )}
+                    </div>
                 ))}
             </div>
-
-            {/* Message Alert */}
-            {isCorrect && (
-                 <div className="mb-8 animate-bounce bg-green-100 text-green-700 px-6 py-2 rounded-full font-bold flex items-center gap-2 shadow-sm">
-                    <Check className="w-5 h-5" />
-                    Benar! Jawaban: {currentQuestion.answer}
-                 </div>
-            )}
 
             {/* Pool (Scrambled Letters) */}
-            <div className="flex flex-wrap gap-2 justify-center mb-8 bg-[var(--color-bg-muted)] p-6 rounded-2xl border border-[var(--color-border)] w-full max-w-lg">
-                {scrambledLetters.map((letter) => (
-                    <button 
-                        key={letter.id}
-                        onClick={() => handleLetterClick(letter, 'pool')}
-                        disabled={isCorrect}
-                        className={`w-10 h-10 md:w-12 md:h-12 bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-[var(--color-border)] text-lg font-bold text-[var(--color-text-main)] hover:bg-gray-50 dark:hover:bg-gray-600 hover:-translate-y-1 transition-transform active:scale-95 flex items-center justify-center ${isArabic(letter.char) ? 'font-arabic' : ''}`}
-                    >
-                        {letter.char}
-                    </button>
-                ))}
-                {scrambledLetters.length === 0 && !isCorrect && (
-                   <div className="text-xs text-[var(--color-text-muted)] italic flex items-center h-12">
-                      Semua huruf terpakai
-                   </div>
-                )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-4">
-                <button 
-                    onClick={handleReset}
-                    className="p-3 text-[var(--color-text-muted)] hover:text-[var(--color-text-main)] bg-[var(--color-bg-muted)] hover:bg-[var(--color-bg-hover)] rounded-full transition-colors"
-                    title="Ulangi"
-                >
-                    <RotateCcw className="w-5 h-5" />
-                </button>
+            <div className="w-full max-w-2xl bg-slate-50/50 dark:bg-slate-800/30 backdrop-blur-sm p-5 md:p-10 rounded-3xl md:rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-800/50 relative">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-widest hidden md:block"> Pilihan Huruf </div>
                 
-                {isCorrect && (
-                    <button 
-                        onClick={handleNext}
-                        className="px-6 py-3 bg-teal-600 text-white rounded-full font-bold shadow-lg hover:bg-teal-700 hover:scale-105 transition-all flex items-center gap-2"
-                    >
-                        Lanjut <div className="w-px h-4 bg-teal-400 mx-1"></div> {currentIndex + 1 < questions.length ? 'Pertanyaan Berikutnya' : 'Selesai'}
-                    </button>
-                )}
+                <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
+                    <AnimatePresence>
+                        {scrambledLetters.map((letter) => (
+                            <motion.button 
+                                key={letter.id}
+                                layoutId={letter.id}
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.8, opacity: 0 }}
+                                whileHover={{ y: -3, scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => handleLetterClick(letter, 'pool')}
+                                disabled={isCorrect}
+                                className={cn(
+                                   "w-11 h-11 md:w-14 md:h-14 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl shadow-md border-2 border-slate-100 dark:border-slate-700 text-lg md:text-xl font-black text-slate-700 dark:text-slate-100 flex items-center justify-center transition-colors hover:border-orange-400 group",
+                                   isArabic(letter.char) ? 'font-arabic' : ''
+                                )}
+                            >
+                                {letter.char}
+                            </motion.button>
+                        ))}
+                    </AnimatePresence>
+                    {scrambledLetters.length === 0 && !isCorrect && (
+                       <motion.div 
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="text-[10px] md:text-xs font-bold text-slate-400 italic py-2 md:py-4 flex items-center gap-2"
+                       >
+                          <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-emerald-400" /> Semua huruf telah terpasang
+                       </motion.div>
+                    )}
+                </div>
             </div>
 
+            {/* Actions Context */}
+            <div className="mt-12 flex flex-col md:flex-row items-center gap-6 w-full justify-center">
+                <AnimatePresence mode="wait">
+                  {!isCorrect ? (
+                     <motion.button 
+                        key="reset-btn"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={handleReset}
+                        className="flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all group"
+                     >
+                        <Undo2 className="w-4 h-4 group-hover:-rotate-45 transition-transform" />
+                        Reset Kata
+                     </motion.button>
+                  ) : (
+                     <motion.button 
+                        key="next-btn"
+                        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        onClick={handleNext}
+                        className="w-full sm:w-80 py-5 bg-gradient-to-r from-orange-500 to-amber-600 text-white rounded-3xl font-black uppercase tracking-widest shadow-2xl shadow-orange-500/30 hover:shadow-orange-500/50 hover:scale-[1.03] active:scale-95 transition-all flex items-center justify-center gap-3 group px-12"
+                     >
+                        <span>{currentIndex + 1 < questions.length ? 'Kata Berikutnya' : 'Selesaikan Misi'}</span>
+                        <MoveRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                     </motion.button>
+                  )}
+                </AnimatePresence>
+            </div>
         </div>
+      </div>
     </div>
   );
 };
+
+// Internal icons needed
+const CheckCircle2 = ({ className }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
 
 export default AnagramGame;

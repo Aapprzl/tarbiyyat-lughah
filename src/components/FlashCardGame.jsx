@@ -1,11 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { RotateCw, RefreshCcw, Shuffle, Sparkles, Languages } from 'lucide-react';
+import { RotateCw, RefreshCcw, Shuffle, Sparkles, Languages, Volume2, VolumeX } from 'lucide-react';
+import { useRef } from 'react';
 import { cn } from '../utils/cn';
 
 const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
   const [cards, setCards] = useState([]);
   const [flippedIndices, setFlippedIndices] = useState(new Set());
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    const muted = window.localStorage.getItem('gameMuted') === 'true';
+    setIsMuted(muted);
+  }, []);
+
+  // Audio Refs
+  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
+  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
+  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
+
+  const playSound = (soundRef) => {
+    if (isMuted) return;
+    soundRef.current.currentTime = 0;
+    soundRef.current.play().catch(() => {});
+  }
+
+  const toggleMute = () => {
+    const newState = !isMuted;
+    setIsMuted(newState);
+    window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
+    if (!newState) {
+      clickSound.current.currentTime = 0;
+      clickSound.current.play().catch(() => {});
+    }
+  };
 
   useEffect(() => {
     if (items && items.length > 0) {
@@ -14,17 +42,21 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
   }, [items]);
 
   const handleShuffle = () => {
+    playSound(clickSound);
+    playSound(successSound);
     const shuffled = [...cards].sort(() => Math.random() - 0.5);
     setCards(shuffled);
     setFlippedIndices(new Set());
   };
 
   const handleReset = () => {
+    playSound(clickSound);
     setCards(items);
     setFlippedIndices(new Set());
   };
 
   const toggleFlip = (idx) => {
+    playSound(clickSound);
     const newFlipped = new Set(flippedIndices);
     if (newFlipped.has(idx)) {
       newFlipped.delete(idx);
@@ -118,12 +150,18 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
         >
            <Shuffle className="w-5 h-5" /> Acak Kartu
         </button>
-        <button 
-           onClick={handleReset}
-           className="px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 border border-slate-200 dark:border-white/10"
-        >
-           <RefreshCcw className="w-4 h-4" /> Reset
-        </button>
+         <button 
+            onClick={handleReset}
+            className="px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 border border-slate-200 dark:border-white/10"
+         >
+            <RefreshCcw className="w-4 h-4" /> Reset
+         </button>
+         <button 
+            onClick={toggleMute}
+            className="p-4 bg-slate-100 dark:bg-white/5 text-slate-500 hover:text-teal-500 rounded-2xl border border-slate-200 dark:border-white/10 transition-colors shadow-lg active:scale-95"
+         >
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+         </button>
       </div>
 
       <style jsx>{`

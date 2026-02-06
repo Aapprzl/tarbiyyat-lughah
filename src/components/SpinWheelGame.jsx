@@ -1,10 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { RefreshCcw, Trophy } from 'lucide-react';
+import { RefreshCcw, Trophy, Volume2, VolumeX } from 'lucide-react';
 
 const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
   const canvasRef = useRef(null);
   const [isSpinning, setIsSpinning] = useState(false);
   const [result, setResult] = useState(null);
+  const [isMuted, setIsMuted] = useState(false);
+
+  useEffect(() => {
+    const muted = window.localStorage.getItem('gameMuted') === 'true';
+    setIsMuted(muted);
+  }, []);
+
+  // Audio Refs
+  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
+  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
+  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
+
+  const playSound = (soundRef) => {
+    if (isMuted) return;
+    soundRef.current.currentTime = 0;
+    soundRef.current.play().catch(() => {});
+  }
+
+  const toggleMute = () => {
+    const newState = !isMuted;
+    setIsMuted(newState);
+    window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
+    if (!newState) {
+      clickSound.current.currentTime = 0;
+      clickSound.current.play().catch(() => {});
+    }
+  };
   
   // Physics state
   // Physics state
@@ -110,6 +137,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
       
       setIsSpinning(true);
       setResult(null);
+      playSound(clickSound);
 
       // Random huge velocity
       velocityRef.current = Math.random() * 0.3 + 0.4; // 0.4 to 0.7 rad/frame
@@ -126,6 +154,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
               animationRef.current = requestAnimationFrame(animate);
           } else {
               setIsSpinning(false);
+              playSound(successSound);
               calculateResult();
           }
       };
@@ -174,10 +203,18 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
   return (
     <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden flex flex-col items-center p-6">
         
-        <h3 className="text-xl font-bold text-[var(--color-text-main)] mb-6 flex items-center gap-2">
-            <RefreshCcw className="w-6 h-6 text-pink-500" />
-            {title}
-        </h3>
+        <div className="w-full flex items-center justify-between mb-6 px-4">
+            <h3 className="text-xl font-bold text-[var(--color-text-main)] flex items-center gap-2">
+                <RefreshCcw className="w-6 h-6 text-pink-500" />
+                {title}
+            </h3>
+            <button 
+                onClick={toggleMute}
+                className="p-3 bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-pink-500 transition-colors"
+            >
+                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+        </div>
 
         <div className="relative mb-8">
             <canvas 
