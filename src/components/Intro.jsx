@@ -82,31 +82,10 @@ const Intro = ({ onEnter, config, homeConfig }) => {
             filter: "blur(40px)",
             transition: { duration: 1.2, ease: [0.4, 0, 0.2, 1] }
           }}
-          className="fixed inset-0 z-[10000] bg-white dark:bg-[#020617] flex items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-[10000] bg-[var(--color-bg-main)] flex items-center justify-center overflow-hidden"
         >
-          {/* Animated Background Gradients */}
-          <div className="absolute inset-0 pointer-events-none">
-            <motion.div 
-               animate={{ 
-                 x: [0, 50, 0],
-                 y: [0, 30, 0],
-                 scale: [1, 1.1, 1],
-                 opacity: [0.15, 0.25, 0.15]
-               }}
-               transition={{ duration: 15, repeat: Infinity }}
-               className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-teal-500/30 rounded-full blur-[120px]"
-            />
-            <motion.div 
-               animate={{ 
-                 x: [0, -40, 0],
-                 y: [0, -20, 0],
-                 scale: [1, 1.2, 1],
-                 opacity: [0.1, 0.2, 0.1]
-               }}
-               transition={{ duration: 18, repeat: Infinity }}
-               className="absolute bottom-[-10%] right-[-10%] w-[70%] h-[70%] bg-amber-500/20 rounded-full blur-[150px]"
-            />
-          </div>
+          {/* Clean Background - Animation Removed as per user request */}
+          <div className="absolute inset-0 pointer-events-none"></div>
 
           {/* Theme Toggle Button */}
           <motion.div 

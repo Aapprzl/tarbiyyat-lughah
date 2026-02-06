@@ -46,19 +46,19 @@
   --color-primary-dark: #10b981; /* Emerald-500 */
   --color-secondary: #fbbf24; /* Amber-400 */
 
-  --color-bg-main: #0f172a; /* Slate-900 */
-  --color-bg-sidebar: #1e293b; /* Slate-800 */
-  --color-bg-card: #1e293b;
-  --color-bg-hover: #334155; /* Slate-700 */
-  --color-bg-muted: #1e293b; /* Slate-800 */
-  --color-bg-surface: #1e293b;
+  --color-bg-main: #131f24; /* Duolingo Midnight */
+  --color-bg-sidebar: #202f36; /* Lighter Midnight */
+  --color-bg-card: #202f36;
+  --color-bg-hover: #37464f; /* Interaction */
+  --color-bg-muted: #18252a; /* Subtle Surface */
+  --color-bg-surface: #202f36;
 
-  --color-text-main: #f8fafc; /* Slate-50 */
-  --color-text-muted: #cbd5e1; /* Slate-300 (Lighter for readability) */
-  --color-text-light: #e2e8f0;
+  --color-text-main: #ffffff; /* Pure White */
+  --color-text-muted: #afbacc; /* Cool Blue-Gray */
+  --color-text-light: #e5e7eb;
   --color-text-highlight: #5eead4; /* Teal-300 */
 
-  --color-border: #334155; /* Slate-700 */
+  --color-border: #37464f; /* Matching Hover */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
@@ -160,18 +160,16 @@ h4 {
 }
 
 /* Custom Dot Grid Background */
-/* Custom Dot Grid Background */
-.bg-dot-grid {
-  /* Mobile: Smaller dots and tighter grid */
+/* Custom Dot Grid Background - Removed as per user request */
+/* .bg-dot-grid {
   background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
   background-size: 16px 16px;
 }
 
 [data-theme="dark"] .bg-dot-grid {
-  background-image: radial-gradient(circle, #475569 1px, transparent 1px);
+  background-image: radial-gradient(circle, #37464f 1px, transparent 1px);
 }
 
-/* Desktop: Original size */
 @media (min-width: 768px) {
   .bg-dot-grid {
     background-image: radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px);
@@ -179,9 +177,9 @@ h4 {
   }
 
   [data-theme="dark"] .bg-dot-grid {
-    background-image: radial-gradient(circle, #475569 1.5px, transparent 1.5px);
+    background-image: radial-gradient(circle, #37464f 1.5px, transparent 1.5px);
   }
-}
+} */
 
 /* Shimmer Animation */
 @keyframes shimmer {

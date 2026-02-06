@@ -11,6 +11,16 @@ export default {
         sans: ['var(--font-latin)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         arabic: ['var(--font-arabic)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
+      colors: {
+        slate: {
+          950: '#0b1215', // Darker Depth
+          900: '#131f24', // Main Background (Midnight)
+          800: '#202f36', // Card Background (Light Midnight)
+          700: '#37464f', // Border/Interactive
+          600: '#506575', // Muted Text
+          // Lower values will fallback to default Slate or can be added if needed
+        },
+      },
       animation: {
         aurora: "aurora 60s linear infinite",
         "fade-in": "fadeIn 0.5s ease-out forwards",

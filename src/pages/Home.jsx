@@ -61,7 +61,7 @@ const Home = () => {
   return (
     <div className="relative overflow-x-hidden">
       {/* Hero Section - Immersive Aurora */}
-      <AuroraBackground className="rounded-b-[3rem] shadow-2xl overflow-hidden mb-24">
+      <AuroraBackground className="rounded-b-[3rem] shadow-2xl overflow-hidden mb-24 !justify-start pt-28 md:!justify-center md:pt-0">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -70,30 +70,30 @@ const Home = () => {
             duration: window.innerWidth < 768 ? 0.4 : 0.8,
             ease: "easeInOut",
           }}
-          className="relative flex flex-col gap-6 items-center justify-center px-4 md:px-0 text-center max-w-4xl z-20"
+          className="relative flex flex-col gap-4 md:gap-6 items-center justify-center px-4 md:px-0 text-center max-w-4xl z-20 md:py-20"
         >
           {/* Badge */}
-          <div className="bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-4 animate-fade-in backdrop-blur-md">
+          <div className="bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 animate-fade-in backdrop-blur-md">
              Platform Belajar Bahasa Arab Modern
           </div>
 
-          <div className="space-y-4">
-            <h1 className="text-5xl md:text-8xl font-black text-slate-900 dark:text-white arabic-title leading-tight drop-shadow-sm">
+          <div className="space-y-3 md:space-y-4">
+            <h1 className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white arabic-title leading-tight drop-shadow-sm">
                 {config.heroTitleArabic}
             </h1>
-            <h2 className="text-2xl md:text-5xl font-extrabold font-sans tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-teal-500 to-indigo-600 animate-gradient bg-300% pb-2">
+            <h2 className="text-3xl md:text-5xl font-extrabold font-sans tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-teal-500 to-indigo-600 animate-gradient bg-300% pb-2">
                 {config.heroTitleLatin}
             </h2>
           </div>
 
-          <p className="font-medium text-slate-600 dark:text-slate-400 md:text-xl max-w-2xl leading-relaxed mt-4 drop-shadow-sm px-4 md:px-0">
+          <p className="font-medium text-slate-600 dark:text-slate-400 text-base md:text-xl max-w-2xl leading-relaxed mt-4 md:mt-4 drop-shadow-sm px-4 md:px-0">
             {config.heroDescription}
           </p>
 
-          <div className="flex flex-col md:flex-row items-center gap-6 mt-10">
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mt-8 md:mt-10 w-full md:w-auto px-6 md:px-0">
             <Link 
               to="/materi" 
-              className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-10 py-5 rounded-2xl font-bold transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center overflow-hidden"
+              className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 md:px-10 md:py-5 rounded-2xl font-bold transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center w-auto min-w-[200px] md:w-auto overflow-hidden"
             >
               <span className="relative z-10">{config.heroButtonText}</span>
               <MoveRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
@@ -102,10 +102,14 @@ const Home = () => {
 
             <Link 
               to="/permainan" 
-              className="group relative px-10 py-5 rounded-2xl font-bold transition-all border-2 border-slate-200 dark:border-white/10 hover:border-teal-500 dark:hover:border-teal-400 text-slate-600 dark:text-slate-300 hover:text-teal-600 dark:hover:text-teal-400 flex items-center gap-3 hover:bg-slate-50 dark:hover:bg-white/5"
+              className="group relative px-8 py-4 md:px-10 md:py-5 rounded-2xl font-bold transition-all shadow-lg hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 w-auto min-w-[200px] md:w-auto overflow-hidden bg-slate-800 dark:bg-slate-800 border-2 border-transparent"
             >
-              <Gamepad className="w-5 h-5" />
-              <span>Masuk Arena Game</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 opacity-20 group-hover:opacity-100 transition-opacity duration-500"></div>
+              {/* Animated Border Gradient */}
+              <div className="absolute inset-0 rounded-2xl border-2 border-teal-500/30 group-hover:border-transparent transition-colors"></div>
+              
+              <Gamepad className="w-5 h-5 relative z-10 text-teal-400 group-hover:text-white transition-colors group-hover:animate-bounce" />
+              <span className="relative z-10 text-teal-100 group-hover:text-white transition-colors">Masuk Arena Game</span>
             </Link>
           </div>
         </motion.div>
