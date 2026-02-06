@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy } from 'lucide-react';
+import { BookOpen, Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy } from 'lucide-react';
 import { PdfViewer } from '../components/PdfViewer';
 import { VisionSection } from '../components/VisionSection';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
@@ -90,26 +90,31 @@ const Home = () => {
             {config.heroDescription}
           </p>
 
-          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 mt-8 md:mt-10 w-full md:w-auto px-6 md:px-0">
+          <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mt-10 md:mt-12 w-full md:w-auto px-6 md:px-0">
             <Link 
               to="/materi" 
-              className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-4 md:px-10 md:py-5 rounded-2xl font-bold transition-all shadow-2xl hover:scale-105 active:scale-95 flex items-center justify-center w-auto min-w-[200px] md:w-auto overflow-hidden"
+              className="group relative px-8 py-4 md:px-10 md:py-5 rounded-3xl font-bold transition-all shadow-xl hover:shadow-teal-500/40 hover:scale-105 active:scale-95 flex items-center justify-center w-full md:w-auto overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-transparent"
             >
-              <span className="relative z-10">{config.heroButtonText}</span>
-              <MoveRight className="ml-3 w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
-              <div className="absolute inset-0 bg-teal-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600 opacity-5 group-hover:opacity-100 transition-opacity duration-500"></div>
+              
+              <div className="w-10 h-10 bg-teal-500 rounded-xl flex items-center justify-center mr-3 relative z-10 shadow-lg shadow-teal-500/20 group-hover:bg-white transition-colors">
+                <BookOpen className="w-5 h-5 text-white group-hover:text-teal-500 transition-colors" />
+              </div>
+              
+              <span className="relative z-10 text-lg text-slate-900 dark:text-white group-hover:text-white transition-colors">{config.heroButtonText}</span>
             </Link>
-
+ 
             <Link 
               to="/permainan" 
-              className="group relative px-8 py-4 md:px-10 md:py-5 rounded-2xl font-bold transition-all shadow-lg hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 flex items-center justify-center gap-3 w-auto min-w-[200px] md:w-auto overflow-hidden bg-slate-800 dark:bg-slate-800 border-2 border-transparent"
+              className="group relative px-8 py-4 md:px-10 md:py-5 rounded-3xl font-bold transition-all shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 flex items-center justify-center w-full md:w-auto overflow-hidden bg-slate-100 dark:bg-slate-800 border-2 border-transparent"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 opacity-20 group-hover:opacity-100 transition-opacity duration-500"></div>
-              {/* Animated Border Gradient */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-teal-500/30 group-hover:border-transparent transition-colors"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-orange-500 opacity-5 group-hover:opacity-100 transition-opacity duration-500"></div>
               
-              <GamepadIcon className="w-5 h-5 relative z-10 text-teal-400 group-hover:text-white transition-colors group-hover:animate-bounce" />
-              <span className="relative z-10 text-teal-100 group-hover:text-white transition-colors">Masuk Arena Game</span>
+              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center mr-3 relative z-10 shadow-lg shadow-rose-500/20 group-hover:bg-white transition-colors">
+                <GamepadIcon className="w-5 h-5 text-white group-hover:text-rose-500 transition-colors" />
+              </div>
+              
+              <span className="relative z-10 text-lg text-slate-900 dark:text-white group-hover:text-white transition-colors">Masuk Arena Game</span>
             </Link>
           </div>
         </motion.div>

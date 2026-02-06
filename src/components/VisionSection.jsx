@@ -14,51 +14,55 @@ export const VisionSection = ({ config }) => {
     
           <div className="relative p-8 md:p-14">
             {/* Header Section */}
-            <div className="flex items-center gap-4 mb-8">
-              <div className="p-3 bg-teal-100 dark:bg-teal-900/30 rounded-2xl text-teal-600 dark:text-teal-400 shadow-sm">
-                <Info className="w-6 h-6" />
+            <div className="flex items-center gap-6 mb-10">
+              <div className="w-16 h-16 bg-teal-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-teal-500/20 transform -rotate-3 hover:rotate-0 transition-transform">
+                <Info className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl md:text-4xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
+              <h2 className="text-3xl md:text-5xl font-black text-slate-800 dark:text-white tracking-tight leading-tight">
                 {config.visionTitle || "Visi Tarbiyyat Al-Lughah"}
               </h2>
             </div>
     
             {/* Main Description */}
-            <div className="space-y-6 md:space-y-8">
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-base md:text-xl font-medium">
+            <div className="space-y-8 md:space-y-10">
+              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-lg md:text-2xl font-medium">
                  {config.visionDesc}
               </p>
     
               {/* Methodology / Steps */}
-              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-6 md:p-8 border-2 border-slate-100 dark:border-slate-700 shadow-inner">
-                <p className="text-[10px] md:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mb-6">Metode Belajar Interaktif:</p>
+              <div className="bg-slate-50 dark:bg-slate-900/50 rounded-[3rem] p-8 md:p-12 border-2 border-slate-100 dark:border-slate-700 shadow-inner relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                   <Info className="w-32 h-32" />
+                </div>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <p className="text-[10px] md:text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-10 border-b border-slate-200 dark:border-slate-800 pb-4 inline-block">Metode Belajar Interaktif</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-10">
                   {/* Step 1 */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 flex items-center justify-center bg-teal-600 text-white rounded-xl text-xs font-black shadow-lg shadow-teal-500/20">1</span>
-                      <span className="text-sm md:text-base font-bold dark:text-slate-100">{config.visionStep1Title || 'Kosakata Visual'}</span>
+                  <div className="space-y-4 relative">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 flex items-center justify-center bg-emerald-500 rounded-2xl text-lg font-black text-white shadow-lg shadow-emerald-500/20 transform -rotate-6">1</div>
+                      <span className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100">{config.visionStep1Title || 'Kosakata Visual'}</span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{config.visionStep1Desc}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{config.visionStep1Desc}</p>
                   </div>
     
                   {/* Step 2 */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 flex items-center justify-center bg-teal-600 text-white rounded-xl text-xs font-black shadow-lg shadow-teal-500/20">2</span>
-                      <span className="text-sm md:text-base font-bold dark:text-slate-100">{config.visionStep2Title || 'Qira\'ah Digital'}</span>
+                  <div className="space-y-4 relative">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 flex items-center justify-center bg-sky-500 rounded-2xl text-lg font-black text-white shadow-lg shadow-sky-500/20 transform rotate-12">2</div>
+                      <span className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100">{config.visionStep2Title || 'Qira\'ah Digital'}</span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{config.visionStep2Desc}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{config.visionStep2Desc}</p>
                   </div>
     
                   {/* Step 3 */}
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 flex items-center justify-center bg-teal-600 text-white rounded-xl text-xs font-black shadow-lg shadow-teal-500/20">3</span>
-                      <span className="text-sm md:text-base font-bold dark:text-slate-100">{config.visionStep3Title || 'Game Edukasi'}</span>
+                  <div className="space-y-4 relative">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 flex items-center justify-center bg-indigo-500 rounded-2xl text-lg font-black text-white shadow-lg shadow-indigo-500/20 transform -rotate-3">3</div>
+                      <span className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100">{config.visionStep3Title || 'Game Edukasi'}</span>
                     </div>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{config.visionStep3Desc}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{config.visionStep3Desc}</p>
                   </div>
                 </div>
               </div>

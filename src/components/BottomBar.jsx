@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { LayoutGrid, Library, Trophy, CircleUser, ShieldHalf } from 'lucide-react';
+import { Home, LayoutGrid, BookOpen, Library, Trophy, CircleUser, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
@@ -28,11 +28,10 @@ const BottomBar = () => {
   }, []);
 
   const navItems = [
-    { to: '/', icon: LayoutGrid, label: 'Beranda' },
-    { to: '/materi', icon: Library, label: 'Materi' },
-    { to: '/permainan', icon: Trophy, label: 'Permainan' },
-    { to: '/perpustakaan', icon: Library, label: 'Perpustakaan' },
-
+    { to: '/', icon: Home, label: 'Beranda', color: 'indigo' },
+    { to: '/materi', icon: BookOpen, label: 'Materi', color: 'teal' },
+    { to: '/permainan', icon: Trophy, label: 'Permainan', color: 'rose' },
+    { to: '/perpustakaan', icon: Library, label: 'Perpustakaan', color: 'sky' },
   ];
 
   // Configurable Scales based on User Feedback
@@ -73,14 +72,15 @@ const BottomBar = () => {
               }
               
               const Icon = item.icon;
+              const color = item.color;
 
               return (
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  className={cn(
-                    "relative flex flex-col items-center justify-center rounded-[2rem] transition-all duration-500",
-                    isActive ? "text-teal-600 dark:text-teal-400" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  className={({ isActive: innerActive }) => cn(
+                    "relative flex flex-col items-center justify-center transition-all duration-500 rounded-[2rem]",
+                    innerActive ? `text-${color}-600 dark:text-${color}-400` : `text-slate-400 hover:text-${color}-500`
                   )}
                   style={{
                     paddingLeft: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padX})`,
@@ -89,29 +89,29 @@ const BottomBar = () => {
                     paddingBottom: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.padY})`
                   }}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeDock"
-                      className="absolute inset-0 bg-teal-500/10 dark:bg-teal-500/20 rounded-[1.8rem]"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  
-                  <div 
-                    className="relative z-10 flex flex-col items-center transition-all"
-                    style={{ gap: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.gap})` }}
+                  <motion.div 
+                    whileHover={{ scale: 1.15, y: -6 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                    className={cn(
+                      "relative z-10 flex items-center justify-center rounded-2xl",
+                      isActive 
+                        ? `bg-${color}-500 text-white shadow-lg shadow-${color}-500/20 scale-110` 
+                        : `bg-transparent hover:bg-${color}-500/10 dark:hover:bg-${color}-500/20 transition-colors duration-300`
+                    )}
+                    style={{
+                      width: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * 2.2)`,
+                      height: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * 2.2)`
+                    }}
                   >
                     <Icon 
-                      className={cn(
-                        "transition-transform duration-300",
-                        isActive ? "scale-110" : "hover:scale-110"
-                      )} 
+                      className="transition-transform duration-300"
                       style={{ 
-                        width: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale})`, 
-                        height: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale})` 
+                        width: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale || 1.1})`, 
+                        height: `calc((var(--font-arabic-sidebar-content-size) * ${config.baseScale}) * ${config.iconScale || 1.1})` 
                       }}
                     />
-                  </div>
+                  </motion.div>
                 </NavLink>
               );
             })}
@@ -123,8 +123,8 @@ const BottomBar = () => {
               className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/5 rounded-full transition-all ml-1"
               title="Sembunyikan Navigasi"
             >
-              <motion.div whileHover={{ rotate: 90 }} transition={{ type: 'spring' }}>
-                <LayoutGrid className="w-5 h-5" />
+              <motion.div whileHover={{ y: 5 }} transition={{ type: 'spring' }}>
+                <ChevronDown className="w-5 h-5" />
               </motion.div>
             </button>
           </motion.nav>

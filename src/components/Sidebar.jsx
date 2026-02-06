@@ -109,11 +109,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                 to="/" 
                 onClick={onClose}
                 className={({ isActive }) => cn(
-                    "flex items-center px-4 py-3 rounded-xl transition-all group relative",
-                    isActive ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                    "flex items-center px-4 py-3 rounded-2xl transition-all group relative",
+                    isActive ? "bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400" : "text-slate-500 hover:text-indigo-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
-                <Home className="w-5 h-5 mr-3" />
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center mr-3 transition-all",
+                  "bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-white/5",
+                  "group-[.active]:bg-indigo-500 group-[.active]:text-white group-[.active]:shadow-indigo-500/20"
+                )}>
+                  <Home className="w-5 h-5" />
+                </div>
                 <span className="font-bold text-sm">Beranda</span>
               </NavLink>
 
@@ -121,11 +127,17 @@ const Sidebar = ({ isOpen, onClose }) => {
                 to="/profil" 
                 onClick={onClose}
                 className={({ isActive }) => cn(
-                    "flex items-center px-4 py-3 rounded-xl transition-all group",
-                    isActive ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
+                    "flex items-center px-4 py-3 rounded-2xl transition-all group",
+                    isActive ? "bg-violet-500/10 dark:bg-violet-500/20 text-violet-600 dark:text-violet-400" : "text-slate-500 hover:text-violet-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5"
                 )}
               >
-                <CircleUser className="w-5 h-5 mr-3" />
+                <div className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center mr-3 transition-all",
+                  "bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-white/5",
+                  "group-[.active]:bg-violet-500 group-[.active]:text-white group-[.active]:shadow-violet-500/20"
+                )}>
+                  <CircleUser className="w-5 h-5" />
+                </div>
                 <span className="font-bold text-sm">Profil</span>
               </NavLink>
             </div>
@@ -135,29 +147,44 @@ const Sidebar = ({ isOpen, onClose }) => {
             <h2 className="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
               Kurikulum
             </h2>
-            {curriculum.map((section) => {
+            {curriculum.map((section, idx) => {
               const Icon = iconMap[section.icon] || Library;
               const isExpanded = expandedSection === section.id;
+              const colors = ['emerald', 'sky', 'teal', 'cyan', 'indigo'];
+              const color = colors[idx % colors.length];
 
               return (
-                <div key={section.id} className="mb-2">
+                <div key={section.id} className="mb-2 px-1">
                   <button
                     onClick={() => !section.isLocked && toggleSection(section.id)}
                     className={cn(
-                        "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-3 rounded-2xl transition-all group",
                         section.isLocked 
                           ? "opacity-50 cursor-not-allowed bg-slate-100/50 dark:bg-white/5" 
-                          : isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
+                          : isExpanded 
+                            ? `bg-${color}-500/10 dark:bg-${color}-500/20 text-${color}-700 dark:text-${color}-300` 
+                            : `text-slate-500 hover:text-${color}-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5`
                     )}
                   >
                     <div className="flex items-center">
-                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", section.isLocked ? "text-slate-400" : isExpanded ? "text-teal-500" : "text-slate-500")} />
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center mr-3 shadow-sm border transition-all",
+                        section.isLocked 
+                          ? "bg-slate-200 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400" 
+                          : isExpanded 
+                            ? `bg-${color}-500 text-white border-transparent shadow-${color}-500/20 rotate-6` 
+                            : `bg-white dark:bg-slate-800 border-slate-100 dark:border-white/5 text-slate-400 group-hover:text-${color}-500 group-hover:scale-105`
+                      )}>
+                        {section.isLocked ? <ShieldCheck className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                      </div>
                       <span className={cn("font-bold text-sm", section.isLocked ? "text-slate-400" : "")}>{section.title}</span>
                     </div>
                     {section.isLocked ? (
-            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      <ShieldCheck className="w-4 h-4 text-slate-300" />
                     ) : (
-                      <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-teal-500" : "text-slate-400")} />
+                      <div className={cn("p-1.5 rounded-lg transition-all bg-slate-100 dark:bg-white/5", isExpanded && `rotate-180 bg-${color}-500/20 text-${color}-600`)}>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </div>
                     )}
                   </button>
 
@@ -182,7 +209,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                                 onClick={onClose}
                                 className={({ isActive }) => cn(
                                     "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
-                                    isActive ? "text-teal-600 dark:text-teal-400 font-black border-teal-500 bg-teal-500/5" : "text-slate-500 hover:text-teal-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                    isActive ? `text-${color}-600 dark:text-${color}-400 font-black border-${color}-500 bg-${color}-500/5` : "text-slate-500 hover:text-teal-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
                                 )}
                               >
                                 <span className="arabic-sidebar-content">{topic.title}</span>
@@ -202,29 +229,44 @@ const Sidebar = ({ isOpen, onClose }) => {
             <h2 className="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4">
               Program Khusus
             </h2>
-            {specialPrograms.map((category) => {
+            {specialPrograms.map((category, idx) => {
               const Icon = iconMap[category.icon] || Star;
               const isExpanded = expandedSection === category.id;
+              const colors = ['amber', 'rose', 'orange', 'pink', 'violet'];
+              const color = colors[idx % colors.length];
 
               return (
-                <div key={category.id} className="mb-2">
+                <div key={category.id} className="mb-2 px-1">
                   <button
                     onClick={() => !category.isLocked && toggleSection(category.id)}
                     className={cn(
-                        "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all",
+                        "w-full flex items-center justify-between px-3 py-3 rounded-2xl transition-all group",
                         category.isLocked 
                           ? "opacity-50 cursor-not-allowed bg-slate-100/50 dark:bg-white/5"
-                          : isExpanded ? "bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white" : "text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5"
+                          : isExpanded 
+                            ? `bg-${color}-500/10 dark:bg-${color}-500/20 text-${color}-700 dark:text-${color}-300` 
+                            : `text-slate-500 hover:text-${color}-600 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-white/5`
                     )}
                   >
                     <div className="flex items-center">
-                      <Icon className={cn("w-5 h-5 mr-3 transition-colors", category.isLocked ? "text-slate-400" : isExpanded ? "text-amber-500" : "text-slate-500")} />
+                      <div className={cn(
+                        "w-10 h-10 rounded-xl flex items-center justify-center mr-3 shadow-sm border transition-all",
+                        category.isLocked 
+                          ? "bg-slate-200 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400" 
+                          : isExpanded 
+                            ? `bg-${color}-500 text-white border-transparent shadow-${color}-500/20 rotate-6` 
+                            : `bg-white dark:bg-slate-800 border-slate-100 dark:border-white/5 text-slate-400 group-hover:text-${color}-500 group-hover:scale-105`
+                      )}>
+                        {category.isLocked ? <ShieldCheck className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                      </div>
                       <span className={cn("font-bold text-sm", category.isLocked ? "text-slate-400" : "")}>{category.title}</span>
                     </div>
                     {category.isLocked ? (
-            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      <ShieldCheck className="w-4 h-4 text-slate-300" />
                     ) : (
-                      <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isExpanded ? "rotate-180 text-amber-500" : "text-slate-400")} />
+                      <div className={cn("p-1.5 rounded-lg transition-all bg-slate-100 dark:bg-white/5", isExpanded && `rotate-180 bg-${color}-500/20 text-${color}-600`)}>
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </div>
                     )}
                   </button>
 
@@ -250,7 +292,7 @@ const Sidebar = ({ isOpen, onClose }) => {
                                 onClick={onClose}
                                 className={({ isActive }) => cn(
                                     "block pl-6 pr-4 py-2.5 text-sm transition-all relative border-l border-slate-100 dark:border-white/5",
-                                    isActive ? "text-amber-600 dark:text-amber-400 font-black border-amber-500 bg-amber-500/5" : "text-slate-500 hover:text-amber-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5"
+                                    isActive ? `text-${color}-600 dark:text-${color}-400 font-black border-${color}-500 bg-${color}-500/5` : `text-slate-500 hover:text-${color}-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5`
                                 )}
                               >
                                 <span className="arabic-sidebar-content">{topic.title}</span>
