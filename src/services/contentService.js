@@ -356,10 +356,12 @@ export const contentService = {
                  ...cat,
                  title: cat.title || 'Untitled Category',
                  icon: cat.icon || 'Star',
+                 // Preserving legacy topics for safety, but primary data is now 'items'
                  topics: (Array.isArray(cat.topics) ? cat.topics : []).map(t => ({
                      ...t,
                      title: t?.title || 'Untitled Topic'
-                 }))
+                 })),
+                 items: (Array.isArray(cat.items) ? cat.items : []) // New Content Items
              })) : [];
              localStorage.setItem('arp_special_programs', JSON.stringify(cleaned));
              return cleaned;
@@ -374,7 +376,7 @@ export const contentService = {
                  // Migration opportunity?
                  let data = parsed;
                  if (data.length > 0 && !data[0].topics) {
-                    data = [{ id: 'sp-migrated', title: 'Program Khusus', icon: 'Star', topics: parsed }];
+                    data = [{ id: 'sp-migrated', title: 'Program Khusus', icon: 'Star', topics: parsed, items: [] }];
                  }
                  return data;
              } catch(e) { return []; }
@@ -414,7 +416,8 @@ export const contentService = {
           title,
           desc,
           icon: iconName,
-          path: `/program/${newId}`
+          path: `/program/${newId}`,
+          items: []
       };
       progs.push(newProg);
       await this.saveSpecialPrograms(progs);
@@ -448,7 +451,8 @@ export const contentService = {
           title,
           icon: iconName,
           desc,
-          topics: []
+          topics: [],
+          items: [] // Initialize with empty items
       };
       progs.push(newCategory);
       await this.saveSpecialPrograms(progs);
@@ -473,6 +477,23 @@ export const contentService = {
           if (desc !== undefined && desc !== null) category.desc = desc;
           if (options.hasOwnProperty('isLocked')) category.isLocked = options.isLocked;
           
+          await this.saveSpecialPrograms(progs);
+          return true;
+      }
+      return false;
+  },
+
+  async syncCategoryItems(categoryId, items) {
+      const progs = await this.getSpecialPrograms();
+      const category = progs.find(c => c.id === categoryId);
+      if (category) {
+          // Store minimal metadata for the grid view
+          category.items = items.map(item => ({
+              id: item.id,
+              type: item.type,
+              title: item.data?.title || item.title || 'Untitled',
+              thumbnail: item.data?.thumbnail || null
+          }));
           await this.saveSpecialPrograms(progs);
           return true;
       }

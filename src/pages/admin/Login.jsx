@@ -44,21 +44,16 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-full bg-slate-50 dark:bg-[#030712] flex items-center justify-center p-6 overflow-hidden transition-colors duration-500">
-      {/* Cinematic Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] bg-teal-500/10 dark:bg-teal-500/10 blur-[120px] rounded-full animate-aurora opacity-50 dark:opacity-100"></div>
-        <div className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] bg-indigo-500/10 dark:bg-indigo-500/10 blur-[120px] rounded-full animate-aurora [animation-delay:2s] opacity-50 dark:opacity-100"></div>
-        <div className="absolute top-[20%] right-[10%] w-[40%] h-[40%] bg-amber-500/5 dark:bg-amber-500/5 blur-[120px] rounded-full animate-aurora [animation-delay:4s] opacity-50 dark:opacity-100"></div>
-      </div>
+    <div className="relative w-full flex items-center justify-center p-4 md:p-6 overflow-hidden min-h-[calc(100vh-5rem)]">
+      {/* Background cleaned as requested */}
 
       <motion.div 
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-lg"
+        className="relative z-10 w-full max-w-[480px]" // Adjusted width for better proportion
       >
-        <div className="bg-white/80 dark:bg-white/5 backdrop-blur-2xl p-12 md:p-16 rounded-[4rem] border border-slate-200 dark:border-white/10 shadow-2xl space-y-12 transition-all">
+        <div className="bg-white dark:bg-slate-800 p-6 md:p-12 rounded-[2.5rem] border-4 border-slate-100 dark:border-slate-800 space-y-10 transition-all">
           {/* Logo Section */}
           <div className="text-center space-y-6">
             <motion.div 
@@ -68,14 +63,14 @@ const LoginPage = () => {
                 className="relative inline-block"
             >
                 <div className="absolute inset-0 bg-teal-500 blur-2xl opacity-20 animate-pulse"></div>
-                <div className="relative bg-gradient-to-br from-teal-400 to-indigo-600 w-24 h-24 rounded-[2rem] mx-auto flex items-center justify-center text-white shadow-2xl overflow-hidden group">
+                <div className="relative bg-gradient-to-br from-teal-400 to-indigo-600 w-20 h-20 md:w-24 md:h-24 rounded-[2rem] mx-auto flex items-center justify-center text-white overflow-hidden group">
                     <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                     <ShieldCheck className="w-10 h-10 group-hover:scale-110 transition-transform" />
                 </div>
             </motion.div>
             
             <div className="space-y-2">
-                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
+                <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
                    Admin Portal <Diamond className="w-5 h-5 text-amber-500" />
                 </h1>
                 <p className="text-slate-500 dark:text-slate-400 font-medium">Autentikasi diperlukan untuk akses kontrol.</p>
@@ -95,7 +90,7 @@ const LoginPage = () => {
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full bg-slate-100/50 dark:bg-white/[0.03] hover:bg-slate-100/80 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-[2rem] pl-16 pr-8 py-5 text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 dark:focus:border-teal-500/50 outline-none transition-all shadow-inner"
+                        className="w-full bg-slate-100/50 dark:bg-white/[0.03] hover:bg-slate-100/80 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-slate-800 rounded-[2rem] pl-16 pr-8 py-5 text-base text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 dark:focus:border-teal-500/50 outline-none transition-all"
                         placeholder="admin@tarbiyatullughah.id"
                         required
                     />
@@ -112,7 +107,7 @@ const LoginPage = () => {
                         type={showPassword ? "text" : "password"}
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full bg-slate-100/50 dark:bg-white/[0.03] hover:bg-slate-100/80 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-[2rem] pl-16 pr-14 py-5 text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 dark:focus:border-teal-500/50 outline-none transition-all shadow-inner"
+                        className="w-full bg-slate-100/50 dark:bg-white/[0.03] hover:bg-slate-100/80 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-white/10 rounded-[2rem] pl-16 pr-14 py-5 text-base text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 dark:focus:border-teal-500/50 outline-none transition-all shadow-inner"
                         placeholder="••••••••••••"
                         required
                     />
@@ -146,7 +141,7 @@ const LoginPage = () => {
                 disabled={loading}
                 whileHover={!loading ? { scale: 1.02, y: -2 } : {}}
                 whileTap={!loading ? { scale: 0.98 } : {}}
-                className="w-full relative group overflow-hidden rounded-[2rem] shadow-xl shadow-teal-500/10 hover:shadow-teal-500/20 active:shadow-inner transition-all"
+                className="w-full relative group overflow-hidden rounded-[2rem] transition-all"
             >
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-indigo-600 to-teal-500 bg-[length:200%_100%] animate-aurora group-hover:bg-right transition-all duration-1000"></div>
                 
@@ -171,17 +166,6 @@ const LoginPage = () => {
                 </div>
             </motion.button>
           </form>
-
-          {/* Footer */}
-          <div className="pt-8 border-t border-slate-100 dark:border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <Link to="/" className="group flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors text-sm font-bold">
-               <MoveLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-               Website Utama
-            </Link>
-            <span className="text-slate-400 dark:text-slate-600 text-[10px] font-black uppercase tracking-widest">
-               {footerText}
-            </span>
-          </div>
         </div>
       </motion.div>
     </div>

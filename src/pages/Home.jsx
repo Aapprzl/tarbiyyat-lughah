@@ -151,7 +151,7 @@ const Home = () => {
                          />
                       </div>
                    ) : (
-                      <Link to={`/program/${prog.id}`}>
+                      <Link to={`/permainan#${prog.id}`}>
                          <BentoGridItem
                            title={prog.title}
                            description={prog.desc || 'Mainkan game ini untuk melatih kosakata dan pemahaman bahasa Arab secara interaktif.'}

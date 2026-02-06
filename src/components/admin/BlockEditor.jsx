@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../../components/PdfViewer';
@@ -171,8 +171,57 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         className="overflow-hidden"
                     >
                         <div className="px-4 md:px-8 pb-6 md:pb-8 pt-4 border-t border-slate-100 dark:border-white/5">
-              
-              {/* --- TEXT BLOCK --- */}
+                            
+                            {/* --- THUMBNAIL UPLOADER (Common for all blocks) --- */}
+                            <div className="mb-6 p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 space-y-3">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Thumbnail (Tampilan Grid)</label>
+                                <div className="flex items-start gap-4">
+                                    <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-white/10 flex items-center justify-center overflow-hidden relative group/thumb">
+                                        {block.data.thumbnail ? (
+                                            <>
+                                                <img src={block.data.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
+                                                <button 
+                                                    onClick={() => onUpdate({ ...block.data, thumbnail: null })}
+                                                    className="absolute inset-0 bg-red-500/50 flex items-center justify-center opacity-0 group-hover/thumb:opacity-100 transition-opacity text-white"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <div className="text-slate-300">
+                                                <ImageIcon className="w-6 h-6" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1 space-y-2">
+                                        <input 
+                                            type="text" 
+                                            placeholder="URL Gambar atau Upload..."
+                                            className="w-full text-xs bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 outline-none focus:border-teal-500 transition-colors"
+                                            value={block.data.thumbnail || ''}
+                                            onChange={(e) => onUpdate({ ...block.data, thumbnail: e.target.value })}
+                                        />
+                                        <input 
+                                            type="file"
+                                            accept="image/*"
+                                            className="block w-full text-[10px] text-slate-400 file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:uppercase file:tracking-widest file:bg-teal-500 file:text-white hover:file:bg-teal-600 transition-all cursor-pointer"
+                                            onChange={(e) => {
+                                                const file = e.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        onUpdate({ ...block.data, thumbnail: reader.result }); // Save as Base64 for simplicity in this prototype. Prod should upload.
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }}
+                                        />
+                                        <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                                            Gambar ini akan muncul di halaman utama game. Gunakan rasio 1:1 atau 4:3.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
               {block.type === 'text' && (
                 <div className="space-y-3">
                   <input 

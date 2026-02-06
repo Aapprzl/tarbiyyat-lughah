@@ -58,16 +58,25 @@ const LessonEditor = () => {
       // Or check Special Programs (now category-based)
       if (title === "Unknown Topic") {
           const progs = await contentService.getSpecialPrograms();
-          for (const category of progs) {
-              if (category.topics) {
-                  const found = category.topics.find(t => t.id === topicId);
-                  if (found) {
-                      title = found.title;
-                      setTopicDesc(found.desc || '');
-                      setIsSpecialProgram(true);
-                      break;
-                  }
-              }
+          // First check if it matches a Category ID directly (New Structure)
+          const categoryFound = progs.find(p => p.id === topicId);
+          if (categoryFound) {
+             title = categoryFound.title;
+             setTopicDesc(categoryFound.desc || '');
+             setIsSpecialProgram(true);
+          } else {
+             // Fallback: Check inside topics (Legacy Structure check)
+             for (const category of progs) {
+                if (category.topics) {
+                    const found = category.topics.find(t => t.id === topicId);
+                    if (found) {
+                        title = found.title;
+                        setTopicDesc(found.desc || '');
+                        setIsSpecialProgram(true);
+                        break;
+                    }
+                }
+             }
           }
       }
       setTopicTitle(title);
@@ -282,6 +291,12 @@ const LessonEditor = () => {
 
     // Save Metadata (Title & Desc)
     await contentService.updateTopicMetadata(topicId, { title: topicTitle, desc: topicDesc });
+
+    // NEW: Sync Content Items to Category Metadata for Grid View
+    if (isSpecialProgram) {
+        const allItems = processedStages.flatMap(stage => stage.items); // Flatten all items from all stages
+        await contentService.syncCategoryItems(topicId, allItems);
+    }
     
     setSaving(false);
     toast.success('Struktur tersimpan! Refresh halaman publik untuk melihat hasil.');

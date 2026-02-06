@@ -1,8 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
-import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown } from 'lucide-react';
+import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music } from 'lucide-react';
 import { contentService } from '../services/contentService';
+
+const getTypeInfo = (type) => {
+    switch (type) {
+        case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle };
+        case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle };
+        case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers };
+        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical };
+        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type };
+        case 'unjumble': return { label: 'Susun Kata', color: 'purple', icon: MoveLeft };
+        case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw };
+        case 'youtube': return { label: 'Video', color: 'red', icon: Youtube };
+        case 'audio': return { label: 'Audio', color: 'violet', icon: Music };
+        case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList };
+        case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
+        case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
+        default: return { label: 'Materi', color: 'slate', icon: ClipboardList };
+    }
+};
 import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
 import MatchUpGame from '../components/MatchUpGame';
@@ -48,6 +66,10 @@ class ErrorBoundary extends React.Component {
 const MaterialDetailContent = () => {
   const { topicId } = useParams();
   const navigate = useNavigate();
+  // NEW: Get ID from query param
+  const [searchParams] = useSearchParams();
+  const targetItemId = searchParams.get('item');
+  
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [parentSection, setParentSection] = useState(null);
@@ -82,14 +104,25 @@ const MaterialDetailContent = () => {
         
         if (!foundTopic) {
             const progs = await contentService.getSpecialPrograms();
-            for (const category of progs) {
-                if (category.topics) {
-                    const t = category.topics.find(t => t.id.toLowerCase() === topicId.toLowerCase());
-                    if (t) {
-                        foundTopic = t;
-                        foundSection = { title: category.title, icon: category.icon, isLocked: category.isLocked };
-                        setIsGame(true);
-                        break;
+            
+            // 1. Direct Category Match (New Structure)
+            const directCat = progs.find(p => p.id === topicId);
+            if (directCat) {
+                foundTopic = directCat;
+                foundSection = { title: 'Program Khusus', icon: directCat.icon, isLocked: directCat.isLocked };
+                setIsGame(true);
+                // If it has topics, it MIGHT be hybrid, but we treat it as Content Container now
+            } else {
+                 // 2. Fallback Topic Match
+                for (const category of progs) {
+                    if (category.topics) {
+                        const t = category.topics.find(t => t.id.toLowerCase() === topicId.toLowerCase());
+                        if (t) {
+                            foundTopic = t;
+                            foundSection = { title: category.title, icon: category.icon, isLocked: category.isLocked };
+                            setIsGame(true);
+                            break;
+                        }
                     }
                 }
             }
@@ -134,6 +167,19 @@ const MaterialDetailContent = () => {
     };
     load();
   }, [topicId]);
+
+  // NEW: Early return for Loading + Focused Item to prevent Layout Shift
+  // Also updated to handle general loading to prevent Header blinking
+  if (loading) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+            <div className="w-12 h-12 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mb-4"></div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">
+                {targetItemId ? 'Memuat Permainan...' : 'Memuat Materi...'}
+            </p>
+        </div>
+      );
+  }
 
   if (!topic && !loading) {
     return (
@@ -208,6 +254,45 @@ const MaterialDetailContent = () => {
               </motion.div>
           </div>
       );
+  }
+
+  // --- NEW: FOCUSED ITEM VIEW ---
+  if (targetItemId && isJson) {
+     // Find the specific item
+     let foundItem = null;
+     for (const stage of displayData) {
+         const item = stage.items?.find(i => String(i.id) === targetItemId);
+         if (item) {
+             foundItem = item;
+             break;
+         }
+     }
+
+     if (foundItem) {
+         return (
+             <div className="min-h-screen pb-20">
+                 {/* Compact Header for Focus Mode */}
+                 <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 dark:border-white/5 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between">
+                     <div className="flex items-center gap-4">
+                         <button 
+                             onClick={() => navigate(isGame ? '/permainan' : -1)}
+                             className="w-10 h-10 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
+                         >
+                            <MoveLeft className="w-5 h-5" />
+                         </button>
+                         <div>
+                            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{foundItem.data?.title || 'Fokus Materi'}</h3>
+                            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{topic?.title}</p>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12 animate-in fade-in zoom-in-95 duration-500">
+                     <ContentBlock block={foundItem} />
+                 </div>
+             </div>
+         );
+     }
   }
 
   return (
@@ -321,48 +406,68 @@ const MaterialDetailContent = () => {
       </div>
 
       {/* Main Content Area */}
-      {loading ? (
-         <div className="flex flex-col items-center justify-center py-40 gap-4">
-            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 2, ease: "linear" }} className="w-14 h-14 border-4 border-teal-500/20 border-t-teal-500 rounded-full" />
-            <p className="text-slate-400 font-black tracking-widest text-xs uppercase animate-pulse">Menyiapkan Materi...</p>
-         </div>
-      ) : isCategoryView ? (
-        /* CATEGORY LANDING PAGE */
+      {isCategoryView ? (
+
+        /* CATEGORY LANDING PAGE (GRID VIEW) */
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 px-4 md:px-0 mt-20">
             <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.4em] mb-10 flex items-center gap-4">
                Pilih Level / Tantangan
                <div className="h-px flex-1 bg-gradient-to-r from-slate-200 to-transparent dark:from-white/10 dark:to-transparent"></div>
             </h3>
             
-            {!Array.isArray(categoryTopics) || categoryTopics.length === 0 ? (
+            {(!topic?.items || topic.items.length === 0) ? (
                 <div className="text-center py-20 bg-slate-50 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-200 dark:border-slate-700">
                     <p className="text-slate-400 font-bold">Belum ada tantangan dalam permainan ini.</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {categoryTopics.filter(t => t).map((item, idx) => (
-                        <Link  
-                            key={item.id || idx} 
-                            to={`/program/${item.id}`} 
-                            className="group flex items-center justify-between p-8 bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 hover:border-amber-500/30 hover:shadow-2xl hover:shadow-amber-500/10 transition-all overflow-hidden relative"
-                        >
-                             <div className="absolute inset-0 bg-gradient-to-r from-amber-500/0 to-amber-500/[0.03] opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                             <div className="flex items-center gap-6 relative z-10">
-                                <span className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-900 text-slate-400 group-hover:bg-amber-500 group-hover:text-white flex items-center justify-center font-black transition-all shadow-sm">
-                                    {idx + 1}
-                                </span>
-                                <div>
-                                    <h4 className="text-xl font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 transition-colors arabic-index-topic">
-                                        {item.title || 'Level Tanpa Judul'}
-                                    </h4>
-                                    <p className="text-amber-600/60 text-[10px] font-black uppercase tracking-widest mt-1 opacity-0 group-hover:opacity-100 transition-all -translate-y-2 group-hover:translate-y-0">Klik Untuk Bermain</p>
-                                </div>
-                             </div>
-                             <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:bg-amber-500 group-hover:text-white transition-all transform group-hover:translate-x-1 relative z-10">
-                                 <Gamepad className="w-5 h-5 ml-1" />
-                             </div>
-                        </Link>
-                    ))}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    {topic.items.map((item, itemIdx) => {
+                          const typeInfo = getTypeInfo(item.type);
+                          const TypeIcon = typeInfo.icon;
+                          
+                          return (
+                              <Link 
+                                  key={item.id} 
+                                  to={`/program/${topic.id}?item=${item.id}`} // Link to Focused Item
+                                  className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1"
+                              >
+                                  {/* Thumbnail Area */}
+                                  <div className="aspect-square bg-slate-100 dark:bg-slate-900/50 relative overflow-hidden">
+                                      {item.thumbnail ? (
+                                          <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                      ) : (
+                                          <div className={cn(
+                                              "w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700 transition-colors",
+                                              `group-hover:text-${typeInfo.color}-500/20`
+                                          )}>
+                                              <TypeIcon className="w-12 h-12" />
+                                          </div>
+                                      )}
+                                      
+                                      {/* Play Overlay */}
+                                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-amber-500 transform scale-50 group-hover:scale-100 transition-transform">
+                                                <Gamepad className="w-5 h-5 ml-1" />
+                                            </div>
+                                      </div>
+                                  </div>
+
+                                  {/* Content Info */}
+                                  <div className="p-5">
+                                      <div className={cn(
+                                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3 border",
+                                          `bg-${typeInfo.color}-50 dark:bg-${typeInfo.color}-900/10 text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400 border-${typeInfo.color}-100 dark:border-${typeInfo.color}-900/20`
+                                      )}>
+                                          <TypeIcon className="w-3 h-3" />
+                                          {typeInfo.label}
+                                      </div>
+                                      <h3 className="font-bold text-slate-900 dark:text-white leading-tight line-clamp-2 min-h-[2.5em] text-sm">
+                                          {item.data?.title || item.title || 'Untitled'}
+                                      </h3>
+                                  </div>
+                              </Link>
+                          );
+                    })}
                 </div>
             )}
         </motion.div>

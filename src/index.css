@@ -83,6 +83,17 @@ textarea {
   font-family: var(--font-latin), sans-serif !important;
 }
 
+/* Fix for AutoFill messing up font size */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  font-size: 1rem !important;
+  font-family: var(--font-latin), sans-serif !important;
+  -webkit-text-fill-color: var(--color-text-main) !important;
+  transition: background-color 5000s ease-in-out 0s; /* Prevent background color change */
+}
+
 h1,
 h2,
 h3,
@@ -149,11 +160,25 @@ h4 {
 }
 
 /* Custom Dot Grid Background */
+/* Custom Dot Grid Background */
 .bg-dot-grid {
-  background-image: radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px);
-  background-size: 24px 24px;
+  /* Mobile: Smaller dots and tighter grid */
+  background-image: radial-gradient(circle, #cbd5e1 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 [data-theme="dark"] .bg-dot-grid {
-  background-image: radial-gradient(circle, #334155 1.5px, transparent 1.5px);
+  background-image: radial-gradient(circle, #475569 1px, transparent 1px);
+}
+
+/* Desktop: Original size */
+@media (min-width: 768px) {
+  .bg-dot-grid {
+    background-image: radial-gradient(circle, #cbd5e1 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+  }
+
+  [data-theme="dark"] .bg-dot-grid {
+    background-image: radial-gradient(circle, #475569 1.5px, transparent 1.5px);
+  }
 }
