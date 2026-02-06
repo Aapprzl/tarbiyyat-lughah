@@ -32,7 +32,7 @@ const getTypeInfo = (type) => {
         case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers };
         case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical };
         case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type };
-        case 'unjumble': return { label: 'Susun Kata', color: 'purple', icon: MoveLeft };
+        case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle };
         case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw };
         case 'youtube': return { label: 'Video', color: 'red', icon: Youtube };
         case 'audio': return { label: 'Audio', color: 'violet', icon: Music };
