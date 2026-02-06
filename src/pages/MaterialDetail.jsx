@@ -7,7 +7,7 @@ import PdfViewer from '../components/PdfViewer';
 import AudioPlayer from '../components/AudioPlayer';
 import MatchUpGame from '../components/MatchUpGame';
 import QuizGame from '../components/QuizGame';
-import FlashCardGame from '../components/FlashCardGame';
+
 import AnagramGame from '../components/AnagramGame';
 import CompleteSentenceGame from '../components/CompleteSentenceGame';
 import UnjumbleGame from '../components/UnjumbleGame';
@@ -21,7 +21,7 @@ const getTypeInfo = (type) => {
     switch (type) {
         case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle, gradient: 'from-pink-500 to-rose-600' };
         case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle, gradient: 'from-emerald-400 to-teal-600' };
-        case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers, gradient: 'from-sky-400 to-indigo-600' };
+
         case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradient: 'from-orange-400 to-amber-600' };
         case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type, gradient: 'from-blue-400 to-indigo-600' };
         case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle, gradient: 'from-emerald-400 to-indigo-600' };
@@ -655,8 +655,7 @@ const ContentBlock = ({ block }) => {
             return <MatchUpGame pairs={block.data?.pairs} title={block.data?.title} />;
         case 'quiz':
             return <QuizGame questions={block.data?.questions} title={block.data?.title} />;
-        case 'flashcard':
-            return <FlashCardGame items={block.data?.items} title={block.data?.title} />;
+
         case 'anagram':
             return <AnagramGame questions={block.data?.questions} title={block.data?.title} />;
         case 'completesentence':

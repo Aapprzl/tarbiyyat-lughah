@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw } from 'lucide-react';
+import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
@@ -27,21 +27,20 @@ const iconMap = {
 
 const getTypeInfo = (type) => {
     switch (type) {
-        case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle, gradient: 'from-pink-500 to-rose-600' };
-        case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle, gradient: 'from-emerald-400 to-teal-600' };
-        case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers, gradient: 'from-sky-400 to-indigo-600' };
-        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradient: 'from-orange-400 to-amber-600' };
-        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type, gradient: 'from-blue-400 to-indigo-600' };
-        case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle, gradient: 'from-emerald-400 to-indigo-600' };
-        case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw, gradient: 'from-indigo-500 to-purple-600' };
-        case 'youtube': return { label: 'Video', color: 'red', icon: Youtube, gradient: 'from-red-500 to-rose-600' };
-        case 'audio': return { label: 'Audio', color: 'violet', icon: Music, gradient: 'from-violet-500 to-purple-600' };
-        case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList, gradient: 'from-blue-500 to-cyan-600' };
-        case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table, gradient: 'from-indigo-500 to-slate-800' }; 
-        case 'text': return { label: 'Bacaan', color: 'teal', icon: Type, gradient: 'from-teal-400 to-emerald-600' };
-        case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle, gradient: 'from-rose-500 to-pink-600' };
-        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard, gradient: 'from-amber-400 to-orange-600' };
-        default: return { label: 'Materi', color: 'slate', icon: FileText, gradient: 'from-slate-400 to-slate-600' };
+        case 'matchup': return { label: 'Cocokkan', color: 'pink', icon: Shuffle, gradientItems: 'from-pink-500/10 to-rose-500/10' };
+        case 'quiz': return { label: 'Kuis', color: 'emerald', icon: BrainCircuit, gradientItems: 'from-emerald-500/10 to-teal-500/10' };
+        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradientItems: 'from-orange-500/10 to-amber-500/10' }; // Keeping GripVertical as Tile metaphor
+        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: CaseSensitive, gradientItems: 'from-blue-500/10 to-indigo-500/10' };
+        case 'unjumble': return { label: 'Susun', color: 'purple', icon: StretchHorizontal, gradientItems: 'from-purple-500/10 to-violet-500/10' };
+        case 'spinwheel': return { label: 'Putar', color: 'indigo', icon: RefreshCcw, gradientItems: 'from-indigo-500/10 to-cyan-500/10' };
+        case 'youtube': return { label: 'Video', color: 'red', icon: Youtube, gradientItems: 'from-red-500/10 to-rose-500/10' };
+        case 'audio': return { label: 'Audio', color: 'violet', icon: Headphones, gradientItems: 'from-violet-500/10 to-fuchsia-500/10' };
+        case 'pdf': return { label: 'Materi', color: 'cyan', icon: ClipboardList, gradientItems: 'from-cyan-500/10 to-teal-500/10' };
+        case 'vocab': return { label: 'Kosakata', color: 'slate', icon: Table, gradientItems: 'from-slate-500/10 to-gray-500/10' }; 
+        case 'text': return { label: 'Bacaan', color: 'teal', icon: BookOpen, gradientItems: 'from-teal-500/10 to-emerald-500/10' };
+        case 'wordclassification': return { label: 'Pilahan', color: 'rose', icon: ALargeSmall, gradientItems: 'from-rose-500/10 to-pink-500/10' };
+        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Vibrate, gradientItems: 'from-orange-500/10 to-yellow-500/10' };
+        default: return { label: 'Materi', color: 'slate', icon: FileText, gradientItems: 'from-slate-500/10 to-gray-500/10' };
     }
 };
 
@@ -134,7 +133,7 @@ const GameIndex = () => {
                   </div>
 
                   {/* Items Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                       {items.map((item, itemIdx) => {
                           const typeInfo = getTypeInfo(item.type);
                           const TypeIcon = typeInfo.icon;
@@ -144,65 +143,56 @@ const GameIndex = () => {
                                   key={item.id} 
                                   to={category.isLocked ? '#' : `/program/${category.id}?item=${item.id}`}
                                   className={cn(
-                                      "group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/10 hover:-translate-y-1",
-                                      category.isLocked && "opacity-60 grayscale cursor-not-allowed"
+                                      "group relative flex flex-col justify-between h-40 md:h-48 rounded-[2rem] overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95 border-b-4 active:border-b-0 active:translate-y-1",
+                                      // Dynamic Backgrounds based on type
+                                      category.isLocked 
+                                        ? "bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 cursor-not-allowed grayscale opacity-60"
+                                        : `bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-${typeInfo.color}-400 dark:hover:border-${typeInfo.color}-500`
                                   )}
                               >
-                                  {/* Thumbnail Area */}
-                                  <div className="aspect-square relative overflow-hidden">
-                                      {item.thumbnail ? (
-                                          <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                      ) : (
-                                          <div className={cn(
-                                              "w-full h-full flex items-center justify-center relative transition-transform duration-700 group-hover:scale-110 bg-gradient-to-br",
-                                              typeInfo.gradient
-                                          )}>
-                                              {/* Decorative background shapes */}
-                                              <div className="absolute inset-0 opacity-10">
-                                                  <div className="absolute top-0 left-0 w-24 h-24 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-2xl" />
-                                                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-black rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
-                                              </div>
-                                              
-                                              {/* Main Stylized Icon */}
-                                              <div className="relative z-10 p-6 bg-white/10 backdrop-blur-md rounded-[2.5rem] border border-white/20 shadow-2xl">
-                                                  <TypeIcon className="w-14 h-14 text-white drop-shadow-lg" />
-                                              </div>
+                                  {/* Background Decorations */}
+                                  <div className={cn(
+                                    "absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br",
+                                    typeInfo.gradientItems || `from-${typeInfo.color}-500/10 to-${typeInfo.color}-600/10`
+                                  )}></div>
 
-                                              {/* Bottom Accent */}
-                                              <div className="absolute bottom-4 left-4 right-4 h-1 bg-white/20 rounded-full overflow-hidden">
-                                                  <div className="w-1/3 h-full bg-white/40 animate-shimmer" />
-                                              </div>
-                                          </div>
-                                      )}
-                                      
-                                      {/* Play Overlay */}
-                                      {!category.isLocked && (
-                                        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg text-amber-500 transform scale-50 group-hover:scale-100 transition-transform">
-                                                <Play className="w-5 h-5 ml-1" />
-                                            </div>
-                                        </div>
-                                      )}
-                                  </div>
-
-                                  {/* Content Info */}
-                                  <div className="p-5">
+                                  {/* Main Content (Top Left) */}
+                                  <div className="relative z-10 p-5 flex flex-col items-start gap-2">
                                       <div className={cn(
-                                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest mb-3 border",
-                                          `bg-${typeInfo.color}-50 dark:bg-${typeInfo.color}-900/10 text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400 border-${typeInfo.color}-100 dark:border-${typeInfo.color}-900/20`
+                                          "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-white/80 dark:bg-black/20 backdrop-blur-sm",
+                                          `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400`
                                       )}>
-                                          <TypeIcon className="w-3 h-3" />
                                           {typeInfo.label}
                                       </div>
-                                      <h3 className="font-bold text-slate-900 dark:text-white leading-tight line-clamp-2 min-h-[2.5em] text-sm">
+                                      <h3 className={cn(
+                                        "font-black text-lg md:text-xl leading-tight line-clamp-2",
+                                        "text-slate-800 dark:text-slate-100"
+                                      )}>
                                           {item.title}
                                       </h3>
                                   </div>
+
+                                  {/* Large Icon (Bottom Right) */}
+                                  <div className="absolute -bottom-4 -right-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                      <div className={cn(
+                                        "w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center opacity-20 dark:opacity-20 group-hover:opacity-100 transition-opacity",
+                                        `bg-${typeInfo.color}-500 dark:bg-${typeInfo.color}-600`
+                                      )}></div>
+                                      <TypeIcon className={cn(
+                                        "absolute inset-0 m-auto w-16 h-16 md:w-20 md:h-20 drop-shadow-lg transition-colors duration-300",
+                                        `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400 group-hover:text-white`
+                                      )} />
+                                  </div>
+
+                                  {/* Play Overlay (Touch Feedback) */}
+                                  {!category.isLocked && (
+                                    <div className="absolute inset-0 z-20 bg-black/0 group-active:bg-black/5 transition-colors" />
+                                  )}
                               </Link>
                           );
                       })}
 
-                      {/* Fallback for Empty Items but has Topics (Legacy Mode or purely empty) */}
+                      {/* Fallback for Empty Items */}
                       {items.length === 0 && (
                           <div className="col-span-full py-12 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[2rem]">
                               <p className="text-slate-400 font-bold text-sm">Belum ada konten di kategori ini.</p>

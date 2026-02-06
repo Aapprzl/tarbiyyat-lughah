@@ -114,6 +114,7 @@ export const contentService = {
                  ...section,
                  title: section.title || 'Untitled Category',
                  icon: section.icon || 'BookOpen',
+                 desc: typeof section.desc === 'string' ? section.desc : '',
                  topics: (Array.isArray(section.topics) ? section.topics : []).map(t => ({
                      ...t,
                      title: t?.title || 'Untitled Topic'
@@ -212,7 +213,7 @@ export const contentService = {
     return null;
   },
 
-  async addNewSection(title, iconName = 'BookOpen') {
+  async addNewSection(title, iconName = 'BookOpen', desc = '') {
     const curr = await this._fetchCurriculum();
     let newId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     if (!newId) newId = `section-${Date.now()}`;
@@ -221,6 +222,7 @@ export const contentService = {
       id: newId,
       title: title,
       icon: iconName,
+      desc: desc,
       topics: []
     };
 
@@ -238,13 +240,14 @@ export const contentService = {
     return newSection;
   },
 
-  async updateSection(id, title, icon, options = {}) {
+  async updateSection(id, title, icon, desc = null, options = {}) {
     const curr = await this._fetchCurriculum();
     const section = curr.find(s => s.id === id);
     
     if (section) {
       if (title) section.title = title;
       if (icon) section.icon = icon;
+      if (desc !== undefined && desc !== null) section.desc = desc;
       if (options.hasOwnProperty('isLocked')) section.isLocked = options.isLocked;
       await this.saveCurriculum(curr);
       return true;

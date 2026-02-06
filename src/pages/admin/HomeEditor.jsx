@@ -330,31 +330,7 @@ const HomeEditor = () => {
                     />
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-slate-100 dark:border-slate-700">
-                   <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Tombol Utama (CTA)</label>
-                        <div className="relative">
-                           <MousePointer className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                           <input 
-                             type="text" 
-                             value={config.heroButtonText}
-                             onChange={(e) => setConfig({...config, heroButtonText: e.target.value})}
-                             className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
-                             placeholder="Mulai Belajar"
-                           />
-                        </div>
-                   </div>
-                   <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Tombol Sekunder</label>
-                        <input 
-                          type="text" 
-                          value={config.heroButtonSecondaryText || 'Tentang Kami'}
-                          onChange={(e) => setConfig({...config, heroButtonSecondaryText: e.target.value})}
-                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
-                          placeholder="Tentang Kami"
-                        />
-                   </div>
-                </div>
+                {/* CTA Buttons Removed */}
             </div>
         </motion.div>
 
@@ -508,10 +484,10 @@ const HomeEditor = () => {
                 {/* General Footer Text */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Seksi Program</label>
+                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Brand (Footer)</label>
                         <input 
                           type="text" 
-                          value={config.programsSectionTitle || 'Program Unggulan'}
+                          value={config.programsSectionTitle || 'Tarbiyyat al-Lughah'}
                           onChange={(e) => setConfig({...config, programsSectionTitle: e.target.value})}
                           className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
                         />

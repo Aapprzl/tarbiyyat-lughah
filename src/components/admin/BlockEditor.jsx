@@ -36,7 +36,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'pdf': return { icon: ClipboardList, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
             case 'matchup': return { icon: Puzzle, label: 'Match Up', color: 'text-pink-600', bg: 'bg-pink-50' };
             case 'quiz': return { icon: HelpCircle, label: 'Quiz', color: 'text-teal-600', bg: 'bg-teal-50' };
-            case 'flashcard': return { icon: Layers, label: 'Flash Card', color: 'text-indigo-600', bg: 'bg-indigo-50' };
+
             case 'anagram': return { icon: GripVertical, label: 'Anagram', color: 'text-orange-600', bg: 'bg-orange-50' };
             case 'completesentence': return { icon: Type, label: 'Lengkapi Kalimat', color: 'text-blue-600', bg: 'bg-blue-50' };
             case 'unjumble': return { icon: MoveLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
@@ -53,7 +53,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
         const gradients = {
             matchup: 'from-pink-500 to-rose-600',
             quiz: 'from-emerald-400 to-teal-600',
-            flashcard: 'from-sky-400 to-indigo-600',
+
             anagram: 'from-orange-400 to-amber-600',
             completesentence: 'from-blue-400 to-indigo-600',
             unjumble: 'from-emerald-400 to-indigo-600',
@@ -586,66 +586,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                 </div>
               )}
 
-              {/* --- FLASHCARD BLOCK --- */}
-              {block.type === 'flashcard' && (
-                <div className="space-y-4">
-                  <input 
-                    type="text" 
-                    placeholder="Judul Flash Card..."
-                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 outline-none text-sm"
-                    value={block.data.title || ''}
-                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {block.data.items?.map((item, idx) => (
-                      <div key={idx} className="bg-slate-100 dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10 space-y-3">
-                         <div className="flex justify-between items-center mb-1">
-                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Kartu #{idx + 1}</span>
-                            <button 
-                                onClick={() => {
-                                    const newItems = block.data.items.filter((_, i) => i !== idx);
-                                    onUpdate({ ...block.data, items: newItems });
-                                }}
-                                className="text-slate-400 hover:text-red-500 p-1"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                            </button>
-                         </div>
-                         <div className="space-y-2">
-                             <input 
-                                type="text" 
-                                placeholder="Sisi Depan"
-                                className="w-full bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 font-black tracking-tight"
-                                value={item.front}
-                                onChange={(e) => {
-                                    const newItems = [...block.data.items];
-                                    newItems[idx].front = e.target.value;
-                                    onUpdate({ ...block.data, items: newItems });
-                                }}
-                             />
-                             <input 
-                                type="text" 
-                                placeholder="Sisi Belakang"
-                                className="w-full bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 text-slate-500"
-                                value={item.back}
-                                onChange={(e) => {
-                                    const newItems = [...block.data.items];
-                                    newItems[idx].back = e.target.value;
-                                    onUpdate({ ...block.data, items: newItems });
-                                }}
-                             />
-                         </div>
-                      </div>
-                    ))}
-                  </div>
-                  <button 
-                    onClick={() => onUpdate({ ...block.data, items: [...(block.data.items || []), { id: Date.now(), front: '', back: '' }] })}
-                    className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-400 hover:border-teal-500 hover:text-teal-500 transition-all"
-                  >
-                    + Tambah Kartu
-                  </button>
-                </div>
-              )}
+
 
               {/* --- ANAGRAM BLOCK --- */}
               {block.type === 'anagram' && (

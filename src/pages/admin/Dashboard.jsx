@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
 import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Telescope, Layers, ClipboardList, MoveRight, Diamond, FolderPlus, MoreVertical, ExternalLink, ShieldCheck, DoorOpen, X, Trophy, Gamepad } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
@@ -50,7 +51,8 @@ const AdminDashboard = () => {
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [newTopicTitle, setNewTopicTitle] = useState('');
   const [newSectionTitle, setNewSectionTitle] = useState('');
-  const [selectedIcon, setSelectedIcon] = useState('BookOpen'); 
+  const [newSectionDesc, setNewSectionDesc] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState('BookOpen');  
   const [selectedSection, setSelectedSection] = useState('');
   const [editingSectionId, setEditingSectionId] = useState(null);
 
@@ -80,10 +82,10 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
         if (editingSectionId) {
-          await contentService.updateSection(editingSectionId, newSectionTitle, selectedIcon);
+          await contentService.updateSection(editingSectionId, newSectionTitle, selectedIcon, newSectionDesc);
           toast.success('Kategori berhasil diperbarui!');
         } else {
-          await contentService.addNewSection(newSectionTitle, selectedIcon);
+          await contentService.addNewSection(newSectionTitle, selectedIcon, newSectionDesc);
           toast.success('Kategori baru berhasil dibuat!');
         }
     
@@ -91,6 +93,7 @@ const AdminDashboard = () => {
         setCurriculum(data);
         setShowSectionModal(false);
         setNewSectionTitle('');
+        setNewSectionDesc('');
         setSelectedIcon('BookOpen');
         setEditingSectionId(null);
     } catch (err) {
@@ -137,6 +140,7 @@ const AdminDashboard = () => {
   const openEditSection = (section) => {
       setEditingSectionId(section.id);
       setNewSectionTitle(section.title);
+      setNewSectionDesc(section.desc || '');
       setSelectedIcon(section.icon || 'BookOpen');
       setShowSectionModal(true);
   };
@@ -190,6 +194,7 @@ const AdminDashboard = () => {
               onClick={() => {
                 setEditingSectionId(null);
                 setNewSectionTitle('');
+                setNewSectionDesc('');
                 setSelectedIcon('BookOpen');
                 setShowSectionModal(true);
               }}
@@ -261,63 +266,106 @@ const AdminDashboard = () => {
       </div>
 
       {/* Modals... */}
-      <AnimatePresence>
-          {showSectionModal && (
-            <Modal title={editingSectionId ? 'Edit Kategori' : 'Buat Kategori Baru'} onClose={() => setShowSectionModal(false)}>
-                <form onSubmit={handleSaveSection} className="space-y-6">
-                  <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Nama Kategori</label>
-                    <input 
-                      type="text" 
-                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl px-5 py-4 focus:ring-2 focus:ring-teal-500 outline-none font-bold text-lg"
-                      placeholder="Contoh: Shorof Dasar"
-                      value={newSectionTitle}
-                      onChange={e => setNewSectionTitle(e.target.value)}
-                      autoFocus
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-4">Pilih Ikon Visual</label>
-                    <div className="grid grid-cols-5 gap-3">
-                        {Object.keys(iconMap).map(iconName => {
-                           const Icon = iconMap[iconName];
-                           const isSelected = selectedIcon === iconName;
-                           return (
-                             <button
-                               key={iconName}
-                               type="button"
-                               onClick={() => setSelectedIcon(iconName)}
-                               className={cn(
-                                 "aspect-square rounded-2xl flex items-center justify-center transition-all border-2",
-                                 isSelected 
-                                   ? "bg-teal-600 border-teal-500 text-white shadow-lg shadow-teal-500/20 scale-105" 
-                                   : "bg-slate-50 dark:bg-slate-900 border-transparent text-slate-400 hover:border-teal-500/30"
-                               )}
-                             >
-                               <Icon className="w-6 h-6" />
-                             </button>
-                           );
-                        })}
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-3 pt-4">
-                    <button type="submit" disabled={!newSectionTitle || loading} className="w-full py-4 bg-teal-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50">
-                        {editingSectionId ? 'Simpan Perubahan' : 'Buat Kategori Sekarang'}
-                    </button>
-                    <button type="button" onClick={() => setShowSectionModal(false)} className="w-full py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-slate-700 transition-colors">Batal</button>
-                  </div>
-                </form>
-            </Modal>
-          )}
+      {/* Category Modal - Ported from Games.jsx */}
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+            {showSectionModal && (
+              <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSectionModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
+                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className="bg-white dark:bg-slate-900 icon-picker-modal rounded-[1.5rem] md:rounded-[3rem] w-full max-w-4xl overflow-hidden shadow-2xl relative border border-white/10 mx-4 md:mx-0 max-h-[90vh] flex flex-col">
+                    <div className="p-4 md:p-10 overflow-y-auto custom-scrollbar">
+                        <div className="flex items-center justify-between mb-5 md:mb-10">
+                          <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+                              <div className="w-9 h-9 md:w-12 md:h-12 bg-teal-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-teal-600 shrink-0">
+                                  <Plus className="w-4 h-4 md:w-6 md:h-6" />
+                              </div>
+                              <div className="min-w-0">
+                                  <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingSectionId ? 'Edit Kategori' : 'Buat Kategori'}</h2>
+                                  <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengaturan kategori kurikulum.</p>
+                              </div>
+                          </div>
+                          <button onClick={() => setShowSectionModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
+                              <X className="w-5 h-5" />
+                          </button>
+                        </div>
+                        
+                        <form onSubmit={handleSaveSection} className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+                                {/* Left Column: Inputs */}
+                                <div className="md:col-span-7 space-y-6">
+                                   <div className="space-y-3">
+                                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Kategori</label>
+                                      <input 
+                                        type="text" 
+                                        value={newSectionTitle}
+                                        onChange={(e) => setNewSectionTitle(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                                        placeholder="Contoh: Shorof Dasar"
+                                        autoFocus
+                                        required
+                                      />
+                                   </div>
 
+                                   <div className="space-y-3">
+                                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi</label>
+                                      <textarea 
+                                        value={newSectionDesc}
+                                        onChange={(e) => setNewSectionDesc(e.target.value)}
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none h-20 md:h-32 resize-none leading-relaxed"
+                                        placeholder="Deskripsi singkat tentang kategori ini..."
+                                      />
+                                   </div>
+                                </div>
+  
+                                {/* Right Column: Icons */}
+                                <div className="md:col-span-5 space-y-3">
+                                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Pilih Ikon</label>
+                                  <div className="grid grid-cols-6 md:grid-cols-5 gap-1.5 md:gap-3 bg-slate-50 dark:bg-black/20 p-2 md:p-4 rounded-xl md:rounded-[2rem] border border-slate-200 dark:border-white/5 max-h-[200px] md:max-h-[400px] overflow-y-auto custom-scrollbar">
+                                     {Object.keys(iconMap).map(iconName => {
+                                        const IconComp = iconMap[iconName];
+                                        const isSelected = selectedIcon === iconName;
+                                        return (
+                                           <button
+                                              key={iconName}
+                                              type="button"
+                                              onClick={() => setSelectedIcon(iconName)}
+                                              className={cn(
+                                                  "aspect-square rounded-2xl flex items-center justify-center transition-all",
+                                                  isSelected ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20 scale-105" : "bg-white dark:bg-white/5 text-slate-300 hover:bg-white hover:text-teal-500 dark:hover:bg-white/10"
+                                              )}
+                                           >
+                                              <IconComp className="w-5 h-5 md:w-6 md:h-6" />
+                                           </button>
+                                        );
+                                     })}
+                                  </div>
+                                </div>
+                            </div>
+  
+                            <div className="pt-2 md:pt-4 border-t border-slate-100 dark:border-white/5">
+                              <button type="submit" className="w-full py-3 md:py-4 bg-teal-500 text-white rounded-xl md:rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-600 transition-all active:scale-95 text-[10px] md:text-sm">
+                                  {editingSectionId ? 'Simpan Perubahan' : 'Buat Kategori'}
+                              </button>
+                            </div>
+                        </form>
+                    </div>
+                 </motion.div>
+              </div>
+            )}
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* Add Topic Modal */}
+      <AnimatePresence>
           {showAddModal && (
             <Modal title="Tambah Materi Baru" onClose={() => setShowAddModal(false)}>
-                <form onSubmit={handleAddTopic} className="space-y-6">
+                <form onSubmit={handleAddTopic} className="space-y-4 md:space-y-6">
                   <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Judul Materi</label>
+                    <label className="block text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-2 md:mb-3">Judul Materi</label>
                     <input 
                       type="text" 
-                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl px-5 py-4 focus:ring-2 focus:ring-teal-500 outline-none font-bold text-lg"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl md:rounded-2xl px-4 py-3 md:px-5 md:py-4 focus:ring-2 focus:ring-teal-500 outline-none font-bold text-sm md:text-lg"
                       placeholder="Contoh: Bab 1 - Pengenalan"
                       value={newTopicTitle}
                       onChange={e => setNewTopicTitle(e.target.value)}
@@ -325,17 +373,17 @@ const AdminDashboard = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Simpan ke Kategori</label>
-                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white font-bold flex items-center justify-between">
+                    <label className="block text-[10px] md:text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Simpan ke Kategori</label>
+                    <div className="p-3 md:p-4 bg-slate-50 dark:bg-slate-900 rounded-xl md:rounded-2xl border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white font-bold flex items-center justify-between text-sm md:text-base">
                          {curriculum.find(s => s.id === selectedSection)?.title}
                          <Layers className="w-4 h-4 text-teal-500" />
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3 pt-4">
-                    <button type="submit" disabled={!newTopicTitle || loading} className="w-full py-4 bg-teal-600 text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-lg shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50">
+                  <div className="flex flex-col gap-3 pt-2 md:pt-4">
+                    <button type="submit" disabled={!newTopicTitle || loading} className="w-full py-3 md:py-4 bg-teal-600 text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[10px] md:text-xs shadow-lg shadow-teal-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50">
                         Tambahkan Materi
                     </button>
-                    <button type="button" onClick={() => setShowAddModal(false)} className="w-full py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-slate-700 transition-colors">Batal</button>
+                    <button type="button" onClick={() => setShowAddModal(false)} className="w-full py-3 md:py-4 text-slate-500 font-bold uppercase tracking-widest text-[10px] hover:text-slate-700 transition-colors">Batal</button>
                   </div>
                 </form>
             </Modal>
@@ -344,6 +392,8 @@ const AdminDashboard = () => {
     </div>
   );
 };
+
+// --- Sub Components ---
 
 // --- Sub Components ---
 
@@ -357,7 +407,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
         e.stopPropagation();
         setToggling(true);
         try {
-            await contentService.updateSection(section.id, null, null, { isLocked: !section.isLocked });
+            await contentService.updateSection(section.id, null, null, null, { isLocked: !section.isLocked });
             onReload();
         } finally {
             setToggling(false);
@@ -377,71 +427,89 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
     return (
         <motion.div 
             layout
-            className="group bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl transition-all border-b-4 border-b-teal-500/50"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white dark:bg-slate-800 rounded-[3rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow p-2"
         >
-            <div
+            <div 
                 onClick={() => setIsOpen(!isOpen)}
-                className="p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 cursor-pointer hover:bg-teal-500/5 transition-colors"
+                className="flex flex-col md:flex-row items-center gap-6 p-6 md:p-8 cursor-pointer group"
             >
-                <div className="flex items-center gap-6">
-                    <div className={cn(
-                        "w-16 h-16 rounded-[1.5rem] flex items-center justify-center shadow-lg transition-all duration-500",
-                        isOpen ? "bg-teal-600 text-white scale-110 rotate-3" : "bg-white dark:bg-slate-900 text-teal-500 group-hover:scale-110"
-                    )}>
-                        <SectionIcon className="w-8 h-8" />
-                    </div>
-                    <div>
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-white leading-tight mb-1 font-arabic">{section.title}</h3>
-                        <div className="flex items-center gap-3">
-                             <span className="px-3 py-1 bg-slate-100 dark:bg-white/10 rounded-full text-[10px] font-black uppercase tracking-widest text-slate-500">
-                                 {topicCount} Topik
-                             </span>
-                                     {topicCount === 0 && (
-                                        <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 uppercase tracking-widest">
-                                            <Rocket className="w-3 h-3" /> Kosong
-                                        </span>
-                                     )}
-                                     {section.isLocked && (
-                                        <span className="px-3 py-1 bg-amber-500/10 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5">
-                                            <ShieldCheck className="w-3 h-3" /> Terkunci
-                                        </span>
-                                     )}
-                                </div>
-                            </div>
-                        </div>
+                {/* Icon */}
+                <div className={cn(
+                    "w-20 h-20 md:w-24 md:h-24 rounded-[2rem] flex items-center justify-center transition-all bg-teal-600 text-white shadow-xl shadow-teal-500/20 shrink-0",
+                    isOpen && "scale-105 rotate-3"
+                )}>
+                    <SectionIcon className="w-8 h-8 md:w-10 md:h-10" />
+                </div>
 
-                        <div className="flex flex-wrap items-center gap-2 md:gap-3 md:border-l border-slate-200 dark:border-white/10 md:pl-6">
-                            <button 
-                                onClick={toggleLock}
-                                disabled={toggling}
-                                className={cn(
-                                    "p-2.5 md:p-3 rounded-2xl transition-all border shrink-0",
-                                    section.isLocked 
-                                        ? "bg-amber-500 text-white border-amber-500 shadow-lg shadow-amber-500/20" 
-                                        : "bg-white dark:bg-slate-900 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 border-slate-100 dark:border-slate-700 hover:border-amber-200"
-                                )}
-                                title={section.isLocked ? "Buka Kunci Kategori" : "Kunci Kategori"}
-                            >
-                                {section.isLocked ? <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" /> : <DoorOpen className="w-4 h-4 md:w-5 md:h-5" />}
-                            </button>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); onEdit(); }}
-                                className="p-2.5 md:p-3 text-slate-400 hover:text-teal-600 hover:bg-white dark:hover:bg-slate-900 rounded-2xl transition-all border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600"
-                                title="Edit Kategori"
-                            >
-                                <Edit2 className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                            <button 
-                                onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                                className="p-2.5 md:p-3 text-slate-400 hover:text-red-500 hover:bg-white dark:hover:bg-slate-900 rounded-2xl transition-all border border-slate-100 dark:border-slate-700 hover:border-slate-200 dark:hover:border-slate-600"
-                                title="Hapus Kategori"
-                            >
-                                <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
-                            </button>
-                            <div className={cn("p-1.5 md:p-2 transition-transform duration-500", isOpen && "rotate-180")}>
-                                <ChevronDown className="w-5 h-5 md:w-6 md:h-6 text-slate-300" />
-                            </div>
-                        </div>
+                {/* Info */}
+                <div className="flex-1 text-center md:text-left min-w-0">
+                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white font-arabic tracking-tight mb-2 group-hover:text-teal-600 transition-colors">{section.title}</h3>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium line-clamp-1 mb-4 hidden md:block">
+                        {section.desc || `Klik untuk melihat ${topicCount} topik materi dalam kategori ini.`}
+                    </p>
+                    
+                    <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                            <span className="bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest border border-slate-200 dark:border-slate-700">
+                                {topicCount} Materi
+                            </span>
+                            {section.isLocked && (
+                                <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-3 py-1.5 rounded-full ring-1 ring-amber-500/20">
+                                    <ShieldCheck className="w-3 h-3" /> Terkunci
+                                </span>
+                            )}
+                            {topicCount === 0 && (
+                                <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 uppercase tracking-widest">
+                                    <Rocket className="w-3 h-3" /> Kosong
+                                </span>
+                            )}
+                    </div>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3 w-full md:w-auto shrink-0">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen) }}
+                        className={cn(
+                            "flex items-center justify-center gap-2 px-6 py-4 bg-teal-500 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-600 active:scale-95 transition-all w-full md:w-auto text-xs",
+                            isOpen && "bg-slate-800 text-slate-300 shadow-none hover:bg-slate-700"
+                        )}
+                    >
+                        {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        {isOpen ? 'Tutup Materi' : 'Lihat Materi'}
+                    </button>
+                    
+                    <div className="flex items-center justify-center gap-2">
+                        <button 
+                            onClick={toggleLock}
+                            disabled={toggling}
+                            className={cn(
+                                "p-3 rounded-2xl transition-all border flex-1 md:flex-none justify-center flex",
+                                section.isLocked 
+                                ? "text-amber-500 bg-amber-500/10 border-amber-500/20" 
+                                : "bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-amber-500 border-slate-200 dark:border-slate-700"
+                            )}
+                            title={section.isLocked ? "Buka Kunci" : "Kunci Kategori"}
+                        >
+                            {section.isLocked ? <ShieldCheck className="w-5 h-5" /> : <DoorOpen className="w-5 h-5" />}
+                        </button>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onEdit(); }}
+                            className="p-3 text-slate-400 hover:text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-900/20 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
+                            title="Edit Info"
+                        >
+                            <Edit2 className="w-5 h-5" />
+                        </button>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
+                            title="Hapus Kategori"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <AnimatePresence>
@@ -451,22 +519,21 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden bg-slate-50/50 dark:bg-slate-900"
+                        className="overflow-hidden bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700/50"
                     >
-                        <div className="p-8 pt-0">
-                        <div className="h-px w-full bg-slate-200 dark:bg-slate-800 mb-8"></div>
+                        <div className="p-6 md:p-8">
                         
                         {topicCount > 0 ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 { (section.topics || []).map((topic) => (
                                     <div key={topic.id} className={cn(
-                                        "group/item flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 bg-white dark:bg-slate-800 border rounded-[2rem] md:rounded-3xl transition-all gap-4",
+                                        "group/item flex flex-col sm:flex-row sm:items-center justify-between p-4 md:p-5 bg-white dark:bg-slate-800 border rounded-[2rem] md:rounded-3xl transition-all gap-4 shadow-sm",
                                         topic.isLocked ? "border-amber-500/30 opacity-80" : "border-slate-200 dark:border-slate-700 hover:border-teal-500/30 hover:shadow-lg"
                                     )}>
                                         <div className="flex items-center gap-3 md:gap-4">
                                             <div className={cn(
                                                 "w-10 h-10 rounded-xl flex items-center justify-center transition-all shrink-0",
-                                                topic.isLocked ? "bg-amber-500 text-white" : "bg-slate-100 dark:bg-slate-900 text-slate-400 group-hover/item:bg-teal-500 group-hover/item:text-white"
+                                                topic.isLocked ? "bg-amber-500 text-white" : "bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 group-hover/item:bg-teal-500 group-hover/item:text-white"
                                             )}>
                                                 {topic.isLocked ? <ShieldCheck className="w-5 h-5" /> : <ClipboardList className="w-5 h-5" />}
                                             </div>
@@ -508,12 +575,12 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         ) : (
                             <div className="text-center py-12 bg-white/50 dark:bg-slate-900 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-700">
                                 <Diamond className="w-10 h-10 mx-auto mb-4 text-slate-300 opacity-50" />
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Kategori ini masih kosong</p>
+                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Kategori ini belum memiliki materi.</p>
                             </div>
                         )}
                         <button 
                             onClick={onAddTopic}
-                            className="mt-6 w-full group flex items-center justify-center gap-3 py-5 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-3xl text-slate-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-500/5 transition-all text-xs font-black uppercase tracking-widest"
+                            className="mt-6 w-full group flex items-center justify-center gap-3 py-5 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-[2rem] text-slate-500 hover:border-teal-500 hover:text-teal-600 hover:bg-teal-500/5 transition-all text-xs font-black uppercase tracking-widest"
                         >
                             <Plus className="w-5 h-5 transition-transform group-hover:rotate-90" />
                             Tambahkan Materi Ke Sini
@@ -527,32 +594,40 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
 };
 
 // Generic Modal Component
-const Modal = ({ title, children, onClose }) => (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
-            onClick={onClose}
-        />
-        <motion.div 
-            initial={{ opacity: 0, scale: 0.9, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 30 }}
-            className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] p-6 md:p-12 shadow-2xl border border-white/20 overflow-hidden"
-        >
-            <div className="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gradient-to-r from-teal-500 via-indigo-500 to-purple-500"></div>
-            <div className="flex items-center justify-between mb-8 md:mb-10">
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">{title}</h2>
-                <button onClick={onClose} className="p-2 md:p-3 bg-slate-100 dark:bg-white/5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors">
-                    <X className="w-5 h-5 md:w-6 md:h-6 text-slate-500" />
-                </button>
-            </div>
-            {children}
-        </motion.div>
-    </div>
-);
+const Modal = ({ title, children, onClose }) => {
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+            <motion.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-slate-950/80 backdrop-blur-md"
+                onClick={onClose}
+            />
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                className="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-[1.5rem] md:rounded-[3rem] shadow-2xl border border-white/20 overflow-hidden mx-4 max-h-[90vh] flex flex-col"
+            >
+                <div className="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gradient-to-r from-teal-500 via-indigo-500 to-purple-500 z-10"></div>
+                
+                <div className="p-5 md:p-12 overflow-y-auto custom-scrollbar">
+                    <div className="flex items-center justify-between mb-6 md:mb-10">
+                        <h2 className="text-xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">{title}</h2>
+                        <button onClick={onClose} className="p-2 md:p-3 bg-slate-100 dark:bg-white/5 rounded-2xl hover:bg-slate-200 dark:hover:bg-white/10 transition-colors shrink-0">
+                            <X className="w-5 h-5 md:w-6 md:h-6 text-slate-500" />
+                        </button>
+                    </div>
+                    {children}
+                </div>
+            </motion.div>
+        </div>,
+        document.body
+    );
+};
 
 
 

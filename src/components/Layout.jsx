@@ -55,7 +55,22 @@ const Layout = () => {
                   <div className="space-y-6">
                     <div className="flex flex-col gap-1">
                       <span className="text-2xl font-black tracking-tighter text-slate-800 dark:text-white uppercase italic">
-                        Tarbiyyat <span className="text-teal-600 dark:text-teal-400">al-Lughah</span>
+                        {config?.programsSectionTitle ? (
+                          (() => {
+                            const text = config.programsSectionTitle;
+                            const firstSpaceIndex = text.indexOf(' ');
+                            if (firstSpaceIndex === -1) return text;
+                            return (
+                              <>
+                                {text.substring(0, firstSpaceIndex)} <span className="text-teal-600 dark:text-teal-400">{text.substring(firstSpaceIndex + 1)}</span>
+                              </>
+                            );
+                          })()
+                        ) : (
+                          <>
+                            Tarbiyyat <span className="text-teal-600 dark:text-teal-400">al-Lughah</span>
+                          </>
+                        )}
                       </span>
                       <div className="h-1.5 w-16 bg-teal-600 dark:bg-teal-400 rounded-full"></div>
                     </div>

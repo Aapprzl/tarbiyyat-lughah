@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
 import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, Diamond, FolderPlus, Crosshair, CheckSquare, Sliders, Orbit, X, ShieldCheck, DoorOpen, Trophy, Gamepad, PlayCircle } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/Toast';
@@ -227,96 +228,108 @@ const AdminGames = () => {
       </div>
 
       {/* Category Modal */}
-      <AnimatePresence>
-          {showCategoryModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
-                <motion.div initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }} className="bg-white dark:bg-slate-900 rounded-[2.5rem] md:rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/10">
-                  <div className="p-6 md:p-10">
-                      <div className="flex items-center justify-between mb-8 md:mb-10">
-                        <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
-                            <div className="w-10 h-10 md:w-12 md:h-12 bg-amber-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
-                                <Plus className="w-5 h-5 md:w-6 md:h-6" />
-                            </div>
-                            <div className="min-w-0">
-                                <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingCategoryId ? 'Edit Info Game' : 'Buat Kategori Baru'}</h2>
-                                <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengaturan nama dan ikon kategori.</p>
-                            </div>
-                        </div>
-                        <button onClick={() => setShowCategoryModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
-                            <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                      
-                      <form onSubmit={handleSaveCategory} className="space-y-8">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Kategori</label>
-                                <input 
-                                  type="text" 
-                                  value={categoryForm.title}
-                                  onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
-                                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none outline-none"
-                                  placeholder="Contoh: Level 1"
-                                  required
-                                />
-                             </div>
-
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Ikon</label>
-                                <div className="grid grid-cols-5 gap-2 bg-slate-50 dark:bg-black/20 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
-                                   {Object.keys(iconMap).map(iconName => {
-                                      const IconComp = iconMap[iconName];
-                                      const isSelected = categoryForm.icon === iconName;
-                                      return (
-                                         <button
-                                            key={iconName}
-                                            type="button"
-                                            onClick={() => setCategoryForm({ ...categoryForm, icon: iconName })}
-                                            className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                                                isSelected ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "text-slate-400"
-                                            )}
-                                         >
-                                            <IconComp className="w-5 h-5" />
-                                         </button>
-                                      );
-                                   })}
-                                </div>
-                             </div>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+            {showCategoryModal && (
+              <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowCategoryModal(false)} className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl" />
+                  <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 10 }} className="bg-white dark:bg-slate-900 icon-picker-modal rounded-[1.5rem] md:rounded-[3rem] w-full max-w-4xl overflow-hidden shadow-2xl relative border border-white/10 mx-4 md:mx-0 max-h-[90vh] flex flex-col">
+                    <div className="p-4 md:p-10 overflow-y-auto custom-scrollbar">
+                        <div className="flex items-center justify-between mb-5 md:mb-10">
+                          <div className="flex items-center gap-3 md:gap-4 overflow-hidden">
+                              <div className="w-9 h-9 md:w-12 md:h-12 bg-amber-500/10 rounded-xl md:rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
+                                  <Plus className="w-4 h-4 md:w-6 md:h-6" />
+                              </div>
+                              <div className="min-w-0">
+                                  <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingCategoryId ? 'Edit Info Game' : 'Buat Kategori'}</h2>
+                                  <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengaturan kategori.</p>
+                              </div>
                           </div>
-
-                          <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi</label>
-                            <textarea 
-                              value={categoryForm.desc}
-                              onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
-                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none h-24 resize-none"
-                              placeholder="Deskripsi singkat tentang kategori ini..."
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10">
-                             <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
-                                   {categoryForm.isLocked ? <ShieldCheck className="w-6 h-6" /> : <DoorOpen className="w-6 h-6" />}
-                                </div>
-                                <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Kunci Kategori</h4>
-                             </div>
-                             <button type="button" onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })} className={cn("px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", categoryForm.isLocked ? "bg-amber-500 text-white" : "bg-white dark:bg-white/5 text-slate-400")}>
-                               {categoryForm.isLocked ? 'Terkunci' : 'Terbuka'}
-                             </button>
-                          </div>
-
-                          <button type="submit" className="w-full py-4 bg-amber-500 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95">
-                             {editingCategoryId ? 'Simpan Perubahan' : 'Buat Kategori'}
+                          <button onClick={() => setShowCategoryModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
+                              <X className="w-5 h-5" />
                           </button>
-                      </form>
-                  </div>
-               </motion.div>
-            </div>
-          )}
-      </AnimatePresence>
+                        </div>
+                        
+                        <form onSubmit={handleSaveCategory} className="space-y-8">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12">
+                                {/* Left Column: Inputs */}
+                                <div className="md:col-span-7 space-y-6">
+                                    <div className="space-y-3">
+                                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Permainan</label>
+                                      <input 
+                                        type="text" 
+                                        value={categoryForm.title}
+                                        onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none"
+                                        placeholder="Contoh: Level 1"
+                                        required
+                                      />
+                                   </div>
+  
+                                   <div className="space-y-3">
+                                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi</label>
+                                      <textarea 
+                                        value={categoryForm.desc}
+                                        onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
+                                        className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-xl md:rounded-2xl px-4 py-2.5 md:px-6 md:py-4 text-xs md:text-base text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none h-20 md:h-32 resize-none leading-relaxed"
+                                        placeholder="Deskripsi singkat..."
+                                      />
+                                    </div>
+  
+                                    <div className="flex items-center justify-between p-3 md:p-5 bg-slate-50 dark:bg-white/5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-white/10">
+                                       <div className="flex items-center gap-3 md:gap-4">
+                                          <div className="w-8 h-8 md:w-10 md:h-10 bg-white dark:bg-slate-800 rounded-lg md:rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-slate-100 dark:border-slate-700">
+                                             {categoryForm.isLocked ? <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" /> : <DoorOpen className="w-4 h-4 md:w-5 md:h-5" />}
+                                          </div>
+                                          <div>
+                                              <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">Status Kunci</h4>
+                                              <p className="text-[10px] text-slate-500 font-bold">Kunci kategori ini dari siswa?</p>
+                                          </div>
+                                       </div>
+                                       <button type="button" onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })} className={cn("w-12 h-6 rounded-full transition-colors relative flex items-center", categoryForm.isLocked ? "bg-amber-500" : "bg-slate-200 dark:bg-slate-700")}>
+                                         <div className={cn("w-4 h-4 bg-white rounded-full shadow-md absolute transition-all", categoryForm.isLocked ? "right-1" : "left-1")} />
+                                       </button>
+                                    </div>
+                                </div>
+  
+                                {/* Right Column: Icons */}
+                                <div className="md:col-span-5 space-y-3">
+                                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-1">Pilih Ikon</label>
+                                  <div className="grid grid-cols-6 md:grid-cols-5 gap-1.5 md:gap-3 bg-slate-50 dark:bg-black/20 p-2 md:p-4 rounded-xl md:rounded-[2rem] border border-slate-200 dark:border-white/5 max-h-[200px] md:max-h-[400px] overflow-y-auto custom-scrollbar">
+                                     {Object.keys(iconMap).map(iconName => {
+                                        const IconComp = iconMap[iconName];
+                                        const isSelected = categoryForm.icon === iconName;
+                                        return (
+                                           <button
+                                              key={iconName}
+                                              type="button"
+                                              onClick={() => setCategoryForm({ ...categoryForm, icon: iconName })}
+                                              className={cn(
+                                                  "aspect-square rounded-2xl flex items-center justify-center transition-all",
+                                                  isSelected ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20 scale-105" : "bg-white dark:bg-white/5 text-slate-300 hover:bg-white hover:text-amber-500 dark:hover:bg-white/10"
+                                              )}
+                                           >
+                                              <IconComp className="w-5 h-5 md:w-6 md:h-6" />
+                                           </button>
+                                        );
+                                     })}
+                                  </div>
+                                </div>
+                            </div>
+  
+                            <div className="pt-2 md:pt-4 border-t border-slate-100 dark:border-white/5">
+                              <button type="submit" className="w-full py-3 md:py-4 bg-amber-500 text-white rounded-xl md:rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95 text-[10px] md:text-sm">
+                                  {editingCategoryId ? 'Simpan' : 'Buat'}
+                              </button>
+                            </div>
+                        </form>
+                    </div>
+                 </motion.div>
+              </div>
+            )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };
