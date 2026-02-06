@@ -32,7 +32,7 @@ const BottomBar = () => {
     { to: '/materi', icon: Library, label: 'Materi' },
     { to: '/permainan', icon: Trophy, label: 'Permainan' },
     { to: '/perpustakaan', icon: Library, label: 'Perpustakaan' },
-    { to: '/admin/login', icon: ShieldHalf, label: 'Admin' },
+
   ];
 
   // Configurable Scales based on User Feedback

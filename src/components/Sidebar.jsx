@@ -268,15 +268,7 @@ const Sidebar = ({ isOpen, onClose }) => {
         </nav>
         
         {/* Admin Link (Footer) */}
-        <div className="p-6 border-t border-slate-100 dark:border-white/5 mt-auto">
-          <NavLink
-            to="/admin/login"
-            className="group flex items-center justify-center gap-2 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-all border border-slate-100 dark:border-white/5"
-          >
-            <ShieldCheck className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-            <span className="font-bold text-xs tracking-widest uppercase">Admin Panel</span>
-          </NavLink>
-        </div>
+
       </aside>
     </>
   );
