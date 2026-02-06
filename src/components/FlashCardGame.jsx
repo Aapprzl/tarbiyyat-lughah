@@ -1,120 +1,129 @@
-import React, { useState } from 'react';
-import { MoveLeft, MoveRight, RotateCw, Layers } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { RotateCw, RefreshCcw, Shuffle, Sparkles, Languages } from 'lucide-react';
+import { cn } from '../utils/cn';
+
 const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
-  
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [cards, setCards] = useState([]);
+  const [flippedIndices, setFlippedIndices] = useState(new Set());
 
-  const currentItem = items[currentIndex];
-
-  const handleNext = (e) => {
-    e.stopPropagation();
-    if (currentIndex < items.length - 1) {
-      setIsFlipped(false);
-      setTimeout(() => setCurrentIndex(prev => prev + 1), 150);
+  useEffect(() => {
+    if (items && items.length > 0) {
+      setCards(items);
     }
+  }, [items]);
+
+  const handleShuffle = () => {
+    const shuffled = [...cards].sort(() => Math.random() - 0.5);
+    setCards(shuffled);
+    setFlippedIndices(new Set());
   };
 
-  const handlePrev = (e) => {
-    e.stopPropagation();
-    if (currentIndex > 0) {
-      setIsFlipped(false);
-      setTimeout(() => setCurrentIndex(prev => prev - 1), 150);
-    }
+  const handleReset = () => {
+    setCards(items);
+    setFlippedIndices(new Set());
   };
 
-  const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+  const toggleFlip = (idx) => {
+    const newFlipped = new Set(flippedIndices);
+    if (newFlipped.has(idx)) {
+      newFlipped.delete(idx);
+    } else {
+      newFlipped.add(idx);
+    }
+    setFlippedIndices(newFlipped);
   };
 
   if (!items || items.length === 0) {
     return (
-      <div className="p-8 text-center bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)]">
-        <p className="text-[var(--color-text-muted)]">Belum ada kartu flash card.</p>
+      <div className="p-12 text-center bg-slate-50 dark:bg-white/5 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-white/10">
+        <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mx-auto mb-4">
+           {/* Fallback icon if Layers is not imported, but it was in previous version */}
+           <RotateCw className="w-8 h-8 text-slate-400" />
+        </div>
+        <h3 className="text-slate-900 dark:text-white font-bold text-lg">Belum ada kartu</h3>
+        <p className="text-slate-500 text-sm mt-1">Tambahkan kosakata melalui panel admin untuk mulai bermain.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden select-none">
-      {/* Header */}
-      <div className="bg-[var(--color-bg-muted)] px-6 py-4 flex justify-between items-center border-b border-[var(--color-border)]">
-        <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-indigo-500" />
-            <span className="font-bold text-[var(--color-text-main)]">{title}</span>
-        </div>
-        <div className="text-xs font-bold bg-[var(--color-bg-main)] px-3 py-1 rounded-full text-[var(--color-text-muted)] border border-[var(--color-border)]">
-           {currentIndex + 1} / {items.length}
+    <div className="max-w-5xl mx-auto space-y-8 select-none">
+      {/* Header Section */}
+      <div className="text-center space-y-4">
+        <div className="space-y-2">
+           <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white flex items-center justify-center gap-3">
+              <span className="text-4xl">🃏</span> Flash <span className="text-teal-500 italic">Card</span>
+           </h1>
+           <p className="text-slate-500 dark:text-slate-400 text-sm md:text-base font-medium max-w-md mx-auto leading-relaxed">
+              Ketuk kartu untuk melihat jawaban. Latih ingatanmu setiap hari!
+           </p>
         </div>
       </div>
 
-      {/* Game Area */}
-      <div className="p-4 md:p-8 flex flex-col items-center min-h-[500px]">
-         
-         {/* Card Container */}
-         <div 
-            className="relative w-full max-w-lg min-h-[350px] cursor-pointer perspective-1000 group mb-6"
-            onClick={handleFlip}
-         >
-            <div 
-                className={`w-full h-full relative transition-all duration-500 transform-style-3d shadow-xl rounded-2xl ${isFlipped ? 'rotate-y-180' : ''}`}
-                style={{ minHeight: '350px' }}
+      {/* Grid Area */}
+      <div className="grid grid-cols-2 gap-3 md:gap-6 px-2 md:px-0">
+        <AnimatePresence mode="popLayout">
+          {cards.map((item, idx) => (
+            <motion.div
+              layout
+              key={item.id || idx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ delay: idx * 0.03 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="perspective-1000 h-[160px] md:h-[240px] group cursor-pointer"
+              onClick={() => toggleFlip(idx)}
             >
-                {/* FRONT */}
-                <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-indigo-500 to-indigo-600 dark:from-indigo-600 dark:to-indigo-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center border-2 border-indigo-400/50">
-                    <span className="text-white/70 text-xs font-bold uppercase tracking-widest mb-2 flex-shrink-0">Depan (Pertanyaan)</span>
-                    
-                    <div className="flex-1 w-full flex items-center justify-center overflow-y-auto custom-scrollbar my-2">
-                         <h3 className="text-2xl md:text-4xl font-bold text-white leading-relaxed dir-rtl px-2 break-words max-w-full" style={{ fontFamily: 'var(--font-arabic)' }}>
-                            {currentItem.front}
-                        </h3>
-                    </div>
-
-                    <p className="mt-2 text-white/50 text-xs flex items-center gap-2 animate-pulse flex-shrink-0">
-                        <RotateCw className="w-4 h-4" /> Klik untuk balik
-                    </p>
+              <motion.div
+                className="relative w-full h-full transition-all duration-500 transform-style-3d bg-transparent rounded-[2rem]"
+                animate={{ 
+                  rotateY: flippedIndices.has(idx) ? 180 : 0,
+                  scale: flippedIndices.has(idx) ? [1, 1.05, 1] : [1, 1.05, 1]
+                }}
+                transition={{ 
+                  rotateY: { type: "spring", stiffness: 300, damping: 25 },
+                  scale: { duration: 0.4 }
+                }}
+              >
+                {/* FRONT (Arabic) - Vibrant Teal Gradient */}
+                <div className="absolute inset-0 backface-hidden bg-gradient-to-br from-teal-500 to-emerald-600 rounded-[1.5rem] md:rounded-[2rem] border-2 border-white/20 flex flex-col items-center justify-center p-4 md:p-8 transition-all group-hover:border-white/40 overflow-hidden shadow-lg">
+                   <div className="font-arabic font-black transition-all text-center leading-tight text-3xl md:text-6xl text-white drop-shadow-md">
+                      {item.front}
+                   </div>
                 </div>
 
-                {/* BACK */}
-                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-white dark:bg-gray-800 rounded-2xl p-6 flex flex-col items-center justify-center text-center border-2 border-[var(--color-border)]">
-                     <span className="text-[var(--color-text-muted)] text-xs font-bold uppercase tracking-widest mb-2 flex-shrink-0">Belakang (Jawaban)</span>
-                     
-                     <div className="flex-1 w-full flex items-center justify-center overflow-y-auto custom-scrollbar my-2">
-                        <h3 className="text-xl md:text-3xl font-bold text-[var(--color-text-main)] leading-relaxed px-2 break-words max-w-full">
-                            {currentItem.back}
-                        </h3>
-                     </div>
+                {/* BACK (Indonesian) - Vibrant Cyan/Indigo Gradient */}
+                <div className="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-cyan-500 to-indigo-600 rounded-[1.5rem] md:rounded-[2rem] flex flex-col items-center justify-center p-4 md:p-8 text-center border-2 md:border-4 border-white/20 shadow-inner overflow-hidden">
+                   <div className="font-black text-white transition-all text-center drop-shadow-md leading-tight text-sm md:text-2xl px-2">
+                      {item.back}
+                   </div>
+                   <div className="mt-2 md:mt-4 flex items-center gap-2 text-white/50 text-[7px] md:text-[9px] font-black uppercase tracking-widest">
+                      <RotateCw className="w-3 h-3" /> Klik balik
+                   </div>
                 </div>
-            </div>
-         </div>
+              </motion.div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
 
-         {/* Controls */}
-         <div className="flex items-center gap-4 md:gap-8 w-full justify-center">
-            <button 
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-                className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
-            >
-                <MoveLeft className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-
-            <button 
-                onClick={handleFlip}
-                className="flex-1 max-w-[200px] px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-bold text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors active:scale-95 flex items-center justify-center gap-2"
-            >
-                <RotateCw className="w-4 h-4" />
-                Putar
-            </button>
-
-            <button 
-                onClick={handleNext}
-                disabled={currentIndex === items.length - 1}
-                className="p-3 md:p-4 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-main)] hover:bg-[var(--color-bg-hover)] disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-sm border border-[var(--color-border)] active:scale-95"
-            >
-                <MoveRight className="w-5 h-5 md:w-6 md:h-6" />
-            </button>
-         </div>
-
+      {/* Actions */}
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+        <button 
+           onClick={handleShuffle}
+           className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-600 hover:to-teal-600 text-white rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-cyan-500/25 transition-all flex items-center gap-3 active:scale-95"
+        >
+           <Shuffle className="w-5 h-5" /> Acak Kartu
+        </button>
+        <button 
+           onClick={handleReset}
+           className="px-8 py-4 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 border border-slate-200 dark:border-white/10"
+        >
+           <RefreshCcw className="w-4 h-4" /> Reset
+        </button>
       </div>
 
       <style jsx>{`
@@ -122,10 +131,14 @@ const FlashCardGame = ({ items = [], title = "Flash Card" }) => {
         .transform-style-3d { transform-style: preserve-3d; }
         .backface-hidden { backface-visibility: hidden; }
         .rotate-y-180 { transform: rotateY(180deg); }
-        /* Custom scrollbar for inside card */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 4px; }
+        
+        @keyframes bounce-subtle {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-4px); }
+        }
+        .animate-bounce-subtle {
+          animation: bounce-subtle 3s ease-in-out infinite;
+        }
       `}</style>
     </div>
   );
