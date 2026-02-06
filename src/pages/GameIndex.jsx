@@ -143,51 +143,57 @@ const GameIndex = () => {
                                   key={item.id} 
                                   to={category.isLocked ? '#' : `/program/${category.id}?item=${item.id}`}
                                   className={cn(
-                                      "group relative flex flex-col justify-between h-40 md:h-48 rounded-[2rem] overflow-hidden transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95 border-b-4 active:border-b-0 active:translate-y-1",
-                                      // Dynamic Backgrounds based on type
+                                      "group relative block h-40 md:h-48 rounded-[2rem] transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95 border-b-4 active:border-b-0 active:translate-y-1 transform-gpu",
+                                      // Border colors only on the parent
                                       category.isLocked 
-                                        ? "bg-slate-200 dark:bg-slate-800 border-slate-300 dark:border-slate-700 cursor-not-allowed grayscale opacity-60"
-                                        : `bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-${typeInfo.color}-400 dark:hover:border-${typeInfo.color}-500`
+                                        ? "border-slate-300 dark:border-slate-700 cursor-not-allowed grayscale opacity-60"
+                                        : `border-slate-200 dark:border-slate-700 hover:border-${typeInfo.color}-400 dark:hover:border-${typeInfo.color}-500`
                                   )}
                               >
-                                  {/* Background Decorations */}
+                                  {/* Inner Surface Wrapper - Handles Background & Clipping */}
                                   <div className={cn(
-                                    "absolute inset-0 rounded-[2rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br",
-                                    typeInfo.gradientItems || `from-${typeInfo.color}-500/10 to-${typeInfo.color}-600/10`
-                                  )}></div>
-
-                                  {/* Main Content (Top Left) */}
-                                  <div className="relative z-10 p-5 flex flex-col items-start gap-2">
+                                      "w-full h-full rounded-[1.8rem] overflow-hidden flex flex-col justify-between relative",
+                                      category.isLocked ? "bg-slate-200 dark:bg-slate-800" : "bg-slate-100 dark:bg-slate-800"
+                                  )}>
+                                      {/* Background Decorations */}
                                       <div className={cn(
-                                          "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-white/80 dark:bg-black/20 backdrop-blur-sm",
-                                          `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400`
-                                      )}>
-                                          {typeInfo.label}
-                                      </div>
-                                      <h3 className={cn(
-                                        "font-black text-lg md:text-xl leading-tight line-clamp-2",
-                                        "text-slate-800 dark:text-slate-100"
-                                      )}>
-                                          {item.title}
-                                      </h3>
-                                  </div>
-
-                                  {/* Large Icon (Bottom Right) */}
-                                  <div className="absolute -bottom-4 -right-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                                      <div className={cn(
-                                        "w-24 h-24 md:w-28 md:h-28 rounded-full flex items-center justify-center opacity-20 dark:opacity-20 group-hover:opacity-100 transition-opacity",
-                                        `bg-${typeInfo.color}-500 dark:bg-${typeInfo.color}-600`
+                                        "absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br",
+                                        typeInfo.gradientItems || `from-${typeInfo.color}-500/10 to-${typeInfo.color}-600/10`
                                       )}></div>
-                                      <TypeIcon className={cn(
-                                        "absolute inset-0 m-auto w-16 h-16 md:w-20 md:h-20 drop-shadow-lg transition-colors duration-300",
-                                        `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400 group-hover:text-white`
-                                      )} />
-                                  </div>
 
-                                  {/* Play Overlay (Touch Feedback) */}
-                                  {!category.isLocked && (
-                                    <div className="absolute inset-0 z-20 bg-black/0 group-active:bg-black/5 transition-colors" />
-                                  )}
+                                      {/* Main Content (Top Left) */}
+                                      <div className="relative z-10 p-5 flex flex-col items-start gap-2">
+                                          <div className={cn(
+                                              "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest bg-white/80 dark:bg-black/20 backdrop-blur-sm",
+                                              `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400`
+                                          )}>
+                                              {typeInfo.label}
+                                          </div>
+                                          <h3 className={cn(
+                                            "font-black text-lg md:text-xl leading-tight line-clamp-2",
+                                            "text-slate-800 dark:text-slate-100"
+                                          )}>
+                                              {item.title}
+                                          </h3>
+                                      </div>
+
+                                      {/* Large Icon (Bottom Right) */}
+                                      <div className="absolute -bottom-4 -right-4 transition-transform duration-500 group-hover:scale-110 group-hover:-rotate-6">
+                                          <div className={cn(
+                                            "w-24 h-24 md:w-28 md:h-28 rounded-[2rem] flex items-center justify-center opacity-20 dark:opacity-20 group-hover:opacity-100 transition-opacity",
+                                            `bg-${typeInfo.color}-500 dark:bg-${typeInfo.color}-600`
+                                          )}></div>
+                                          <TypeIcon className={cn(
+                                            "absolute inset-0 m-auto w-16 h-16 md:w-20 md:h-20 drop-shadow-lg transition-colors duration-300",
+                                            `text-${typeInfo.color}-600 dark:text-${typeInfo.color}-400 group-hover:text-white`
+                                          )} />
+                                      </div>
+
+                                      {/* Play Overlay (Touch Feedback) */}
+                                      {!category.isLocked && (
+                                        <div className="absolute inset-0 z-20 bg-black/0 group-active:bg-black/5 transition-colors" />
+                                      )}
+                                  </div>
                               </Link>
                           );
                       })}
