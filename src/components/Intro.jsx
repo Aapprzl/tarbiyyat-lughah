@@ -42,7 +42,7 @@ const TypingText = ({ texts, speed = 80, wait = 2500 }) => {
   return (
     <div className="flex items-center justify-center min-h-[1.5em]">
       <motion.span 
-        key={`${currentIndex}-${displayText}`}
+        key={currentIndex} 
         initial={{ opacity: 0.8 }}
         animate={{ opacity: 1 }}
         className="text-slate-500 dark:text-slate-400 font-medium inline-block"
