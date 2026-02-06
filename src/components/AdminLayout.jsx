@@ -59,7 +59,7 @@ const AdminLayout = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-main)]">
         <div className="relative">
             <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
             <LayoutDashboard className="absolute inset-0 m-auto w-6 h-6 text-teal-500 animate-pulse" />

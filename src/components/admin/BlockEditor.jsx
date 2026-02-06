@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Image as ImageIcon } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../../components/PdfViewer';
@@ -9,12 +9,14 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
     <button 
         onClick={onClick}
         className={cn(
-            bg, color, 
-            "px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:brightness-95 active:scale-95 transition-all border border-transparent hover:border-current shadow-sm"
+            bg,
+            "px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all border border-slate-200/50 dark:border-white/10 shadow-sm backdrop-blur-md group"
         )}
     >
-        <Icon className="w-3 md:w-3.5 h-3 md:h-3.5" />
-        <span className="truncate">{label}</span>
+        <div className={cn("w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center transition-colors shrink-0", bg, color, "brightness-95")}>
+            <Icon className="w-3 md:w-4 h-3 md:h-4" />
+        </div>
+        <span className="truncate dark:text-white/90 text-slate-700">{label}</span>
     </button>
 );
 
@@ -39,9 +41,30 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'completesentence': return { icon: Type, label: 'Lengkapi Kalimat', color: 'text-blue-600', bg: 'bg-blue-50' };
             case 'unjumble': return { icon: MoveLeft, label: 'Unjumble', color: 'text-purple-600', bg: 'bg-purple-50' };
             case 'spinwheel': return { icon: RefreshCcw, label: 'Spin Wheel', color: 'text-pink-600', bg: 'bg-pink-50' };
-            case 'wordclassification': return { icon: Puzzle, label: 'Tebak Kata', color: 'text-rose-600', bg: 'bg-rose-50' };
-            default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50' };
+            case 'wordclassification': return { icon: Puzzle, label: 'Tebak Kata', color: 'text-rose-600', bg: 'bg-rose-50', gradient: 'from-rose-500 to-pink-600' };
+            case 'harakat': return { icon: Keyboard, label: 'Harakat', color: 'text-orange-600', bg: 'bg-orange-50', gradient: 'from-amber-400 to-orange-600' };
+            default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50', gradient: 'from-slate-400 to-slate-600' };
         }
+    };
+
+    const getEnhancedInfo = (type) => {
+        const base = getBlockInfo(type);
+        // Add specific gradients if not present (extending getBlockInfo for thumbnails)
+        const gradients = {
+            matchup: 'from-pink-500 to-rose-600',
+            quiz: 'from-emerald-400 to-teal-600',
+            flashcard: 'from-sky-400 to-indigo-600',
+            anagram: 'from-orange-400 to-amber-600',
+            completesentence: 'from-blue-400 to-indigo-600',
+            unjumble: 'from-emerald-400 to-indigo-600',
+            spinwheel: 'from-indigo-500 to-purple-600',
+            youtube: 'from-red-500 to-rose-600',
+            audio: 'from-violet-500 to-purple-600',
+            pdf: 'from-blue-500 to-cyan-600',
+            vocab: 'from-indigo-500 to-slate-800',
+            text: 'from-teal-400 to-emerald-600'
+        };
+        return { ...base, gradient: base.gradient || gradients[type] || 'from-slate-400 to-slate-600' };
     };
 
     const info = getBlockInfo(block.type);
@@ -60,13 +83,13 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white dark:bg-slate-900/40 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 border-b-4 border-b-teal-500/50 overflow-hidden group hover:shadow-xl transition-all -ml-11 md:-ml-15"
+            className="bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 border-b-4 border-b-teal-500/50 overflow-hidden group hover:shadow-xl transition-all -ml-11 md:-ml-15"
         >
             {/* Header / Accordion Trigger */}
             <div 
                 className={cn(
                     "flex flex-col transition-all",
-                    isOpen ? "bg-slate-50 dark:bg-white/[0.02]" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.01]"
+                    isOpen ? "bg-slate-50 dark:bg-white/[0.05]" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.02]"
                 )}
             >
                 <div 
@@ -171,7 +194,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
-                        <div className="px-4 md:px-8 pb-6 md:pb-8 pt-4 border-t border-slate-100 dark:border-white/5">
+                        <div className="px-4 md:px-8 pb-6 md:pb-8 pt-4 border-t border-slate-100 dark:border-white/[0.08]">
                             
                             {/* --- THUMBNAIL UPLOADER (Common for all blocks) --- */}
                             <div className="mb-6 p-4 bg-slate-50 dark:bg-black/20 rounded-2xl border border-slate-100 dark:border-white/5 space-y-3">
@@ -189,8 +212,12 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                 </button>
                                             </>
                                         ) : (
-                                            <div className="text-slate-300">
-                                                <ImageIcon className="w-6 h-6" />
+                                            <div className={cn(
+                                                "w-full h-full flex items-center justify-center relative bg-gradient-to-br",
+                                                getEnhancedInfo(block.type).gradient
+                                            )}>
+                                                <div className="absolute inset-0 opacity-10 bg-black/20" />
+                                                <Icon className="w-8 h-8 text-white/80 drop-shadow-md relative z-10" />
                                             </div>
                                         )}
                                     </div>

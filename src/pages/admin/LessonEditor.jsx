@@ -31,6 +31,7 @@ const LessonEditor = () => {
   const [topicTitle, setTopicTitle] = useState('');
   const [topicDesc, setTopicDesc] = useState('');
   const [isSpecialProgram, setIsSpecialProgram] = useState(false);
+  const [pickerTab, setPickerTab] = useState('common'); // 'common' or 'game'
 
   // Helper to extract Firebase URLs
   const extractUrls = (content) => {
@@ -185,7 +186,7 @@ const LessonEditor = () => {
             : { title: '', content: '' }
     };
 
-    setStages(stages.map(stage => {
+    setStages(prevStages => prevStages.map(stage => {
         if (stage.id === stageId) {
             return { ...stage, items: [...stage.items, newBlock] };
         }
@@ -373,7 +374,7 @@ const LessonEditor = () => {
                   {/* Stage Header Card */}
                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 md:mb-8 gap-4 px-0">
                       <div className="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden pl-0">
-                          <div className="w-10 h-10 md:w-14 md:h-14 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl flex items-center justify-center text-teal-500 font-black text-lg md:text-xl shadow-sm transition-all shrink-0 ml-0">
+                          <div className="w-10 h-10 md:w-14 md:h-14 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/20 rounded-2xl flex items-center justify-center text-teal-500 font-black text-lg md:text-xl shadow-md transition-all shrink-0 ml-0">
                              {stageIndex + 1}
                           </div>
                           <div className="flex-1 min-w-0">
@@ -408,7 +409,7 @@ const LessonEditor = () => {
                             <motion.div 
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="text-center py-16 bg-white dark:bg-white/5 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-[3rem] text-slate-400 flex flex-col items-center gap-4"
+                                className="text-center py-16 bg-white dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-white/20 rounded-[3rem] text-slate-400 flex flex-col items-center gap-4"
                             >
                                 <div className="w-16 h-16 rounded-3xl bg-slate-50 dark:bg-white/5 flex items-center justify-center">
                                     <Layers className="w-8 h-8 opacity-20" />
@@ -436,23 +437,67 @@ const LessonEditor = () => {
 
                       {/* Floating Block Picker */}
                       <div className="pt-12">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-6 block text-center md:text-left">Tambahkan Komponen Materi</label>
-                          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-6 gap-2 md:gap-3">
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks" color="text-teal-600" bg="bg-teal-50 dark:bg-teal-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'vocab')} icon={Table} label="Kosakata" color="text-indigo-600" bg="bg-indigo-50 dark:bg-indigo-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={ClipboardList} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Card" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Susun Kata" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordclassification')} icon={Puzzle} label="Tebak Kata" color="text-rose-600" bg="bg-rose-50 dark:bg-rose-500/10" />
-                               <AddBlockButton onClick={() => addBlockToStage(stage.id, 'harakat')} icon={Keyboard} label="Harakat" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
+                          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                              <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Tambahkan Komponen Materi</label>
+                              
+                              <div className="flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200 dark:border-white/5">
+                                  <button 
+                                      onClick={() => setPickerTab('common')}
+                                      className={cn(
+                                          "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                          pickerTab === 'common' 
+                                              ? "bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 shadow-sm" 
+                                              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                      )}
+                                  >
+                                      Fitur Biasa
+                                  </button>
+                                  <button 
+                                      onClick={() => setPickerTab('game')}
+                                      className={cn(
+                                          "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                          pickerTab === 'game' 
+                                              ? "bg-white dark:bg-slate-800 text-teal-600 dark:text-teal-400 shadow-sm" 
+                                              : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                                      )}
+                                  >
+                                      Fitur Game
+                                  </button>
+                              </div>
                           </div>
+
+                          <AnimatePresence mode="wait">
+                              <motion.div 
+                                  key={pickerTab}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  exit={{ opacity: 0, y: -10 }}
+                                  transition={{ duration: 0.2 }}
+                                  className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3"
+                              >
+                                  {pickerTab === 'common' ? (
+                                      <>
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks" color="text-teal-600" bg="bg-teal-50 dark:bg-teal-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'vocab')} icon={Table} label="Kosakata" color="text-indigo-600" bg="bg-indigo-50 dark:bg-indigo-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={ClipboardList} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                                      </>
+                                  ) : (
+                                      <>
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'matchup')} icon={Puzzle} label="Match Up" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'flashcard')} icon={Layers} label="Card" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Susun Kata" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordclassification')} icon={Puzzle} label="Tebak Kata" color="text-rose-600" bg="bg-rose-50 dark:bg-rose-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'harakat')} icon={Keyboard} label="Harakat" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
+                                      </>
+                                  )}
+                              </motion.div>
+                          </AnimatePresence>
                       </div>
                   </div>
               </motion.div>

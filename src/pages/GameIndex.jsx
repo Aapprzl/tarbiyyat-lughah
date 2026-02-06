@@ -27,21 +27,21 @@ const iconMap = {
 
 const getTypeInfo = (type) => {
     switch (type) {
-        case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle };
-        case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle };
-        case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers };
-        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical };
-        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type };
-        case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle };
-        case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw };
-        case 'youtube': return { label: 'Video', color: 'red', icon: Youtube };
-        case 'audio': return { label: 'Audio', color: 'violet', icon: Music };
-        case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList };
-        case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table }; 
-        case 'text': return { label: 'Bacaan', color: 'teal', icon: Type };
-        case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle };
-        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard };
-        default: return { label: 'Materi', color: 'slate', icon: FileText };
+        case 'matchup': return { label: 'Match Up', color: 'pink', icon: Puzzle, gradient: 'from-pink-500 to-rose-600' };
+        case 'quiz': return { label: 'Kuis', color: 'emerald', icon: HelpCircle, gradient: 'from-emerald-400 to-teal-600' };
+        case 'flashcard': return { label: 'Kartu', color: 'sky', icon: Layers, gradient: 'from-sky-400 to-indigo-600' };
+        case 'anagram': return { label: 'Anagram', color: 'orange', icon: GripVertical, gradient: 'from-orange-400 to-amber-600' };
+        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: Type, gradient: 'from-blue-400 to-indigo-600' };
+        case 'unjumble': return { label: 'Susun Kalimat', color: 'emerald', icon: Puzzle, gradient: 'from-emerald-400 to-indigo-600' };
+        case 'spinwheel': return { label: 'Roda Putar', color: 'indigo', icon: RefreshCcw, gradient: 'from-indigo-500 to-purple-600' };
+        case 'youtube': return { label: 'Video', color: 'red', icon: Youtube, gradient: 'from-red-500 to-rose-600' };
+        case 'audio': return { label: 'Audio', color: 'violet', icon: Music, gradient: 'from-violet-500 to-purple-600' };
+        case 'pdf': return { label: 'Dokumen', color: 'blue', icon: ClipboardList, gradient: 'from-blue-500 to-cyan-600' };
+        case 'vocab': return { label: 'Kosakata', color: 'indigo', icon: Table, gradient: 'from-indigo-500 to-slate-800' }; 
+        case 'text': return { label: 'Bacaan', color: 'teal', icon: Type, gradient: 'from-teal-400 to-emerald-600' };
+        case 'wordclassification': return { label: 'Tebak Jenis Kata', color: 'rose', icon: Puzzle, gradient: 'from-rose-500 to-pink-600' };
+        case 'harakat': return { label: 'Harakat', color: 'orange', icon: Keyboard, gradient: 'from-amber-400 to-orange-600' };
+        default: return { label: 'Materi', color: 'slate', icon: FileText, gradient: 'from-slate-400 to-slate-600' };
     }
 };
 
@@ -149,15 +149,29 @@ const GameIndex = () => {
                                   )}
                               >
                                   {/* Thumbnail Area */}
-                                  <div className="aspect-square bg-slate-100 dark:bg-slate-900/50 relative overflow-hidden">
+                                  <div className="aspect-square relative overflow-hidden">
                                       {item.thumbnail ? (
                                           <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                       ) : (
                                           <div className={cn(
-                                              "w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-700 transition-colors",
-                                              `group-hover:text-${typeInfo.color}-500/20`
+                                              "w-full h-full flex items-center justify-center relative transition-transform duration-700 group-hover:scale-110 bg-gradient-to-br",
+                                              typeInfo.gradient
                                           )}>
-                                              <TypeIcon className="w-12 h-12" />
+                                              {/* Decorative background shapes */}
+                                              <div className="absolute inset-0 opacity-10">
+                                                  <div className="absolute top-0 left-0 w-24 h-24 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-2xl" />
+                                                  <div className="absolute bottom-0 right-0 w-32 h-32 bg-black rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
+                                              </div>
+                                              
+                                              {/* Main Stylized Icon */}
+                                              <div className="relative z-10 p-6 bg-white/10 backdrop-blur-md rounded-[2.5rem] border border-white/20 shadow-2xl">
+                                                  <TypeIcon className="w-14 h-14 text-white drop-shadow-lg" />
+                                              </div>
+
+                                              {/* Bottom Accent */}
+                                              <div className="absolute bottom-4 left-4 right-4 h-1 bg-white/20 rounded-full overflow-hidden">
+                                                  <div className="w-1/3 h-full bg-white/40 animate-shimmer" />
+                                              </div>
                                           </div>
                                       )}
                                       

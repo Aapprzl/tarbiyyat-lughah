@@ -65,7 +65,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white dark:bg-slate-950 z-[10000]">
+      <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-main)] z-[10000]">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Memuat...</span>
@@ -82,7 +82,7 @@ function App() {
           {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
           <Router>
             <ScrollToTop />
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen">Memuat...</div>}>
+            <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}>
               <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<Layout />}>
