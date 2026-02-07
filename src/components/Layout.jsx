@@ -92,7 +92,7 @@ const Layout = () => {
                       <div className="space-y-2">
                         <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{config?.footerBackendTitle || 'Backend & Infrastructure'}</p>
                         <p className="text-xs text-slate-600 dark:text-slate-300 font-semibold leading-relaxed">
-                          {config?.footerBackendList || 'Firebase Backend • Google Cloud Console • Git • Node.js'}
+                          {config?.footerBackendList || 'Supabase • PostgreSQL • Vercel • Node.js'}
                         </p>
                       </div>
                       <div className="space-y-2">

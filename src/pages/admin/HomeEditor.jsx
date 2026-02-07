@@ -557,7 +557,7 @@ const HomeEditor = () => {
                                 className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs font-bold outline-none mb-2"
                             />
                             <textarea
-                                value={config.footerBackendList || 'Firebase Backend • Google Cloud Console • Git • Node.js'}
+                                value={config.footerBackendList || 'Supabase • PostgreSQL • Vercel • Node.js'}
                                 onChange={(e) => setConfig({...config, footerBackendList: e.target.value})}
                                 className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-xs font-medium outline-none h-20 resize-none"
                             />

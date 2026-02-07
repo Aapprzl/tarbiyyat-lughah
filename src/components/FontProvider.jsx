@@ -24,9 +24,24 @@ const LATIN_FAMILIES = [
 ];
 
 export const FontProvider = ({ children }) => {
-  const [config, setConfig] = useState(null);
+  const [config, setConfig] = useState(() => {
+    const cached = contentService.getFontConfigSync();
+    return cached || {
+       fontFamily: 'Amiri',
+       latinFontFamily: 'Plus Jakarta Sans',
+       titleSize: 'text-4xl',
+       contentSize: 'text-xl',
+       sidebarSize: 'text-2xl',
+       sidebarLinkSize: 'text-lg',
+       indexTopicSize: 'text-xl',
+       mobileNavScale: '0.8'
+    };
+  });
 
   useEffect(() => {
+    // Apply immediate if valid
+    if (config) applyConfig(config);
+
     const load = async () => {
       const cfg = await contentService.getFontConfig();
       setConfig(cfg);

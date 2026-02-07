@@ -33,12 +33,12 @@ const LessonEditor = () => {
   const [isSpecialProgram, setIsSpecialProgram] = useState(false);
   const [pickerTab, setPickerTab] = useState('common'); // 'common' or 'game'
 
-  // Helper to extract Firebase URLs
+  // Helper to extract URLs (Firebase & Supabase)
   const extractUrls = (content) => {
     if (!content) return [];
     const str = typeof content === 'string' ? content : JSON.stringify(content);
-    // Be robust with URL matching
-    const urlRegex = /https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+/g;
+    // Be robust with URL matching for both Firebase and Supabase
+    const urlRegex = /(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+)|(https:\/\/[^"\s]+\.supabase\.co\/storage\/v1\/object\/public\/[^"\s]+)/g;
     const matches = str.match(urlRegex) || [];
     return [...new Set(matches)];
   };

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { ShieldCheck, Mail, Key, MoveLeft, Diamond, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Mail, Key, MoveLeft, Diamond, Eye, EyeOff, CircleUser } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { useEffect } from 'react';
@@ -12,6 +12,7 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false); // Toggle Register Mode
   const [footerText, setFooterText] = useState('Port of Al-Azhar © 2024');
   const navigate = useNavigate();
 
@@ -35,10 +36,19 @@ const LoginPage = () => {
     setError('');
 
     try {
-      await contentService.login(email, password);
+      if (isRegistering) {
+          await contentService.register(email, password);
+          // Auto login or ask user to login? Supabase usually logs in after signup if confirm disabled.
+          // Let's assume auto-login or redirect.
+          // navigate('/admin/dashboard'); 
+          // For safety, let's login explicitly or if register returns user, we are good.
+      } else {
+          await contentService.login(email, password);
+      }
       navigate('/admin/dashboard');
     } catch (err) {
-      setError('Akses ditolak. Periksa kredensial anda.');
+      console.error(err);
+      setError(isRegistering ? 'Gagal mendaftar. Email mungkin sudah dipakai.' : 'Akses ditolak. Periksa kredensial anda.');
       setLoading(false);
     }
   };
@@ -80,6 +90,30 @@ const LoginPage = () => {
           {/* Form */}
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="space-y-6">
+              {/* Name Field (Only for Register) */}
+              <AnimatePresence>
+                {isRegistering && (
+                    <motion.div 
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="space-y-3 overflow-hidden"
+                    >
+                        <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-6">Full Name</label>
+                        <div className="relative group/input">
+                            <div className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 group-focus-within/input:text-teal-500 dark:group-focus-within/input:text-teal-400 transition-colors">
+                                <CircleUser className="w-5 h-5" />
+                            </div>
+                            <input
+                                type="text"
+                                className="w-full bg-slate-100/50 dark:bg-white/[0.03] hover:bg-slate-100/80 dark:hover:bg-white/[0.05] border border-slate-200 dark:border-slate-800 rounded-[2rem] pl-16 pr-8 py-5 text-base text-slate-900 dark:text-white font-bold placeholder-slate-400 dark:placeholder-slate-600 focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 dark:focus:border-teal-500/50 outline-none transition-all"
+                                placeholder="Admin Name"
+                            />
+                        </div>
+                    </motion.div>
+                )}
+              </AnimatePresence>
+
               <div className="space-y-3">
                 <label className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] ml-6">Email Address</label>
                 <div className="relative group/input">
@@ -160,11 +194,27 @@ const LoginPage = () => {
                             animate={{ x: 0 }}
                             whileHover={{ x: 5 }}
                         >
-                            Masuk Dashboard <Diamond className="w-4 h-4" />
+                            {isRegistering ? 'Daftar Akun Baru' : 'Masuk Dashboard'} <Diamond className="w-4 h-4" />
                         </motion.div>
                     )}
                 </div>
             </motion.button>
+            
+            {/* Registration Hidden for Security after Initial Setup */}
+            {/* 
+            <div className="text-center">
+                <button
+                    type="button" 
+                    onClick={() => {
+                        setIsRegistering(!isRegistering);
+                        setError('');
+                    }}
+                    className="text-xs font-bold text-slate-400 hover:text-teal-500 transition-colors uppercase tracking-widest"
+                >
+                    {isRegistering ? 'Sudah punya akun? Login' : 'Belum punya akun? Daftar'}
+                </button>
+            </div>
+            */}
           </form>
         </div>
       </motion.div>

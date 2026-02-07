@@ -1,80 +1,69 @@
-import { storage } from '../firebaseConfig';
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from 'firebase/storage';
+import { supabase } from '../supabaseClient';
+
+const BUCKET_NAME = 'content';
 
 export const storageService = {
     /**
-     * Uploads a file to Firebase Storage with progress reporting.
+     * Uploads a file to Supabase Storage.
      * @param {File} file - The file object to upload
-     * @param {string} path - The folder path
-     * @param {function} onProgress - Callback for upload progress (0-100)
+     * @param {string} path - The folder path (e.g. 'materials/pdfs')
+     * @param {function} onProgress - Callback for upload progress (Not fully supported in simple retry upload, simulating 0-100)
      * @returns {Promise<string>} - The public download URL
      */
     async uploadFile(file, path = 'uploads', onProgress = null) {
-        return new Promise((resolve, reject) => {
-            try {
-                const timestamp = Date.now();
-                const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
-                const uniqueName = `${timestamp}_${safeName}`;
-                const storageRef = ref(storage, `${path}/${uniqueName}`);
-                
-                const metadata = {
-                    contentType: file.type || 'application/octet-stream'
-                };
+        try {
+            if (onProgress) onProgress(10);
 
-                const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+            const timestamp = Date.now();
+            const safeName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+            const uniquePath = `${path}/${timestamp}_${safeName}`; // e.g. materials/pdfs/123_abc.pdf
 
-                uploadTask.on('state_changed', 
-                    (snapshot) => {
-                        if (onProgress) {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            onProgress(progress);
-                        }
-                    }, 
-                    (error) => {
-                        console.error("Error uploading file:", error);
-                        reject(error);
-                    }, 
-                    async () => {
-                        const url = await getDownloadURL(uploadTask.snapshot.ref);
-                        resolve(url);
-                    }
-                );
-            } catch (error) {
-                console.error("Error in uploadFile setup:", error);
-                reject(error);
-            }
-        });
+            const { data, error } = await supabase.storage
+                .from(BUCKET_NAME)
+                .upload(uniquePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) throw error;
+            if (onProgress) onProgress(100);
+
+            // Get Public URL
+            const { data: publicData } = supabase.storage
+                .from(BUCKET_NAME)
+                .getPublicUrl(uniquePath);
+            
+            return publicData.publicUrl;
+        } catch (error) {
+            console.error("Error uploading file to Supabase:", error);
+            throw error;
+        }
     },
 
     /**
-     * Deletes a file from Firebase Storage using its download URL.
+     * Deletes a file from Supabase Storage using its download URL.
      * @param {string} url - The download URL of the file to delete
      */
     async deleteFile(url) {
         if (!url) return;
         try {
-            let fileRef;
+            // Extract path from URL. 
+            // URL format: .../storage/v1/object/public/content/path/to/file
+            const urlObj = new URL(url);
+            const pathParts = urlObj.pathname.split(`/public/${BUCKET_NAME}/`);
             
-            // Extract path specifically from Firebase Storage URL
-            // Format: .../b/{bucket}/o/{path}?token=...
-            if (url.includes('/o/')) {
-                const matches = url.match(/\/o\/(.+?)(\?|$)/);
-                if (matches && matches[1]) {
-                    // Firebase encodes slashes as %2F, we must decode
-                    const fullPath = decodeURIComponent(matches[1]);
-                    fileRef = ref(storage, fullPath);
-                } else {
-                    fileRef = ref(storage, url);
-                }
-            } else {
-                // Assume it's a gs:// path or raw path
-                fileRef = ref(storage, url);
+            if (pathParts.length > 1) {
+                const fullPath = decodeURIComponent(pathParts[1]); // path/to/file
+                
+                const { error } = await supabase.storage
+                    .from(BUCKET_NAME)
+                    .remove([fullPath]);
+                
+                if (error) throw error;
+                console.log(`[Storage] Deleted file: ${fullPath}`);
             }
-
-            await deleteObject(fileRef);
-            console.log(`[Storage] Deleted file: ${url}`);
         } catch (error) {
-            console.warn(`[Storage] Failed to delete file (might not exist): ${url}`, error);
+            console.warn(`[Storage] Failed to delete file: ${url}`, error);
         }
     }
 };
