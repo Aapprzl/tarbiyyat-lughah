@@ -255,7 +255,13 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                   />
                   <textarea 
                     placeholder="Tulis materi di sini..."
-                    className="w-full h-24 text-sm resize-y outline-none text-[var(--color-text-main)] bg-transparent placeholder-[var(--color-text-muted)]/50"
+                    className="w-full h-48 text-sm resize-y outline-none text-[var(--color-text-main)] bg-transparent placeholder-[var(--color-text-muted)]/50 p-4 rounded-xl border border-slate-200 dark:border-white/10"
+                    style={{ 
+                        fontFamily: isArabic(block.data.content) ? 'var(--font-arabic)' : 'inherit', 
+                        fontSize: isArabic(block.data.content) ? 'var(--font-arabic-content-size)' : 'inherit',
+                        lineHeight: isArabic(block.data.content) ? '2' : '1.5',
+                        direction: isArabic(block.data.content) ? 'rtl' : 'ltr'
+                    }}
                     value={block.data.content || ''}
                     onChange={(e) => onUpdate({ ...block.data, content: e.target.value })}
                   />
@@ -269,8 +275,12 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      <div key={idx} className="flex gap-2 mb-2">
                         <input 
                           type="text"
-                          className="w-1/2 p-2 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded text-right font-arabic border-none outline-none focus:ring-1 focus:ring-teal-200"
-                          style={{ fontSize: 'var(--font-arabic-content-size)' }}
+                          className="w-1/2 p-3 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-xl text-right font-arabic border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-teal-500/50 transition-all"
+                          style={{ 
+                            fontFamily: 'var(--font-arabic)',
+                            fontSize: 'var(--font-arabic-content-size)',
+                            direction: 'rtl'
+                          }}
                           placeholder="Arab"
                           value={item.arab}
                           onChange={(e) => {
@@ -558,6 +568,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                 type="text" 
                                 placeholder="Pilihan jawaban..."
                                 className="flex-1 bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50"
+                                style={{ 
+                                    fontFamily: 'var(--font-arabic)',
+                                    fontSize: 'var(--font-arabic-content-size)',
+                                    direction: 'rtl'
+                                }}
                                 value={opt.text}
                                 onChange={(e) => {
                                   const newQs = [...block.data.questions];
@@ -615,7 +630,12 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     <label className="text-[10px] font-bold text-slate-400 px-1">Kata Target (Akan diacak)</label>
                                     <input 
                                         type="text" 
-                                        className="w-full bg-slate-50 dark:bg-black/20 p-3 rounded-xl text-lg font-black tracking-widest uppercase outline-none focus:ring-1 focus:ring-orange-500"
+                                        className="w-full bg-slate-50 dark:bg-black/20 p-4 rounded-xl text-right outline-none focus:ring-2 focus:ring-orange-500/50 transition-all"
+                                        style={{ 
+                                            fontFamily: 'var(--font-arabic)', 
+                                            fontSize: 'var(--font-arabic-content-size)',
+                                            direction: 'rtl'
+                                        }}
                                         value={item.answer}
                                         onChange={(e) => {
                                             const newQs = [...block.data.questions];
@@ -680,7 +700,12 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                               </button>
                            </div>
                            <textarea 
-                              className="w-full bg-white dark:bg-black/20 p-4 rounded-2xl text-base font-medium outline-none border border-transparent focus:border-blue-500 resize-none h-24 font-arabic leading-relaxed"
+                              className="w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-medium outline-none border border-transparent focus:border-blue-500 resize-none h-32 leading-relaxed text-right dir-rtl"
+                              style={{ 
+                                  fontFamily: 'var(--font-arabic)', 
+                                  fontSize: 'var(--font-arabic-content-size)',
+                                  lineHeight: '1.8'
+                              }}
                               placeholder="Ketik kalimat di sini. Gunakan kurung siku [ ] untuk menentukan kata yang harus diisi. Contoh: Menanam [pohon] di taman."
                               value={item.text}
                               onChange={(e) => {
@@ -748,7 +773,12 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                            
                            <div className="space-y-4">
                                <textarea 
-                                  className="w-full bg-white dark:bg-black/20 p-4 rounded-2xl text-xl font-bold outline-none border border-transparent focus:border-purple-500 resize-none h-24 font-arabic leading-relaxed text-right dir-rtl"
+                                  className="w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-bold outline-none border border-transparent focus:border-purple-500 resize-none h-32 leading-relaxed text-right dir-rtl"
+                                  style={{ 
+                                      fontFamily: 'var(--font-arabic)', 
+                                      fontSize: 'var(--font-arabic-content-size)',
+                                      lineHeight: '1.8'
+                                  }}
                                   placeholder="Ketik kalimat Arab lengkap di sini..."
                                   value={item.text}
                                   onChange={(e) => {

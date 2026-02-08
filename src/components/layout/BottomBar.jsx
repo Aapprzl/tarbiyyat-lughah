@@ -49,6 +49,62 @@ const BottomBar = () => {
     baseScale: 'var(--mobile-nav-scale, 0.8)' 
   };
 
+  const [pillPosition, setPillPosition] = useState(() => {
+    try {
+      const saved = localStorage.getItem('bottom-bar-pill-pos');
+      return saved ? JSON.parse(saved) : { x: 0, y: 0 };
+    } catch (e) {
+      return { x: 0, y: 0 };
+    }
+  });
+
+  // Safety Reset & Clamping
+  useEffect(() => {
+    const clamp = () => {
+        const topLimit = -window.innerHeight + 120;
+        
+        let needsUpdate = false;
+        let newPos = { ...pillPosition };
+
+        if (newPos.y < topLimit) { newPos.y = topLimit; needsUpdate = true; }
+        if (newPos.y > 10) { newPos.y = 10; needsUpdate = true; }
+        
+        // Force Right Side Only
+        if (newPos.x !== 0) { newPos.x = 0; needsUpdate = true; }
+
+        if (needsUpdate) {
+            setPillPosition(newPos);
+            localStorage.setItem('bottom-bar-pill-pos', JSON.stringify(newPos));
+        }
+    };
+
+    clamp();
+    window.addEventListener('resize', clamp);
+    return () => window.removeEventListener('resize', clamp);
+  }, [pillPosition.x, pillPosition.y]);
+
+  const handleDragEnd = (_, info) => {
+    const pillWidth = isDesktop ? 64 : 56;
+    const margin = 4; // Super tight margin (4px)
+    const initialRightOffset = 4; // Matches right-1
+    const availableWidth = window.innerWidth;
+    
+    // Total offset from the initial position (right: 4px)
+    // We force snappedX to 0 because the user wants it ONLY on the right side.
+    const currentTotalY = pillPosition.y + info.offset.y;
+
+    // Snap to the right edge always
+    const snappedX = 0;
+    
+    const newPos = { 
+      x: snappedX, 
+      y: currentTotalY 
+    };
+    
+    setPillPosition(newPos);
+    localStorage.setItem('bottom-bar-pill-pos', JSON.stringify(newPos));
+  };
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[100] pb-4 md:pb-8 flex justify-center px-4 pointer-events-none">
       <AnimatePresence mode="wait">
@@ -131,14 +187,29 @@ const BottomBar = () => {
         ) : (
           <motion.div 
             key="pill-launcher"
+            drag
+            dragMomentum={false}
+            dragConstraints={{
+                top: -window.innerHeight + 120, // 80px header + 40px safety margin
+                bottom: 10,  // Keep 10px below starting point at most
+                left: -(window.innerWidth - (isDesktop ? 64 : 56) - 8), // Symmetrical: innerWidth - width - (4 * 2)
+                right: 0
+            }}
+            onDragEnd={handleDragEnd}
             initial={{ x: 100, opacity: 0, scale: 0.5 }}
-            animate={{ x: 0, opacity: 1, scale: 1 }}
+            animate={{ 
+                x: pillPosition.x, 
+                y: pillPosition.y, 
+                opacity: 1, 
+                scale: 1 
+            }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             exit={{ x: 100, opacity: 0, scale: 0.5 }}
             whileHover={{ scale: 1.1, rotate: 5 }}
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsVisible(true)}
             className={cn(
-              "fixed bottom-6 right-6 z-[110] bg-teal-600 text-white shadow-2xl shadow-teal-500/30 rounded-full flex items-center justify-center cursor-pointer pointer-events-auto",
+              "fixed bottom-6 right-1 z-[110] bg-teal-600 text-white shadow-2xl shadow-teal-500/30 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto",
               isDesktop ? "w-16 h-16" : "w-14 h-14"
             )}
           >

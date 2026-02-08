@@ -85,8 +85,8 @@ textarea {
 
 /* Fix for AutoFill messing up font size */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   font-size: 1rem !important;
   font-family: var(--font-latin), sans-serif !important;
@@ -132,6 +132,10 @@ h4 {
 /* Explicit Utilities to bypass Tailwind Config lag */
 .font-arabic {
   font-family: var(--font-arabic) !important;
+}
+
+.dir-rtl {
+  direction: rtl;
 }
 
 .font-sans {
@@ -183,8 +187,12 @@ h4 {
 
 /* Shimmer Animation */
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(300%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
 }
 
 .animate-shimmer {
@@ -193,8 +201,13 @@ h4 {
 
 /* Bounce Animation */
 @keyframes bounce-short {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .animate-bounce-short {
