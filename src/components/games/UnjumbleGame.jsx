@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, RotateCcw, ArrowRightLeft, Sparkles, Lightbulb, Puzzle, Info, ChefHat, Trophy, Volume2, VolumeX } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 import confetti from 'canvas-confetti';
 
 const UnjumbleGame = ({ data }) => {

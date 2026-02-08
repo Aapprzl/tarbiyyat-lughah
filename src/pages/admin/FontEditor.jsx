@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Type, Save, Eye, Sparkles, CircleCheckBig, ChevronRight, Monitor, Languages, Hash, Diamond } from 'lucide-react';
-import { useToast } from '../../components/Toast';
-import { useFont } from '../../components/FontProvider';
+import { useToast } from '../../components/ui/Toast';
+import { useFont } from '../../components/providers/FontProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 

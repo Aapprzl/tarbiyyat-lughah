@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
-import { contentService } from '../services/contentService';
-import { useTheme } from '../components/ThemeProvider';
+import { contentService } from '../../services/contentService';
+import { useTheme } from '../providers/ThemeProvider';
 import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash, Monitor } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 const AdminLayout = () => {
   const navigate = useNavigate();

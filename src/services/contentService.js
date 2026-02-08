@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import { curriculum as initialCurriculum } from '../data/curriculum';
+import contentServiceV2 from './contentServiceV2';
 
 // In-memory cache to prevent blinking on navigation
 const configCache = {};
@@ -29,561 +30,638 @@ const saveToStorage = (key, value) => {
     }
 };
 
-// Fetch data from a table, returning default if error/empty
-const fetchConfig = async (tableName, configId, defaultValue) => {
-    // 1. Check Memory Cache
-    if (configCache[configId]) {
-        return configCache[configId];
-    }
-
-    // 2. Check LocalStorage (Sync Fallback for next reload)
-    const stored = getFromStorage(configId);
-    if (stored) {
-        configCache[configId] = stored; // Hydrate memory cache
-        // We still fetch fresh data in background to update, but we can return stored for now?
-        // Better strategy: Return stored immediately if we were sync? 
-        // For async fetchConfig, we prefer fresh data, but we can use stored as placeholder.
-        // Let's rely on standard fetch but allow getSync to use stored.
-    }
-
-    try {
-        const { data, error } = await supabase
-            .from('settings')
-            .select('value')
-            .eq('id', configId)
-            .maybeSingle(); 
-
-        if (error) {
-            console.error(`[Supabase] Error fetching ${configId}:`, error);
-            // Fallback to stored if available, else default
-            return stored || defaultValue;
-        }
-        
-        const val = data?.value || defaultValue;
-        configCache[configId] = val; 
-        saveToStorage(configId, val); // Persist
-        return val;
-    } catch (err) {
-        console.error(`[Supabase] Unexpected error fetching ${configId}:`, err);
-        return stored || defaultValue;
-    }
+// Transform programs from new schema to old curriculum format
+const transformProgramsToOldFormat = (programs) => {
+    return programs.map(program => ({
+        id: program.slug,
+        title: program.title,
+        desc: program.description,
+        icon: program.icon,
+        color: program.color,
+        topics: (program.topics || []).map(topic => ({
+            id: topic.slug,
+            title: topic.title,
+            subtitle: topic.subtitle,
+            desc: topic.description,
+            thumbnail: topic.thumbnail,
+            isLocked: topic.is_locked,
+            type: 'grammar' // Default type
+        }))
+    }));
 };
 
-// Save config to settings table (Key-Value Store pattern)
-const saveConfig = async (configId, value) => {
-    try {
-        const { error } = await supabase
-            .from('settings')
-            .upsert({ id: configId, value: value });
-
-        if (error) throw error;
-        
-        configCache[configId] = value; 
-        saveToStorage(configId, value); // Persist
-        return value;
-    } catch (err) {
-        console.error(`[Supabase] Error saving ${configId}:`, err);
-        throw err;
-    }
+// Transform lesson content from new schema to old format
+const transformLessonContentToOldFormat = (stages) => {
+    return stages.map(stage => ({
+        id: stage.id,
+        title: stage.title,
+        items: (stage.blocks || []).map(block => ({
+            id: block.id,
+            type: block.type,
+            data: block.data
+        }))
+    }));
 };
 
+// Transform lesson content from old format to new schema
+const transformLessonContentFromOldFormat = (oldStages) => {
+    return oldStages.map((stage, idx) => ({
+        title: stage.title,
+        order_index: idx,
+        items: (stage.items || []).map((item, itemIdx) => ({
+            type: item.type,
+            data: item.data,
+            order_index: itemIdx
+        }))
+    }));
+};
 
 export const contentService = {
-    // --- Curriculum Management ---
+    // ============================================
+    // CURRICULUM MANAGEMENT
+    // ============================================
     
     async getCurriculum() {
-        // In the future, this should be a real relational query.
-        // For migration speed, we might store the whole JSON blob in 'settings' table first.
-        return await fetchConfig('settings', 'curriculum', initialCurriculum);
+        try {
+            const programs = await contentServiceV2.programs.getAll();
+            return transformProgramsToOldFormat(programs);
+        } catch (error) {
+            console.error('[contentService] Error fetching curriculum:', error);
+            return initialCurriculum;
+        }
     },
 
-    async saveCurriculum(newCurriculum) {
-        return await saveConfig('curriculum', newCurriculum);
+    async saveCurriculum(curriculum) {
+        // TODO: Implement save to normalized schema
+        console.warn('[contentService] saveCurriculum not yet implemented for new schema');
+        throw new Error('saveCurriculum not yet implemented for new schema');
     },
-
-    // --- Granular Updates (Mirroring Firebase Service) ---
 
     async updateTopicMetadata(topicId, metadata) {
-        const curr = await this.getCurriculum();
-        // Handle array vs object wrapper if necessary, but getCurriculum should return array
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-        
-        let found = false;
-        
-        // Search in Main Curriculum
-        for (const section of curriculumArray) {
-            const topic = section.topics.find(t => t.id === topicId);
-            if (topic) {
-                if (metadata.title !== undefined && metadata.title !== null) topic.title = metadata.title;
-                if (metadata.desc !== undefined) topic.desc = metadata.desc; 
-                if (metadata.hasOwnProperty('isLocked')) topic.isLocked = metadata.isLocked;
-                found = true;
-                break;
-            }
-        }
-
-        if (found) {
-            await this.saveCurriculum(curriculumArray);
-            return true;
-        }
-
-        // Search in Special Programs
-        const progs = await this.getSpecialPrograms();
-        const programsArray = Array.isArray(progs) ? progs : [];
-
-        for (const category of programsArray) {
-            if (category.topics) {
-                const topic = category.topics.find(t => t.id === topicId);
-                if (topic) {
-                    if (metadata.title !== undefined && metadata.title !== null) topic.title = metadata.title;
-                    if (metadata.desc !== undefined) topic.desc = metadata.desc;
-                    if (metadata.hasOwnProperty('isLocked')) topic.isLocked = metadata.isLocked;
-                    await this.saveSpecialPrograms(programsArray);
+        try {
+            // 1. Try Curriculum Topic
+            try {
+                const programs = await contentServiceV2.programs.getAll();
+                let topicUuid = null;
+                for (const program of programs) {
+                    const topic = program.topics?.find(t => t.slug === topicId || t.id === topicId);
+                    if (topic) {
+                        topicUuid = topic.id;
+                        break;
+                    }
+                }
+                
+                if (topicUuid) {
+                     const updates = {};
+                    if (metadata.title !== undefined) updates.title = metadata.title;
+                    if (metadata.desc !== undefined) updates.description = metadata.desc;
+                    if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                    await contentServiceV2.topics.update(topicUuid, updates);
                     return true;
                 }
-            }
+            } catch (e) { /* Ignore */ }
+
+            // 2. Try Game Category
+            try {
+                 const gameCat = await contentServiceV2.gameCategories.getById(topicId);
+                 if (gameCat) {
+                    const updates = {};
+                    if (metadata.title !== undefined) updates.title = metadata.title;
+                    if (metadata.desc !== undefined) updates.description = metadata.desc;
+                    // if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                    await contentServiceV2.gameCategories.update(topicId, updates);
+                    return true;
+                 }
+            } catch (e) { /* Ignore */ }
+            
+            console.error('[contentService] Topic/Category not found for metadata update:', topicId);
+            return false;
+
+        } catch (error) {
+            console.error('[contentService] Error updating topic metadata:', error);
+            return false;
         }
-        return false;
     },
 
     async updateTopicTitle(topicId, newTitle) {
-        return this.updateTopicMetadata(topicId, { title: newTitle });
+        return await this.updateTopicMetadata(topicId, { title: newTitle });
     },
 
     async addNewTopic(sectionId, title) {
-        const curr = await this.getCurriculum();
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-        
-        const section = curriculumArray.find(s => s.id === sectionId);
-        
-        if (section) {
-            let newId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-            if (!newId) newId = `topic-${Date.now()}`;
+        try {
+             // Find program by slug
+            const { data: programs } = await supabase
+                .from('programs')
+                .select('id')
+                .eq('slug', sectionId)
+                .limit(1);
             
-            const newTopic = {
-                id: newId,
+            if (!programs || programs.length === 0) return null;
+            const programId = programs[0].id;
+            
+            const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const uniqueSlug = `${baseSlug}-${Date.now()}`;
+            
+            const { data: topics } = await supabase
+                .from('topics')
+                .select('order_index')
+                .eq('program_id', programId)
+                .order('order_index', { ascending: false })
+                .limit(1);
+            const nextOrder = topics && topics.length > 0 ? topics[0].order_index + 1 : 0;
+            
+            const newTopic = await contentServiceV2.topics.create({
+                program_id: programId,
+                slug: uniqueSlug,
                 title: title,
-                type: 'grammar' 
+                subtitle: '',
+                description: '',
+                thumbnail: '',
+                order_index: nextOrder,
+                is_locked: false
+            });
+            
+            return {
+                id: newTopic.slug,
+                title: newTopic.title,
+                subtitle: newTopic.subtitle,
+                desc: newTopic.description,
+                thumbnail: newTopic.thumbnail,
+                isLocked: newTopic.is_locked
             };
-            
-            if (!section.topics) section.topics = [];
-            section.topics.push(newTopic);
-            
-            await this.saveCurriculum(curriculumArray);
-            
-            // In Supabase version, we create the row to ensure consistency
-            await this.initialiseLessonRow(newId);
-            
-            return newTopic;
+        } catch (error) {
+            console.error('[contentService] Error adding new topic:', error);
+            throw error;
         }
-        return null;
     },
 
     async addNewSection(title, iconName = 'BookOpen', desc = '') {
-        const curr = await this.getCurriculum();
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-
-        let newId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-        if (!newId) newId = `section-${Date.now()}`;
-        
-        const newSection = {
-            id: newId,
-            title: title,
-            icon: iconName,
-            desc: desc,
-            topics: []
-        };
-
-        curriculumArray.push(newSection);
-        await this.saveCurriculum(curriculumArray);
-        return newSection;
-    },
-
-    async updateSection(id, title, icon, desc = null, options = {}) {
-        const curr = await this.getCurriculum();
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-
-        const section = curriculumArray.find(s => s.id === id);
-        
-        if (section) {
-            if (title) section.title = title;
-            if (icon) section.icon = icon;
-            if (desc !== undefined && desc !== null) section.desc = desc;
-            if (options.hasOwnProperty('isLocked')) section.isLocked = options.isLocked;
-            await this.saveCurriculum(curriculumArray);
-            return true;
-        }
-        return false;
-    },
-
-    async deleteSection(id) {
-        const curr = await this.getCurriculum();
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-
-        const section = curriculumArray.find(s => s.id === id);
-        if (!section) return false;
-
-        // Cascade delete topics? In JSON store, removing the section removes topics from the tree.
-        // But we should cleanup 'lessons' table rows too.
-        if (section.topics) {
-            for (const topic of section.topics) {
-                await this.deleteLessonRow(topic.id);
-            }
-        }
-
-        const newCurr = curriculumArray.filter(s => s.id !== id);
-        await this.saveCurriculum(newCurr);
-        return true;
-    },
-
-    async deleteTopic(topicId) {
-        const curr = await this.getCurriculum();
-        const curriculumArray = Array.isArray(curr) ? curr : (curr.items || []);
-
-        let found = false;
-        
-        for (const section of curriculumArray) {
-            if (section.topics && section.topics.some(t => t.id === topicId)) {
-                await this.deleteLessonRow(topicId);
-                section.topics = section.topics.filter(t => t.id !== topicId);
-                found = true;
-                break; 
-            }
-        }
-        
-        if (found) {
-            await this.saveCurriculum(curriculumArray);
-            return true;
-        }
-        return false;
-    },
-
-    // --- Helper for Lessons Table ---
-    async initialiseLessonRow(topicId) {
         try {
-            const { error } = await supabase
-                .from('lessons')
-                .insert([{ id: topicId, content: "" }]); // content as JSONB or Text? Schema said JSONB or Text.
-            if (error) console.error("Error init lesson row:", error);
-        } catch(e) { console.error("Error init lesson row:", e); }
+            const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const uniqueSlug = `${baseSlug}-${Date.now()}`;
+             const { data: programs } = await supabase
+                .from('programs')
+                .select('order_index')
+                .order('order_index', { ascending: false })
+                .limit(1);
+            const nextOrder = programs && programs.length > 0 ? programs[0].order_index + 1 : 0;
+            
+            const newProgram = await contentServiceV2.programs.create({
+                slug: uniqueSlug,
+                title: title,
+                description: desc,
+                icon: iconName,
+                color: '#14b8a6', 
+                order_index: nextOrder
+            });
+            
+            return {
+                id: newProgram.slug,
+                title: newProgram.title,
+                desc: newProgram.description,
+                icon: newProgram.icon,
+                color: newProgram.color,
+                topics: []
+            };
+        } catch (error) {
+            console.error('[contentService] Error adding new section:', error);
+            throw error;
+        }
     },
 
-    async deleteLessonRow(topicId) {
+    async deleteTopic(sectionId, topicId) {
         try {
-            const { error } = await supabase.from('lessons').delete().eq('id', topicId);
-            if (error) console.error("Error deleting lesson row:", error);
-        } catch(e) { console.error("Error deleting lesson row:", e); }
+            // Find by slug
+             const { data: topics } = await supabase
+                .from('topics')
+                .select('id')
+                .eq('slug', topicId)
+                .limit(1);
+            
+            if (topics && topics.length > 0) {
+                 await contentServiceV2.topics.delete(topics[0].id);
+                 return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('[contentService] Error deleting topic:', error);
+            return false;
+        }
     },
 
-    // --- Content / Lesson Management ---
+    async deleteSection(sectionId) {
+        try {
+            const { data: programs } = await supabase
+                .from('programs')
+                .select('id')
+                .eq('slug', sectionId)
+                .limit(1);
+            
+            if (programs && programs.length > 0) {
+                await contentServiceV2.programs.delete(programs[0].id);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('[contentService] Error deleting section:', error);
+            return false;
+        }
+    },
+
+    // ============================================
+    // LESSON CONTENT MANAGEMENT
+    // ============================================
+
+    // ============================================
+    // LESSON CONTENT MANAGEMENT
+    // ============================================
+
+    isValidUUID(uuid) {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(uuid);
+    },
 
     async getLessonContent(topicId) {
         try {
-            const { data, error } = await supabase
-                .from('lessons')
-                .select('content')
-                .eq('id', topicId)
-                .maybeSingle();
+            const isUUID = this.isValidUUID(topicId);
+            let topics = null;
 
-            if (error) throw error;
+             // 1. Try to find as a Curriculum Topic (by Slug or ID)
+             if (isUUID) {
+                const { data } = await supabase
+                    .from('topics')
+                    .select('id')
+                    .eq('id', topicId)
+                    .maybeSingle();
+                topics = data;
+             } else {
+                const { data } = await supabase
+                    .from('topics')
+                    .select('id')
+                    .eq('slug', topicId)
+                    .maybeSingle();
+                topics = data;
+             }
             
-            // If data exists, return content. If not, return null? 
-            // The UI might expect a certain format.
-            if (!data) return null;
-            
-            // Content is stored as JSONB or Text.
-            // If it's a JSON object/string, we returns it as is.
-            return data.content;
-        } catch (e) {
-            console.error(`[Supabase] Error fetching lesson content ${topicId}:`, e);
-            throw e; 
+            if (topics) {
+                const stages = await contentServiceV2.lessonContent.get(topics.id);
+                const transformed = transformLessonContentToOldFormat(stages);
+                return JSON.stringify(transformed);
+            }
+
+            // 2. Try to find as a Game Category (SIMPLIFIED SCHEMA)
+            // If topicId is a Game Category ID (usually UUID), we fetch blocks_game
+            // But game_categories also have slugs, so might be accessed by slug?
+            let gameCat = null;
+            if (isUUID) {
+                const { data } = await supabase
+                    .from('game_categories')
+                    .select('id')
+                    .eq('id', topicId)
+                    .maybeSingle();
+                gameCat = data;
+            } else {
+                 // Try finding by slug just in case
+                const { data } = await supabase
+                    .from('game_categories')
+                    .select('id')
+                    .eq('slug', topicId)
+                    .maybeSingle();
+                gameCat = data;
+            }
+
+            if (gameCat) {
+                 const blocks = await contentServiceV2.gameBlocks.getByCategory(gameCat.id);
+                 // Wrap game blocks in a single virtual stage
+                 const stageWrapper = [{
+                     id: Date.now(),
+                     title: 'Game Content',
+                     items: blocks.map(b => ({
+                         id: b.id,
+                         type: b.type,
+                         data: b.data
+                     }))
+                 }];
+                 return JSON.stringify(stageWrapper);
+            }
+
+            console.error('[contentService] Topic or Category not found:', topicId);
+            return '[]';
+        } catch (error) {
+            console.error('[contentService] Error fetching lesson content:', error);
+            return '[]';
         }
     },
 
     async saveLessonContent(topicId, content) {
         try {
-            // Upsert (Insert or Update)
-            const { error } = await supabase
-                .from('lessons')
-                .upsert({ id: topicId, content: content }, { onConflict: 'id' });
+            let parsedContent = typeof content === 'string' ? JSON.parse(content) : content;
+            if (!Array.isArray(parsedContent)) parsedContent = [];
 
-            if (error) throw error;
-            return true;
-        } catch (e) {
-            console.error(`[Supabase] Error saving lesson content ${topicId}:`, e);
-            throw e;
-        }
-    },
+            const isUUID = this.isValidUUID(topicId);
 
-    
-    // --- Special Programs Management ---
-    // Ensure we handle the "Array" vs "Wrapped Object" structure consistently.
-    // getSpecialPrograms returns an ARRAY.
-
-    async getSpecialPrograms() {
-        const data = await fetchConfig('settings', 'special_programs', { items: [] });
-        // Handle both wrapped { items: [...] } and direct array formats
-        if (Array.isArray(data)) return data;
-        return data?.items || [];
-    },
-
-    async saveSpecialPrograms(progs) {
-        return await saveConfig('special_programs', { items: progs });
-    },
-
-    async updateSpecialProgram(id, newTitle, newDesc, newIcon) {
-        const progs = await this.getSpecialPrograms();
-        // progs is an ARRAY here because getSpecialPrograms unwraps it.
-        
-        const p = progs.find(p => p.id === id);
-        if (p) {
-            p.title = newTitle;
-            if (newDesc) p.desc = newDesc;
-            if (newIcon) p.icon = newIcon;
-            await this.saveSpecialPrograms(progs);
-            return true;
-        }
-        return false;
-    },
-
-    async addNewSpecialProgram(title, desc, iconName) {
-        const progs = await this.getSpecialPrograms();
-        
-        let baseId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-        const newId = `${baseId}-${Date.now()}`;
-        
-        const newProg = {
-            id: newId,
-            title,
-            desc,
-            icon: iconName,
-            path: `/program/${newId}`,
-            items: []
-        };
-        progs.push(newProg);
-        await this.saveSpecialPrograms(progs);
-        return newProg;
-    },
-
-    async deleteSpecialProgram(categoryId, topicId) {
-        const progs = await this.getSpecialPrograms();
-        
-        const category = progs.find(c => c.id === categoryId);
-        if (category && category.topics) {
-            if (category.topics.some(t => t.id === topicId)) {
-                await this.deleteLessonRow(topicId); // Clean DB row
-                category.topics = category.topics.filter(t => t.id !== topicId);
-                await this.saveSpecialPrograms(progs);
-                return true;
+             // 1. Check if it's a Game Category
+            let gameCat = null;
+            if (isUUID) {
+                const { data } = await supabase.from('game_categories').select('id').eq('id', topicId).maybeSingle();
+                gameCat = data;
+            } else { // try by slug
+                 const { data } = await supabase.from('game_categories').select('id').eq('slug', topicId).maybeSingle();
+                 gameCat = data;
             }
-        }
-        return false;
-    },
 
-    // --- Special Programs Category ---
-
-    async addSpecialCategory(title, iconName, desc = '') {
-        const progs = await this.getSpecialPrograms();
-
-        let baseId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-        const newId = `${baseId}-${Date.now()}`;
-        
-        const newCategory = {
-            id: newId,
-            title,
-            icon: iconName,
-            desc,
-            topics: [],
-            items: []
-        };
-        progs.push(newCategory);
-        await this.saveSpecialPrograms(progs);
-        
-        await this.initialiseLessonRow(newId);
-
-        return newCategory;
-    },
-
-    async updateSpecialCategory(categoryId, title, iconName, desc, options = {}) {
-        const progs = await this.getSpecialPrograms();
-        
-        const category = progs.find(c => c.id === categoryId);
-        if (category) {
-            if (title) category.title = title;
-            if (iconName) category.icon = iconName;
-            if (desc !== undefined && desc !== null) category.desc = desc;
-            if (options.hasOwnProperty('isLocked')) category.isLocked = options.isLocked;
-            
-            await this.saveSpecialPrograms(progs);
-            return true;
-        }
-        return false;
-    },
-
-    async syncCategoryItems(categoryId, syncItems) {
-        const progs = await this.getSpecialPrograms();
-        
-        const category = progs.find(c => c.id === categoryId);
-        if (category) {
-            category.items = syncItems.map(item => ({
-                id: item.id,
-                type: item.type,
-                title: item.data?.title || item.title || 'Untitled',
-                thumbnail: item.data?.thumbnail || null
-            }));
-            await this.saveSpecialPrograms(progs);
-            return true;
-        }
-        return false;
-    },
-
-    async deleteSpecialCategory(categoryId) {
-        const progs = await this.getSpecialPrograms();
-        
-        const category = progs.find(c => c.id === categoryId);
-        
-        if (category) {
-            if (category.topics) {
-                for (const topic of category.topics) {
-                    await this.deleteLessonRow(topic.id);
-                }
+            if (gameCat) {
+                 // Flatten all stages to get blocks (Game Category contains direct blocks)
+                 const allBlocks = [];
+                 let order = 0;
+                 parsedContent.forEach(stage => {
+                     if (stage.items) {
+                         stage.items.forEach(item => {
+                             allBlocks.push({
+                                 type: item.type,
+                                 data: item.data,
+                                 order_index: order++
+                             });
+                         });
+                     }
+                 });
+                 // Use the ID found (gameCat.id) to ensure we use UUID for the service call
+                 await contentServiceV2.gameBlocks.replaceForCategory(gameCat.id, allBlocks);
+                 return true;
             }
-            
-            const newProgs = progs.filter(c => c.id !== categoryId);
-            await this.saveSpecialPrograms(newProgs);
-            await this.deleteLessonRow(categoryId);
 
-            return true;
+            // 2. Assume Curriculum Topic
+            let topics = null;
+            if (isUUID) {
+                const { data } = await supabase.from('topics').select('id').eq('id', topicId).maybeSingle();
+                topics = data;
+            } else {
+                 const { data } = await supabase.from('topics').select('id').eq('slug', topicId).maybeSingle();
+                 topics = data;
+            }
+
+             if (topics) {
+                 const stages = transformLessonContentFromOldFormat(parsedContent);
+                 await contentServiceV2.lessonContent.save(topics.id, stages);
+                 return true;
+             }
+
+             console.error('[contentService] Topic or Category not found for saving:', topicId);
+             return false;
+        } catch (error) {
+            console.error('[contentService] Error saving lesson content:', error);
+            throw error;
         }
-        return false;
     },
 
-    async addSpecialTopic(categoryId, title) {
-        const progs = await this.getSpecialPrograms();
-        
-        const category = progs.find(c => c.id === categoryId);
-        if (category) {
-            const baseId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-            const uniqueId = `${baseId}-${Date.now().toString(36)}`;
-            
-            const newTopic = { id: uniqueId, title };
-            if (!category.topics) category.topics = [];
-            category.topics.push(newTopic);
-            await this.saveSpecialPrograms(progs);
-            
-            await this.initialiseLessonRow(uniqueId);
+    async initialiseLessonRow(topicId) { return true; },
+    async deleteLessonRow(topicId) { return true; },
 
-            return newTopic;
+    // ============================================
+    // CONFIGURATION MANAGEMENT
+    // ============================================
+
+    async getFontConfig() {
+        try {
+            const config = await contentServiceV2.siteConfig.getFontConfig();
+            if (config) {
+                configCache['font_config'] = config;
+                saveToStorage('font_config', config);
+            }
+            return config || {};
+        } catch (error) {
+            return getFromStorage('font_config') || {};
         }
-        return null;
     },
-    
-    // --- Home Page Config ---
+
+    getFontConfigSync() {
+        return configCache['font_config'] || getFromStorage('font_config') || null;
+    },
+
+    async saveFontConfig(config) {
+        try {
+            await contentServiceV2.siteConfig.saveFontConfig(config);
+            configCache['font_config'] = config;
+            saveToStorage('font_config', config);
+            return config;
+        } catch (error) { throw error; }
+    },
 
     async getHomeConfig() {
-         const defaults = {
-            heroTitleArabic: 'العربيّة لغة عملية',
-            heroTitleLatin: 'Bahasa Arab Praktis',
-            heroDescription: 'Media pembelajaran bahasa Arab terstruktur untuk penutur Indonesia. Kuasai Nahwu dan Shorof dengan metode yang sistematis dan mudah dipahami.',
-            heroButtonText: 'Mulai Belajar',
-            heroButtonSecondaryText: 'Tentang Kami',
-            programsSectionTitle: 'Program Unggulan',
-            footerText: `© ${new Date().getFullYear()} Maria Ulfah Syarif. All rights reserved.`,
-            siteTitle: 'Bahasa Arab Praktis',
-            siteLogoType: 'icon', 
-            siteLogoIcon: 'BookOpen',
-            siteLogoUrl: '',
-            sidebarTitle: 'Platform Pembelajaran Modern',
-            headerTitleSize: 'text-lg',
-            sidebarTitleSize: 'text-[10px]',
-            visionTitle: 'Visi Tarbiyyat Al-Lughah',
-            visionDesc: 'Tarbiyyat al-Lughah adalah ekosistem Next-Gen Interactive Learning yang dirancang khusus untuk merevolusi cara siswa MTs menguasai Maharah Qira\'ah (Kemampuan Membaca).',
-            visionStep1Title: 'Kosakata Visual',
-            visionStep1Desc: 'Penguasaan mufradat melalui kartu kosakata 3D yang interaktif.',
-            visionStep2Title: 'Qira\'ah Digital',
-            visionStep2Desc: 'Praktik membaca teks terstruktur dengan dukungan multimedia.',
-            visionStep3Title: 'Game Edukasi',
-            visionStep3Desc: 'Evaluasi pemahaman melalui tantangan gamifikasi yang seru.',
-            contactPhone: '0822 6686 2306',
-            contactEmail: 'icalafrizal550790@gmail.com',
-            contactAddress: '(Alamat akan segera diperbarui)',
-            devName: 'Muh. Aprizal',
-            devRole: 'Developer',
-            devCampus: 'PBA IAIN BONE',
-            visionBadgeText: 'Skripsi Original Project',
-            footerStackTitle: 'Development Stack',
-            footerToolsTitle: 'Tools & Editors',
-            footerToolsList: 'VS Code • Google Antigravity • Sublime Text',
-            footerBackendTitle: 'Backend & Infrastructure',
-            footerBackendList: 'Supabase • PostgreSQL • Vercel • Node.js',
-            footerAiTitle: 'Powered by AI Technology',
-            footerAiList: 'Powered by AI Technology', 
-            footerRightText: 'PBA IAIN Bone'
-        };
-        // We will need to copy the full defaults object here eventually
-        return await fetchConfig('settings', 'home_config', defaults);
+        try {
+            const config = await contentServiceV2.siteConfig.getHomeConfig();
+            if (config) {
+                configCache['home_config'] = config;
+                saveToStorage('home_config', config);
+            }
+            return config || {};
+        } catch (error) {
+             return getFromStorage('home_config') || {};
+        }
     },
 
-    // Sync version for initial render in Header.jsx (returns null to force default)
     getHomeConfigSync() {
-        return configCache['home_config'] || getFromStorage('home_config') || null; 
+        return configCache['home_config'] || getFromStorage('home_config') || null;
     },
 
     async saveHomeConfig(config) {
-        return await saveConfig('home_config', config);
+        try {
+            await contentServiceV2.siteConfig.saveHomeConfig(config);
+            configCache['home_config'] = config;
+            saveToStorage('home_config', config);
+            return config;
+        } catch (error) { throw error; }
     },
 
-    // --- Access Configs (Intro, About, Library, etc) ---
     async getIntroConfig() {
-        const defaults = {
-            intro_active: true,
-            intro_title_ar: 'تربية اللغة',
-            intro_title_en: 'Tarbiyyat Lughah',
-            intro_typing_texts: [
-                "Menghubungkan Hati dengan Bahasa Al-Qur'an",
-                "Media Pembelajaran Interaktif & Terstruktur",
-                "Kuasai Maharah Qira'ah dengan Menyenangkan",
-                "Teknologi Digital untuk Pendidikan Bahasa"
-            ],
-            intro_button_text: 'Mulai Belajar'
-        };
-        const stored = await fetchConfig('settings', 'intro_config', {});
-        return { ...defaults, ...stored };
+         try {
+            const config = await contentServiceV2.siteConfig.getIntroConfig();
+            return config || {};
+        } catch (error) { return {}; }
     },
+
     async saveIntroConfig(config) {
-        return await saveConfig('intro_config', config);
-    },
-    
-    async getAboutConfig() {
-        const defaults = {
-            title: 'Tentang Kami',
-            description: 'Kami berdedikasi untuk mempermudah pembelajaran bahasa Arab bagi penutur Indonesia dengan metode yang praktis, sistematis, dan modern.',
-            content: 'Website ini didirikan oleh Ustadzah Maria Ulfah Syarif dengan visi mencetak generasi yang fasih berbahasa Al-Quran. Metode kami menggabungkan kaidah klasik (Nahwu Shorof) dengan pendekatan digital yang interaktif.\n\n### Visi Kami\nMenjadi platform rujukan utama belajar bahasa Arab di Indonesia.\n\n### Misi Kami\n1. Menyediakan materi yang mudah dipahami.\n2. Menggunakan teknologi untuk mempercepat pemahaman.\n3. Membangun komunitas pembelajar yang aktif.',
-            email: 'info@bahasaarabpraktis.com',
-            phone: '+62 812 3456 7890'
-        };
-        const stored = await fetchConfig('settings', 'about_config', {});
-        return { ...defaults, ...stored };
-    },
-    async saveAboutConfig(config) {
-        return await saveConfig('about_config', config);
+         try {
+            await contentServiceV2.siteConfig.saveIntroConfig(config);
+            return config;
+        } catch (error) { throw error; }
     },
 
     async getLibraryConfig() {
-        return await fetchConfig('settings', 'library_config', { categories: ['Umum', 'Nahwu', 'Shorof', 'Lughah'] });
+         try {
+            const config = await contentServiceV2.siteConfig.getLibraryConfig();
+            return config || { categories: [] };
+        } catch (error) { return { categories: [] }; }
     },
+
     async saveLibraryConfig(config) {
-        return await saveConfig('library_config', config);
+         try {
+            await contentServiceV2.siteConfig.saveLibraryConfig(config);
+            return config;
+        } catch (error) { throw error; }
     },
 
-    async getGameHubConfig() {
-        return await fetchConfig('settings', 'game_hub_config', {});
-    },
-    async saveGameHubConfig(config) {
-        return await saveConfig('game_hub_config', config);
+    async getBooks() {
+        try {
+            const books = await contentServiceV2.siteConfig.get('library_books');
+            return Array.isArray(books) ? books : [];
+        } catch (error) {
+            console.error('[contentService] Error fetching books:', error);
+            return [];
+        }
     },
 
-    // --- Theme Config ---
+    async addBook(bookData) {
+        try {
+            const books = await this.getBooks();
+            const newBook = { ...bookData, id: Date.now() };
+            const updatedBooks = [newBook, ...books];
+            await contentServiceV2.siteConfig.save('library_books', updatedBooks, 'Library books collection');
+            return newBook;
+        } catch (error) {
+            console.error('[contentService] Error adding book:', error);
+            throw error;
+        }
+    },
+
+    async deleteBook(bookId) {
+        try {
+            const books = await this.getBooks();
+            const updatedBooks = books.filter(b => b.id !== bookId);
+            await contentServiceV2.siteConfig.save('library_books', updatedBooks, 'Library books collection');
+            return true;
+        } catch (error) {
+            console.error('[contentService] Error deleting book:', error);
+            return false;
+        }
+    },
+
+     // ============================================
+    // GAME MANAGEMENT (Updated to use new Tables)
+    // ============================================
+
+    async getGamesConfig() {
+        try {
+            // Fetch from game_categories and INCLUDE blocks
+            // We need to fetch blocks content to show the "Games" in the public view
+            const { data: categories, error } = await supabase
+                .from('game_categories')
+                .select(`
+                    *,
+                    blocks:blocks_game (*)
+                `)
+                .order('order_index');
+            
+            if (error) throw error;
+
+            return categories.map(cat => ({
+                id: cat.id, 
+                title: cat.title,
+                desc: cat.description,
+                icon: cat.icon,
+                isLocked: cat.is_locked,
+                // Map BLOCKS to ITEMS so GameIndex.jsx can render them
+                items: (cat.blocks || []).sort((a,b) => a.order_index - b.order_index).map(block => ({
+                    id: block.id,
+                    title: block.data?.title || block.type, // Fallback to type if no title
+                    type: block.type, // 'quiz', 'matchup', etc.
+                    thumbnail: block.data?.thumbnail
+                })),
+                blockCount: cat.blocks ? cat.blocks.length : 0
+            }));
+        } catch (error) {
+            console.error('[contentService] Error fetching games config:', error);
+            return [];
+        }
+    },
+
+    async saveGamesConfig(gamesConfig) {
+        console.warn('[contentService] saveGamesConfig is deprecated.');
+        return { items: gamesConfig };
+    },
+
+    async updateGameCategory(id, newTitle, newDesc, newIcon) {
+        try {
+            await contentServiceV2.gameCategories.update(id, {
+                title: newTitle,
+                description: newDesc,
+                icon: newIcon
+            });
+            return true;
+        } catch (error) {
+            console.error('[contentService] Error updating game category:', error);
+            return false;
+        }
+    },
+
+    async addNewGameCategory(title, desc, iconName) {
+        try {
+            const baseSlug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            const uniqueSlug = `${baseSlug}-${Date.now()}`;
+            
+            // Get max order
+            const cats = await contentServiceV2.gameCategories.getAll();
+            const maxOrder = cats.length > 0 ? Math.max(...cats.map(c => c.order_index)) : 0;
+
+            const newCat = await contentServiceV2.gameCategories.create({
+                slug: uniqueSlug,
+                title: title,
+                description: desc,
+                icon: iconName,
+                order_index: maxOrder + 1
+            });
+
+            return {
+                id: newCat.id,
+                title: newCat.title,
+                desc: newCat.description,
+                icon: newCat.icon,
+                items: []
+            };
+        } catch (error) {
+            console.error('[contentService] Error adding new game category:', error);
+            throw error;
+        }
+    },
+
+    async addGameCategory(title, iconName, desc = '') {
+        return await this.addNewGameCategory(title, desc, iconName);
+    },
+
+    async deleteGameCategory(categoryId) {
+        try {
+            await contentServiceV2.gameCategories.delete(categoryId);
+            return true;
+        } catch (error) {
+             console.error('[contentService] Error deleting game category:', error);
+             return false;
+        }
+    },
+
+    // ============================================
+    // BACKWARD COMPATIBILITY ALIASES
+    // ============================================
+
+    async getSpecialPrograms() {
+        return await this.getGamesConfig();
+    },
+
+    async updateSpecialCategory(id, newTitle, newDesc, newIcon) {
+        return await this.updateGameCategory(id, newTitle, newDesc, newIcon);
+    },
+
+    async addSpecialCategory(title, iconName, desc = '') {
+        return await this.addGameCategory(title, iconName, desc);
+    },
+
+    async deleteSpecialCategory(categoryId) {
+        return await this.deleteGameCategory(categoryId);
+    }, 
+
+    // ============================================
+    // THEME & AUTH & SEARCH (Keep as is)
+    // ============================================
+
     getTheme() {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('theme') || 'light';
@@ -598,22 +676,8 @@ export const contentService = {
         return newTheme;
     },
 
-    async getFontConfig() {
-        return await fetchConfig('settings', 'font_config', {});
-    },
-
-    getFontConfigSync() {
-        return configCache['font_config'] || getFromStorage('font_config') || null;
-    },
-    async saveFontConfig(config) {
-        return await saveConfig('font_config', config);
-    },
-
-    
-    // --- Supabase Auth Implementation ---
-    
     async login(email, password) {
-         const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         });
@@ -629,22 +693,17 @@ export const contentService = {
         if (error) throw error;
         return data.user;
     },
-    
+
     async logout() {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         return true;
     },
-    
-    // Auth State Listener
+
     onAuthStateChange(callback) {
         const { data } = supabase.auth.onAuthStateChange((event, session) => {
-            // event: SIGNED_IN, SIGNED_OUT, TOKEN_REFRESHED, etc.
-            // callback expects 'user' object or null
             callback(session?.user || null);
         });
-        
-        // Return unsubscribe function
         return () => data.subscription.unsubscribe();
     },
 
@@ -652,106 +711,34 @@ export const contentService = {
         const { data: { user } } = await supabase.auth.getUser();
         return user;
     },
-    
+
     isAuthenticated() {
-         // Using synchronous check of session from localStorage if possible would be ideal,
-         // but Supabase is async. 
-         // For now, we return a promise or usage in AdminLayout handles the waiting.
-         // However, if some code expects sync true/false, this is tricky.
-         // Let's rely on onAuthStateChange for critical flows.
-         // This is a "best guess" sync check for UI bits that don't want to wait.
-         // We can check if the token exists in localStorage.
-         if (typeof window !== 'undefined') {
-             const key = `sb-${import.meta.env.VITE_SUPABASE_URL?.split('//')[1].split('.')[0]}-auth-token`;
-             // Actually Supabase key generation is complex.
-             // Simpler: Check if we have any key starting with 'sb-' and ending with '-auth-token'
-             // Or just return null and let the async listener handle it.
-             return false; // Deprecated in favor of async listener
-         }
-         return false;
+        return false; 
     },
 
-    // --- Unified Search Content ---
     async getAllContent() {
         const content = [];
-        
-        // 1. Main Curriculum
-        const curriculum = await this.getCurriculum();
-        const currArray = Array.isArray(curriculum) ? curriculum : (curriculum.items || []);
-        
-        currArray.forEach(section => {
-            if (section.topics) {
-                section.topics.forEach(topic => {
-                    content.push({
-                        title: topic.title,
-                        desc: topic.desc || 'Materi pembelajaran',
-                        path: `/materi/${section.id}/${topic.id}`,
-                        icon: section.icon || 'BookOpen',
-                        sectionTitle: section.title
+        try {
+            const curriculum = await this.getCurriculum();
+            const currArray = Array.isArray(curriculum) ? curriculum : (curriculum.items || []);
+            currArray.forEach(section => {
+                if (section.topics) {
+                    section.topics.forEach(topic => {
+                        content.push({
+                            title: topic.title,
+                            desc: topic.desc || 'Materi pembelajaran',
+                            path: `/materi/${section.id}/${topic.id}`,
+                            icon: section.icon || 'BookOpen',
+                            sectionTitle: section.title
+                        });
                     });
-                });
-            }
-        });
-
-        // 2. Special Programs
-        const programs = await this.getSpecialPrograms();
-        const progArray = Array.isArray(programs) ? programs : (programs.items || []);
-
-        progArray.forEach(prog => {
-             // Program Category
-             content.push({
-                 title: prog.title,
-                 desc: prog.desc || 'Program Khusus',
-                 path: `/program/${prog.id}`,
-                 icon: prog.icon || 'Star',
-                 sectionTitle: 'Program Unggulan'
-             });
-             
-             // Program Items/Topics
-             if (prog.topics) {
-                 prog.topics.forEach(topic => {
-                     content.push({
-                        title: topic.title,
-                        desc: 'Topik Program Khusus',
-                        path: `/program/${prog.id}?item=${topic.id}`, // Assuming query param or sub-route
-                        icon: prog.icon,
-                        sectionTitle: prog.title
-                     });
-                 });
-             }
-             if (prog.items) {
-                 prog.items.forEach(item => {
-                     content.push({
-                        title: item.title || item.data?.title || 'Item',
-                        desc: 'Konten Program Khusus',
-                        path: `/program/${prog.id}?item=${item.id}`,
-                        icon: prog.icon,
-                        sectionTitle: prog.title
-                     });
-                 });
-             }
-        });
-        
+                }
+            });
+        } catch (error) {
+            console.error('[contentService] Error getting all content:', error);
+        }
         return content;
-    },
-
-    // --- Library Management ---
-    async getBooks() {
-        return await fetchConfig('settings', 'library_books', []);
-    },
-
-    async addBook(bookData) {
-        const books = await this.getBooks();
-        const newBook = { ...bookData, id: bookData.id || `book-${Date.now()}` };
-        books.push(newBook);
-        await saveConfig('library_books', books);
-        return newBook;
-    },
-
-    async deleteBook(bookId) {
-        const books = await this.getBooks();
-        const newBooks = books.filter(b => b.id !== bookId);
-        await saveConfig('library_books', newBooks);
-        return true;
     }
 };
+
+export default contentService;

@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef } from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 import confetti from 'canvas-confetti';
 
 const AnagramGame = ({ questions = [], title = "Anagram" }) => {
@@ -78,20 +78,37 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
       return;
     }
     const q = questions[index];
-    const answer = q.answer.replace(/\s/g, '').toUpperCase(); 
-    const letters = answer.split('').map((char, i) => ({ id: `${index}-${i}`, char }));
+    
+    // Normalisasi untuk kata Arab: hapus spasi dan karakter non-huruf
+    let answer = q.answer.replace(/\s/g, '');
+    
+    // Untuk kata Arab, kita tidak perlu uppercase karena Arab tidak memiliki konsep uppercase/lowercase
+    // Tapi kita tetap normalisasi untuk konsistensi
+    if (!isArabic(answer)) {
+      answer = answer.toUpperCase();
+    }
+    
+    // Pecah kata menjadi array huruf individual
+    // Filter hanya karakter yang valid (huruf Arab: \u0600-\u06FF atau huruf Latin: A-Z, a-z)
+    const letters = answer.split('')
+      .filter(char => {
+        // Terima huruf Arab atau huruf Latin
+        return /[\u0600-\u06FF]/.test(char) || /[A-Za-z]/.test(char);
+      })
+      .map((char, i) => ({ id: `${index}-${i}`, char }));
     
     // Scramble
     let scrambled = [...letters].sort(() => Math.random() - 0.5);
     // Ensure it's actually scrambled
-    if (scrambled.map(l => l.char).join('') === answer && answer.length > 1) {
+    const originalWord = letters.map(l => l.char).join('');
+    if (scrambled.map(l => l.char).join('') === originalWord && originalWord.length > 1) {
        scrambled = [...letters].sort(() => Math.random() - 0.5);
     }
 
     setCurrentQuestion(q);
     setCurrentIndex(index);
     setScrambledLetters(scrambled);
-    setSelectedLetters(Array(answer.length).fill(null));
+    setSelectedLetters(Array(letters.length).fill(null));
     setIsCorrect(false);
   };
 
@@ -125,11 +142,26 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
     if (currentSelected.some(l => l === null)) return;
 
     const userAnswer = currentSelected.map(l => l.char).join('');
-    const correctAnswer = currentQuestion.answer.replace(/\s/g, '').toUpperCase();
+    
+    let correctAnswer = currentQuestion.answer.replace(/\s/g, '');
+    if (!isArabic(correctAnswer)) {
+      correctAnswer = correctAnswer.toUpperCase();
+    }
+    
+    // Filter hanya karakter yang valid untuk perbandingan
+    correctAnswer = correctAnswer.split('')
+      .filter(char => /[\u0600-\u06FF]/.test(char) || /[A-Za-z]/.test(char))
+      .join('');
 
     if (userAnswer === correctAnswer) {
       setIsCorrect(true);
       playSound(successSound);
+      
+      // Auto-advance ke soal berikutnya setelah 1.5 detik
+      setTimeout(() => {
+        setScore(s => s + 10);
+        loadQuestion(currentIndex + 1);
+      }, 1500);
     } else {
       playSound(errorSound);
     }
@@ -144,10 +176,19 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   const handleReset = () => {
      playSound(clickSound);
      if (!currentQuestion) return;
-     const answer = currentQuestion.answer.replace(/\s/g, '').toUpperCase();
-     const letters = answer.split('').map((char, i) => ({ id: `${currentIndex}-${i}`, char }));
+     
+     let answer = currentQuestion.answer.replace(/\s/g, '');
+     if (!isArabic(answer)) {
+       answer = answer.toUpperCase();
+     }
+     
+     // Filter hanya karakter yang valid
+     const letters = answer.split('')
+       .filter(char => /[\u0600-\u06FF]/.test(char) || /[A-Za-z]/.test(char))
+       .map((char, i) => ({ id: `${currentIndex}-${i}`, char }));
+       
      setScrambledLetters(letters.sort(() => Math.random() - 0.5));
-     setSelectedLetters(Array(answer.length).fill(null));
+     setSelectedLetters(Array(letters.length).fill(null));
      setIsCorrect(false);
   };
 

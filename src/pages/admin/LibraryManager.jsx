@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Library, Plus, Trash2, FileText, Upload, X, Check, BookOpen, AlertCircle, Loader2 } from 'lucide-react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { useToast } from '../../components/Toast';
-import { useConfirm } from '../../components/Toast';
+import { useToast } from '../../components/ui/Toast';
+import { useConfirm } from '../../components/ui/Toast';
 import { cn } from '../../utils/cn';
 import * as pdfjs from 'pdfjs-dist';
 

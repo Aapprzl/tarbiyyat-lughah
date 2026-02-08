@@ -3,18 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
 import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard } from 'lucide-react';
-import PdfViewer from '../../components/PdfViewer';
-import AudioPlayer from '../../components/AudioPlayer';
-import MatchUpGame from '../../components/MatchUpGame';
-import QuizGame from '../../components/QuizGame';
-
-import AnagramGame from '../../components/AnagramGame';
-import CompleteSentenceGame from '../../components/CompleteSentenceGame';
-import UnjumbleGame from '../../components/UnjumbleGame';
-import SpinWheelGame from '../../components/SpinWheelGame';
+import PdfViewer from '../../components/media/PdfViewer';
+import AudioPlayer from '../../components/media/AudioPlayer';
+import MatchUpGame from '../../components/games/MatchUpGame';
+import QuizGame from '../../components/games/QuizGame';
+import AnagramGame from '../../components/games/AnagramGame';
+import CompleteSentenceGame from '../../components/games/CompleteSentenceGame';
+import UnjumbleGame from '../../components/games/UnjumbleGame';
+import SpinWheelGame from '../../components/games/SpinWheelGame';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { cn } from '../../utils/cn';
-import { useConfirm, useToast } from '../../components/Toast';
+import { useConfirm, useToast } from '../../components/ui/Toast';
 import { BlockEditor, AddBlockButton } from '../../components/admin/BlockEditor';
 
 const LessonEditor = () => {

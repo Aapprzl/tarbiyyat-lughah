@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
 import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor, Info, MapPin } from 'lucide-react';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 

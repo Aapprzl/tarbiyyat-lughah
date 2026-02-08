@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad as GamepadIcon } from 'lucide-react';
-import { contentService } from '../services/contentService';
-import { useTheme } from './ThemeProvider';
+import { contentService } from '../../services/contentService';
+import { useTheme } from '../providers/ThemeProvider';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 const iconMap = {
   BookOpen: Library, 

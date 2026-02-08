@@ -1,6 +1,6 @@
 import React, { Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from './components/Layout';
+import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import MaterialIndex from './pages/MaterialIndex';
 import GameIndex from './pages/GameIndex';
@@ -9,7 +9,7 @@ const Library = lazy(() => import('./pages/Library'));
 
 
 // Lazy Load Admin Components to improve performance
-const AdminLayout = lazy(() => import('./components/AdminLayout'));
+const AdminLayout = lazy(() => import('./components/layout/AdminLayout'));
 const LoginPage = lazy(() => import('./pages/admin/Login'));
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
 const AdminPrograms = lazy(() => import('./pages/admin/Programs'));
@@ -21,12 +21,12 @@ const LibraryManager = lazy(() => import('./pages/admin/LibraryManager'));
 const IntroEditor = lazy(() => import('./pages/admin/IntroEditor'));
 
 import { contentService } from './services/contentService';
-import { ToastProvider, ConfirmProvider } from './components/Toast';
-import { FontProvider } from './components/FontProvider';
-import { ThemeProvider } from './components/ThemeProvider';
+import { ToastProvider, ConfirmProvider } from './components/ui/Toast';
+import { FontProvider } from './components/providers/FontProvider';
+import { ThemeProvider } from './components/providers/ThemeProvider';
 
-import Intro from './components/Intro';
-import ScrollToTop from './components/ScrollToTop';
+import Intro from './components/features/Intro';
+import ScrollToTop from './components/ui/ScrollToTop';
 
 function App() {
   const [loading, setLoading] = React.useState(true);

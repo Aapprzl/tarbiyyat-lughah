@@ -3,9 +3,9 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomBar from './BottomBar';
 import Header from './Header';
-import { contentService } from '../services/contentService';
+import { contentService } from '../../services/contentService';
 import { Phone, Mail, MapPin } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 const Layout = () => {
   const [config, setConfig] = useState(null);

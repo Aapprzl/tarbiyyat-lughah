@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRef, useEffect } from 'react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 import confetti from 'canvas-confetti';
 
 const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {

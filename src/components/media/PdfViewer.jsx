@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { ClipboardList, AlertCircle } from 'lucide-react';
-import { useTheme } from './ThemeProvider';
+import { useTheme } from '../providers/ThemeProvider';
 
 // Helper: Convert base64 data URL to Blob URL
 const dataUrlToBlobUrl = (dataUrl) => {

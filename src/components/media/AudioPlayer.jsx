@@ -12,7 +12,7 @@ import {
   Music4
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
   const audioRef = useRef(null);

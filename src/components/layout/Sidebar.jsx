@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { Library, Package, LineChart, Link2, ChevronDown, GraduationCap, ShieldCheck, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Compass, CircleUser, Medal, Hexagon, Layers, X, Gamepad as GamepadIcon } from 'lucide-react';
-import { contentService } from '../services/contentService';
+import { contentService } from '../../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 const iconMap = {
   BookOpen: Library, 

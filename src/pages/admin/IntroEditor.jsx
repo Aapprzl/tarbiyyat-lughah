@@ -14,7 +14,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { contentService } from '../../services/contentService';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../components/ui/Toast';
 import { cn } from '../../utils/cn';
 
 const IntroEditor = () => {

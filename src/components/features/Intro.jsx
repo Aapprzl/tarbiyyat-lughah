@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as LucideIcons from 'lucide-react';
 import { ArrowRight, Sun, Moon, Sparkles } from 'lucide-react';
-import { useTheme } from './ThemeProvider';
-import { cn } from '../utils/cn';
+import { useTheme } from '../providers/ThemeProvider';
+import { cn } from '../../utils/cn';
 
 const FadeText = ({ texts, duration = 5000 }) => {
   const [index, setIndex] = useState(0);

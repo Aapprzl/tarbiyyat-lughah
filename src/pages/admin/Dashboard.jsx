@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
  // Import Migration Service
 import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Telescope, Layers, ClipboardList, MoveRight, Diamond, FolderPlus, MoreVertical, ExternalLink, ShieldCheck, DoorOpen, X, Trophy, Gamepad as GamepadIcon, Database } from 'lucide-react';
-import { useConfirm, useToast } from '../../components/Toast';
+import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 

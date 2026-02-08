@@ -16,7 +16,7 @@ import {
   Volume2,
   VolumeX
 } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 import confetti from 'canvas-confetti';
 
 const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {

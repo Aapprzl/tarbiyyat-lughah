@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, Diamond, FolderPlus, Crosshair, CheckSquare, Sliders, Orbit, X, ShieldCheck, DoorOpen, Trophy, Gamepad as GamepadIcon, PlayCircle } from 'lucide-react';
-import { useConfirm, useToast } from '../../components/Toast';
+import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronRight, Diamond, FolderPlus, Crosshair, CheckSquare, Sliders, Orbit, X, ShieldCheck, DoorOpen, Trophy, Gamepad as GamepadIcon, PlayCircle, BookOpen } from 'lucide-react';
+import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { Link } from 'react-router-dom';
@@ -23,23 +23,24 @@ const iconMap = {
   Globe: Orbit, 
   Sparkles: Diamond,
   PlayCircle: GamepadIcon,
-  Play: GamepadIcon
+  Play: GamepadIcon,
+  BookOpen: BookOpen
 };
 
 const AdminGames = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategoryId, setEditingCategoryId] = useState(null);
+  const [categoryForm, setCategoryForm] = useState({ title: '', icon: 'Gamepad2', desc: '', isLocked: false });
+
   const confirm = useConfirm();
   const toast = useToast();
 
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
-  
-  const [categoryForm, setCategoryForm] = useState({ title: '', icon: 'Gamepad2', desc: '', isLocked: false });
-
   const loadData = async () => {
     try {
-      const gamesData = await contentService.getSpecialPrograms();
+      const gamesData = await contentService.getGamesConfig();
       setCategories(gamesData);
     } catch (err) {
       toast.error('Gagal memuat Data Game.');
@@ -59,15 +60,16 @@ const AdminGames = () => {
     setLoading(true);
     try {
       if (editingCategoryId) {
-        await contentService.updateSpecialCategory(editingCategoryId, categoryForm.title, categoryForm.icon, categoryForm.desc, { isLocked: categoryForm.isLocked });
+        await contentService.updateGameCategory(editingCategoryId, categoryForm.title, categoryForm.desc, categoryForm.icon);
         toast.success('Kategori Game diperbarui!');
       } else {
-        await contentService.addSpecialCategory(categoryForm.title, categoryForm.icon, categoryForm.desc);
+        await contentService.addNewGameCategory(categoryForm.title, categoryForm.desc, categoryForm.icon);
         toast.success('Kategori Game baru dibuat!');
       }
       await loadData();
       setShowCategoryModal(false);
     } catch (err) {
+      console.error(err);
       toast.error('Gagal menyimpan kategori.');
     } finally {
       setLoading(false);
@@ -86,11 +88,11 @@ const AdminGames = () => {
   };
 
   const handleDeleteCategory = async (catId) => {
-    const ok = await confirm('Hapus kategori game ini beserta semua isinya?', 'Hapus Kategori');
+    const ok = await confirm('Hapus kategori game ini beserta semua kontennya?', 'Hapus Kategori');
     if (ok) {
       setLoading(true);
       try {
-        await contentService.deleteSpecialCategory(catId);
+        await contentService.deleteGameCategory(catId);
         await loadData();
         toast.success('Kategori dihapus.');
       } catch (err) {
@@ -100,17 +102,6 @@ const AdminGames = () => {
       }
     }
   };
-
-  const toggleCategoryLock = async (category) => {
-    try {
-        await contentService.updateSpecialCategory(category.id, null, null, null, { isLocked: !category.isLocked });
-        await loadData();
-        toast.success(`Kategori ${!category.isLocked ? 'dikunci' : 'dibuka'}!`);
-    } catch (err) {
-        toast.error('Gagal mengubah status kunci.');
-    }
-  };
-
 
   if (loading && categories.length === 0) return (
     <div className="py-24 text-center">
@@ -128,7 +119,7 @@ const AdminGames = () => {
               <Trophy className="w-3 h-3" /> Dashboard Edukasi
            </div>
            <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Manajemen Game</h1>
-           <p className="text-slate-500 dark:text-slate-400 font-medium">Buat kategori permainan dan isi dengan konten interaktif.</p>
+           <p className="text-slate-500 dark:text-slate-400 font-medium">Buat kategori permainan dan atur konten di dalamnya.</p>
         </div>
         
         <button 
@@ -141,8 +132,8 @@ const AdminGames = () => {
       </div>
 
 
-      {/* Categories List */}
-      <div className="grid grid-cols-1 gap-6">
+      {/* Categories Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <AnimatePresence mode="popLayout">
             {(categories || []).map((category, index) => {
               const IconComp = iconMap[category.icon] || Trophy;
@@ -154,71 +145,52 @@ const AdminGames = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     key={category.id} 
-                    className="bg-white dark:bg-slate-800 rounded-[3rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow p-2"
+                    className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group"
                 >
-                  <div className="flex flex-col md:flex-row items-center gap-6 p-6 md:p-8">
-                      {/* Icon */}
-                      <div className={cn(
-                          "w-20 h-20 md:w-24 md:h-24 rounded-[2rem] flex items-center justify-center transition-all bg-teal-500 text-white shadow-xl shadow-teal-500/20 shrink-0"
-                      )}>
-                        <IconComp className="w-8 h-8 md:w-10 md:h-10" />
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 text-center md:text-left min-w-0">
-                        <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white font-arabic tracking-tight mb-2">{category.title}</h3>
-                        <p className="text-slate-500 dark:text-slate-400 font-medium line-clamp-2 md:line-clamp-1 mb-4">{category.desc || 'Tidak ada deskripsi.'}</p>
-                        
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-                             <div className="bg-slate-100 dark:bg-slate-900 px-3 py-1.5 rounded-full text-xs font-bold text-slate-500 uppercase tracking-widest border border-slate-200 dark:border-slate-700">
-                                 {category.items?.length || 0} Konten
-                             </div>
-                             {category.isLocked && (
-                                 <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest bg-teal-500/10 text-teal-600 px-3 py-1.5 rounded-full ring-1 ring-teal-500/20">
-                                     <ShieldCheck className="w-3 h-3" /> Terkunci
-                                 </span>
-                             )}
-                        </div>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex flex-col gap-3 w-full md:w-auto shrink-0">
-                          <Link 
-                             to={`/admin/edit/${category.id}`}
-                             className="flex items-center justify-center gap-2 px-6 py-4 bg-teal-500 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-600 active:scale-95 transition-all w-full md:w-auto text-xs"
-                          >
-                             <PlayCircle className="w-4 h-4" />
-                             Edit Konten
-                          </Link>
-                          
-                          <div className="flex items-center justify-center gap-2">
-                                <button 
-                                    onClick={() => toggleCategoryLock(category)}
-                                    className={cn(
-                                        "p-3 rounded-2xl transition-all border flex-1 md:flex-none justify-center flex",
-                                        category.isLocked 
-                                        ? "text-amber-500 bg-amber-500/10 border-amber-500/20" 
-                                        : "bg-slate-100 dark:bg-slate-900 text-slate-400 hover:text-amber-500 border-slate-200 dark:border-slate-700"
-                                    )}
-                                    title={category.isLocked ? "Buka Kunci" : "Kunci Kategori"}
-                                >
-                                    {category.isLocked ? <ShieldCheck className="w-5 h-5" /> : <DoorOpen className="w-5 h-5" />}
-                                </button>
-                                <button 
-                                    onClick={() => openEditCategory(category)}
-                                    className="p-3 text-slate-400 hover:text-teal-500 hover:bg-teal-500/10 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
-                                    title="Edit Info"
-                                >
-                                    <Sliders className="w-5 h-5" />
-                                </button>
-                                <button 
-                                    onClick={() => handleDeleteCategory(category.id)}
-                                    className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex-1 md:flex-none justify-center flex"
-                                    title="Hapus Kategori"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
+                  <div className="p-8">
+                      <div className="flex items-start justify-between mb-6">
+                          <div className="w-20 h-20 rounded-[2rem] bg-teal-500/10 text-teal-600 flex items-center justify-center shadow-sm group-hover:bg-teal-500 group-hover:text-white transition-colors duration-300">
+                            <IconComp className="w-10 h-10" />
                           </div>
+                          
+                          <div className="flex items-center gap-2">
+                              <button 
+                                 onClick={() => openEditCategory(category)}
+                                 className="p-3 text-slate-400 hover:text-teal-500 hover:bg-teal-500/10 rounded-2xl transition-all"
+                                 title="Edit Info"
+                              >
+                                 <Sliders className="w-5 h-5" />
+                              </button>
+                              <button 
+                                 onClick={() => handleDeleteCategory(category.id)}
+                                 className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
+                                 title="Hapus Kategori"
+                              >
+                                 <Trash2 className="w-5 h-5" />
+                              </button>
+                          </div>
+                      </div>
+
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white font-arabic tracking-tight mb-2 leading-tight">
+                        {category.title}
+                      </h3>
+                      <p className="text-slate-500 dark:text-slate-400 font-medium line-clamp-2 mb-8 h-12">
+                        {category.desc || 'Tidak ada deskripsi.'}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-700">
+                          <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                             <Package className="w-4 h-4" />
+                             {/* Show block count if available, or just generic label */}
+                             {category.blockCount !== undefined ? `${category.blockCount} Konten` : 'Konten Game'}
+                          </div>
+
+                          <Link
+                             to={`/admin/edit/${category.id}`}
+                             className="flex items-center gap-2 px-6 py-3 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-full font-bold text-sm shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all"
+                          >
+                             Edit Konten <ChevronRight className="w-4 h-4" />
+                          </Link>
                       </div>
                   </div>
                 </motion.div>
@@ -241,8 +213,8 @@ const AdminGames = () => {
                                   <Plus className="w-4 h-4 md:w-6 md:h-6" />
                               </div>
                               <div className="min-w-0">
-                                  <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingCategoryId ? 'Edit Info Game' : 'Buat Kategori'}</h2>
-                                  <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengaturan kategori.</p>
+                                  <h2 className="text-lg md:text-2xl font-black text-slate-900 dark:text-white tracking-tight truncate">{editingCategoryId ? 'Edit Info Kategori' : 'Buat Kategori Baru'}</h2>
+                                  <p className="text-[10px] md:text-sm text-slate-500 font-medium truncate">Pengaturan kategori game.</p>
                               </div>
                           </div>
                           <button onClick={() => setShowCategoryModal(false)} className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shrink-0">
@@ -275,21 +247,6 @@ const AdminGames = () => {
                                         placeholder="Deskripsi singkat..."
                                       />
                                     </div>
-  
-                                    <div className="flex items-center justify-between p-3 md:p-5 bg-slate-50 dark:bg-white/5 rounded-2xl md:rounded-3xl border border-slate-200 dark:border-white/10">
-                                       <div className="flex items-center gap-3 md:gap-4">
-                                          <div className="w-8 h-8 md:w-10 md:h-10 bg-white dark:bg-slate-800 rounded-lg md:rounded-2xl flex items-center justify-center text-amber-600 shadow-sm border border-slate-100 dark:border-slate-700">
-                                             {categoryForm.isLocked ? <ShieldCheck className="w-4 h-4 md:w-5 md:h-5" /> : <DoorOpen className="w-4 h-4 md:w-5 md:h-5" />}
-                                          </div>
-                                          <div>
-                                              <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-tight">Status Kunci</h4>
-                                              <p className="text-[10px] text-slate-500 font-bold">Kunci kategori ini dari siswa?</p>
-                                          </div>
-                                       </div>
-                                       <button type="button" onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })} className={cn("w-12 h-6 rounded-full transition-colors relative flex items-center", categoryForm.isLocked ? "bg-amber-500" : "bg-slate-200 dark:bg-slate-700")}>
-                                         <div className={cn("w-4 h-4 bg-white rounded-full shadow-md absolute transition-all", categoryForm.isLocked ? "right-1" : "left-1")} />
-                                       </button>
-                                    </div>
                                 </div>
   
                                 {/* Right Column: Icons */}
@@ -319,7 +276,7 @@ const AdminGames = () => {
   
                             <div className="pt-2 md:pt-4 border-t border-slate-100 dark:border-white/5">
                               <button type="submit" className="w-full py-3 md:py-4 bg-teal-500 text-white rounded-xl md:rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-600 transition-all active:scale-95 text-[10px] md:text-sm">
-                                  {editingCategoryId ? 'Simpan' : 'Buat'}
+                                  {editingCategoryId ? 'Simpan Perubahan' : 'Buat Kategori'}
                               </button>
                             </div>
                         </form>

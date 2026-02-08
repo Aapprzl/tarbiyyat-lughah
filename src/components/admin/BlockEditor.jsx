@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
-import PdfViewer from '../../components/PdfViewer';
-import AudioPlayer from '../../components/AudioPlayer';
+import PdfViewer from '../media/PdfViewer';
+import AudioPlayer from '../media/AudioPlayer';
 
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
     <button 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { contentService } from '../services/contentService';
+import { contentService } from '../../services/contentService';
 
 const FontContext = createContext();
 

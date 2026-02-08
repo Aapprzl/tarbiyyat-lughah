@@ -3,15 +3,14 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown';
 import { MoveLeft, Library, AlertCircle, Edit, Youtube, ClipboardList, Download, ExternalLink, MoveRight, Gamepad as GamepadIcon, CircleCheckBig, Clock, ArrowRightCircle, Share2, Printer, Pocket, ShieldCheck, Diamond, Trophy, Award, ChevronRight, ChevronDown, RefreshCcw, Type, Table, Puzzle, HelpCircle, Layers, GripVertical, Music, Keyboard } from 'lucide-react';
 import { contentService } from '../services/contentService';
-import PdfViewer from '../components/PdfViewer';
-import AudioPlayer from '../components/AudioPlayer';
-import MatchUpGame from '../components/MatchUpGame';
-import QuizGame from '../components/QuizGame';
-
-import AnagramGame from '../components/AnagramGame';
-import CompleteSentenceGame from '../components/CompleteSentenceGame';
-import UnjumbleGame from '../components/UnjumbleGame';
-import SpinWheelGame from '../components/SpinWheelGame';
+import PdfViewer from '../components/media/PdfViewer';
+import AudioPlayer from '../components/media/AudioPlayer';
+import MatchUpGame from '../components/games/MatchUpGame';
+import QuizGame from '../components/games/QuizGame';
+import AnagramGame from '../components/games/AnagramGame';
+import CompleteSentenceGame from '../components/games/CompleteSentenceGame';
+import UnjumbleGame from '../components/games/UnjumbleGame';
+import SpinWheelGame from '../components/games/SpinWheelGame';
 import WordClassificationGame from '../components/games/WordClassificationGame';
 import HarakatGame from '../components/games/HarakatGame';
 import { motion, AnimatePresence } from 'framer-motion';
