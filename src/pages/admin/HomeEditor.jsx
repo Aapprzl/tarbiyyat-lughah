@@ -61,46 +61,34 @@ const HomeEditor = () => {
 
   if (loading) return (
     <div className="py-24 text-center">
-        <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Memuat Editor Beranda...</p>
+        <div className="w-12 h-12 border-3 border-slate-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-500 text-sm">Memuat editor...</p>
     </div>
   );
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto pb-24">
+    <div className="space-y-6 pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
         <div>
-           <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-              <Monitor className="w-3 h-3" /> Manajemen Tampilan
-           </div>
-           <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Editor Beranda</h1>
-           <p className="text-slate-500 dark:text-slate-400 font-medium">Sesuaikan identitas dan konten utama portal Anda.</p>
+           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Editor Beranda</h1>
+           <p className="text-sm text-slate-500 mt-1">Sesuaikan identitas dan konten portal</p>
         </div>
         
         <button 
           onClick={handleSave}
           disabled={saving}
-          className="group flex items-center justify-center bg-teal-600 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-teal-500/20 hover:bg-teal-700 active:scale-95 transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
         >
-          <Save className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
-          {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+          <Save className="w-4 h-4" />
+          {saving ? 'Menyimpan...' : 'Simpan'}
         </button>
       </div>
 
-      <form onSubmit={handleSave} className="space-y-10">
-        {/* --- Site Identity Section --- */}
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-        >
-            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
-                    <Orbit className="w-6 h-6" />
-                </div>
-                Identitas Website
-            </h2>
+      <form onSubmit={handleSave} className="space-y-6">
+        {/* Site Identity Section */}
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Identitas Website</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div className="space-y-4">
@@ -280,51 +268,46 @@ const HomeEditor = () => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
 
         {/* --- Hero Section --- */}
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-        >
-            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                    <Type className="w-6 h-6" />
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                <div className="w-8 h-8 bg-teal-500/10 rounded-lg flex items-center justify-center text-teal-600">
+                    <Type className="w-5 h-5" />
                 </div>
                 Hero Section (Konten Utama)
             </h2>
             
-            <div className="space-y-8">
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Utama (Arabic)</label>
+            <div className="space-y-4">
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Judul Utama (Arabic)</label>
                     <input 
                         type="text" 
                         value={config.heroTitleArabic}
                         onChange={(e) => setConfig({...config, heroTitleArabic: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-black text-right text-2xl focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all dir-rtl font-arabic"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold text-right text-xl focus:ring-2 focus:ring-teal-500 outline-none transition-colors dir-rtl font-arabic"
                         placeholder="تَعَلَّمِ اللُّغَةَ الْعَرَبِيَّةَ"
                     />
                 </div>
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Sub-Judul (Latin)</label>
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Sub-Judul (Latin)</label>
                     <input 
                         type="text" 
                         value={config.heroTitleLatin}
                         onChange={(e) => setConfig({...config, heroTitleLatin: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-8 py-5 text-slate-900 dark:text-white font-black text-xl focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold text-lg focus:ring-2 focus:ring-teal-500 outline-none transition-colors"
                         style={{ fontFamily: 'var(--font-latin)' }}
                         placeholder="Belajar Bahasa Arab dengan Mudah"
                     />
                 </div>
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Portal</label>
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Deskripsi Portal</label>
                     <textarea 
                         value={config.heroDescription}
                         onChange={(e) => setConfig({...config, heroDescription: e.target.value})}
                         rows="3"
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[2.5rem] px-8 py-6 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none leading-relaxed"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-colors leading-relaxed"
                         style={{ fontFamily: 'var(--font-latin)' }}
                         placeholder="Jelaskan secara singkat tentang website Anda..."
                     />
@@ -332,91 +315,84 @@ const HomeEditor = () => {
                 
                 {/* CTA Buttons Removed */}
             </div>
-        </motion.div>
+        </div>
 
         {/* --- Branding & Footer --- */}
         {/* --- Vision Section --- */}
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-        >
-            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                    <Info className="w-6 h-6" />
-                </div>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                <Info className="w-5 h-5 text-teal-600" />
                 Visi & Misi
             </h2>
             
-            <div className="space-y-6">
-                 <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Judul Seksi</label>
+            <div className="space-y-4">
+                 <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Judul Seksi</label>
                     <input 
                       type="text" 
                       value={config.visionTitle || ''}
                       onChange={(e) => setConfig({...config, visionTitle: e.target.value})}
-                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-teal-500 outline-none transition-colors"
                       placeholder="Visi Tarbiyyat Al-Lughah"
                     />
                 </div>
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Utama</label>
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Deskripsi Utama</label>
                     <textarea 
                         value={config.visionDesc || ''}
                         onChange={(e) => setConfig({...config, visionDesc: e.target.value})}
                         rows="3"
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[2.5rem] px-8 py-6 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 shadow-sm outline-none leading-relaxed"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-colors leading-relaxed"
                         placeholder="Deskripsi visi..."
                     />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 1</label>
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Step 1</label>
                         <input
                             type="text"
                             value={config.visionStep1Title || ''}
                             onChange={(e) => setConfig({...config, visionStep1Title: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-colors mb-2"
                             placeholder="Judul Step 1"
                         />
                         <textarea
                             value={config.visionStep1Desc || ''}
                             onChange={(e) => setConfig({...config, visionStep1Desc: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-xs outline-none transition-colors h-24 resize-none"
                             placeholder="Deskripsi Step 1"
                         />
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 2</label>
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Step 2</label>
                         <input
                             type="text"
                             value={config.visionStep2Title || ''}
                             onChange={(e) => setConfig({...config, visionStep2Title: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-colors mb-2"
                             placeholder="Judul Step 2"
                         />
                          <textarea
                             value={config.visionStep2Desc || ''}
                             onChange={(e) => setConfig({...config, visionStep2Desc: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-xs outline-none transition-colors h-24 resize-none"
                             placeholder="Deskripsi Step 2"
                         />
                      </div>
                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Step 3</label>
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Step 3</label>
                         <input
                             type="text"
                             value={config.visionStep3Title || ''}
                             onChange={(e) => setConfig({...config, visionStep3Title: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-sm font-bold outline-none mb-2"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-medium outline-none transition-colors mb-2"
                             placeholder="Judul Step 3"
                         />
                         <textarea
                             value={config.visionStep3Desc || ''}
                             onChange={(e) => setConfig({...config, visionStep3Desc: e.target.value})}
-                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 text-xs outline-none h-24 resize-none"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-xs outline-none transition-colors h-24 resize-none"
                             placeholder="Deskripsi Step 3"
                         />
                      </div>
@@ -464,52 +440,45 @@ const HomeEditor = () => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
 
         {/* --- Footer & Contact --- */}
-        <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-        >
-            <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
-                    <MapPin className="w-6 h-6" />
-                </div>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                <MapPin className="w-5 h-5 text-purple-600" />
                 Informasi Kontak & Footer
             </h2>
             
-            <div className="space-y-8">
+            <div className="space-y-4">
                 {/* General Footer Text */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Brand (Footer)</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Nama Brand (Footer)</label>
                         <input 
                           type="text" 
                           value={config.programsSectionTitle || 'Tarbiyyat al-Lughah'}
                           onChange={(e) => setConfig({...config, programsSectionTitle: e.target.value})}
-                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-teal-500 outline-none transition-colors"
                         />
                     </div>
-                    <div className="space-y-3">
-                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Teks Pojok Kanan Bawah</label>
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Teks Pojok Kanan Bawah</label>
                         <input 
                           type="text" 
                           value={config.footerRightText || 'PBA IAIN Bone'}
                           onChange={(e) => setConfig({...config, footerRightText: e.target.value})}
-                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                          className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-teal-500 outline-none transition-colors"
                         />
                     </div>
                 </div>
 
-                <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Teks Hak Cipta (Footer)</label>
+                <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Teks Hak Cipta (Footer)</label>
                     <input 
                         type="text" 
                         value={config.footerText}
                         onChange={(e) => setConfig({...config, footerText: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-teal-500 outline-none transition-colors"
                         placeholder="© 2024 Bahasa Arab Praktis"
                     />
                 </div>
@@ -610,7 +579,7 @@ const HomeEditor = () => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
       </form>
     </div>
   );

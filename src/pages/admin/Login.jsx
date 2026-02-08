@@ -54,36 +54,20 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative w-full flex items-center justify-center p-4 md:p-6 overflow-hidden min-h-[calc(100vh-5rem)]">
-      {/* Background cleaned as requested */}
-
-      <motion.div 
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 w-full max-w-[480px]" // Adjusted width for better proportion
-      >
-        <div className="bg-white dark:bg-slate-800 p-6 md:p-12 rounded-[2.5rem] border-4 border-slate-100 dark:border-slate-800 space-y-10 transition-all">
+    <div className="relative w-full flex items-center justify-center p-4 md:p-6 min-h-[calc(100vh-5rem)]">
+      <div className="relative z-10 w-full max-w-[480px]">
+        <div className="bg-white dark:bg-slate-800 p-8 rounded-lg border border-slate-200 dark:border-slate-700 space-y-8">
           {/* Logo Section */}
-          <div className="text-center space-y-6">
-            <motion.div 
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                className="relative inline-block"
-            >
-                <div className="absolute inset-0 bg-teal-500 blur-2xl opacity-20 animate-pulse"></div>
-                <div className="relative bg-gradient-to-br from-teal-400 to-indigo-600 w-20 h-20 md:w-24 md:h-24 rounded-[2rem] mx-auto flex items-center justify-center text-white overflow-hidden group">
-                    <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <ShieldCheck className="w-10 h-10 group-hover:scale-110 transition-transform" />
+          <div className="text-center space-y-4">
+            <div className="inline-block">
+                <div className="bg-gradient-to-br from-teal-500 to-indigo-600 w-16 h-16 rounded-xl mx-auto flex items-center justify-center text-white">
+                    <ShieldCheck className="w-8 h-8" />
                 </div>
-            </motion.div>
+            </div>
             
             <div className="space-y-2">
-                <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-3">
-                   Admin Portal <Diamond className="w-5 h-5 text-amber-500" />
-                </h1>
-                <p className="text-slate-500 dark:text-slate-400 font-medium">Autentikasi diperlukan untuk akses kontrol.</p>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Admin Portal</h1>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Autentikasi diperlukan untuk akses kontrol</p>
             </div>
           </div>
 
@@ -217,7 +201,7 @@ const LoginPage = () => {
             */}
           </form>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

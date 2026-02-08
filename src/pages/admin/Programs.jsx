@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Diamond, FolderPlus, FilePlus, Crosshair, CheckSquare, Sliders, Orbit, MoreVertical, X, ShieldCheck, DoorOpen, Gamepad as GamepadIcon } from 'lucide-react';
+import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Trash2, ChevronDown, ChevronUp, Crosshair, CheckSquare, Sliders, Orbit, X, Lock, Unlock, Gamepad as GamepadIcon } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -58,7 +58,6 @@ const AdminPrograms = () => {
     setExpandedCategories(prev => ({ ...prev, [catId]: !prev[catId] }));
   };
 
-  // Category Actions
   const handleSaveCategory = async (e) => {
     e.preventDefault();
     if (!categoryForm.title) return;
@@ -118,7 +117,6 @@ const AdminPrograms = () => {
     }
   };
 
-  // Topic Actions
   const handleAddTopic = async (e) => {
     e.preventDefault();
     if (!topicTitle || !selectedCategoryId) return;
@@ -130,7 +128,7 @@ const AdminPrograms = () => {
         setShowTopicModal(false);
         setTopicTitle('');
         setSelectedCategoryId(null);
-        toast.success('Topik baru ditambahkan! 📚');
+        toast.success('Topik baru ditambahkan!');
     } catch (err) {
         toast.error('Gagal menambahkan topik.');
     } finally {
@@ -174,383 +172,359 @@ const AdminPrograms = () => {
 
   if (loading && specialPrograms.length === 0) return (
     <div className="py-24 text-center">
-        <div className="w-16 h-16 border-4 border-amber-500/20 border-t-amber-500 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Singkronisasi Program Khusus...</p>
+        <div className="w-12 h-12 border-3 border-slate-200 border-t-amber-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-500 text-sm">Memuat program khusus...</p>
     </div>
   );
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto pb-24">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="flex items-center justify-between">
         <div>
-           <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-              <Crosshair className="w-3 h-3" /> Kurikulum Unggulan
-           </div>
-           <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Program Khusus</h1>
-           <p className="text-slate-500 dark:text-slate-400 font-medium">Kelola kategori dan topik program pembelajaran khusus.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Program Khusus</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola kategori dan topik program pembelajaran khusus</p>
         </div>
         
         <button 
           onClick={() => { setCategoryForm({ title: '', icon: 'Star', desc: '', isLocked: false }); setEditingCategoryId(null); setShowCategoryModal(true); }}
-          className="group flex items-center justify-center bg-amber-500 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-amber-500/20 hover:bg-amber-600 active:scale-95 transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
         >
-          <FolderPlus className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
-          Tambah Kategori
+          <Plus className="w-4 h-4" />
+          Kategori Baru
         </button>
       </div>
 
       {/* Categories List */}
-      <div className="grid grid-cols-1 gap-6">
-        <AnimatePresence mode="popLayout">
-            {(specialPrograms || []).map((category, index) => {
-              if (!category) return null;
-              const IconComp = iconMap[category.icon] || Star;
-              const isExpanded = expandedCategories[category.id];
+      <div className="space-y-4">
+        {specialPrograms.length > 0 ? (
+          specialPrograms.map((category) => {
+            if (!category) return null;
+            const IconComp = iconMap[category.icon] || Award;
+            const isExpanded = expandedCategories[category.id];
 
-              return (
-                <motion.div 
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    key={category.id} 
-                    className="bg-white dark:bg-white/5 rounded-[3rem] border border-slate-200 dark:border-white/10 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+            return (
+              <div 
+                key={category.id} 
+                className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+              >
+                {/* Category Header */}
+                <div 
+                  className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                  onClick={() => toggleCategory(category.id)}
                 >
-                  {/* Category Header */}
-                  <div 
-                    className={cn(
-                        "flex items-center justify-between px-8 py-6 cursor-pointer transition-colors group",
-                        isExpanded ? "bg-slate-50 dark:bg-white/5" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.02]"
-                    )}
-                    onClick={() => toggleCategory(category.id)}
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className={cn(
-                          "w-14 h-14 rounded-[1.5rem] flex items-center justify-center transition-all group-hover:scale-110 shadow-lg",
-                          isExpanded ? "bg-amber-500 text-white shadow-amber-500/20" : "bg-amber-500/10 text-amber-600 shadow-none"
-                      )}>
-                        <IconComp className="w-6 h-6" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white font-arabic tracking-tight">{category.title}</h3>
-                        <div className="flex items-center gap-2">
-                             <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">{category.topics?.length || 0} Materi Terdaftar</p>
-                             {category.isLocked && (
-                                 <span className="flex items-center gap-1 text-[8px] font-black uppercase tracking-widest bg-amber-500/10 text-amber-600 px-2 py-0.5 rounded-full ring-1 ring-amber-500/20">
-                                     <ShieldCheck className="w-2.5 h-2.5" /> Terkunci
-                                 </span>
-                             )}
-                        </div>
-                      </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg flex items-center justify-center">
+                      <IconComp className="w-6 h-6" />
                     </div>
-                    
-                    <div className="flex items-center gap-3">
-                      <div className="flex opacity-0 group-hover:opacity-100 transition-opacity">
-                         <button 
-                            onClick={(e) => { e.stopPropagation(); toggleCategoryLock(category); }}
-                            className={cn(
-                                "p-3 rounded-2xl transition-all",
-                                category.isLocked ? "text-amber-500 bg-amber-500/10" : "text-slate-400 hover:text-amber-500"
-                            )}
-                            title={category.isLocked ? "Buka Kunci" : "Kunci Kategori"}
-                         >
-                            {category.isLocked ? <ShieldCheck className="w-4 h-4" /> : <DoorOpen className="w-4 h-4" />}
-                         </button>
-                         <button 
-                            onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
-                            className="p-3 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-2xl transition-all"
-                         >
-                            <Edit2 className="w-4 h-4" />
-                         </button>
-                         <button 
-                            onClick={(e) => { e.stopPropagation(); handleDeleteCategory(category.id); }}
-                            className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-2xl transition-all"
-                         >
-                            <Trash2 className="w-4 h-4" />
-                         </button>
-                      </div>
-                      <div className={cn(
-                          "w-10 h-10 rounded-full flex items-center justify-center transition-all",
-                          isExpanded ? "bg-amber-500 text-white rotate-180" : "bg-slate-100 dark:bg-white/5 text-slate-400"
-                      )}>
-                        <ChevronDown className="w-5 h-5" />
-                      </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{category.title}</h3>
+                      <p className="text-sm text-slate-500">
+                        {category.topics?.length || 0} Materi
+                        {category.isLocked && ' • Terkunci'}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Topics List with AnimatePresence */}
-                  <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div 
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                            className="overflow-hidden"
-                        >
-                          <div className="px-8 pb-8 pt-2">
-                          <div className="h-px bg-slate-200 dark:bg-white/5 mb-8"></div>
-                          
-                          {category.topics?.length === 0 ? (
-                            <div className="text-center py-12 bg-slate-50 dark:bg-black/20 rounded-[2.5rem] border border-dashed border-slate-200 dark:border-white/5">
-                              <Diamond className="w-10 h-10 text-slate-300 mx-auto mb-4" />
-                              <p className="text-slate-400 font-bold text-sm">Belum ada topik yang ditambahkan.</p>
-                            </div>
-                          ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              {category.topics?.map(topic => (
-                                <motion.div 
-                                    layout
-                                    key={topic.id} 
-                                    className="flex items-center justify-between p-5 bg-slate-50 dark:bg-black/20 border border-slate-100 dark:border-white/5 rounded-[2rem] hover:border-amber-500/30 transition-all group/topic"
-                                >
-                                  <div className="flex items-center gap-4">
-                                     <div className={cn(
-                                         "w-1.5 h-1.5 rounded-full",
-                                         topic.isLocked ? "bg-amber-500 animate-pulse" : "bg-teal-500"
-                                     )}></div>
-                                     <div className="flex flex-col">
-                                         <span className={cn(
-                                             "font-bold font-arabic text-lg leading-tight",
-                                             topic.isLocked ? "text-slate-400" : "text-slate-900 dark:text-white"
-                                         )}>{topic.title}</span>
-                                         {topic.isLocked && <span className="text-[8px] font-black text-amber-600 uppercase tracking-widest">Akses Dikunci</span>}
-                                     </div>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <button 
-                                      onClick={() => toggleTopicLock(category.id, topic.id, topic.isLocked)}
-                                      className={cn(
-                                          "p-2 rounded-xl transition-all border",
-                                          topic.isLocked ? "bg-amber-500/10 text-amber-600 border-amber-500/20" : "text-slate-300 hover:text-amber-500 border-transparent hover:border-amber-100"
-                                      )}
-                                      title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
-                                    >
-                                      {topic.isLocked ? <ShieldCheck className="w-3.5 h-3.5" /> : <DoorOpen className="w-3.5 h-3.5" />}
-                                    </button>
-                                    <Link
-                                      to={`/admin/edit/${topic.id}`}
-                                      className="text-[10px] font-black uppercase tracking-widest bg-white dark:bg-white/10 text-teal-600 dark:text-teal-400 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/5 hover:bg-teal-500 hover:text-white hover:border-teal-500 transition-all shadow-sm"
-                                    >
-                                      Edit Konten
-                                    </Link>
-                                    <button 
-                                      onClick={() => handleDeleteTopic(category.id, topic.id)}
-                                      className="w-9 h-9 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </button>
-                                  </div>
-                                </motion.div>
-                              ))}
-                            </div>
-                          )}
-
-                          {/* Add Topic Action */}
-                          <button 
-                            onClick={() => openAddTopic(category.id)}
-                            className="mt-6 w-full py-4 bg-amber-50 dark:bg-amber-500/5 border-2 border-dashed border-amber-200 dark:border-amber-500/20 rounded-[2rem] text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-500/10 transition-all text-sm font-black uppercase tracking-widest flex items-center justify-center gap-2 group/add"
-                          >
-                            <FilePlus className="w-4 h-4 group-hover:scale-125 transition-transform" />
-                            Tambah Topik Baru
-                          </button>
-                          </div>
-                        </motion.div>
+                  
+                  <div className="flex items-center gap-2">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleCategoryLock(category); }}
+                      className={cn(
+                          "p-2 rounded-lg transition-colors",
+                          category.isLocked ? "text-amber-600 bg-amber-50 dark:bg-amber-900/20" : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                       )}
-                  </AnimatePresence>
-                </motion.div>
-              );
-            })}
-        </AnimatePresence>
+                      title={category.isLocked ? "Buka Kunci" : "Kunci Kategori"}
+                    >
+                      {category.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); openEditCategory(category); }}
+                      className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); handleDeleteCategory(category.id); }}
+                      className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); toggleCategory(category.id) }}
+                      className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    >
+                      {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                    </button>
+                  </div>
+                </div>
 
-        {specialPrograms.length === 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-24 bg-white dark:bg-white/5 rounded-[4rem] border border-slate-200 dark:border-white/10 shadow-sm"
-          >
-            <div className="w-24 h-24 bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <LayoutGrid className="w-12 h-12" />
-            </div>
-            <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Program Masih Kosong</h2>
-            <p className="text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Mulai susun kurikulum anda dengan menambahkan kategori pertama.</p>
-          </motion.div>
+                {/* Topics List */}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div 
+                      initial={{ height: 0 }} 
+                      animate={{ height: "auto" }} 
+                      exit={{ height: 0 }}
+                      className="overflow-hidden border-t border-slate-200 dark:border-slate-700"
+                    >
+                      <div className="p-4 bg-slate-50 dark:bg-slate-900/50 space-y-2">
+                      
+                      {category.topics?.length === 0 ? (
+                        <div className="text-center py-8 text-slate-400 text-sm">
+                          Belum ada topik yang ditambahkan.
+                        </div>
+                      ) : (
+                        category.topics?.map(topic => (
+                          <div 
+                            key={topic.id} 
+                            className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                          >
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className={cn(
+                                  "w-8 h-8 rounded-lg flex items-center justify-center",
+                                  topic.isLocked ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600" : "bg-teal-50 dark:bg-teal-900/30 text-teal-600"
+                              )}>
+                                {topic.isLocked ? <Lock className="w-4 h-4" /> : <Library className="w-4 h-4" />}
+                              </div>
+                              <span className="font-medium text-slate-900 dark:text-white truncate text-sm">{topic.title}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button 
+                                onClick={() => toggleTopicLock(category.id, topic.id, topic.isLocked)}
+                                className={cn(
+                                    "p-1.5 rounded-lg transition-colors",
+                                    topic.isLocked ? "bg-amber-50 dark:bg-amber-900/20 text-amber-600" : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                )}
+                                title={topic.isLocked ? "Buka Akses" : "Kunci Akses"}
+                              >
+                                {topic.isLocked ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                              </button>
+                              <Link
+                                to={`/admin/edit/${topic.id}`}
+                                className="px-3 py-1.5 bg-teal-600 text-white rounded-lg text-xs font-medium hover:bg-teal-700 transition-colors"
+                              >
+                                Edit
+                              </Link>
+                              <button 
+                                onClick={() => handleDeleteTopic(category.id, topic.id)}
+                                className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+
+                      <button 
+                        onClick={() => openAddTopic(category.id)}
+                        className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-lg text-slate-500 hover:border-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors text-sm font-medium"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Tambah Topik
+                      </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            );
+          })
+        ) : (
+          <div className="text-center py-16 bg-slate-50 dark:bg-slate-800 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700">
+            <LayoutGrid className="w-12 h-12 mx-auto mb-3 text-slate-300" />
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">Program Masih Kosong</h2>
+            <p className="text-slate-500 text-sm">Mulai dengan menambahkan kategori pertama.</p>
+          </div>
         )}
       </div>
 
       {/* Category Modal */}
       <AnimatePresence>
-          {showCategoryModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
-               <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowCategoryModal(false)}
-                  className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
-               />
-               <motion.div 
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                  className="bg-white dark:bg-slate-900 rounded-[3rem] w-full max-w-2xl overflow-hidden shadow-2xl relative border border-white/10"
-               >
-                  <div className="p-10">
-                      <div className="flex items-center justify-between mb-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
-                                <FolderPlus className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{editingCategoryId ? 'Edit Kategori' : 'Kategori Baru'}</h2>
-                                <p className="text-sm text-slate-500 font-medium">Pengelompokan program unggulan.</p>
-                            </div>
-                        </div>
-                        <button onClick={() => setShowCategoryModal(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-                            <X className="w-5 h-5" />
-                        </button>
+        {showCategoryModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => setShowCategoryModal(false)}
+              className="absolute inset-0 bg-black/50"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-2xl relative shadow-xl"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                    {editingCategoryId ? 'Edit Kategori' : 'Kategori Baru'}
+                  </h2>
+                  <button 
+                    onClick={() => setShowCategoryModal(false)} 
+                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <form onSubmit={handleSaveCategory} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2 space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Program</label>
+                        <input 
+                          type="text" 
+                          value={categoryForm.title}
+                          onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                          placeholder="Contoh: Tahsin Al-Qur'an"
+                          required
+                        />
                       </div>
-                      
-                      <form onSubmit={handleSaveCategory} className="space-y-8">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Program</label>
-                                <input 
-                                  type="text" 
-                                  value={categoryForm.title}
-                                  onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
-                                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-amber-500 shadow-sm outline-none transition-all"
-                                  placeholder="Contoh: Tahsin Al-Qur'an"
-                                  required
-                                />
-                             </div>
 
-                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Ikon Visual</label>
-                                <div className="grid grid-cols-5 gap-2 bg-slate-50 dark:bg-black/20 p-3 rounded-2xl border border-slate-200 dark:border-white/5">
-                                   {Object.keys(iconMap).map(iconName => {
-                                      const IconComp = iconMap[iconName];
-                                      const isSelected = categoryForm.icon === iconName;
-                                      return (
-                                         <button
-                                            key={iconName}
-                                            type="button"
-                                            onClick={() => setCategoryForm({ ...categoryForm, icon: iconName })}
-                                            className={cn(
-                                                "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                                                isSelected ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20" : "text-slate-400 hover:bg-white dark:hover:bg-white/5"
-                                            )}
-                                         >
-                                            <IconComp className="w-5 h-5" />
-                                         </button>
-                                      );
-                                   })}
-                                </div>
-                             </div>
-                          </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
+                        <textarea 
+                          value={categoryForm.desc}
+                          onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
+                          className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none h-24 resize-none"
+                          placeholder="Penjelasan singkat tentang program ini..."
+                        />
+                      </div>
+                    </div>
 
-                          <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Deskripsi Singkat</label>
-                            <textarea 
-                              value={categoryForm.desc}
-                              onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
-                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-amber-500 shadow-sm outline-none transition-all h-24 resize-none"
-                              placeholder="Penjelasan singkat tentang program ini..."
-                            />
-                          </div>
-
-                          <div className="flex items-center justify-between p-6 bg-amber-500/10 rounded-3xl border border-amber-500/20">
-                             <div className="flex items-center gap-4">
-                               <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
-                                  {categoryForm.isLocked ? <ShieldCheck className="w-6 h-6" /> : <DoorOpen className="w-6 h-6" />}
-                               </div>
-                               <div>
-                                  <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">Status Akses</h4>
-                                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{categoryForm.isLocked ? 'Hanya Admin (Segera Rilis)' : 'Publik (Dapat Diakses)'}</p>
-                               </div>
-                             </div>
-                             <button 
-                               type="button"
-                               onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })}
-                               className={cn(
-                                   "px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all",
-                                   categoryForm.isLocked ? "bg-amber-500 text-white" : "bg-white dark:bg-white/5 text-slate-400"
-                               )}
-                             >
-                               {categoryForm.isLocked ? 'Terkunci' : 'Publik'}
-                             </button>
-                          </div>
-
-                          <div className="flex gap-4 pt-6">
-                            <button type="submit" className="flex-1 py-4 bg-amber-500 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-600 transition-all active:scale-95">
-                               {editingCategoryId ? 'Simpan Perubahan' : 'Terbitkan Kategori'}
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Ikon</label>
+                      <div className="grid grid-cols-4 gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto">
+                        {Object.keys(iconMap).map(iconName => {
+                          const IconComp = iconMap[iconName];
+                          const isSelected = categoryForm.icon === iconName;
+                          return (
+                            <button
+                              key={iconName}
+                              type="button"
+                              onClick={() => setCategoryForm({ ...categoryForm, icon: iconName })}
+                              className={cn(
+                                  "aspect-square rounded-lg flex items-center justify-center transition-colors",
+                                  isSelected ? "bg-amber-600 text-white" : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
+                              )}
+                            >
+                              <IconComp className="w-5 h-5" />
                             </button>
-                         </div>
-                      </form>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
-               </motion.div>
-            </div>
-          )}
+
+                  <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center text-amber-600">
+                        {categoryForm.isLocked ? <Lock className="w-5 h-5" /> : <Unlock className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Status Akses</h4>
+                        <p className="text-xs text-slate-500">{categoryForm.isLocked ? 'Terkunci' : 'Publik'}</p>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setCategoryForm({ ...categoryForm, isLocked: !categoryForm.isLocked })}
+                      className={cn(
+                          "px-4 py-2 rounded-lg text-xs font-medium transition-colors",
+                          categoryForm.isLocked ? "bg-amber-600 text-white" : "bg-white dark:bg-slate-800 text-slate-600"
+                      )}
+                    >
+                      {categoryForm.isLocked ? 'Terkunci' : 'Publik'}
+                    </button>
+                  </div>
+
+                  <div className="flex gap-2 pt-2">
+                    <button 
+                      type="submit" 
+                      className="flex-1 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                    >
+                      {editingCategoryId ? 'Simpan Perubahan' : 'Buat Kategori'}
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowCategoryModal(false)}
+                      className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
 
       {/* Topic Modal */}
       <AnimatePresence>
-          {showTopicModal && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-               <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  onClick={() => setShowTopicModal(false)}
-                  className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
-               />
-               <motion.div 
-                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                  className="bg-white dark:bg-slate-900 rounded-[3rem] w-full max-w-lg overflow-hidden shadow-2xl relative border border-white/10"
-               >
-                  <div className="p-10">
-                      <div className="flex items-center justify-between mb-10">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                                <FilePlus className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Topik Baru</h2>
-                                <p className="text-sm text-slate-500 font-medium">Tambahkan unit pembelajaran.</p>
-                            </div>
-                        </div>
-                        <button onClick={() => setShowTopicModal(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-                            <X className="w-5 h-5" />
-                        </button>
-                      </div>
-                      
-                      <form onSubmit={handleAddTopic} className="space-y-8">
-                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Nama Unit / Topik</label>
-                            <input 
-                              type="text" 
-                              value={topicTitle}
-                              onChange={(e) => setTopicTitle(e.target.value)}
-                              className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/5 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all"
-                              placeholder="Nama topik pembelajaran..."
-                              required
-                              autoFocus
-                            />
-                         </div>
-
-                         <div className="flex gap-4 pt-6">
-                            <button type="submit" className="flex-1 py-4 bg-teal-600 text-white rounded-[1.5rem] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-teal-700 transition-all active:scale-95">
-                               Tambah Unit Pembelajaran
-                            </button>
-                         </div>
-                      </form>
+        {showTopicModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              onClick={() => setShowTopicModal(false)}
+              className="absolute inset-0 bg-black/50"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-slate-800 rounded-lg w-full max-w-lg relative shadow-xl"
+            >
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white">Topik Baru</h2>
+                  <button 
+                    onClick={() => setShowTopicModal(false)} 
+                    className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                
+                <form onSubmit={handleAddTopic} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Unit / Topik</label>
+                    <input 
+                      type="text" 
+                      value={topicTitle}
+                      onChange={(e) => setTopicTitle(e.target.value)}
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                      placeholder="Nama topik pembelajaran..."
+                      required
+                      autoFocus
+                    />
                   </div>
-               </motion.div>
-            </div>
-          )}
+
+                  <div className="flex gap-2 pt-2">
+                    <button 
+                      type="submit" 
+                      className="flex-1 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
+                    >
+                      Tambah Topik
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setShowTopicModal(false)}
+                      className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

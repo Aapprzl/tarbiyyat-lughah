@@ -61,8 +61,8 @@ const FontEditor = () => {
 
   if (!localConfig) return (
     <div className="py-24 text-center">
-        <div className="w-16 h-16 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Memuat Konfigurasi Font...</p>
+        <div className="w-12 h-12 border-3 border-slate-200 border-t-teal-600 rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-slate-500 text-sm">Memuat konfigurasi...</p>
     </div>
   );
 
@@ -70,60 +70,51 @@ const FontEditor = () => {
   const latinStyle = localConfig.latinFontFamily || 'Plus Jakarta Sans';
 
   return (
-    <div className="space-y-10 max-w-5xl mx-auto pb-24">
+    <div className="space-y-6 pb-16">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
         <div>
-           <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-              <Type className="w-3 h-3" /> Tipografi Sistem
-           </div>
-           <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Editor Font</h1>
-           <p className="text-slate-500 dark:text-slate-400 font-medium">Atur estetika teks dan keterbacaan di seluruh website.</p>
+           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Editor Font</h1>
+           <p className="text-sm text-slate-500 mt-1">Atur tipografi website</p>
         </div>
         
         <button 
           onClick={handleSave}
           disabled={saving}
-          className="group flex items-center justify-center bg-teal-600 text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-teal-500/20 hover:bg-teal-700 active:scale-95 transition-all disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50"
         >
-          <Save className="w-5 h-5 mr-3 transition-transform group-hover:scale-110" />
-          {saving ? 'Menyimpan...' : 'Simpan Konfigurasi'}
+          <Save className="w-4 h-4" />
+          {saving ? 'Menyimpan...' : 'Simpan'}
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Selection */}
-        <div className="lg:col-span-8 space-y-8">
+        <div className="lg:col-span-8 space-y-6">
             {/* Arabic Font Family */}
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-            >
-                <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                        <div className="w-12 h-12 bg-teal-500/10 rounded-2xl flex items-center justify-center text-teal-600">
-                            <Languages className="w-6 h-6" />
-                        </div>
-                        Keluarga Font Arab
-                    </h2>
-                </div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                    <div className="w-5 h-5 flex items-center justify-center text-teal-600">
+                        <Languages className="w-5 h-5" />
+                    </div>
+                    Font Arab (Arabic)
+                </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {ARABIC_FAMILIES.map(font => (
                         <button
                             key={font.name}
                             onClick={() => setLocalConfig({ ...localConfig, fontFamily: font.name })}
                             className={cn(
-                                "p-6 rounded-[2rem] border-2 text-right transition-all group relative overflow-hidden",
+                                "p-4 rounded-lg border-2 text-right transition-colors group relative overflow-hidden",
                                 localConfig.fontFamily === font.name 
-                                    ? "bg-teal-500 border-teal-500 text-white shadow-xl shadow-teal-500/20 scale-[1.02]" 
-                                    : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 hover:border-teal-500/30"
+                                    ? "bg-teal-500 border-teal-500 text-white" 
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-teal-500/50"
                             )}
                         >
-                            <div className="flex flex-row-reverse justify-between items-start mb-4">
+                            <div className="flex flex-row-reverse justify-between items-start mb-3">
                                 <span className={cn(
-                                    "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
+                                    "text-xs font-medium px-2 py-1 rounded-md",
                                     localConfig.fontFamily === font.name ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                 )}>
                                     {font.label}
@@ -132,7 +123,7 @@ const FontEditor = () => {
                             </div>
                             <p 
                                 className={cn(
-                                    "text-3xl dir-rtl arabic-content",
+                                    "text-2xl dir-rtl arabic-content",
                                     localConfig.fontFamily === font.name ? "text-white" : "text-slate-900 dark:text-white"
                                 )}
                                 style={{ fontFamily: font.style }}
@@ -142,63 +133,49 @@ const FontEditor = () => {
                         </button>
                     ))}
                 </div>
-            </motion.div>
+            </div>
 
             {/* Latin Font Family Selection */}
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-            >
-                <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600">
-                        <Type className="w-6 h-6" />
-                    </div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                    <Type className="w-5 h-5 text-blue-600" />
                     Font Alfabet (Latin)
                 </h2>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     {LATIN_FAMILIES.map(font => (
                         <button
                             key={font.name}
                             onClick={() => setLocalConfig({ ...localConfig, latinFontFamily: font.name })}
                             className={cn(
-                                "p-6 rounded-[2rem] border-2 transition-all group text-center",
+                                "p-4 rounded-lg border-2 transition-colors text-center",
                                 localConfig.latinFontFamily === font.name 
-                                    ? "bg-blue-500 border-blue-500 text-white shadow-xl shadow-blue-500/20 scale-[1.05]" 
-                                    : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-700 text-slate-400 hover:border-blue-500/30"
+                                    ? "bg-blue-500 border-blue-500 text-white" 
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-400 hover:border-blue-500/50"
                             )}
                             style={{ fontFamily: font.name === 'System Default' ? 'sans-serif' : font.name }}
                         >
                             <p className={cn(
-                                "text-2xl font-black mb-1",
+                                "text-xl font-semibold mb-1",
                                 localConfig.latinFontFamily === font.name ? "text-white" : "text-slate-900 dark:text-white"
                             )}>Aa</p>
                             <p className={cn(
-                                "text-[10px] font-black uppercase tracking-widest",
+                                "text-xs font-medium",
                                 localConfig.latinFontFamily === font.name ? "text-white/80" : "text-slate-500"
                             )}>{font.label}</p>
                         </button>
                     ))}
                 </div>
-            </motion.div>
+            </div>
 
             {/* Font Size Settings */}
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="bg-white dark:bg-slate-800 p-8 md:p-12 rounded-[3.5rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-10"
-            >
-                <h2 className="text-xl font-black text-slate-900 dark:text-white flex items-center gap-4">
-                    <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
-                        <Hash className="w-6 h-6" />
-                    </div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6">
+                <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-3">
+                    <Hash className="w-5 h-5 text-purple-600" />
                     Pengaturan Skala Font
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {[
                         { id: 'titleSize', label: 'Judul Halaman (Page Title)', icon: Type, options: FONT_SIZES },
                         { id: 'contentSize', label: 'Konten Materi (Arabic)', icon: Languages, options: FONT_SIZES },
@@ -219,14 +196,14 @@ const FontEditor = () => {
                             ]
                         }
                     ].map(field => (
-                        <div key={field.id} className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">{field.label}</label>
+                        <div key={field.id} className="space-y-2">
+                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">{field.label}</label>
                             <div className="relative">
-                                <field.icon className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <field.icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                                 <select
                                     value={localConfig[field.id] || (field.id === 'mobileNavScale' ? '0.8' : 'text-lg')}
                                     onChange={(e) => setLocalConfig({ ...localConfig, [field.id]: e.target.value })}
-                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none appearance-none transition-all cursor-pointer"
+                                    className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none appearance-none transition-colors cursor-pointer"
                                 >
                                     {field.options.map(size => (
                                         <option key={size.value} value={size.value} className="bg-white dark:bg-slate-900">{size.label}</option>
@@ -236,58 +213,54 @@ const FontEditor = () => {
                         </div>
                     ))}
                 </div>
-            </motion.div>
+            </div>
         </div>
 
         {/* Right Column: Dynamic Preview */}
         <div className="lg:col-span-4 lg:sticky lg:top-24 h-fit">
-            <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white dark:bg-slate-800 p-8 rounded-[3rem] border border-slate-200 dark:border-slate-700 shadow-sm space-y-8 overflow-hidden relative"
+            <div 
+                className="bg-white dark:bg-slate-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 space-y-6 relative"
                 style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}
             >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-3xl -mr-16 -mt-16"></div>
-                
-                <h2 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest flex items-center gap-3">
+                <h2 className="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase flex items-center gap-2">
                     <Eye className="w-4 h-4" /> Live Preview
                 </h2>
                 
-                <div className="space-y-8 relative">
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Judul {localConfig.titleSize}</p>
+                <div className="space-y-4 relative">
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Judul {localConfig.titleSize}</p>
                         <p className={cn(localConfig.titleSize, "text-slate-900 dark:text-white leading-tight")} style={{ fontFamily: fontStyle }}>الدرس الأول</p>
                     </div>
                     
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Konten {localConfig.contentSize}</p>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Konten {localConfig.contentSize}</p>
                         <p className={cn(localConfig.contentSize, "text-slate-900 dark:text-white leading-relaxed dir-rtl arabic-content")} style={{ fontFamily: fontStyle }}>
-                           التَّرْبِيَّةُ اللُّغَوِيَّةُ
+                           التَّرْبِيَّةُ اللُّغَوِيَّةُ
                         </p>
                     </div>
                     
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Navigasi {localConfig.sidebarLinkSize}</p>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Navigasi {localConfig.sidebarLinkSize}</p>
                         <p className={cn(localConfig.sidebarLinkSize, "text-slate-900 dark:text-white text-center")} style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
                            Beranda &nbsp; Materi &nbsp; Profil
                         </p>
                     </div>
 
-                    <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-700 transition-all">
-                        <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Latin Style</p>
-                        <p className="text-xl font-bold text-slate-900 dark:text-white" style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
+                    <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
+                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Latin Style</p>
+                        <p className="text-lg font-semibold text-slate-900 dark:text-white" style={{ fontFamily: latinStyle === 'System Default' ? 'sans-serif' : latinStyle }}>
                             Tarbiyyat Al-Lughah
                         </p>
                     </div>
                 </div>
 
-                <div className="pt-4 px-2">
-                    <div className="flex items-center gap-3 text-amber-500 bg-amber-500/5 p-4 rounded-2xl border border-amber-500/10">
-                        <Diamond className="w-10 h-10 shrink-0" />
-                        <p className="text-[10px] font-bold leading-relaxed">Preview mencerminkan tampilan di berbagai bagian portal secara real-time.</p>
+                <div className="pt-2">
+                    <div className="flex items-center gap-3 text-amber-600 dark:text-amber-500 bg-amber-50 dark:bg-amber-500/10 p-3 rounded-lg border border-amber-200 dark:border-amber-500/20">
+                        <Diamond className="w-8 h-8 shrink-0" />
+                        <p className="text-xs font-medium leading-relaxed">Preview mencerminkan tampilan di berbagai bagian portal secara real-time.</p>
                     </div>
                 </div>
-            </motion.div>
+            </div>
         </div>
       </div>
     </div>

@@ -19,21 +19,16 @@ const AdminLayout = () => {
     return () => window.removeEventListener('toggle-admin-sidebar', handleToggle);
   }, []);
 
-  // Floating Toggle Button (Replaces Header)
+  // Floating Toggle Button (Mobile only)
   const FloatingToggle = () => (
     <AnimatePresence>
       {!isMobileMenuOpen && (
-        <motion.button
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          exit={{ scale: 0, rotate: 180 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
+        <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className="fixed bottom-6 right-6 z-[100] w-14 h-14 bg-teal-600 text-white rounded-full shadow-2xl shadow-teal-500/30 flex items-center justify-center border-2 border-white/20 backdrop-blur-md md:hidden"
+          className="fixed bottom-6 right-6 z-[100] w-12 h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-full shadow-lg flex items-center justify-center md:hidden transition-colors"
         >
-          <Menu className="w-7 h-7" />
-        </motion.button>
+          <Menu className="w-6 h-6" />
+        </button>
       )}
     </AnimatePresence>
   );
@@ -72,31 +67,15 @@ const AdminLayout = () => {
     <NavLink 
       to={to} 
       target={target}
-      className={({ isActive }) => `
-        group relative flex items-center px-4 py-4 rounded-2xl transition-all duration-500
-        ${isActive 
-          ? 'bg-teal-600 text-white shadow-xl shadow-teal-500/20 translate-x-1' 
-          : 'text-slate-400 hover:text-teal-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/[0.03] hover:translate-x-1'}
-      `}
-    >
-      {({ isActive }) => (
-        <>
-          <div className={cn(
-              "w-8 h-8 rounded-xl flex items-center justify-center mr-3 transition-colors duration-500",
-              isActive ? "bg-white/20 text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:text-teal-400 group-hover:bg-teal-500/10"
-          )}>
-            <Icon className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-          </div>
-          <span className="font-bold text-sm tracking-tight flex-1">{label}</span>
-          {isActive && (
-            <motion.div 
-              layoutId="activeTab"
-              className="absolute right-3 w-1.5 h-1.5 bg-white rounded-full shadow-[0_0_10px_white]"
-            />
-          )}
-          {!isActive && <ChevronRight className="w-4 h-4 opacity-0 group-hover:opacity-40 -translate-x-2 group-hover:translate-x-0 transition-all text-teal-400" />}
-        </>
+      className={({ isActive }) => cn(
+        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+        isActive 
+          ? "bg-teal-600 text-white" 
+          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
       )}
+    >
+      <Icon className="w-5 h-5" />
+      <span className="text-sm font-medium">{label}</span>
     </NavLink>
   );
 
@@ -116,63 +95,59 @@ const AdminLayout = () => {
       
       <FloatingToggle />
 
-      {/* Admin Sidebar - Integrated into Layout flow */}
-      <aside className={`
-        fixed inset-y-0 left-0 z-[100] w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-white/10 flex flex-col shadow-2xl transition-transform duration-500 md:translate-x-0 md:sticky md:top-8 md:m-0 md:h-[calc(100vh-4rem)] md:rounded-[2.5rem] md:border
-        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        {/* Profile Header */}
-        <div className="p-8 pb-6">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 bg-gradient-to-tr from-teal-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-lg shadow-teal-500/20">
-               <Diamond className="w-6 h-6 text-white" />
+      {/* Admin Sidebar */}
+      <aside className={cn(
+        "fixed inset-y-0 left-0 z-[100] w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col transition-transform duration-300 md:translate-x-0 md:sticky md:top-6 md:h-[calc(100vh-3rem)] md:rounded-lg",
+        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      )}>
+        {/* Header */}
+        <div className="p-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-indigo-600 rounded-lg flex items-center justify-center">
+               <Diamond className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-slate-900 dark:text-white leading-none mb-1">Admin Panel</h2>
-              <p className="text-[10px] font-black uppercase tracking-widest text-teal-500">Workspace V2.5</p>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Admin Panel</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Workspace V2.5</p>
             </div>
           </div>
-          
-          <div className="h-px w-full bg-gradient-to-r from-slate-200 dark:from-white/10 via-slate-100 dark:via-white/5 to-transparent"></div>
         </div>
         
         {/* Navigation */}
-        <nav className="flex-1 p-6 space-y-2 overflow-y-auto custom-scrollbar">
-          <div className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Menu Utama</div>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar">
+          <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 px-3">Menu Utama</div>
           <NavItem to="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" />
           <NavItem to="/admin/games" icon={Trophy} label="Manajemen Game" />
           
-          <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Pengaturan Web</div>
+          <div className="pt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 px-3">Pengaturan Web</div>
           <NavItem to="/admin/home-editor" icon={LayoutGrid} label="Editor Beranda" />
           <NavItem to="/admin/library-manager" icon={Library} label="Manajemen Perpustakaan" />
           <NavItem to="/admin/intro-editor" icon={Monitor} label="Manajemen Intro" />
           
-          <div className="pt-6 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 px-4">Sistem & Aset</div>
+          <div className="pt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 px-3">Sistem & Aset</div>
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
           
-          <div className="pt-8 px-4">
-             <Link to="/" className="flex items-center gap-3 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-colors py-2 group">
-               <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-teal-500/10 transition-colors">
-                  <Home className="w-4 h-4" />
-               </div>
-               <span className="text-xs font-bold uppercase tracking-widest">Lihat Beranda</span>
+          <div className="pt-6 px-3">
+             <Link to="/" className="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-2">
+               <Home className="w-5 h-5" />
+               <span className="text-sm font-medium">Lihat Beranda</span>
              </Link>
           </div>
         </nav>
 
-        {/* Footer Actions */}
-        <div className="p-6 mt-auto">
-           <div className="bg-slate-50 dark:bg-slate-800 rounded-3xl p-4 border border-slate-200 dark:border-white/5">
-              <div className="flex items-center justify-between mb-4">
-                 <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 flex items-center justify-center">
-                       <CircleUser className="w-4 h-4 text-slate-400" />
+        {/* Footer */}
+        <div className="p-3 mt-auto border-t border-slate-200 dark:border-slate-800">
+           <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3 space-y-3">
+              <div className="flex items-center justify-between">
+                 <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 flex items-center justify-center">
+                       <CircleUser className="w-4 h-4 text-slate-500" />
                     </div>
-                    <span className="text-xs font-bold text-slate-900 dark:text-white">Admin Utama</span>
+                    <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Admin Utama</span>
                  </div>
                  <button 
                   onClick={toggleTheme}
-                  className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-transparent hover:bg-slate-50 dark:hover:bg-white/10 text-slate-400 hover:text-teal-600 dark:hover:text-white transition-all shadow-sm dark:shadow-none"
+                  className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-teal-600 dark:hover:text-teal-400 transition-colors"
                  >
                    {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                  </button>
@@ -180,9 +155,9 @@ const AdminLayout = () => {
               
               <button 
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all font-black uppercase tracking-widest text-[10px] border border-red-500/20"
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-xs font-medium border border-red-200 dark:border-red-900/50"
               >
-                <LogOut className="w-4 h-4" /> Keluar Sesi
+                <LogOut className="w-4 h-4" /> Keluar
               </button>
            </div>
         </div>

@@ -203,127 +203,102 @@ const LibraryManager = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-20">
-        <Loader2 className="w-8 h-8 text-teal-500 animate-spin" />
+        <Loader2 className="w-6 h-6 text-teal-600 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12 pb-20">
-      {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl relative overflow-hidden">
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-teal-500/5 blur-[100px] rounded-full"></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-black uppercase tracking-[0.2em] text-[10px] mb-2">
-            <BookOpen className="w-3 h-3" /> Management Suite
-          </div>
-          <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-4">
-            Perpustakaan Digital
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Kelola buku PDF, sampul otomatis, dan segmentasi kategori.</p>
+    <div className="space-y-6 pb-16">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Perpustakaan Digital</h1>
+          <p className="text-sm text-slate-500 mt-1">Kelola buku PDF dan kategori</p>
         </div>
         
         <button 
           onClick={() => setIsAdding(!isAdding)}
           className={cn(
-            "flex items-center justify-center gap-3 px-8 py-5 rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl active:scale-95 relative z-10",
+            "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
             isAdding 
-              ? "bg-slate-100 dark:bg-slate-800 text-slate-500" 
-              : "bg-teal-500 text-white shadow-teal-500/20 hover:bg-teal-600"
+              ? "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300" 
+              : "bg-teal-600 text-white hover:bg-teal-700"
           )}
         >
-          {isAdding ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-          {isAdding ? 'Batal Tambah' : 'Tambah Buku Baru'}
+          {isAdding ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+          {isAdding ? 'Batal' : 'Tambah Buku'}
         </button>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-10">
-        {/* Sidebar: Category Management (Always Visible) */}
-        <div className="lg:col-span-4 lg:sticky lg:top-28 lg:h-fit">
-          <div className="bg-slate-50 dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200 dark:border-slate-800 shadow-sm">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 bg-teal-500/10 rounded-xl flex items-center justify-center text-teal-600">
-                <Plus className="w-5 h-5" />
-              </div>
-              <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider">Kategori</h2>
-            </div>
+      {/* Category Management - Full Width */}
+      <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Kategori</h2>
 
-            <div className="space-y-6">
-              <div className="relative group">
-                <input 
-                  type="text"
-                  placeholder="Nama kategori..."
-                  className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold text-slate-900 dark:text-white outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all"
-                  value={newCategory}
-                  onChange={e => setNewCategory(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
-                />
+        <div className="space-y-4">
+          <div className="relative max-w-md">
+            <input 
+              type="text"
+              placeholder="Nama kategori..."
+              className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 pr-20 text-sm font-medium text-slate-900 dark:text-white outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-colors"
+              value={newCategory}
+              onChange={e => setNewCategory(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleAddCategory()}
+            />
+            <button 
+              onClick={handleAddCategory}
+              className="absolute right-2 top-2 bottom-2 px-3 bg-teal-500 text-white rounded-md text-xs font-medium hover:bg-teal-600 transition-colors"
+            >
+              Simpan
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
+            {categories.map(cat => (
+              <div key={cat} className="group flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-teal-500/30 transition-colors">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{cat}</span>
                 <button 
-                  onClick={handleAddCategory}
-                  className="absolute right-2 top-2 bottom-2 px-4 bg-teal-500 text-white rounded-xl font-black uppercase text-[10px] tracking-widest hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/10"
+                  onClick={() => handleDeleteCategory(cat)}
+                  className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-md transition-all"
                 >
-                  Simpan
+                  <Trash2 className="w-3 h-3" />
                 </button>
               </div>
-
-              <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {categories.map(cat => (
-                  <div key={cat} className="group flex items-center justify-between bg-white dark:bg-slate-800 px-5 py-4 rounded-2xl border border-slate-100 dark:border-slate-700 hover:border-teal-500/30 transition-all shadow-sm">
-                    <span className="text-xs font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">{cat}</span>
-                    <button 
-                      onClick={() => handleDeleteCategory(cat)}
-                      className="p-2 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-xl transition-all"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-                {categories.length === 0 && (
-                  <div className="text-center py-8">
-                    <AlertCircle className="w-8 h-8 text-slate-200 mx-auto mb-2" />
-                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest">Belum ada kategori</p>
-                  </div>
-                )}
+            ))}
+            {categories.length === 0 && (
+              <div className="w-full text-center py-8">
+                <AlertCircle className="w-8 h-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
+                <p className="text-xs text-slate-400 font-medium">Belum ada kategori</p>
               </div>
-            </div>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Main Section: Form & Book List */}
-        <div className="lg:col-span-8 space-y-12">
+      {/* Main Section: Form & Book List */}
+      <div className="space-y-12">
           {/* Add Book Form (Toggled) */}
           <AnimatePresence>
             {isAdding && (
-              <motion.div 
-                initial={{ opacity: 0, y: -20, scale: 0.98 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.98 }}
-                className="bg-white dark:bg-slate-900 p-10 rounded-[3.5rem] border-2 border-teal-500/10 shadow-2xl relative overflow-hidden"
-              >
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-indigo-500/5 blur-[100px] rounded-full"></div>
-                
-                <form onSubmit={handleSubmit} className="relative z-10 grid gap-10">
-                  <div className="grid md:grid-cols-2 gap-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-teal-500"></div> Judul Arab
-                      </label>
+              <div className="bg-white dark:bg-slate-900 p-6 rounded-lg border border-teal-500/20 relative">
+                <form onSubmit={handleSubmit} className="grid gap-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Judul Arab</label>
                       <input 
                         type="text"
                         dir="rtl"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[1.5rem] px-6 py-5 text-2xl font-black font-arabic text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700 shadow-inner"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-xl font-semibold font-arabic text-slate-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-colors placeholder:text-slate-300 dark:placeholder:text-slate-700"
                         placeholder="...كتاب"
                         value={formData.titleAr}
                         onChange={e => setFormData({ ...formData, titleAr: e.target.value })}
                       />
                     </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div> Judul Indonesia
-                      </label>
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Judul Indonesia</label>
                       <input 
                         type="text"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[1.5rem] px-6 py-5 text-lg font-bold text-slate-900 dark:text-white focus:border-teal-500 outline-none transition-all shadow-inner"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-lg font-semibold text-slate-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-colors"
                         placeholder="Masukkan judul buku..."
                         value={formData.titleId}
                         onChange={e => setFormData({ ...formData, titleId: e.target.value })}
@@ -331,9 +306,9 @@ const LibraryManager = () => {
                     </div>
                   </div>
 
-                  {/* Redesigned Category Selector (Harmonious Buttons) */}
-                  <div className="space-y-4">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">Pilih Segmentasi Kategori</label>
+                  {/* Category Selector */}
+                  <div className="space-y-2">
+                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Pilih Kategori</label>
                     {categories.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
                         {categories.map(cat => (
@@ -342,10 +317,10 @@ const LibraryManager = () => {
                             type="button"
                             onClick={() => setFormData({ ...formData, category: cat })}
                             className={cn(
-                              "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95",
+                              "px-4 py-2 rounded-lg text-xs font-medium border transition-colors",
                               formData.category === cat 
-                                ? "bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/20" 
-                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                                ? "bg-teal-500 border-teal-500 text-white" 
+                                : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-teal-500/50"
                             )}
                           >
                             {cat}
@@ -353,8 +328,8 @@ const LibraryManager = () => {
                         ))}
                       </div>
                     ) : (
-                      <div className="p-6 bg-red-50 dark:bg-red-500/5 rounded-2xl border border-red-100 dark:border-red-500/20 text-center">
-                        <p className="text-xs font-bold text-red-500">Mohon buat kategori di panel samping terlebih dahulu.</p>
+                      <div className="p-4 bg-red-50 dark:bg-red-500/5 rounded-lg border border-red-200 dark:border-red-500/20 text-center">
+                        <p className="text-xs font-medium text-red-600 dark:text-red-400">Mohon buat kategori di panel samping terlebih dahulu.</p>
                       </div>
                     )}
                   </div>
@@ -415,64 +390,62 @@ const LibraryManager = () => {
                     </div>
                   )}
                 </form>
-              </motion.div>
+              </div>
             )}
           </AnimatePresence>
 
           {/* Book Grid */}
-          <div className="grid sm:grid-cols-2 gap-8">
+          <div className="grid sm:grid-cols-2 gap-6">
             {books.map((book) => (
-              <motion.div 
-                layout
+              <div 
                 key={book.id}
-                className="group bg-white dark:bg-slate-900 rounded-[3rem] p-8 border border-slate-200 dark:border-slate-800 shadow-lg hover:shadow-2xl transition-all duration-500"
+                className="group bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-teal-500/30 transition-colors"
               >
-                <div className="flex items-start gap-6 mb-8">
-                  <div className="w-28 h-40 rounded-[2rem] overflow-hidden shadow-2xl flex-shrink-0 group-hover:scale-105 group-hover:-rotate-3 transition-transform duration-500 border border-slate-100 dark:border-slate-800">
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-24 h-32 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
                     <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
                   </div>
-                  <div className="flex-1 min-w-0 py-2">
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[9px] font-black uppercase tracking-widest rounded-lg">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="px-2 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-md">
                         {book.category}
                       </span>
                     </div>
-                    <h3 className="text-2xl font-black font-arabic text-slate-900 dark:text-white leading-[1.2] mb-2 truncate" dir="rtl">{book.titleAr}</h3>
-                    <h4 className="text-sm font-semibold text-slate-400 dark:text-slate-500 line-clamp-2">{book.titleId}</h4>
+                    <h3 className="text-xl font-semibold font-arabic text-slate-900 dark:text-white leading-tight mb-1 truncate" dir="rtl">{book.titleAr}</h3>
+                    <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">{book.titleId}</h4>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 pt-4 border-t border-slate-50 dark:border-slate-800">
+                <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
                   <a 
                     href={book.pdfUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-3 py-4 bg-slate-50 dark:bg-slate-800 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-black uppercase tracking-widest text-[10px] rounded-2xl transition-all group/btn shadow-inner"
+                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-medium text-xs rounded-lg transition-colors"
                   >
-                    <FileText className="w-4 h-4 group-hover/btn:scale-110" /> Buka PDF
+                    <FileText className="w-4 h-4" /> Buka PDF
                   </a>
                   <button 
                     onClick={() => handleDelete(book)}
-                    className="p-4 flex items-center justify-center bg-red-500/5 text-red-400 hover:bg-red-500 hover:text-white rounded-2xl transition-all shadow-inner"
+                    className="p-2 flex items-center justify-center bg-red-500/5 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
 
           {books.length === 0 && !loading && (
-            <div className="py-24 text-center bg-slate-50 dark:bg-slate-900 rounded-[4rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
-              <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl">
-                <BookOpen className="w-12 h-12 text-slate-300" />
+            <div className="py-16 text-center bg-slate-50 dark:bg-slate-900 rounded-lg border border-dashed border-slate-200 dark:border-slate-700">
+              <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-8 h-8 text-slate-300 dark:text-slate-600" />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white">Perpustakaan Kosong</h3>
-              <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-3 font-medium">Klik tombol "Tambah Buku Baru" untuk memulai koleksi Anda.</p>
+              <h3 className="text-xl font-semibold text-slate-900 dark:text-white">Perpustakaan Kosong</h3>
+              <p className="text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-2 text-sm">Klik tombol "Tambah Buku" untuk memulai koleksi Anda.</p>
             </div>
           )}
         </div>
-      </div>
     </div>
   );
 };
