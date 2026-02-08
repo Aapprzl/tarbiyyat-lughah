@@ -395,7 +395,7 @@ const LessonEditor = () => {
                   </div>
                   
                   {/* Stage Body (Blocks Canvas) */}
-                  <div className="space-y-4 pl-4">
+                  <div className="space-y-4">
                       
                       <AnimatePresence mode="popLayout">
                         {stage.items.length === 0 ? (

@@ -10,10 +10,10 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
         onClick={onClick}
         className={cn(
             bg,
-            "px-3 md:px-4 py-2.5 md:py-3 rounded-xl md:rounded-2xl flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all border border-slate-200/50 dark:border-white/10 shadow-sm backdrop-blur-md group"
+            "px-3 md:px-4 py-2.5 md:py-3 rounded-lg flex items-center justify-center gap-2 text-xs font-medium hover:brightness-110 transition-colors border border-slate-200/50 dark:border-white/10 backdrop-blur-md group"
         )}
     >
-        <div className={cn("w-6 h-6 md:w-8 md:h-8 rounded-lg flex items-center justify-center transition-colors shrink-0", bg, color, "brightness-95")}>
+        <div className={cn("w-6 h-6 md:w-7 md:h-7 rounded-md flex items-center justify-center transition-colors shrink-0", bg, color)}>
             <Icon className="w-3 md:w-4 h-3 md:h-4" />
         </div>
         <span className="truncate dark:text-white/90 text-slate-700">{label}</span>
@@ -78,17 +78,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
     };
 
     return (
-        <motion.div 
-            layout
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-white dark:bg-slate-800 rounded-[2.5rem] shadow-sm border border-slate-200 dark:border-white/10 border-b-4 border-b-teal-500/50 overflow-hidden group hover:shadow-xl transition-all -ml-11 md:-ml-15"
-        >
+        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-white/10 border-b-2 border-b-teal-500/50 overflow-hidden group hover:shadow-md transition-shadow">
             {/* Header / Accordion Trigger */}
             <div 
                 className={cn(
-                    "flex flex-col transition-all",
+                    "flex flex-col transition-colors",
                     isOpen ? "bg-slate-50 dark:bg-white/[0.05]" : "hover:bg-slate-50/50 dark:hover:bg-white/[0.02]"
                 )}
             >
@@ -96,19 +90,19 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                     onClick={() => setIsOpen(!isOpen)}
                     className="px-4 md:px-6 py-3 md:py-4 flex justify-between items-center cursor-pointer select-none"
                 >
-                   <div className="flex items-center gap-3 md:gap-5 flex-1 min-w-0 overflow-hidden">
+                   <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0 overflow-hidden">
                        {/* Icon Badge */}
                        <div className={cn(
-                           "w-10 h-10 md:w-14 md:h-14 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-500 shadow-sm",
-                           isOpen ? `${info.bg} ${info.color} scale-110 rotate-3 shadow-lg shadow-current/10` : "bg-slate-100 dark:bg-white/5 text-slate-400 group-hover:scale-110"
+                           "w-10 h-10 md:w-12 md:h-12 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors",
+                           isOpen ? `${info.bg} ${info.color}` : "bg-slate-100 dark:bg-white/5 text-slate-400"
                        )}>
-                           <Icon className="w-5 h-5 md:w-7 md:h-7" />
+                           <Icon className="w-5 h-5 md:w-6 md:h-6" />
                        </div>
                        
                        {/* Title/Label */}
                        <div className="flex flex-col flex-1 min-w-0">
-                           <span className="text-[7px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">{info.label}</span>
-                           <span className="text-sm md:text-base font-black text-slate-900 dark:text-white truncate block tracking-tight font-arabic">
+                           <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">{info.label}</span>
+                           <span className="text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate block font-arabic">
                                 {getTitlePreview()}
                            </span>
                        </div>
@@ -1032,7 +1026,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                     </motion.div>
                 )}
             </AnimatePresence>
-        </motion.div>
+        </div>
     );
 };
 
