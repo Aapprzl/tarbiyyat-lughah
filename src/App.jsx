@@ -36,6 +36,10 @@ function App() {
 
   React.useEffect(() => {
     const initApp = async () => {
+      // Remove critical CSS fix after hydration
+      const fix = document.getElementById('dark-theme-flash-fix');
+      if (fix) fix.remove();
+
       try {
         const [config, hConfig] = await Promise.all([
           contentService.getIntroConfig(),
@@ -64,8 +68,12 @@ function App() {
   };
 
   if (loading) {
+    const isDark = typeof window !== 'undefined' && localStorage.getItem('arp_theme') === 'dark';
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[var(--color-bg-main)] z-[10000]">
+      <div 
+        className="fixed inset-0 flex items-center justify-center z-[10000]"
+        style={{ backgroundColor: isDark ? '#131f24' : '#fcfbf9' }}
+      >
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin" />
           <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">Memuat...</span>

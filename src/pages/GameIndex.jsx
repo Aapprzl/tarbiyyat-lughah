@@ -97,8 +97,20 @@ const GameIndex = () => {
     );
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="container mx-auto px-6 py-12 max-w-7xl pb-40">
+    <div 
+      className="container mx-auto px-6 py-12 max-w-7xl pb-40"
+    >
         
 
         <div className="space-y-24">
@@ -126,14 +138,19 @@ const GameIndex = () => {
                   </div>
 
                   {/* Items Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                  <motion.div 
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
+                  >
                       {items.map((item, itemIdx) => {
                           const typeInfo = getTypeInfo(item.type);
                           const TypeIcon = typeInfo.icon;
                           
                           return (
+                              <motion.div key={item.id} variants={itemVariants}>
                               <Link 
-                                  key={item.id} 
                                   to={category.isLocked ? '#' : `/program/${category.id}?item=${item.id}`}
                                   className={cn(
                                       "group relative block h-40 md:h-48 rounded-[2rem] transition-all duration-300 hover:scale-[1.03] hover:shadow-xl active:scale-95 border-b-4 active:border-b-0 active:translate-y-1 transform-gpu",
@@ -189,6 +206,7 @@ const GameIndex = () => {
                                       )}
                                   </div>
                               </Link>
+                              </motion.div>
                           );
                       })}
 
@@ -203,18 +221,18 @@ const GameIndex = () => {
                               )}
                           </div>
                       )}
-                  </div>
+                   </motion.div>
               </section>
             );
         })}
         </div>
 
-        {categories.length === 0 && (
-            <div className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700">
+            {categories.length === 0 && (
+            <motion.div variants={itemVariants} className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700">
                <Trophy className="w-20 h-20 text-slate-200 mx-auto mb-6" />
                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Belum ada Permainan</h3>
                <p className="text-slate-500 font-medium">Instruktur sedang menyiapkan tantangan baru untukmu.</p>
-            </div>
+            </motion.div>
         )}
     </div>
   );

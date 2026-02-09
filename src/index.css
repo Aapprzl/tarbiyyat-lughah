@@ -64,6 +64,10 @@
   --shadow-premium: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
 }
 
+html {
+  overflow-y: scroll; /* Force scrollbar to prevent layout shift */
+}
+
 html,
 body {
   background-color: var(--color-bg-main);

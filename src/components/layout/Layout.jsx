@@ -27,7 +27,7 @@ const Layout = () => {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-main)] relative">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 relative">
       {/* Global Background Blobs - Hidden for cleaner look as per request */}
       {/* <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob"></div> */}
       {/* <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-teal-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob animation-delay-2000"></div> */}
@@ -38,20 +38,25 @@ const Layout = () => {
         "min-h-screen transition-all duration-300 relative z-10",
         !isAdmin && "pt-20"
       )}>
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={location.pathname}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
+            className={cn(
+              "flex flex-col gap-8",
+              !isAdmin ? "min-h-[calc(100vh-5rem)]" : "min-h-screen"
+            )}
           >
             <Outlet />
             
             {/* Footer Style - Synced with page fade to prevent blinking */}
             <footer className={cn(
                  "relative bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors z-10 w-full",
-                 isAdmin ? "py-8" : isHome ? "mt-20 pt-16 pb-8" : "mt-8 py-8"
+                 isAdmin ? "py-8" : isHome ? "mt-20 pt-16 pb-8" : "py-8",
+                 "mt-auto" // Force sticky bottom
             )}>
               <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-600 via-cyan-500 to-teal-500 opacity-80"></div>
 

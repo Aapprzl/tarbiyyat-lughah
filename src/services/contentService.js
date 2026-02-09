@@ -835,14 +835,14 @@ export const contentService = {
 
     getTheme() {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('theme') || 'light';
+            return localStorage.getItem('arp_theme') || 'light';
         }
         return 'light';
     },
 
     saveTheme(newTheme) {
         if (typeof window !== 'undefined') {
-            localStorage.setItem('theme', newTheme);
+            localStorage.setItem('arp_theme', newTheme);
         }
         return newTheme;
     },

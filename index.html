@@ -12,6 +12,13 @@
         try {
           var theme = localStorage.getItem("arp_theme") || "light";
           document.documentElement.setAttribute("data-theme", theme);
+
+          // Pre-set background color to prevent flash
+          if (theme === "dark") {
+            document.documentElement.style.backgroundColor = "#131f24"; // Match --color-bg-main for dark
+          } else {
+            document.documentElement.style.backgroundColor = "#fcfbf9"; // Match --color-bg-main for light
+          }
         } catch (e) {}
       })();
     </script>

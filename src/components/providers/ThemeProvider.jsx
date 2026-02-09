@@ -18,6 +18,7 @@ export const ThemeProvider = ({ children }) => {
     setTheme(newTheme);
     contentService.saveTheme(newTheme);
     document.documentElement.setAttribute('data-theme', newTheme);
+    document.documentElement.style.backgroundColor = ''; // Clear inline style to let CSS take over
   };
 
   return (

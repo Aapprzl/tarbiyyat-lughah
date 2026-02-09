@@ -55,11 +55,8 @@ const MaterialIndex = () => {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="relative">
-          <div className="absolute inset-0 bg-teal-500/20 rounded-full blur-xl animate-pulse"></div>
-          <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center relative z-10 border border-slate-100 dark:border-slate-800">
-            <Library className="w-10 h-10 text-teal-600 dark:text-teal-400 animate-bounce" />
-          </div>
-          <div className="absolute -inset-1 border-2 border-teal-500/30 rounded-2xl z-0 animate-ping"></div>
+            <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
+            <Library className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
         </div>
         <p className="mt-8 text-xs font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
           Menyiapkan Kurikulum

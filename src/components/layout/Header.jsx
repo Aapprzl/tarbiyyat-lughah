@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad as GamepadIcon } from 'lucide-react';
+import { Menu, Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Sun, Moon, Medal, Hexagon, Layers, MoveRight, X, Gamepad as GamepadIcon, Shield } from 'lucide-react';
 import { contentService } from '../../services/contentService';
 import { useTheme } from '../providers/ThemeProvider';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -93,7 +93,9 @@ const Header = ({ minimal = false }) => {
           <Link to="/" className="group flex items-center gap-4">
              {/* Dynamic Logo */}
              {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
-                 <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-10 h-10 object-contain drop-shadow-md" />
+                 <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center shadow-sm border border-white/10 group-hover:scale-110 group-hover:bg-white/20 group-hover:border-teal-200/40 group-hover:shadow-[0_0_15px_rgba(45,212,191,0.3)] transition-all duration-300 p-1.5">
+                     <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-full h-full object-contain drop-shadow-sm" />
+                 </div>
              ) : (
                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white shadow-inner border border-white/10 group-hover:bg-white/20 transition-all">
                      {React.createElement(iconMap[siteConfig.siteLogoIcon] || Library, { className: "w-5 h-5" })}
@@ -126,6 +128,15 @@ const Header = ({ minimal = false }) => {
                   <span className="ml-auto text-[10px] bg-white/20 px-1.5 py-0.5 rounded uppercase font-bold text-white">Ctrl K</span>
               </button>
             </div>
+
+            {/* Admin Access (Desktop Only) */}
+            <Link 
+              to="/admin/dashboard"
+              className="hidden md:flex p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-teal-200 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
+              title="Akses Admin"
+            >
+              <Shield className="w-5 h-5" />
+            </Link>
 
             {/* Theme Toggle */}
             <button 

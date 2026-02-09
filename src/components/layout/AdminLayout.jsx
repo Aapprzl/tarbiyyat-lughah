@@ -12,6 +12,19 @@ const AdminLayout = () => {
 
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  const [siteConfig, setSiteConfig] = useState(() => {
+      const syncConf = contentService.getHomeConfigSync();
+      return syncConf || { siteTitle: 'Tarbiyyat Al-Lughah', siteLogoType: 'icon' };
+  });
+
+  useEffect(() => {
+     const loadConfig = async () => {
+         const conf = await contentService.getHomeConfig();
+         if (conf) setSiteConfig(conf);
+     };
+     loadConfig();
+  }, []);
 
   useEffect(() => {
     const handleToggle = () => setIsMobileMenuOpen(prev => !prev);
@@ -103,12 +116,19 @@ const AdminLayout = () => {
         {/* Header */}
         <div className="p-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-indigo-600 rounded-lg flex items-center justify-center">
-               <Diamond className="w-5 h-5 text-white" />
-            </div>
+             {/* Dynamic Logo */}
+             {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
+                 <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5">
+                     <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-full h-full object-contain" />
+                 </div>
+             ) : (
+                <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                   <Diamond className="w-5 h-5 text-white" />
+                </div>
+             )}
             <div>
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Admin Panel</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Workspace V2.5</p>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Admin Panel</h2>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Tarbiyyat Al-Lughah</p>
             </div>
           </div>
         </div>
@@ -128,7 +148,7 @@ const AdminLayout = () => {
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
           
           <div className="pt-6 px-3">
-             <Link to="/" className="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-2">
+             <Link to="/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 transition-colors py-2">
                <Home className="w-5 h-5" />
                <span className="text-sm font-medium">Lihat Beranda</span>
              </Link>
