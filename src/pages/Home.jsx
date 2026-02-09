@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy } from 'lucide-react';
+import { BookOpen, Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy, Home as HomeIcon } from 'lucide-react';
 import { PdfViewer } from '../components/media/PdfViewer';
 import { VisionSection } from '../components/features/VisionSection';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
@@ -49,12 +49,18 @@ const Home = () => {
   }, []);
 
   if (!config) return (
-    <div className="h-screen flex items-center justify-center bg-[var(--color-bg-main)]">
-        <motion.div 
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="w-16 h-16 bg-teal-500 rounded-2xl shadow-xl shadow-teal-500/20"
-        />
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="relative">
+        <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-xl animate-pulse"></div>
+        <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center relative z-10 border border-slate-100 dark:border-slate-800">
+           {/* Note: I need to make sure HomeIcon is valid or imported as Home */}
+          <HomeIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400 animate-bounce" />
+        </div>
+        <div className="absolute -inset-1 border-2 border-indigo-500/30 rounded-2xl z-0 animate-ping"></div>
+      </div>
+      <p className="mt-8 text-xs font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
+        Memuat Beranda
+      </p>
     </div>
   );
 

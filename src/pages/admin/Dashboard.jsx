@@ -22,6 +22,12 @@ const iconMap = {
   Play: GamepadIcon
 };
 
+const isArabic = (text) => {
+  if (!text) return false;
+  const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  return arabicRegex.test(text);
+};
+
 const AdminDashboard = () => {
   const [curriculum, setCurriculum] = useState([]);
   const [specialPrograms, setSpecialPrograms] = useState([]);
@@ -353,8 +359,14 @@ const AdminDashboard = () => {
                     <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Judul Materi</label>
                     <input 
                       type="text" 
-                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                      style={{ fontFamily: 'var(--font-latin)' }}
+                      className={cn(
+                        "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all",
+                        isArabic(newTopicTitle) && "arabic-index-topic"
+                      )}
+                      style={{ 
+                        fontFamily: isArabic(newTopicTitle) ? 'var(--font-arabic)' : 'var(--font-latin)',
+                        direction: isArabic(newTopicTitle) ? 'rtl' : 'ltr'
+                      }}
                       placeholder="Contoh: Bab 1 - Pengenalan"
                       value={newTopicTitle}
                       onChange={e => setNewTopicTitle(e.target.value)}
@@ -502,7 +514,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                         )}>
                                             {topic.isLocked ? <Lock className="w-4 h-4" /> : <Library className="w-4 h-4" />}
                                         </div>
-                                        <span className="font-medium text-slate-900 dark:text-white truncate text-sm">{topic.title}</span>
+                                        <span className="font-medium text-slate-900 dark:text-white arabic-index-topic transition-all leading-tight">{topic.title}</span>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
                                         <button 

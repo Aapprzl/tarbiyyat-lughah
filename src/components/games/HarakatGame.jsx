@@ -64,7 +64,13 @@ const HarakatGame = ({ data }) => {
     }
   }, [data.questions]);
 
-  const shuffleAndSetQuestions = (qs) => {
+    const isArabic = (text) => {
+        if (!text) return false;
+        const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+        return arabicRegex.test(text);
+    };
+
+    const shuffleAndSetQuestions = (qs) => {
     const shuffled = [...qs].sort(() => Math.random() - 0.5);
     setQuestions(shuffled);
     setCurrentIdx(0);
@@ -242,7 +248,7 @@ const HarakatGame = ({ data }) => {
                 showKeyboard ? "p-4 md:p-6 min-h-[100px] md:min-h-[140px]" : "p-8 min-h-[160px] md:min-h-[200px]"
               )}>
                  <div className={cn(
-                   "font-bold font-arabic text-slate-700 dark:text-slate-200 transition-all",
+                   "font-bold arabic-content text-slate-700 dark:text-slate-200 transition-all",
                    showKeyboard ? "text-4xl md:text-5xl" : "text-6xl md:text-7xl"
                  )}>
                     {removeHarakat(currentQ.text)}
@@ -262,7 +268,7 @@ const HarakatGame = ({ data }) => {
               )}>
                  {userAnswer ? (
                    <div className={cn(
-                     "font-bold font-arabic text-slate-900 dark:text-white drop-shadow-sm transition-all",
+                     "font-bold arabic-content text-slate-900 dark:text-white drop-shadow-sm transition-all",
                      showKeyboard ? "text-4xl md:text-5xl" : "text-6xl md:text-7xl"
                    )}>
                       {userAnswer}
@@ -338,7 +344,7 @@ const HarakatGame = ({ data }) => {
                       <button 
                         key={i}
                         onClick={() => handleKeyClick(h.char)}
-                        className="h-9 md:h-12 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-lg md:rounded-xl text-lg md:text-2xl font-bold font-arabic hover:scale-105 active:scale-95 transition-all shadow-sm border border-orange-200 dark:border-orange-500/20"
+                        className="h-9 md:h-12 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-lg md:rounded-xl text-lg md:text-2xl font-bold arabic-content hover:scale-105 active:scale-95 transition-all shadow-sm border border-orange-200 dark:border-orange-500/20"
                         title={h.name}
                       >
                         {h.char}
@@ -353,7 +359,7 @@ const HarakatGame = ({ data }) => {
                       <button 
                         key={charIdx}
                         onClick={() => handleKeyClick(char)}
-                        className="flex-1 h-9 md:h-12 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg md:rounded-xl text-base md:text-xl font-bold font-arabic hover:scale-105 active:scale-90 transition-all shadow-sm border border-slate-200 dark:border-slate-700 min-w-[20px]"
+                        className="flex-1 h-9 md:h-12 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg md:rounded-xl text-base md:text-xl font-bold arabic-content hover:scale-105 active:scale-90 transition-all shadow-sm border border-slate-200 dark:border-slate-700 min-w-[20px]"
                       >
                         {char}
                       </button>

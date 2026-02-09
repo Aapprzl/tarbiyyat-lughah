@@ -34,13 +34,15 @@ const LessonEditor = () => {
   const [thumbnailPreview, setThumbnailPreview] = useState(''); // Preview URL
   const [isSpecialProgram, setIsSpecialProgram] = useState(false);
   const [pickerTab, setPickerTab] = useState('common'); // 'common' or 'game'
+  const [lastSavedThumbnail, setLastSavedThumbnail] = useState(''); // Tracking state for cleanup
 
   // Helper to extract URLs (Firebase & Supabase)
   const extractUrls = (content) => {
     if (!content) return [];
     const str = typeof content === 'string' ? content : JSON.stringify(content);
     // Be robust with URL matching for both Firebase and Supabase
-    const urlRegex = /(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+)|(https:\/\/[^"\s]+\.supabase\.co\/storage\/v1\/object\/public\/[^"\s]+)/g;
+    // Detects both /object/public/ and /render/image/public/ formats
+    const urlRegex = /(https:\/\/firebasestorage\.googleapis\.com\/v0\/b\/[^"\s]+)|(https:\/\/[^"\s]+\.supabase\.co\/storage\/v1\/(object|render\/image)\/public\/[^"\s]+)/g;
     const matches = str.match(urlRegex) || [];
     return [...new Set(matches)];
   };
@@ -94,6 +96,7 @@ const LessonEditor = () => {
       setTopicDesc(desc);
       setThumbnail(thumb);
       setThumbnailPreview(thumb);
+      setLastSavedThumbnail(thumb);
 
       // Load Content
       const rawContent = await contentService.getLessonContent(topicId);
@@ -274,12 +277,8 @@ const LessonEditor = () => {
   };
 
   const removeThumbnail = async () => {
-    const ok = await confirm('Hapus thumbnail ini?', 'Hapus Thumbnail');
+    const ok = await confirm('Hapus thumbnail ini? File akan dihapus permanen saat Anda menyimpan perubahan.', 'Hapus Thumbnail');
     if (ok) {
-      // Delete from storage if exists
-      if (thumbnail) {
-        await storageService.deleteFile(thumbnail);
-      }
       setThumbnail('');
       setThumbnailFile(null);
       setThumbnailPreview('');
@@ -348,19 +347,29 @@ const LessonEditor = () => {
     let thumbnailUrl = thumbnail;
     if (thumbnailFile) {
       try {
-        // Delete old thumbnail if exists
-        if (thumbnail) {
-          await storageService.deleteFile(thumbnail);
+        // Delete old thumbnail if it exists and is different from the new selection
+        if (lastSavedThumbnail) {
+          await storageService.deleteFile(lastSavedThumbnail);
         }
         // Upload new thumbnail
         thumbnailUrl = await storageService.uploadThumbnail(thumbnailFile);
         setThumbnail(thumbnailUrl);
         setThumbnailFile(null);
+        setLastSavedThumbnail(thumbnailUrl); // Update tracked state
         toast.success('Thumbnail berhasil diupload!');
       } catch (e) {
         toast.error(e.message || 'Gagal upload thumbnail');
         thumbnailUrl = thumbnail; // Keep old thumbnail on error
       }
+    } else if (lastSavedThumbnail && !thumbnail) {
+        // Thumbnail was removed (and not replaced by a new file)
+        try {
+            await storageService.deleteFile(lastSavedThumbnail);
+            setLastSavedThumbnail('');
+            toast.success('Thumbnail lama dihapus.');
+        } catch (e) {
+            console.warn("Gagal menghapus thumbnail lama", e);
+        }
     }
 
     // Save Metadata (Title, Desc, Thumbnail)
@@ -400,16 +409,12 @@ const LessonEditor = () => {
                 <MoveLeft className="w-5 h-5" />
             </button>
             <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="px-2 py-0.5 bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-400 rounded text-xs font-medium">
-                    {isSpecialProgram ? 'Program Khusus' : 'Kurikulum Utama'}
-                  </span>
-                </div>
+
                 <input 
                   type="text" 
                   value={topicTitle}
                   onChange={(e) => setTopicTitle(e.target.value)}
-                  className="text-xl font-bold text-slate-900 dark:text-white bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate"
+                  className="text-xl font-bold text-slate-900 dark:text-white bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate arabic-index-topic transition-all"
                   placeholder="Judul Materi..."
                 />
                 <input 

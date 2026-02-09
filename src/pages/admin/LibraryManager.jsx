@@ -288,7 +288,7 @@ const LibraryManager = () => {
                       <input 
                         type="text"
                         dir="rtl"
-                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-xl font-semibold font-arabic text-slate-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-colors placeholder:text-slate-300 dark:placeholder:text-slate-700"
+                        className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-xl font-semibold text-slate-900 dark:text-white focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 outline-none transition-all placeholder:text-slate-300 dark:placeholder:text-slate-700 arabic-title"
                         placeholder="...كتاب"
                         value={formData.titleAr}
                         onChange={e => setFormData({ ...formData, titleAr: e.target.value })}
@@ -411,7 +411,7 @@ const LibraryManager = () => {
                         {book.category}
                       </span>
                     </div>
-                    <h3 className="text-xl font-semibold font-arabic text-slate-900 dark:text-white leading-tight mb-1 truncate" dir="rtl">{book.titleAr}</h3>
+                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight mb-1 truncate arabic-title transition-all" dir="rtl">{book.titleAr}</h3>
                     <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">{book.titleId}</h4>
                   </div>
                 </div>

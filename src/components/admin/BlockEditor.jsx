@@ -24,7 +24,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
     const [isOpen, setIsOpen] = useState(false);
 
     // Helper to detect Arabic
-    const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
+    const isArabic = (text) => {
+        if (!text) return false;
+        const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+        return arabicRegex.test(text);
+    };
 
     const getBlockInfo = (type) => {
         switch(type) {
@@ -102,7 +106,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                        {/* Title/Label */}
                        <div className="flex flex-col flex-1 min-w-0">
                            <span className="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase">{info.label}</span>
-                           <span className="text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate block font-arabic">
+                           <span className={cn(
+                                "text-sm md:text-base font-semibold text-slate-900 dark:text-white truncate block transition-all",
+                                isArabic(getTitlePreview()) && "arabic-content"
+                           )}>
                                 {getTitlePreview()}
                            </span>
                        </div>
@@ -255,10 +262,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                   />
                   <textarea 
                     placeholder="Tulis materi di sini..."
-                    className="w-full h-48 text-sm resize-y outline-none text-[var(--color-text-main)] bg-transparent placeholder-[var(--color-text-muted)]/50 p-4 rounded-xl border border-slate-200 dark:border-white/10"
+                    className={cn(
+                        "w-full h-48 text-sm resize-y outline-none text-[var(--color-text-main)] bg-transparent placeholder-[var(--color-text-muted)]/50 p-4 rounded-xl border border-slate-200 dark:border-white/10 transition-all",
+                        isArabic(block.data.content) && "arabic-content"
+                    )}
                     style={{ 
-                        fontFamily: isArabic(block.data.content) ? 'var(--font-arabic)' : 'inherit', 
-                        fontSize: isArabic(block.data.content) ? 'var(--font-arabic-content-size)' : 'inherit',
                         lineHeight: isArabic(block.data.content) ? '2' : '1.5',
                         direction: isArabic(block.data.content) ? 'rtl' : 'ltr'
                     }}
@@ -275,10 +283,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                      <div key={idx} className="flex gap-2 mb-2">
                         <input 
                           type="text"
-                          className="w-1/2 p-3 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-xl text-right font-arabic border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-teal-500/50 transition-all"
+                          className="w-1/2 p-3 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-xl text-right arabic-content transition-all border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-teal-500/50"
                           style={{ 
-                            fontFamily: 'var(--font-arabic)',
-                            fontSize: 'var(--font-arabic-content-size)',
                             direction: 'rtl'
                           }}
                           placeholder="Arab"
@@ -472,7 +478,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <input 
                           type="text" 
                           placeholder="Pertanyaan"
-                          className="w-1/2 bg-transparent text-sm outline-none font-medium"
+                          className={cn(
+                            "w-1/2 bg-transparent text-sm outline-none font-medium transition-all",
+                            isArabic(pair.question) && "arabic-content"
+                          )}
                           value={pair.question}
                           onChange={(e) => {
                             const newPairs = [...block.data.pairs];
@@ -484,7 +493,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <input 
                           type="text" 
                           placeholder="Jawaban"
-                          className="w-1/2 bg-transparent text-sm outline-none font-medium text-teal-600 dark:text-teal-400"
+                          className={cn(
+                            "w-1/2 bg-transparent text-sm outline-none font-medium text-teal-600 dark:text-teal-400 transition-all",
+                            isArabic(pair.answer) && "arabic-content"
+                          )}
                           value={pair.answer}
                           onChange={(e) => {
                             const newPairs = [...block.data.pairs];
@@ -529,7 +541,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <div className="flex justify-between items-start gap-4">
                           <textarea 
                             placeholder="Tulis pertanyaan di sini..."
-                            className="w-full bg-transparent text-sm font-bold outline-none resize-none h-12"
+                            className={cn(
+                                "w-full bg-transparent text-sm font-bold outline-none resize-none h-12 transition-all",
+                                isArabic(q.text) && "arabic-content"
+                            )}
                             value={q.text}
                             onChange={(e) => {
                               const newQs = [...block.data.questions];
@@ -567,12 +582,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                               <input 
                                 type="text" 
                                 placeholder="Pilihan jawaban..."
-                                className="flex-1 bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50"
-                                style={{ 
-                                    fontFamily: 'var(--font-arabic)',
-                                    fontSize: 'var(--font-arabic-content-size)',
-                                    direction: 'rtl'
-                                }}
+                                className={cn(
+                                    "flex-1 bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 transition-all",
+                                    isArabic(opt.text) && "arabic-content"
+                                )}
                                 value={opt.text}
                                 onChange={(e) => {
                                   const newQs = [...block.data.questions];
@@ -630,10 +643,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     <label className="text-[10px] font-bold text-slate-400 px-1">Kata Target (Akan diacak)</label>
                                     <input 
                                         type="text" 
-                                        className="w-full bg-slate-50 dark:bg-black/20 p-4 rounded-xl text-right outline-none focus:ring-2 focus:ring-orange-500/50 transition-all"
+                                        className="w-full bg-slate-50 dark:bg-black/20 p-4 rounded-xl text-right outline-none focus:ring-2 focus:ring-orange-500/50 transition-all arabic-content"
                                         style={{ 
-                                            fontFamily: 'var(--font-arabic)', 
-                                            fontSize: 'var(--font-arabic-content-size)',
                                             direction: 'rtl'
                                         }}
                                         value={item.answer}
@@ -700,10 +711,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                               </button>
                            </div>
                            <textarea 
-                              className="w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-medium outline-none border border-transparent focus:border-blue-500 resize-none h-32 leading-relaxed text-right dir-rtl"
+                              className={cn(
+                                  "w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-medium outline-none border border-transparent focus:border-blue-500 resize-none h-32 leading-relaxed text-right dir-rtl transition-all",
+                                  isArabic(item.text) && "arabic-content"
+                              )}
                               style={{ 
-                                  fontFamily: 'var(--font-arabic)', 
-                                  fontSize: 'var(--font-arabic-content-size)',
                                   lineHeight: '1.8'
                               }}
                               placeholder="Ketik kalimat di sini. Gunakan kurung siku [ ] untuk menentukan kata yang harus diisi. Contoh: Menanam [pohon] di taman."
@@ -773,10 +785,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                            
                            <div className="space-y-4">
                                <textarea 
-                                  className="w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-bold outline-none border border-transparent focus:border-purple-500 resize-none h-32 leading-relaxed text-right dir-rtl"
+                                  className="w-full bg-white dark:bg-black/20 p-6 rounded-2xl font-bold outline-none border border-transparent focus:border-purple-500 resize-none h-32 leading-relaxed text-right dir-rtl arabic-content transition-all"
                                   style={{ 
-                                      fontFamily: 'var(--font-arabic)', 
-                                      fontSize: 'var(--font-arabic-content-size)',
                                       lineHeight: '1.8'
                                   }}
                                   placeholder="Ketik kalimat Arab lengkap di sini..."
@@ -847,17 +857,20 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                      {block.data.items?.map((item, idx) => (
                         <div key={idx} className="bg-slate-50 dark:bg-white/5 p-3 rounded-2xl border border-slate-200 dark:border-white/10 group/item relative">
-                           <input 
-                              type="text" 
-                              className="w-full bg-transparent text-xs font-bold outline-none text-center"
-                              placeholder={`Item ${idx+1}`}
-                              value={item.text}
-                              onChange={(e) => {
-                                 const newItems = [...block.data.items];
-                                 newItems[idx].text = e.target.value;
-                                 onUpdate({ ...block.data, items: newItems });
-                              }}
-                           />
+                            <input 
+                               type="text" 
+                               className={cn(
+                                   "w-full bg-transparent text-xs font-bold outline-none text-center transition-all",
+                                   isArabic(item.text) && "arabic-content"
+                               )}
+                               placeholder={`Item ${idx+1}`}
+                               value={item.text}
+                               onChange={(e) => {
+                                  const newItems = [...block.data.items];
+                                  newItems[idx].text = e.target.value;
+                                  onUpdate({ ...block.data, items: newItems });
+                               }}
+                            />
                            <button 
                              onClick={() => {
                                 const newItems = block.data.items.filter((_, i) => i !== idx);
@@ -927,7 +940,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                </div>
                                <input 
                                   type="text"
-                                  className="flex-1 bg-transparent text-lg font-bold outline-none font-arabic dir-rtl text-right placeholder-slate-300"
+                                  className={cn(
+                                     "flex-1 bg-transparent text-lg font-bold outline-none dir-rtl text-right placeholder-slate-300 transition-all",
+                                     isArabic(item.text) && "arabic-content"
+                                  )}
                                   placeholder="Kata Arab..."
                                   value={item.text}
                                   onChange={(e) => {
@@ -1029,7 +1045,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                </button>
                                <input 
                                   type="text"
-                                  className="w-full bg-transparent text-xl font-bold outline-none font-arabic dir-rtl text-center placeholder-slate-300 py-3 mt-1 leading-loose"
+                                  className="w-full bg-transparent text-xl font-bold outline-none arabic-content transition-all dir-rtl text-center placeholder-slate-300 py-3 mt-1 leading-loose"
                                   placeholder="يَأْكُلُ"
                                   value={item.text}
                                   onChange={(e) => {

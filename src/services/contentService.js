@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 import { curriculum as initialCurriculum } from '../data/curriculum';
+import { storageService } from './storageService';
 import contentServiceV2 from './contentServiceV2';
 
 // In-memory cache to prevent blinking on navigation
@@ -80,6 +81,12 @@ export const contentService = {
     // ============================================
     // CURRICULUM MANAGEMENT
     // ============================================
+
+    isValidUUID(uuid) {
+        if (!uuid) return false;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(uuid);
+    },
     
     async getCurriculum() {
         try {
@@ -99,52 +106,64 @@ export const contentService = {
 
     async updateTopicMetadata(topicId, metadata) {
         try {
-            // 1. Try Curriculum Topic
-            try {
-                const programs = await contentServiceV2.programs.getAll();
-                let topicUuid = null;
-                for (const program of programs) {
-                    const topic = program.topics?.find(t => t.slug === topicId || t.id === topicId);
-                    if (topic) {
-                        topicUuid = topic.id;
-                        break;
-                    }
-                }
-                
-                if (topicUuid) {
-                     const updates = {};
-                    if (metadata.title !== undefined) updates.title = metadata.title;
-                    if (metadata.desc !== undefined) updates.description = metadata.desc;
-                    if (metadata.description !== undefined) updates.description = metadata.description;
-                    if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
-                    if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
-                    await contentServiceV2.topics.update(topicUuid, updates);
-                    return true;
-                }
-            } catch (e) { /* Ignore */ }
+            const isUUID = this.isValidUUID(topicId);
+            
+            // 1. Try Topic (Curriculum)
+            let topicToUpdate = null;
+            if (isUUID) {
+                const { data } = await supabase.from('topics').select('id').eq('id', topicId).maybeSingle();
+                if (data) topicToUpdate = data.id;
+            } else {
+                const { data } = await supabase.from('topics').select('id').eq('slug', topicId).maybeSingle();
+                if (data) topicToUpdate = data.id;
+            }
+
+            if (topicToUpdate) {
+                const updates = {};
+                if (metadata.title !== undefined) updates.title = metadata.title;
+                if (metadata.desc !== undefined) updates.description = metadata.desc;
+                if (metadata.description !== undefined) updates.description = metadata.description;
+                if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
+                if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                await contentServiceV2.topics.update(topicToUpdate, updates);
+                return true;
+            }
 
             // 2. Try Game Category
-            try {
-                 const gameCat = await contentServiceV2.gameCategories.getById(topicId);
-                 if (gameCat) {
-                    const updates = {};
-                    if (metadata.title !== undefined) updates.title = metadata.title;
-                    if (metadata.desc !== undefined) updates.description = metadata.desc;
-                    if (metadata.description !== undefined) updates.description = metadata.description;
-                    if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
-                    // if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
-                    await contentServiceV2.gameCategories.update(topicId, updates);
-                    return true;
-                 }
-            } catch (e) { /* Ignore */ }
-            
+            let catToUpdate = null;
+            if (isUUID) {
+                const { data } = await supabase.from('game_categories').select('id').eq('id', topicId).maybeSingle();
+                if (data) catToUpdate = data.id;
+            } else {
+                const { data } = await supabase.from('game_categories').select('id').eq('slug', topicId).maybeSingle();
+                if (data) catToUpdate = data.id;
+            }
+
+            if (catToUpdate) {
+                const updates = {};
+                if (metadata.title !== undefined) updates.title = metadata.title;
+                if (metadata.desc !== undefined) updates.description = metadata.desc;
+                if (metadata.description !== undefined) updates.description = metadata.description;
+                // Note: game_categories does not have a thumbnail column, skipping
+                if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                await contentServiceV2.gameCategories.update(catToUpdate, updates);
+                return true;
+            }
+
             console.error('[contentService] Topic/Category not found for metadata update:', topicId);
             return false;
-
         } catch (error) {
             console.error('[contentService] Error updating topic metadata:', error);
             return false;
         }
+    },
+
+    async syncCategoryItems(categoryId, items) {
+        // Placeholder implementation. 
+        // In the current normalized schema, items are fetched via join,
+        // so we don't strictly need to sync them to a column.
+        console.log(`[contentService] syncCategoryItems called for ${categoryId} with ${items?.length || 0} items`);
+        return true;
     },
 
     async updateTopicTitle(topicId, newTitle) {
@@ -235,17 +254,47 @@ export const contentService = {
 
     async deleteTopic(sectionId, topicId) {
         try {
-            // Find by slug
-             const { data: topics } = await supabase
-                .from('topics')
-                .select('id')
-                .eq('slug', topicId)
-                .limit(1);
+            // 1. Try to find as a Curriculum Topic (by ID or Slug)
+            const isUUID = this.isValidUUID(topicId);
+            let topicQuery = supabase.from('topics').select('id, thumbnail');
+            if (isUUID) topicQuery = topicQuery.eq('id', topicId);
+            else topicQuery = topicQuery.eq('slug', topicId);
+
+            const { data: topics } = await topicQuery.limit(1);
             
             if (topics && topics.length > 0) {
-                 await contentServiceV2.topics.delete(topics[0].id);
+                 const topic = topics[0];
+                 console.log(`[contentService] Deleting topic ${topic.id}...`);
+                 
+                 if (topic.thumbnail) await storageService.deleteFile(topic.thumbnail);
+
+                 const lessonContent = await this.getLessonContent(topic.id);
+                 if (lessonContent) await storageService.deleteAllFilesFromContent(lessonContent);
+
+                 await contentServiceV2.topics.delete(topic.id);
                  return true;
             }
+
+            // 2. Try to find as a Game Block (Special Program Item)
+            // In the dashboard, game items from special programs are passed here too
+            let gameQuery = supabase.from('blocks_game').select('id, data');
+            if (isUUID) gameQuery = gameQuery.eq('id', topicId);
+            // blocks_game doesn't have a slug, usually accessed by ID
+            
+            const { data: gameBlocks } = await gameQuery.limit(1);
+            if (gameBlocks && gameBlocks.length > 0) {
+                const block = gameBlocks[0];
+                console.log(`[contentService] Deleting game block ${block.id}...`);
+                
+                // Content cleanup for the block's data (includes thumbnail)
+                if (block.data) await storageService.deleteAllFilesFromContent(block.data);
+
+                // Delete from DB (manual delete since it's a specific block)
+                await supabase.from('blocks_game').delete().eq('id', block.id);
+                return true;
+            }
+
+            console.warn(`[contentService] Topic/Game not found for deletion: ${topicId}`);
             return false;
         } catch (error) {
             console.error('[contentService] Error deleting topic:', error);
@@ -255,16 +304,47 @@ export const contentService = {
 
     async deleteSection(sectionId) {
         try {
-            const { data: programs } = await supabase
-                .from('programs')
-                .select('id')
-                .eq('slug', sectionId)
-                .limit(1);
+            // 1. Find the program
+            const isUUID = this.isValidUUID(sectionId);
+            let query = supabase.from('programs').select('id');
+            
+            if (isUUID) {
+                query = query.eq('id', sectionId);
+            } else {
+                query = query.eq('slug', sectionId);
+            }
+
+            const { data: programs } = await query.limit(1);
             
             if (programs && programs.length > 0) {
-                await contentServiceV2.programs.delete(programs[0].id);
+                const programId = programs[0].id;
+                console.log(`[contentService] Deleting section ${programId} (Slug: ${sectionId})...`);
+
+                // 2. Fetch all topics in this program to clean up thumbnails
+                const { data: topics } = await supabase
+                    .from('topics')
+                    .select('id, thumbnail')
+                    .eq('program_id', programId);
+                
+                if (topics && topics.length > 0) {
+                    for (const topic of topics) {
+                        // Cleanup thumbnail
+                        if (topic.thumbnail) {
+                            await storageService.deleteFile(topic.thumbnail);
+                        }
+                        // Cleanup lesson content files
+                        const lessonContent = await this.getLessonContent(topic.id);
+                        if (lessonContent) {
+                            await storageService.deleteAllFilesFromContent(lessonContent);
+                        }
+                    }
+                }
+
+                // 3. Delete program from database (cascades to topics, stages, and blocks)
+                await contentServiceV2.programs.delete(programId);
                 return true;
             }
+            console.warn(`[contentService] Section not found for deletion: ${sectionId}`);
             return false;
         } catch (error) {
             console.error('[contentService] Error deleting section:', error);
@@ -611,8 +691,7 @@ export const contentService = {
             if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
             if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
             if (metadata.description !== undefined) dbUpdates.description = metadata.description;
-            if (metadata.thumbnail !== undefined) dbUpdates.thumbnail = metadata.thumbnail;
-            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
+            // Note: game_categories does not have thumbnail or is_locked columns
 
             await contentServiceV2.gameCategories.update(categoryUuid, dbUpdates);
             return true;
@@ -658,8 +737,34 @@ export const contentService = {
 
     async deleteGameCategory(categoryId) {
         try {
-            await contentServiceV2.gameCategories.delete(categoryId);
-            return true;
+            // 1. Find the category to check for thumbnail and blocks
+            const isUUID = this.isValidUUID(categoryId);
+            let cat = null;
+
+            if (isUUID) {
+                const { data } = await supabase.from('game_categories').select('id').eq('id', categoryId).maybeSingle();
+                cat = data;
+            } else {
+                const { data } = await supabase.from('game_categories').select('id').eq('slug', categoryId).maybeSingle();
+                cat = data;
+            }
+
+            if (cat) {
+                // 2. Cleanup files from all blocks in this category
+                const { data: blocks } = await supabase
+                    .from('blocks_game')
+                    .select('data')
+                    .eq('category_id', cat.id);
+                
+                if (blocks && blocks.length > 0) {
+                    await storageService.deleteAllFilesFromContent(blocks);
+                }
+
+                // 4. Delete from database
+                await contentServiceV2.gameCategories.delete(cat.id);
+                return true;
+            }
+            return false;
         } catch (error) {
              console.error('[contentService] Error deleting game category:', error);
              return false;
@@ -714,7 +819,7 @@ export const contentService = {
             if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
             if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
             if (metadata.description !== undefined) dbUpdates.description = metadata.description;
-            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
+            // Note: programs usually doesn't have is_locked, though topics do
 
             await contentServiceV2.programs.update(programUuid, dbUpdates);
             return true;

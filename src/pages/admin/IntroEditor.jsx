@@ -136,7 +136,7 @@ const IntroEditor = () => {
                     type="text"
                     value={config.intro_title_ar}
                     onChange={(e) => setConfig(prev => ({ ...prev, intro_title_ar: e.target.value }))}
-                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 rounded-lg text-lg font-semibold text-right"
+                    className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-3 rounded-lg text-lg font-semibold text-right arabic-title transition-all"
                     dir="rtl"
                   />
                 </div>

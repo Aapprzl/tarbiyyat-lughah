@@ -291,7 +291,7 @@ const AdminPrograms = () => {
                               )}>
                                 {topic.isLocked ? <Lock className="w-4 h-4" /> : <Library className="w-4 h-4" />}
                               </div>
-                              <span className="font-medium text-slate-900 dark:text-white truncate text-sm">{topic.title}</span>
+                              <span className="font-medium text-slate-900 dark:text-white arabic-index-topic transition-all leading-tight">{topic.title}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <button 

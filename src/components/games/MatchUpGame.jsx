@@ -84,7 +84,11 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
         setGameState('playing');
     };
 
-    const isArabic = (text) => text && /[\u0600-\u06FF]/.test(text);
+    const isArabic = (text) => {
+        if (!text) return false;
+        const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+        return arabicRegex.test(text);
+    };
 
     const placeAnswer = (answerId, targetQuestionId, sourceQuestionId = null) => {
         let newMatches = { ...matches };
@@ -333,7 +337,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                                         onClick={() => handleSlotClick(pair.id, filledAnswerId, filledAnswer)}
                                     >
                                         <div className="absolute top-0 left-0 text-[8px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest m-3">Mission {idx + 1}</div>
-                                        <span className={isArabic(pair.question) ? 'font-arabic text-2xl md:text-3xl leading-relaxed py-2' : 'text-sm md:text-base font-black px-4'}>{pair.question}</span>
+                                        <span className={isArabic(pair.question) ? 'arabic-content text-2xl md:text-3xl leading-relaxed py-2 transition-all' : 'text-sm md:text-base font-black px-4'}>{pair.question}</span>
                                     </div>
 
                                     {/* Link Icon (Decorative on Desktop) */}
@@ -363,7 +367,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                                                     onTouchStart={(e) => { e.stopPropagation(); handleDragStart(e, { id: filledAnswerId, text: filledAnswer, origin: 'slot', sourceQuestionId: pair.id }); }}
                                                     style={{ touchAction: 'none' }}
                                                 >
-                                                    <span className={isArabic(filledAnswer) ? 'font-arabic text-3xl' : 'text-base'}>{filledAnswer}</span>
+                                                    <span className={isArabic(filledAnswer) ? 'arabic-content text-3xl transition-all' : 'text-base'}>{filledAnswer}</span>
                                                     {!isSubmitted && (
                                                         <div className="absolute inset-0 bg-teal-500 opacity-0 group-hover/ans:opacity-5 transition-opacity pointer-events-none" />
                                                     )}
@@ -450,7 +454,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                                             onTouchStart={(e) => handleDragStart(e, { id: ans.id, text: ans.text, origin: 'pool' })}
                                             style={{ touchAction: 'none' }}
                                         >
-                                            <span className={isArabic(ans.text) ? 'font-arabic text-xl md:text-3xl px-2' : 'text-base md:text-lg px-2'}>{ans.text}</span>
+                                            <span className={isArabic(ans.text) ? 'arabic-content text-xl md:text-3xl px-2 transition-all' : 'text-base md:text-lg px-2'}>{ans.text}</span>
                                             {isSelected && (
                                                 <motion.div layoutId="cursor" className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-white dark:bg-slate-900 rounded-full flex items-center justify-center shadow-lg ring-2 ring-teal-500">
                                                     <MousePointer2 className="w-3 h-3 text-teal-500" />
@@ -510,7 +514,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                         className="fixed z-[9999] pointer-events-none bg-teal-600 text-white px-5 md:px-8 py-3 md:py-5 rounded-2xl md:rounded-3xl shadow-[0_20px_60px_-15px_rgba(13,148,136,0.6)] font-black text-xl md:text-3xl border-2 border-teal-300/50 backdrop-blur-md"
                         style={{ left: dragPosition.x, top: dragPosition.y, transform: 'translate(-50%, -50%)', width: 'max-content' }}
                     >
-                        <span className={isArabic(dragItem.text) ? 'font-arabic px-2' : 'px-4'}>{dragItem.text}</span>
+                        <span className={isArabic(dragItem.text) ? 'arabic-content px-2 transition-all' : 'px-4'}>{dragItem.text}</span>
                         <div className="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
                              <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} className="h-full bg-white" />
                         </div>

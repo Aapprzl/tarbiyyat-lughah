@@ -70,23 +70,53 @@ export const storageService = {
     async deleteFile(url) {
         if (!url) return;
         try {
-            // Extract path from URL. 
             // URL format: .../storage/v1/object/public/content/path/to/file
+            // We need to extract everything after '/public/[BUCKET_NAME]/'
             const urlObj = new URL(url);
-            const pathParts = urlObj.pathname.split(`/public/${BUCKET_NAME}/`);
+            const publicMarker = `/public/${BUCKET_NAME}/`;
+            const markerIndex = urlObj.pathname.indexOf(publicMarker);
             
-            if (pathParts.length > 1) {
-                const fullPath = decodeURIComponent(pathParts[1]); // path/to/file
+            if (markerIndex !== -1) {
+                const fullPath = decodeURIComponent(urlObj.pathname.substring(markerIndex + publicMarker.length));
                 
                 const { error } = await supabase.storage
                     .from(BUCKET_NAME)
                     .remove([fullPath]);
                 
-                if (error) throw error;
-                console.log(`[Storage] Deleted file: ${fullPath}`);
+                if (error) {
+                    console.error(`[Storage] Supabase error deleting ${fullPath}:`, error);
+                    throw error;
+                }
+                console.log(`[Storage] Successfully deleted file: ${fullPath}`);
+            } else {
+                console.warn(`[Storage] Could not find bucket marker '/public/${BUCKET_NAME}/' in URL: ${url}`);
             }
         } catch (error) {
-            console.warn(`[Storage] Failed to delete file: ${url}`, error);
+            console.error(`[Storage] Fatal error deleting file: ${url}`, error);
+        }
+    },
+
+    /**
+     * Extracts all Supabase storage URLs from a content string or object
+     * and deletes them.
+     * @param {string|object} content - The content to scan for URLs
+     */
+    async deleteAllFilesFromContent(content) {
+        if (!content) return;
+        try {
+            const str = typeof content === 'string' ? content : JSON.stringify(content);
+            // Matches Supabase storage URLs more flexibly, ensuring it targets the configured BUCKET_NAME
+            // URL can be /object/public/bucket/... or /render/image/public/bucket/...
+            const urlRegex = new RegExp(`https://[^"\\s]+\\.supabase\\.co/storage/v1/(object|render/image)/public/${BUCKET_NAME}/[^"\\s]+`, 'g');
+            const matches = str.match(urlRegex) || [];
+            const uniqueUrls = [...new Set(matches)];
+
+            if (uniqueUrls.length > 0) {
+                console.log(`[Storage] Cleaning up ${uniqueUrls.length} files from content...`);
+                await Promise.allSettled(uniqueUrls.map(url => this.deleteFile(url)));
+            }
+        } catch (error) {
+            console.warn(`[Storage] Error during content file cleanup:`, error);
         }
     }
 };

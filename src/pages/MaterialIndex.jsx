@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Library, BookOpen, Telescope, MoveRight, Lock, Image as ImageIcon } from 'lucide-react';
+import { Library, BookOpen, Telescope, MoveRight, Lock, Image as ImageIcon, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Gamepad as GamepadIcon } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
+
+const iconMap = {
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart,
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon
+};
 
 const MaterialIndex = () => {
   const [sections, setSections] = useState([]);
@@ -38,13 +53,17 @@ const MaterialIndex = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-40 gap-4">
-        <motion.div 
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-          className="w-12 h-12 border-4 border-teal-500/20 border-t-teal-500 rounded-full"
-        />
-        <p className="text-slate-400 font-bold tracking-widest text-xs uppercase animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>Menyiapkan Kurikulum...</p>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="relative">
+          <div className="absolute inset-0 bg-teal-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center relative z-10 border border-slate-100 dark:border-slate-800">
+            <Library className="w-10 h-10 text-teal-600 dark:text-teal-400 animate-bounce" />
+          </div>
+          <div className="absolute -inset-1 border-2 border-teal-500/30 rounded-2xl z-0 animate-ping"></div>
+        </div>
+        <p className="mt-8 text-xs font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
+          Menyiapkan Kurikulum
+        </p>
       </div>
     );
   }
@@ -83,7 +102,10 @@ const MaterialIndex = () => {
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-teal-500/30"></div>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-teal-500/20">
-                <Library className="w-6 h-6" />
+                {(() => {
+                  const IconComp = iconMap[section.icon] || Library;
+                  return <IconComp className="w-6 h-6" />;
+                })()}
               </div>
               <div>
                 <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight" style={{ fontFamily: 'var(--font-latin)' }}>

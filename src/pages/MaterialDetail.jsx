@@ -38,7 +38,29 @@ import {
   GripVertical,
   Music,
   Keyboard,
+  Package, 
+  LineChart, 
+  Link2, 
+  Rocket, 
+  Milestone, 
+  Heart,
+  LayoutGrid,
 } from "lucide-react";
+
+const iconMap = {
+  BookOpen: Library, 
+  Box: Package, 
+  Activity: LineChart, 
+  Hash: Link2, 
+  Star: Award, 
+  Zap: Rocket, 
+  Bookmark: Pocket, 
+  Layout: LayoutGrid, 
+  Flag: Milestone, 
+  Smile: Heart,
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon
+};
 import { contentService } from "../services/contentService";
 import PdfViewer from "../components/media/PdfViewer";
 import AudioPlayer from "../components/media/AudioPlayer";
@@ -326,10 +348,20 @@ const MaterialDetailContent = () => {
   // Also updated to handle general loading to prevent Header blinking
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-800 border-t-teal-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
-          {targetItemId ? "Memuat Permainan..." : "Memuat Materi..."}
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <div className="relative">
+          <div className="absolute inset-0 bg-teal-500/20 rounded-full blur-xl animate-pulse"></div>
+          <div className="w-20 h-20 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl flex items-center justify-center relative z-10 border border-slate-100 dark:border-slate-800">
+            {targetItemId ? (
+              <Gamepad2 className="w-10 h-10 text-teal-600 dark:text-teal-400 animate-bounce" />
+            ) : (
+              <Library className="w-10 h-10 text-teal-600 dark:text-teal-400 animate-bounce" />
+            )}
+          </div>
+          <div className="absolute -inset-1 border-2 border-teal-500/30 rounded-2xl z-0 animate-ping"></div>
+        </div>
+        <p className="mt-8 text-xs font-black uppercase tracking-[0.3em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
+          {targetItemId ? "Memuat Permainan" : "Memuat Materi"}
         </p>
       </div>
     );
@@ -487,7 +519,10 @@ const MaterialDetailContent = () => {
           >
             <div className="flex items-center gap-5 mb-6">
               <div className="w-16 h-16 bg-teal-500 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-teal-500/20">
-                <Trophy className="w-8 h-8" />
+                {(() => {
+                  const IconComp = iconMap[topic?.icon || parentSection?.icon] || Trophy;
+                  return <IconComp className="w-8 h-8" />;
+                })()}
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -756,7 +791,11 @@ const ContentBlock = ({ block }) => {
                         {String(idx + 1).padStart(2, '0')}
                       </td>
                       <td className="px-4 md:px-8 py-4 md:py-6 text-right">
-                        <span className="text-xl md:text-3xl font-black text-slate-900 dark:text-white dir-rtl arabic-content leading-relaxed block group-hover:scale-105 transition-transform origin-right">
+                        <span className={cn(
+                          "font-black text-slate-900 dark:text-white dir-rtl arabic-content leading-relaxed block group-hover:scale-105 transition-transform origin-right",
+                          item.arab?.length < 15 ? "text-3xl md:text-4xl" : 
+                          item.arab?.length < 30 ? "text-2xl md:text-3xl" : "text-xl md:text-xl"
+                        )}>
                           {item.arab}
                         </span>
                       </td>

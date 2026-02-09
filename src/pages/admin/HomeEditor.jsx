@@ -286,7 +286,7 @@ const HomeEditor = () => {
                         type="text" 
                         value={config.heroTitleArabic}
                         onChange={(e) => setConfig({...config, heroTitleArabic: e.target.value})}
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold text-right text-xl focus:ring-2 focus:ring-teal-500 outline-none transition-colors dir-rtl font-arabic"
+                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold text-right text-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all dir-rtl arabic-title"
                         placeholder="تَعَلَّمِ اللُّغَةَ الْعَرَبِيَّةَ"
                     />
                 </div>

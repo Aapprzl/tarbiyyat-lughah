@@ -60,7 +60,7 @@ const AdminGames = () => {
     setLoading(true);
     try {
       if (editingCategoryId) {
-        await contentService.updateGameCategory(editingCategoryId, categoryForm.title, categoryForm.desc, categoryForm.icon);
+        await contentService.updateGameCategory(editingCategoryId, categoryForm);
         toast.success('Kategori Game diperbarui!');
       } else {
         await contentService.addNewGameCategory(categoryForm.title, categoryForm.desc, categoryForm.icon);

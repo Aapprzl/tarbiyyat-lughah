@@ -55,7 +55,11 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
   const currentQuestion = questions[currentIndex];
 
   // Helper to detect Arabic
-  const isArabic = (text) => text && /[\u0600-\u06FF]/.test(text);
+  const isArabic = (text) => {
+    if (!text) return false;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicRegex.test(text);
+  };
   
   const handleOptionClick = (option) => {
     if (isAnswered) return;
@@ -213,7 +217,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
 
                {/* Question Text */}
                <h4 
-                  className={`text-2xl md:text-4xl font-black text-slate-800 dark:text-white mb-10 leading-tight ${isArabic(currentQuestion.text) ? 'font-arabic text-right text-3xl md:text-5xl py-4' : 'tracking-tighter'}`}
+                  className={`text-2xl md:text-4xl font-black text-slate-800 dark:text-white mb-10 leading-tight ${isArabic(currentQuestion.text) ? 'arabic-content text-right text-3xl md:text-5xl py-4 transition-all' : 'tracking-tighter'}`}
                   dir={isArabic(currentQuestion.text) ? 'rtl' : 'ltr'}
                >
                   {currentQuestion.text}
@@ -259,7 +263,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
                           <span className={cn(
                              "flex-1 font-bold text-lg md:text-xl",
                              isAnswered && isCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-100',
-                             isArabic(option.text) ? 'font-arabic text-2xl md:text-3xl pt-1' : ''
+                             isArabic(option.text) ? 'arabic-content text-2xl md:text-3xl pt-1 transition-all' : ''
                           )}>
                             {option.text}
                           </span>

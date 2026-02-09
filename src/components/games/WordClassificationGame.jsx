@@ -45,6 +45,12 @@ const WordClassificationGame = ({ data }) => {
   const questions = data?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
 
+  const isArabic = (text) => {
+    if (!text) return false;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicRegex.test(text);
+  };
+
   // Types Configuration with premium color schemes
   const types = [
     { 
@@ -320,7 +326,10 @@ const WordClassificationGame = ({ data }) => {
                            key={currentQuestion?.text}
                            initial={{ y: 15, opacity: 0 }}
                            animate={{ y: 0, opacity: 1 }}
-                           className="text-[clamp(2.5rem,10vw,4.5rem)] font-black text-slate-900 dark:text-white font-arabic leading-tight drop-shadow-sm select-all pt-2"
+                           className={cn(
+                             "text-[clamp(2.5rem,10vw,4.5rem)] font-black text-slate-900 dark:text-white leading-tight drop-shadow-sm select-all pt-2 transition-all",
+                             isArabic(currentQuestion?.text) && "arabic-content"
+                           )}
                          >
                             {currentQuestion?.text}
                          </motion.h1>

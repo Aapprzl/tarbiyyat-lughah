@@ -96,7 +96,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
           ctx.textAlign = 'right';
           ctx.fillStyle = '#fff';
           ctx.font = 'bold 16px sans-serif';
-          if (/[\u0600-\u06FF]/.test(item.text)) {
+          if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(item.text)) {
              ctx.font = `bold 18px ${arabicFontRef.current}`;
           }
           ctx.fillText(item.text, radius - 20, 6);
@@ -241,7 +241,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
             <div className="bg-green-100 text-green-800 p-6 rounded-xl text-center animate-bounce-short">
                 <Trophy className="w-8 h-8 mx-auto mb-2 text-green-600" />
                 <p className="text-sm uppercase tracking-widest font-bold mb-1">Hasil:</p>
-                <p className="text-3xl font-bold font-arabic">{result.text}</p>
+                <p className="text-3xl font-bold arabic-content transition-all">{result.text}</p>
             </div>
         ) : (
              <button 

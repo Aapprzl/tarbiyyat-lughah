@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall } from 'lucide-react';
+import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen: Award,
+  BookOpen: Library, 
   Box: Package, 
   Activity: LineChart, 
   Hash: Link2, 
@@ -15,14 +15,20 @@ const iconMap = {
   Bookmark: Pocket, 
   Layout: LayoutGrid, 
   Flag: Milestone, 
-  Smile: Heart, 
+  Smile: Heart,
+  PlayCircle: GamepadIcon,
+  Play: GamepadIcon,
   Target: Crosshair, 
   ListChecks: CheckSquare, 
   Settings: Sliders, 
-  Globe: Orbit, 
-  PlayCircle: GamepadIcon, 
-  Play: GamepadIcon, 
+  Globe: Orbit,
   Gamepad2: Trophy
+};
+
+const isArabic = (text) => {
+  if (!text) return false;
+  const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  return arabicRegex.test(text);
 };
 
 const getTypeInfo = (type) => {
@@ -94,19 +100,6 @@ const GameIndex = () => {
   return (
     <div className="container mx-auto px-6 py-12 max-w-7xl pb-40">
         
-        {/* Header */}
-        <div className="mb-20 text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-black uppercase tracking-widest mb-6" style={{ fontFamily: 'var(--font-latin)' }}>
-                <GamepadIcon className="w-4 h-4" />
-                Zona Permainan
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight" style={{ fontFamily: 'var(--font-latin)' }}>
-                Asah Kemampuanmu
-            </h1>
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed" style={{ fontFamily: 'var(--font-latin)' }}>
-                Pilih kategori dan mulai tantangan interaktif untuk meningkatkan level bahasa Arabmu.
-            </p>
-        </div>
 
         <div className="space-y-24">
         {categories.map((category, idx) => {
@@ -170,8 +163,9 @@ const GameIndex = () => {
                                               {typeInfo.label}
                                           </div>
                                           <h3 className={cn(
-                                            "font-black text-lg md:text-xl leading-tight line-clamp-2",
-                                            "text-slate-800 dark:text-slate-100"
+                                            "font-black text-lg md:text-xl leading-tight line-clamp-2 transition-all",
+                                            "text-slate-800 dark:text-slate-100",
+                                            isArabic(item.title) && "arabic-text"
                                           )}>
                                               {item.title}
                                           </h3>

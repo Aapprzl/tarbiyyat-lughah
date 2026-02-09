@@ -61,7 +61,11 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   };
 
   // Helper to detect Arabic
-  const isArabic = (text) => text && /[\u0600-\u06FF]/.test(text);
+  const isArabic = (text) => {
+    if (!text) return false;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicRegex.test(text);
+  };
 
   const loadQuestion = (index) => {
     if (index >= questions.length) {
@@ -330,7 +334,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                                     : 'bg-slate-100 dark:bg-slate-800/50 border-2 border-dashed border-slate-200 dark:border-slate-700 shadow-inner'
                             )}
                         >
-                            <span className={cn(letter && isArabic(letter.char) ? 'font-arabic' : 'tracking-tighter')}>
+                            <span className={cn(letter && isArabic(letter.char) ? 'arabic-content transition-all' : 'tracking-tighter')}>
                                {letter ? letter.char : ''}
                             </span>
                         </motion.button>
@@ -366,7 +370,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
                                 disabled={isCorrect}
                                 className={cn(
                                    "w-11 h-11 md:w-14 md:h-14 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl shadow-md border-2 border-slate-100 dark:border-slate-700 text-lg md:text-xl font-black text-slate-700 dark:text-slate-100 flex items-center justify-center transition-colors hover:border-orange-400 group",
-                                   isArabic(letter.char) ? 'font-arabic' : ''
+                                   isArabic(letter.char) ? 'arabic-content transition-all' : ''
                                 )}
                             >
                                 {letter.char}

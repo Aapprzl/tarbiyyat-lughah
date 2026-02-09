@@ -33,7 +33,11 @@ const UnjumbleGame = ({ data }) => {
   }
 
   // Helper to detect Arabic
-  const isArabic = (text) => /[\u0600-\u06FF]/.test(text);
+  const isArabic = (text) => {
+    if (!text) return false;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicRegex.test(text);
+  };
 
   useEffect(() => {
     if (data?.questions && data.questions.length > 0) {
@@ -186,7 +190,7 @@ const UnjumbleGame = ({ data }) => {
                 >
                     {/* Title & Subtitle */}
                     <div className="text-center mb-6 md:mb-10">
-                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2 font-arabic leading-tight">
+                        <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-slate-900 dark:text-white mb-2 arabic-content transition-all leading-tight">
                            {data.subtitle || 'Susunlah Kalimat Arab'}
                         </h1>
                         
@@ -211,7 +215,7 @@ const UnjumbleGame = ({ data }) => {
                                        layoutId={word.id}
                                        key={word.id}
                                        onClick={() => handleWordClick(word, 'pool')}
-                                       className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-lg md:text-xl font-bold font-arabic shadow-sm border border-emerald-200 dark:border-emerald-500/30 hover:scale-105 active:scale-95 transition-transform"
+                                       className="bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-lg md:text-xl font-bold arabic-content transition-all shadow-sm border border-emerald-200 dark:border-emerald-500/30 hover:scale-105 active:scale-95 transition-transform"
                                     >
                                        {word.text}
                                     </motion.button>
@@ -240,7 +244,7 @@ const UnjumbleGame = ({ data }) => {
                                            layoutId={word.id}
                                            key={word.id}
                                            onClick={() => handleWordClick(word, 'selected')}
-                                           className="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-lg md:text-xl font-bold font-arabic shadow-sm border border-slate-200 dark:border-slate-600 hover:text-red-500 hover:border-red-200 transition-colors"
+                                           className="bg-white dark:bg-slate-700 text-slate-800 dark:text-white px-3 md:px-4 py-1.5 md:py-2 rounded-lg md:rounded-xl text-lg md:text-xl font-bold arabic-content transition-all shadow-sm border border-slate-200 dark:border-slate-600 hover:text-red-500 hover:border-red-200 transition-colors"
                                         >
                                            {word.text}
                                         </motion.button>

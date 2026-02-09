@@ -233,7 +233,11 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
     );
   }
 
-  const isArabic = (text) => text && /[\u0600-\u06FF]/.test(text);
+  const isArabic = (text) => {
+    if (!text) return false;
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicRegex.test(text);
+  };
   const isRTL = questions[currentIndex]?.text && isArabic(questions[currentIndex].text);
 
   if (!currentSegments.length) return null;
@@ -291,7 +295,7 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
                animate={{ opacity: 1, y: 0 }}
                className={cn(
                   "text-2xl md:text-3xl lg:text-4xl leading-relaxed text-slate-800 dark:text-white text-center mb-16 w-full flex flex-wrap gap-x-2 md:gap-x-4 gap-y-6 items-center justify-center",
-                  isRTL ? 'font-arabic' : 'tracking-tight font-bold'
+                  isRTL ? 'arabic-content transition-all' : 'tracking-tight font-bold'
                )}
                dir={isRTL ? 'rtl' : 'ltr'}
             >
@@ -316,7 +320,7 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
                             >
                                 <span className={cn(
                                    "text-xl md:text-2xl",
-                                   isRTL ? 'font-arabic pt-2' : 'font-black'
+                                   isRTL ? 'arabic-content pt-2 transition-all' : 'font-black'
                                 )}>
                                    {filledWord ? filledWord.text : ''}
                                 </span>
@@ -353,7 +357,7 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
                                     disabled={isCorrect}
                                     className={cn(
                                         "px-5 md:px-8 py-3 md:py-4 bg-white dark:bg-slate-800 rounded-2xl md:rounded-3xl shadow-md border-2 border-slate-100 dark:border-slate-700 font-bold transition-all text-lg md:text-xl text-slate-700 dark:text-slate-100 hover:border-blue-400 group",
-                                        isRTL ? 'font-arabic pt-4' : ''
+                                        isRTL ? 'arabic-content pt-4 transition-all' : ''
                                     )}
                                 >
                                     {word.text}
