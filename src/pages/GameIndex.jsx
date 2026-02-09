@@ -96,14 +96,14 @@ const GameIndex = () => {
         
         {/* Header */}
         <div className="mb-20 text-center max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-black uppercase tracking-widest mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 text-xs font-black uppercase tracking-widest mb-6" style={{ fontFamily: 'var(--font-latin)' }}>
                 <GamepadIcon className="w-4 h-4" />
                 Zona Permainan
             </div>
-            <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-6 tracking-tight" style={{ fontFamily: 'var(--font-latin)' }}>
                 Asah Kemampuanmu
             </h1>
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed" style={{ fontFamily: 'var(--font-latin)' }}>
                 Pilih kategori dan mulai tantangan interaktif untuk meningkatkan level bahasa Arabmu.
             </p>
         </div>
@@ -123,10 +123,10 @@ const GameIndex = () => {
                           <IconComp className="w-8 h-8" />
                       </div>
                       <div>
-                          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2">
+                          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2" style={{ fontFamily: 'var(--font-latin)' }}>
                               {category.title}
                           </h2>
-                          <p className="text-slate-500 dark:text-slate-400 font-medium max-w-2xl">
+                          <p className="text-slate-500 dark:text-slate-400 font-medium max-w-2xl" style={{ fontFamily: 'var(--font-latin)' }}>
                               {category.desc}
                           </p>
                       </div>

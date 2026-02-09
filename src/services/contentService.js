@@ -115,6 +115,8 @@ export const contentService = {
                      const updates = {};
                     if (metadata.title !== undefined) updates.title = metadata.title;
                     if (metadata.desc !== undefined) updates.description = metadata.desc;
+                    if (metadata.description !== undefined) updates.description = metadata.description;
+                    if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
                     if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
                     await contentServiceV2.topics.update(topicUuid, updates);
                     return true;
@@ -128,6 +130,8 @@ export const contentService = {
                     const updates = {};
                     if (metadata.title !== undefined) updates.title = metadata.title;
                     if (metadata.desc !== undefined) updates.description = metadata.desc;
+                    if (metadata.description !== undefined) updates.description = metadata.description;
+                    if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
                     // if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
                     await contentServiceV2.gameCategories.update(topicId, updates);
                     return true;
@@ -580,13 +584,37 @@ export const contentService = {
         return { items: gamesConfig };
     },
 
-    async updateGameCategory(id, newTitle, newDesc, newIcon) {
+    async updateGameCategory(id, metadata) {
         try {
-            await contentServiceV2.gameCategories.update(id, {
-                title: newTitle,
-                description: newDesc,
-                icon: newIcon
-            });
+            // Convert slug to UUID if needed
+            const isUUID = this.isValidUUID(id);
+            let categoryUuid = id;
+            
+            if (!isUUID) {
+                // ID is a slug, need to find the UUID
+                const { data } = await supabase
+                    .from('game_categories')
+                    .select('id')
+                    .eq('slug', id)
+                    .maybeSingle();
+                
+                if (!data) {
+                    console.error('[contentService] Game category not found for slug:', id);
+                    return false;
+                }
+                categoryUuid = data.id;
+            }
+
+            // Normalize field names for database
+            const dbUpdates = {};
+            if (metadata.title !== undefined) dbUpdates.title = metadata.title;
+            if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
+            if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
+            if (metadata.description !== undefined) dbUpdates.description = metadata.description;
+            if (metadata.thumbnail !== undefined) dbUpdates.thumbnail = metadata.thumbnail;
+            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
+
+            await contentServiceV2.gameCategories.update(categoryUuid, dbUpdates);
             return true;
         } catch (error) {
             console.error('[contentService] Error updating game category:', error);
@@ -646,8 +674,8 @@ export const contentService = {
         return await this.getGamesConfig();
     },
 
-    async updateSpecialCategory(id, newTitle, newDesc, newIcon) {
-        return await this.updateGameCategory(id, newTitle, newDesc, newIcon);
+    async updateSpecialCategory(id, metadata) {
+        return await this.updateGameCategory(id, metadata);
     },
 
     async addSpecialCategory(title, iconName, desc = '') {
@@ -657,6 +685,44 @@ export const contentService = {
     async deleteSpecialCategory(categoryId) {
         return await this.deleteGameCategory(categoryId);
     }, 
+
+    // Backward compatibility alias for Dashboard.jsx - updates PROGRAMS, not game categories
+    async updateSection(id, metadata) {
+        try {
+            // Convert slug to UUID if needed
+            const isUUID = this.isValidUUID(id);
+            let programUuid = id;
+            
+            if (!isUUID) {
+                // ID is a slug, need to find the UUID
+                const { data } = await supabase
+                    .from('programs')
+                    .select('id')
+                    .eq('slug', id)
+                    .maybeSingle();
+                
+                if (!data) {
+                    console.error('[contentService] Program not found for slug:', id);
+                    return false;
+                }
+                programUuid = data.id;
+            }
+
+            // Normalize field names for database
+            const dbUpdates = {};
+            if (metadata.title !== undefined) dbUpdates.title = metadata.title;
+            if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
+            if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
+            if (metadata.description !== undefined) dbUpdates.description = metadata.description;
+            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
+
+            await contentServiceV2.programs.update(programUuid, dbUpdates);
+            return true;
+        } catch (error) {
+            console.error('[contentService] Error updating program:', error);
+            return false;
+        }
+    },
 
     // ============================================
     // THEME & AUTH & SEARCH (Keep as is)

@@ -41,6 +41,29 @@ export const storageService = {
     },
 
     /**
+     * Uploads a thumbnail image with validation.
+     * @param {File} file - The image file to upload
+     * @param {function} onProgress - Optional progress callback
+     * @returns {Promise<string>} - The public download URL
+     */
+    async uploadThumbnail(file, onProgress = null) {
+        // Validate file type
+        const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            throw new Error('Format file tidak valid. Gunakan JPG, PNG, atau WebP.');
+        }
+
+        // Validate file size (max 2MB)
+        const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+        if (file.size > maxSize) {
+            throw new Error('Ukuran file terlalu besar. Maksimal 2MB.');
+        }
+
+        // Upload to specific thumbnail path
+        return this.uploadFile(file, 'materi/thumbnail_bacaan', onProgress);
+    },
+
+    /**
      * Deletes a file from Supabase Storage using its download URL.
      * @param {string} url - The download URL of the file to delete
      */

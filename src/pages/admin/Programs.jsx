@@ -65,7 +65,12 @@ const AdminPrograms = () => {
     setLoading(true);
     try {
       if (editingCategoryId) {
-        await contentService.updateSpecialCategory(editingCategoryId, categoryForm.title, categoryForm.icon, categoryForm.desc, { isLocked: categoryForm.isLocked });
+        await contentService.updateSpecialCategory(editingCategoryId, {
+          title: categoryForm.title,
+          description: categoryForm.desc,
+          icon: categoryForm.icon,
+          isLocked: categoryForm.isLocked
+        });
         toast.success('Kategori diperbarui!');
       } else {
         await contentService.addSpecialCategory(categoryForm.title, categoryForm.icon, categoryForm.desc);
@@ -109,7 +114,7 @@ const AdminPrograms = () => {
 
   const toggleCategoryLock = async (category) => {
     try {
-        await contentService.updateSpecialCategory(category.id, null, null, null, { isLocked: !category.isLocked });
+        await contentService.updateSpecialCategory(category.id, { isLocked: !category.isLocked });
         await loadData();
         toast.success(`Kategori ${!category.isLocked ? 'dikunci' : 'dibuka'}!`);
     } catch (err) {
@@ -379,6 +384,7 @@ const AdminPrograms = () => {
                           value={categoryForm.title}
                           onChange={(e) => setCategoryForm({ ...categoryForm, title: e.target.value })}
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none"
+                          style={{ fontFamily: 'var(--font-latin)' }}
                           placeholder="Contoh: Tahsin Al-Qur'an"
                           required
                         />
@@ -390,6 +396,7 @@ const AdminPrograms = () => {
                           value={categoryForm.desc}
                           onChange={(e) => setCategoryForm({ ...categoryForm, desc: e.target.value })}
                           className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent outline-none h-24 resize-none"
+                          style={{ fontFamily: 'var(--font-latin)' }}
                           placeholder="Penjelasan singkat tentang program ini..."
                         />
                       </div>

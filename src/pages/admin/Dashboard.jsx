@@ -82,7 +82,11 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
         if (editingSectionId) {
-          await contentService.updateSection(editingSectionId, newSectionTitle, selectedIcon, newSectionDesc);
+          await contentService.updateSection(editingSectionId, {
+            title: newSectionTitle,
+            description: newSectionDesc,
+            icon: selectedIcon
+          });
           toast.success('Kategori berhasil diperbarui!');
         } else {
           await contentService.addNewSection(newSectionTitle, selectedIcon, newSectionDesc);
@@ -194,6 +198,7 @@ const AdminDashboard = () => {
           type="text" 
           placeholder="Cari kategori atau materi..."
           className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+          style={{ fontFamily: 'var(--font-latin)' }}
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
         />
@@ -270,6 +275,7 @@ const AdminDashboard = () => {
                                         value={newSectionTitle}
                                         onChange={(e) => setNewSectionTitle(e.target.value)}
                                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                                        style={{ fontFamily: 'var(--font-latin)' }}
                                         placeholder="Contoh: Shorof Dasar"
                                         autoFocus
                                         required
@@ -282,6 +288,7 @@ const AdminDashboard = () => {
                                         value={newSectionDesc}
                                         onChange={(e) => setNewSectionDesc(e.target.value)}
                                         className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none h-24 resize-none"
+                                        style={{ fontFamily: 'var(--font-latin)' }}
                                         placeholder="Deskripsi singkat tentang kategori ini..."
                                       />
                                    </div>
@@ -347,6 +354,7 @@ const AdminDashboard = () => {
                     <input 
                       type="text" 
                       className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+                      style={{ fontFamily: 'var(--font-latin)' }}
                       placeholder="Contoh: Bab 1 - Pengenalan"
                       value={newTopicTitle}
                       onChange={e => setNewTopicTitle(e.target.value)}
@@ -394,7 +402,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
         e.stopPropagation();
         setToggling(true);
         try {
-            await contentService.updateSection(section.id, null, null, null, { isLocked: !section.isLocked });
+            await contentService.updateSection(section.id, { isLocked: !section.isLocked });
             onReload();
         } finally {
             setToggling(false);

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Upload } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -29,6 +29,9 @@ const LessonEditor = () => {
   const [saving, setSaving] = useState(false);
   const [topicTitle, setTopicTitle] = useState('');
   const [topicDesc, setTopicDesc] = useState('');
+  const [thumbnail, setThumbnail] = useState(''); // Current thumbnail URL
+  const [thumbnailFile, setThumbnailFile] = useState(null); // New file to upload
+  const [thumbnailPreview, setThumbnailPreview] = useState(''); // Preview URL
   const [isSpecialProgram, setIsSpecialProgram] = useState(false);
   const [pickerTab, setPickerTab] = useState('common'); // 'common' or 'game'
 
@@ -47,14 +50,19 @@ const LessonEditor = () => {
       // Load Metadata
       const curr = await contentService.getCurriculum();
       let title = "Unknown Topic";
+      let desc = '';
+      let thumb = '';
+      
       for (const s of curr) {
         const found = s.topics.find(t => t.id === topicId);
         if (found) {
           title = found.title;
-          setTopicDesc(found.desc || '');
+          desc = found.desc || found.description || '';
+          thumb = found.thumbnail || '';
           break;
         }
       }
+      
       // Or check Special Programs (now category-based)
       if (title === "Unknown Topic") {
           const progs = await contentService.getSpecialPrograms();
@@ -62,7 +70,8 @@ const LessonEditor = () => {
           const categoryFound = progs.find(p => p.id === topicId);
           if (categoryFound) {
              title = categoryFound.title;
-             setTopicDesc(categoryFound.desc || '');
+             desc = categoryFound.desc || categoryFound.description || '';
+             thumb = categoryFound.thumbnail || '';
              setIsSpecialProgram(true);
           } else {
              // Fallback: Check inside topics (Legacy Structure check)
@@ -71,7 +80,8 @@ const LessonEditor = () => {
                     const found = category.topics.find(t => t.id === topicId);
                     if (found) {
                         title = found.title;
-                        setTopicDesc(found.desc || '');
+                        desc = found.desc || found.description || '';
+                        thumb = found.thumbnail || '';
                         setIsSpecialProgram(true);
                         break;
                     }
@@ -79,7 +89,11 @@ const LessonEditor = () => {
              }
           }
       }
+      
       setTopicTitle(title);
+      setTopicDesc(desc);
+      setThumbnail(thumb);
+      setThumbnailPreview(thumb);
 
       // Load Content
       const rawContent = await contentService.getLessonContent(topicId);
@@ -233,6 +247,45 @@ const LessonEditor = () => {
     }));
   };
 
+  const handleThumbnailChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type and size
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+      toast.error('Format file tidak valid. Gunakan JPG, PNG, atau WebP.');
+      return;
+    }
+
+    const maxSize = 2 * 1024 * 1024; // 2MB
+    if (file.size > maxSize) {
+      toast.error('Ukuran file terlalu besar. Maksimal 2MB.');
+      return;
+    }
+
+    // Set file and preview
+    setThumbnailFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setThumbnailPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeThumbnail = async () => {
+    const ok = await confirm('Hapus thumbnail ini?', 'Hapus Thumbnail');
+    if (ok) {
+      // Delete from storage if exists
+      if (thumbnail) {
+        await storageService.deleteFile(thumbnail);
+      }
+      setThumbnail('');
+      setThumbnailFile(null);
+      setThumbnailPreview('');
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     
@@ -291,8 +344,32 @@ const LessonEditor = () => {
     // Update initialUrls for the next save cycle
     setInitialUrls(finalUrls);
 
-    // Save Metadata (Title & Desc)
-    await contentService.updateTopicMetadata(topicId, { title: topicTitle, desc: topicDesc });
+    // Upload thumbnail if new file selected
+    let thumbnailUrl = thumbnail;
+    if (thumbnailFile) {
+      try {
+        // Delete old thumbnail if exists
+        if (thumbnail) {
+          await storageService.deleteFile(thumbnail);
+        }
+        // Upload new thumbnail
+        thumbnailUrl = await storageService.uploadThumbnail(thumbnailFile);
+        setThumbnail(thumbnailUrl);
+        setThumbnailFile(null);
+        toast.success('Thumbnail berhasil diupload!');
+      } catch (e) {
+        toast.error(e.message || 'Gagal upload thumbnail');
+        thumbnailUrl = thumbnail; // Keep old thumbnail on error
+      }
+    }
+
+    // Save Metadata (Title, Desc, Thumbnail)
+    await contentService.updateTopicMetadata(topicId, { 
+      title: topicTitle, 
+      desc: topicDesc,
+      description: topicDesc, // Alias for compatibility
+      thumbnail: thumbnailUrl 
+    });
 
     // NEW: Sync Content Items to Category Metadata for Grid View
     if (isSpecialProgram) {
@@ -357,6 +434,74 @@ const LessonEditor = () => {
           )}
           {saving ? 'Menyimpan...' : 'Simpan'}
         </button>
+      </div>
+
+      {/* Thumbnail Upload Section */}
+      <div className="mb-6 p-4 md:p-6 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className="flex flex-col md:flex-row items-start gap-4 md:gap-6">
+          {/* Thumbnail Preview */}
+          <div className="w-full md:w-auto md:flex-shrink-0">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" style={{ fontFamily: 'var(--font-latin)' }}>
+              Thumbnail Cerita
+            </label>
+            <div className="relative w-full md:w-64 aspect-video bg-slate-100 dark:bg-slate-900 rounded-lg overflow-hidden border-2 border-dashed border-slate-300 dark:border-slate-600">
+              {thumbnailPreview ? (
+                <>
+                  <img 
+                    src={thumbnailPreview} 
+                    alt="Thumbnail preview" 
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    onClick={removeThumbnail}
+                    className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors shadow-lg"
+                    title="Hapus Thumbnail"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-400">
+                  <ImageIcon className="w-12 h-12 mb-2" />
+                  <p className="text-xs font-medium" style={{ fontFamily: 'var(--font-latin)' }}>Belum ada thumbnail</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Upload Instructions */}
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" style={{ fontFamily: 'var(--font-latin)' }}>
+              Upload Thumbnail Baru
+            </label>
+            <p className="text-xs text-slate-500 mb-4" style={{ fontFamily: 'var(--font-latin)' }}>
+              Ukuran yang disarankan: <strong>1280x720px (16:9)</strong><br />
+              Format: JPG, PNG, WebP • Maksimal: 2MB
+            </p>
+            
+            <label className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm font-medium cursor-pointer transition-colors" style={{ fontFamily: 'var(--font-latin)' }}>
+              <Upload className="w-4 h-4" />
+              Pilih Gambar
+              <input 
+                type="file" 
+                accept="image/jpeg,image/jpg,image/png,image/webp"
+                onChange={handleThumbnailChange}
+                className="hidden"
+              />
+            </label>
+
+            {thumbnailFile && (
+              <div className="mt-3 p-3 bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg">
+                <p className="text-xs text-teal-700 dark:text-teal-400 font-medium" style={{ fontFamily: 'var(--font-latin)' }}>
+                  ✓ File siap diupload: {thumbnailFile.name}
+                </p>
+                <p className="text-xs text-teal-600 dark:text-teal-500 mt-1" style={{ fontFamily: 'var(--font-latin)' }}>
+                  Klik "Simpan" untuk mengupload thumbnail
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* CANVAS STAGES */}

@@ -175,19 +175,20 @@ class ErrorBoundary extends React.Component {
       return (
         <div className="p-12 text-center bg-red-50 dark:bg-red-900/10 text-red-900 dark:text-red-400 rounded-[2.5rem] m-8 border border-red-200 dark:border-red-900/30">
           <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
-          <h2 className="text-2xl font-black mb-4 uppercase tracking-widest text-red-600">
+          <h2 className="text-2xl font-black mb-4 uppercase tracking-widest text-red-600" style={{ fontFamily: 'var(--font-latin)' }}>
             Sistem Mengalami Error
           </h2>
-          <p className="mb-6 font-medium">
+          <p className="mb-6 font-medium" style={{ fontFamily: 'var(--font-latin)' }}>
             Halaman tidak dapat dimuat karena kesalahan teknis.
           </p>
           <div className="text-left bg-white dark:bg-black/40 p-6 rounded-2xl border border-red-100 dark:border-red-900/40 text-xs font-mono mb-8 overflow-auto max-h-40">
-            <p className="font-bold text-red-600 mb-2">Technical Info:</p>
+            <p className="font-bold text-red-600 mb-2" style={{ fontFamily: 'var(--font-latin)' }}>Technical Info:</p>
             {this.state.error?.toString()}
           </div>
           <button
             onClick={() => window.location.reload()}
             className="px-8 py-4 bg-red-600 text-white rounded-2xl font-bold transition-all hover:scale-105 active:scale-95"
+            style={{ fontFamily: 'var(--font-latin)' }}
           >
             Muat Ulang Halaman
           </button>
@@ -327,7 +328,7 @@ const MaterialDetailContent = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="w-12 h-12 border-4 border-slate-200 dark:border-slate-800 border-t-teal-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 animate-pulse" style={{ fontFamily: 'var(--font-latin)' }}>
           {targetItemId ? "Memuat Permainan..." : "Memuat Materi..."}
         </p>
       </div>
@@ -340,16 +341,17 @@ const MaterialDetailContent = () => {
         <div className="w-24 h-24 bg-red-50 dark:bg-red-900/10 rounded-full flex items-center justify-center mb-8">
           <AlertCircle className="w-12 h-12 text-red-500" />
         </div>
-        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4">
+        <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4" style={{ fontFamily: 'var(--font-latin)' }}>
           Konten Hilang dari Radar
         </h2>
-        <p className="text-slate-500 max-w-sm mb-10 leading-relaxed font-medium">
+        <p className="text-slate-500 max-w-sm mb-10 leading-relaxed font-medium" style={{ fontFamily: 'var(--font-latin)' }}>
           Maaf, materi yang Anda cari tidak dapat ditemukan. Mungkin telah
           dipindahkan atau dihapus.
         </p>
         <button
           onClick={() => navigate("/materi")}
           className="flex items-center gap-3 px-10 py-5 bg-teal-500 text-white rounded-[2rem] font-bold shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all"
+          style={{ fontFamily: 'var(--font-latin)' }}
         >
           <MoveLeft className="w-5 h-5" />
           Kembali ke Kurikulum
@@ -489,17 +491,17 @@ const MaterialDetailContent = () => {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-black text-teal-600 uppercase tracking-[0.3em]">
+                  <span className="text-[10px] font-black text-teal-600 uppercase tracking-[0.3em]" style={{ fontFamily: 'var(--font-latin)' }}>
                     Permainan Bahasa Arab
                   </span>
                   <Diamond className="w-3 h-3 text-teal-500" />
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight arabic-text">
                   {topic?.title}
                 </h1>
               </div>
             </div>
-            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl leading-relaxed">
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium max-w-2xl leading-relaxed" style={{ fontFamily: 'var(--font-latin)' }}>
               {topic?.desc ||
                 "Pilih level permainan di bawah ini untuk memulai latihan interaktifmu."}
             </p>

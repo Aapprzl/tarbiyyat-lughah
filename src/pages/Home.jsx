@@ -73,7 +73,7 @@ const Home = () => {
           className="relative flex flex-col gap-4 md:gap-6 items-center justify-center px-4 md:px-0 text-center max-w-4xl z-20 md:py-20"
         >
           {/* Badge */}
-          <div className="bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 animate-fade-in backdrop-blur-md">
+          <div className="bg-teal-500/10 border border-teal-500/20 text-teal-700 dark:text-teal-300 px-3 py-1 md:px-4 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 animate-fade-in backdrop-blur-md" style={{ fontFamily: 'var(--font-latin)' }}>
              Platform Belajar Bahasa Arab Modern
           </div>
 
@@ -86,7 +86,7 @@ const Home = () => {
             </h2>
           </div>
 
-          <p className="font-medium text-slate-600 dark:text-slate-400 text-base md:text-xl max-w-2xl leading-relaxed mt-4 md:mt-4 drop-shadow-sm px-4 md:px-0">
+          <p className="font-medium text-slate-600 dark:text-slate-400 text-base md:text-xl max-w-2xl leading-relaxed mt-4 md:mt-4 drop-shadow-sm px-4 md:px-0" style={{ fontFamily: 'var(--font-latin)' }}>
             {config.heroDescription}
           </p>
 
@@ -114,7 +114,7 @@ const Home = () => {
                 <GamepadIcon className="w-5 h-5 text-white group-hover:text-rose-500 transition-colors" />
               </div>
               
-              <span className="relative z-10 text-lg text-slate-900 dark:text-white group-hover:text-white transition-colors">Masuk Arena Game</span>
+              <span className="relative z-10 text-lg text-slate-900 dark:text-white group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-latin)' }}>Masuk Arena Game</span>
             </Link>
           </div>
         </motion.div>
