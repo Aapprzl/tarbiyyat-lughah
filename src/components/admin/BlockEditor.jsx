@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, Image as ImageIcon } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, Image as ImageIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../media/PdfViewer';
 import AudioPlayer from '../media/AudioPlayer';
+import RichTextEditor from '../ui/RichTextEditor';
 
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
     <button 
@@ -30,7 +31,10 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
         return arabicRegex.test(text);
     };
 
-    const getBlockInfo = (type) => {
+    const getBlockInfo = (type, data) => {
+        if (type === 'text' && data?.isRichText) {
+            return { icon: FileText, label: 'Rich Text', color: 'text-emerald-600', bg: 'bg-emerald-50' };
+        }
         switch(type) {
             case 'text': return { icon: Type, label: 'Teks', color: 'text-teal-600', bg: 'bg-teal-50' };
             case 'vocab': return { icon: Table, label: 'Kosakata', color: 'text-indigo-600', bg: 'bg-indigo-50' };
@@ -38,6 +42,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'youtube': return { icon: Youtube, label: 'Video', color: 'text-red-600', bg: 'bg-red-50' };
             case 'audio': return { icon: Music, label: 'Audio', color: 'text-violet-600', bg: 'bg-violet-50' };
             case 'pdf': return { icon: ClipboardList, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
+            case 'richtext': return { icon: FileText, label: 'Rich Text', color: 'text-emerald-600', bg: 'bg-emerald-50' };
             case 'matchup': return { icon: Puzzle, label: 'Match Up', color: 'text-pink-600', bg: 'bg-pink-50' };
             case 'quiz': return { icon: HelpCircle, label: 'Quiz', color: 'text-teal-600', bg: 'bg-teal-50' };
 
@@ -53,8 +58,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
         }
     };
 
-    const getEnhancedInfo = (type) => {
-        const base = getBlockInfo(type);
+    const getEnhancedInfo = (type, data) => {
+        const base = getBlockInfo(type, data);
         // Add specific gradients if not present (extending getBlockInfo for thumbnails)
         const gradients = {
             matchup: 'from-pink-500 to-rose-600',
@@ -73,13 +78,22 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
         return { ...base, gradient: base.gradient || gradients[type] || 'from-slate-400 to-slate-600' };
     };
 
-    const info = getBlockInfo(block.type);
+    const info = getBlockInfo(block.type, block.data);
     const Icon = info.icon;
 
     // Get a preview title for the header
     const getTitlePreview = () => {
         if (block.data.title && block.data.title.trim() !== '') return block.data.title;
-        if (block.type === 'text' && block.data.content) return block.data.content.substring(0, 30) + (block.data.content.length > 30 ? '...' : '');
+        
+        let content = block.data.content || block.data.question || '';
+        if (block.data?.isRichText && content) {
+            content = content.replace(/<[^>]*>?/gm, ''); // Strip HTML tags
+        }
+        
+        if (content && content.trim() !== '') {
+            return content.substring(0, 30) + (content.length > 30 ? '...' : '');
+        }
+        
         return info.label;
     };
 
@@ -217,7 +231,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                         ) : (
                                             <div className={cn(
                                                 "w-full h-full flex items-center justify-center relative bg-gradient-to-br",
-                                                getEnhancedInfo(block.type).gradient
+                                                getEnhancedInfo(block.type, block.data).gradient
                                             )}>
                                                 <div className="absolute inset-0 opacity-10 bg-black/20" />
                                                 <Icon className="w-8 h-8 text-white/80 drop-shadow-md relative z-10" />
@@ -253,7 +267,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                     </div>
                                 </div>
                             </div>
-              {block.type === 'text' && (
+              {(block.type === 'text' && !block.data?.isRichText) && (
                 <div className="space-y-3">
                   <input 
                     type="text" 
@@ -459,6 +473,31 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         <PdfViewer src={block.data.url} height={200} />
                      </div>
                    )}
+                </div>
+              )}
+
+              {/* --- RICH TEXT BLOCK --- */}
+              {(block.type === 'richtext' || (block.type === 'text' && block.data?.isRichText)) && (
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Konten (Opsional)</label>
+                    <input 
+                        type="text" 
+                        placeholder="Bab 1: Pendahuluan..."
+                        className="w-full font-bold text-lg text-slate-900 dark:text-white bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none px-1"
+                        value={block.data.title || ''}
+                        onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Isi Konten</label>
+                    <RichTextEditor 
+                        value={block.data.content || ''}
+                        onChange={(content) => onUpdate({ ...block.data, content })}
+                        placeholder="Tulis materi pembelajaran secara lengkap di sini..."
+                    />
+                  </div>
                 </div>
               )}
 

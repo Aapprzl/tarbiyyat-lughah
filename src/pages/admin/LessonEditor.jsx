@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost, FileText } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -178,8 +178,9 @@ const LessonEditor = () => {
   const addBlockToStage = (stageId, type) => {
     const newBlock = {
       id: Date.now(),
-      type,
-      data: type === 'vocab' ? { items: [{ arab: '', indo: '' }] } 
+      type: type === 'richtext' ? 'text' : type,
+      data: type === 'richtext' ? { title: '', content: '', isRichText: true }
+            : type === 'vocab' ? { items: [{ arab: '', indo: '' }] } 
             : type === 'matchup' ? { title: 'Pasangkan', pairs: [{ id: 1, question: '', answer: '' }] }
             : type === 'quiz' ? { 
                 title: 'Kuis', 
@@ -612,6 +613,7 @@ const LessonEditor = () => {
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={ClipboardList} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'richtext')} icon={FileText} label="Rich Text" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
                                       </>
                                   ) : (
                                       <>

@@ -47,6 +47,7 @@ import {
   Heart,
   LayoutGrid,
   Zap,
+  FileText,
 } from "lucide-react";
 
 const iconMap = {
@@ -756,6 +757,24 @@ const ContentBlock = ({ block }) => {
 
   switch (block.type) {
     case "text": {
+      if (block.data?.isRichText) {
+        return (
+          <div className="px-4 md:px-0">
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+              {block.data?.title && (
+                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
+                  <FileText className="w-6 h-6 text-emerald-500" />
+                  {block.data.title}
+                </h3>
+              )}
+              <div 
+                className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: block.data?.content }}
+              />
+            </div>
+          </div>
+        );
+      }
       const hasArabic = isArabic(block.data.content);
       return (
         <div className="px-4 md:px-0">
@@ -774,6 +793,24 @@ const ContentBlock = ({ block }) => {
             >
               {block.data?.content}
             </div>
+          </div>
+        </div>
+      );
+    }
+    case "richtext": {
+      return (
+        <div className="px-4 md:px-0">
+          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+            {block.data?.title && (
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
+                <FileText className="w-6 h-6 text-emerald-500" />
+                {block.data.title}
+              </h3>
+            )}
+            <div 
+              className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: block.data?.content }}
+            />
           </div>
         </div>
       );
