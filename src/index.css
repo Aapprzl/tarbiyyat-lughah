@@ -108,18 +108,18 @@ h4 {
 }
 
 .arabic-text {
-  font-family: var(--font-arabic) !important;
+  font-family: var(--font-arabic);
   font-size: var(--font-arabic-content-size);
   direction: rtl;
 }
 
 .arabic-title {
-  font-family: var(--font-arabic) !important;
+  font-family: var(--font-arabic);
   font-size: var(--font-arabic-title-size);
 }
 
 .arabic-content {
-  font-family: var(--font-arabic) !important;
+  font-family: var(--font-arabic);
   font-size: var(--font-arabic-content-size);
 }
 .arabic-sidebar {
@@ -134,7 +134,7 @@ h4 {
 
 /* Explicit Utilities to bypass Tailwind Config lag */
 .font-arabic {
-  font-family: var(--font-arabic) !important;
+  font-family: var(--font-arabic);
 }
 
 .dir-rtl {
@@ -147,7 +147,7 @@ h4 {
 }
 
 .arabic-index-topic {
-  font-family: var(--font-arabic) !important;
+  font-family: var(--font-arabic);
   font-size: var(--font-arabic-index-topic-size) !important;
   direction: rtl;
   text-align: left;

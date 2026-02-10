@@ -88,7 +88,7 @@ const GameIndex = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
         <div className="relative">
             <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
             <Trophy className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
@@ -128,12 +128,26 @@ const GameIndex = () => {
                           <IconComp className="w-8 h-8" />
                       </div>
                       <div>
-                          <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2" style={{ fontFamily: 'var(--font-latin)' }}>
+                          <h2 
+                            className={cn(
+                                "text-3xl font-black text-slate-900 dark:text-white tracking-tight mb-2",
+                                isArabic(category.title) ? "arabic-text dir-rtl leading-relaxed py-2" : "font-sans"
+                            )}
+                            dir={isArabic(category.title) ? "rtl" : "ltr"}
+                          >
                               {category.title}
                           </h2>
-                          <p className="text-slate-500 dark:text-slate-400 font-medium max-w-2xl" style={{ fontFamily: 'var(--font-latin)' }}>
-                              {category.desc}
-                          </p>
+                          {category.desc && (
+                            <p 
+                                className={cn(
+                                    "text-slate-500 dark:text-slate-400 font-medium max-w-2xl",
+                                    isArabic(category.desc) ? "arabic-text dir-rtl" : "font-sans"
+                                )}
+                                dir={isArabic(category.desc) ? "rtl" : "ltr"}
+                            >
+                                {category.desc}
+                            </p>
+                          )}
                       </div>
                   </div>
 

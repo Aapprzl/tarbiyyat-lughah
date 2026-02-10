@@ -56,7 +56,7 @@ const Home = () => {
   }, []);
 
   if (loading || !config) return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
       <div className="relative">
         <div className="w-20 h-20 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
         <HomeIcon className="absolute inset-0 m-auto w-8 h-8 text-indigo-500 animate-pulse" />

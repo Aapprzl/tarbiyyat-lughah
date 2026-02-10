@@ -27,7 +27,7 @@ const Layout = () => {
   const isHome = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 relative">
+    <div className="min-h-screen bg-[var(--color-bg-main)] relative">
       {/* Global Background Blobs - Hidden for cleaner look as per request */}
       {/* <div className="fixed top-[-10%] right-[-5%] w-[500px] h-[500px] bg-cyan-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob"></div> */}
       {/* <div className="fixed bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-teal-400/10 rounded-full blur-[100px] pointer-events-none z-0 animate-blob animation-delay-2000"></div> */}
@@ -54,7 +54,7 @@ const Layout = () => {
             
             {/* Footer Style - Synced with page fade to prevent blinking */}
             <footer className={cn(
-                 "relative bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors z-10 w-full",
+                 "relative bg-white/80 dark:bg-[var(--color-bg-main)]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors z-10 w-full",
                  isAdmin ? "py-8" : isHome ? "mt-20 pt-16 pb-8" : "py-8",
                  "mt-auto" // Force sticky bottom
             )}>

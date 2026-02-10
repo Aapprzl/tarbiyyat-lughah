@@ -39,6 +39,7 @@ import {
   Music,
   Keyboard,
   Package, 
+  Gamepad2,
   LineChart, 
   Link2, 
   Rocket, 
@@ -348,7 +349,7 @@ const MaterialDetailContent = () => {
   // Also updated to handle general loading to prevent Header blinking
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
         <div className="relative">
           <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
           {targetItemId ? (
@@ -624,7 +625,13 @@ const MaterialDetailContent = () => {
                         <TypeIcon className="w-3 h-3" />
                         {typeInfo.label}
                       </div>
-                      <h3 className="font-bold text-slate-900 dark:text-white leading-tight line-clamp-2 min-h-[2.5em] text-sm">
+                      <h3 
+                        className={cn(
+                          "font-bold text-slate-900 dark:text-white line-clamp-2 min-h-[2.5em] text-sm",
+                          isArabic(item.data?.title || item.title) ? "arabic-text dir-rtl leading-[1.4] py-0.5" : "font-sans leading-tight"
+                        )}
+                        dir={isArabic(item.data?.title || item.title) ? "rtl" : "ltr"}
+                      >
                         {item.data?.title || item.title || "Untitled"}
                       </h3>
                     </div>

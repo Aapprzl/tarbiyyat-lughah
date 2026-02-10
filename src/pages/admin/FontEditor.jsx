@@ -123,7 +123,7 @@ const FontEditor = () => {
                             </div>
                             <p 
                                 className={cn(
-                                    "text-2xl dir-rtl arabic-content",
+                                    "text-2xl dir-rtl",
                                     localConfig.fontFamily === font.name ? "text-white" : "text-slate-900 dark:text-white"
                                 )}
                                 style={{ fontFamily: font.style }}
@@ -234,7 +234,7 @@ const FontEditor = () => {
                     
                     <div className="p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors">
                         <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-2">Konten {localConfig.contentSize}</p>
-                        <p className={cn(localConfig.contentSize, "text-slate-900 dark:text-white leading-relaxed dir-rtl arabic-content")} style={{ fontFamily: fontStyle }}>
+                        <p className={cn(localConfig.contentSize, "text-slate-900 dark:text-white leading-relaxed dir-rtl")} style={{ fontFamily: fontStyle }}>
                            التَّرْبِيَّةُ اللُّغَوِيَّةُ
                         </p>
                     </div>

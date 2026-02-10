@@ -41,10 +41,10 @@ const Library = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
         <div className="relative">
-          <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
-          <LibraryIcon className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
+          <div className="w-20 h-20 border-4 border-sky-500/20 border-t-sky-500 rounded-full animate-spin"></div>
+          <LibraryIcon className="absolute inset-0 m-auto w-8 h-8 text-sky-500 animate-pulse" />
         </div>
       </div>
     );
@@ -59,11 +59,11 @@ const Library = () => {
       <div className="max-w-7xl mx-auto mb-12 flex flex-col lg:flex-row items-center gap-6">
         {/* Search */}
         <div className="relative w-full lg:w-96 group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-teal-500 transition-colors" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-sky-500 transition-colors" />
           <input 
             type="text"
             placeholder="Cari judul buku..."
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white outline-none focus:border-teal-500/50 focus:ring-4 focus:ring-teal-500/5 transition-all shadow-sm"
+            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/5 transition-all shadow-sm"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
           />
@@ -78,7 +78,7 @@ const Library = () => {
               className={cn(
                 "px-6 py-4 rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[10px] transition-all",
                 activeCategory === cat 
-                  ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" 
+                  ? "bg-sky-500 text-white shadow-lg shadow-sky-500/20" 
                   : "bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-slate-700"
               )}
             >
@@ -91,13 +91,13 @@ const Library = () => {
         <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
           <button 
             onClick={() => setViewMode('shelf')}
-            className={cn("p-2 rounded-xl transition-all", viewMode === 'shelf' ? "bg-white dark:bg-slate-800 shadow-sm text-teal-500" : "text-slate-400")}
+            className={cn("p-2 rounded-xl transition-all", viewMode === 'shelf' ? "bg-white dark:bg-slate-800 shadow-sm text-sky-500" : "text-slate-400")}
           >
             <LayoutGrid className="w-5 h-5" />
           </button>
           <button 
             onClick={() => setViewMode('list')}
-            className={cn("p-2 rounded-xl transition-all", viewMode === 'list' ? "bg-white dark:bg-slate-800 shadow-sm text-teal-500" : "text-slate-400")}
+            className={cn("p-2 rounded-xl transition-all", viewMode === 'list' ? "bg-white dark:bg-slate-800 shadow-sm text-sky-500" : "text-slate-400")}
           >
             <List className="w-5 h-5" />
           </button>
@@ -147,21 +147,22 @@ const Library = () => {
                   viewMode === 'list' && "text-left flex-1"
                 )}>
                   <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[9px] font-black uppercase tracking-widest rounded-md">
+                    <span className="px-2 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-[9px] font-black uppercase tracking-widest rounded-md">
                       {book.category}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black font-arabic text-slate-900 dark:text-white mb-1 leading-tight line-clamp-1" dir="rtl">{book.titleAr}</h3>
+                  <h3 className="text-2xl font-black font-arabic text-slate-900 dark:text-white mb-1 leading-[2] py-2 line-clamp-1" dir="rtl">{book.titleAr}</h3>
                   <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 truncate">{book.titleId}</h4>
                   
                   <a 
                     href={book.pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-teal-500 dark:hover:bg-teal-500 hover:text-white transition-all shadow-xl shadow-slate-900/10 active:scale-95 group/btn"
+                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-sky-500 dark:hover:bg-sky-500 hover:text-white transition-all shadow-xl shadow-slate-900/10 active:scale-95 group/btn"
                   >
                     <BookOpen className="w-4 h-4 group-hover/btn:rotate-12 transition-transform" />
-                    Buka Buku <ChevronRight className="w-4 h-4" />
+                    <span className="font-arabic text-lg mt-1 mr-1">اقرأ الكتاب</span>
+                    <ChevronRight className="w-4 h-4" />
                   </a>
                 </div>
               </motion.div>

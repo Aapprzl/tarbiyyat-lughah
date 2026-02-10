@@ -20,6 +20,8 @@ const iconMap = {
   Play: GamepadIcon
 };
 
+const isArabic = (text) => /[\u0600-\u06FF]/.test(text || "");
+
 const MaterialIndex = () => {
   const [sections, setSections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,7 @@ const MaterialIndex = () => {
 
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
         <div className="relative">
             <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
             <Library className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
@@ -105,7 +107,13 @@ const MaterialIndex = () => {
                 })()}
               </div>
               <div>
-                <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight" style={{ fontFamily: 'var(--font-latin)' }}>
+                <h2 
+                  className={cn(
+                    "text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight",
+                    isArabic(section.title) ? "arabic-text dir-rtl leading-relaxed py-2" : "font-sans"
+                  )}
+                  dir={isArabic(section.title) ? "rtl" : "ltr"}
+                >
                   {section.title}
                 </h2>
                 {section.desc && (
@@ -143,6 +151,7 @@ const MaterialIndex = () => {
 
 // Story Card Component
 const StoryCard = ({ topic, index, isLocked }) => {
+  const hasArabic = isArabic(topic.title);
   const cardVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { 
@@ -204,7 +213,13 @@ const StoryCard = ({ topic, index, isLocked }) => {
 
           {/* Title Overlay on Banner */}
           <div className="absolute bottom-0 left-0 right-0 p-6">
-            <h3 className="text-xl md:text-2xl font-black text-white leading-tight line-clamp-2 drop-shadow-lg arabic-text">
+            <h3 
+              className={cn(
+                "text-xl md:text-2xl font-black text-white drop-shadow-lg",
+                hasArabic ? "arabic-text dir-rtl leading-[1.4] py-1" : "font-sans leading-tight"
+              )}
+              dir={hasArabic ? "rtl" : "ltr"}
+            >
               {topic.title}
             </h3>
           </div>
@@ -230,7 +245,7 @@ const StoryCard = ({ topic, index, isLocked }) => {
             )}
           >
             <BookOpen className="w-4 h-4" />
-            <span style={{ fontFamily: 'var(--font-latin)' }}>{isLocked ? "Terkunci" : "Baca Cerita"}</span>
+            <span className={cn(isLocked ? "font-sans" : "font-arabic text-lg mt-0.5")}>{isLocked ? "Terkunci" : "اقرأ القصة"}</span>
             {!isLocked && <MoveRight className="w-4 h-4" />}
           </button>
         </div>
