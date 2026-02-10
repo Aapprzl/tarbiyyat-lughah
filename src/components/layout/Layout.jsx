@@ -54,11 +54,11 @@ const Layout = () => {
             
             {/* Footer Style - Synced with page fade to prevent blinking */}
             <footer className={cn(
-                 "relative bg-white/80 dark:bg-[var(--color-bg-main)]/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 transition-colors z-10 w-full",
+                 "relative bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800/50 transition-colors z-10 w-full",
                  isAdmin ? "py-8" : isHome ? "mt-20 pt-16 pb-8" : "py-8",
                  "mt-auto" // Force sticky bottom
             )}>
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-600 via-cyan-500 to-teal-500 opacity-80"></div>
+              <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-teal-500/50 to-transparent"></div>
 
               <div className="max-w-7xl mx-auto px-6">
                 {!isAdmin ? (
