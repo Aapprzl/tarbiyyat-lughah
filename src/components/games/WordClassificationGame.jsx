@@ -32,15 +32,41 @@ const WordClassificationGame = ({ data }) => {
   }, []);
   
   // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
+  const audioRefs = useRef({});
 
-  const playSound = (soundRef) => {
+  useEffect(() => {
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
+  }, []);
+
+  const playSound = (soundKey) => {
     if (isMuted) return;
-    soundRef.current.currentTime = 0;
-    soundRef.current.play().catch(() => {});
-  }
+    const audio = audioRefs.current[soundKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
+  };
   
   const questions = data?.questions || [];
   const currentQuestion = questions[currentQuestionIndex];
@@ -96,7 +122,7 @@ const WordClassificationGame = ({ data }) => {
 
 
   const handleStart = () => {
-    playSound(clickSound);
+    playSound('click');
     setGameState('playing');
     setScore(0);
     setTimeLeft(data?.timeLimit || 60);
@@ -120,7 +146,7 @@ const WordClassificationGame = ({ data }) => {
 
   const handleAnswer = (selectedType) => {
     if (!currentQuestion || feedback) return;
-    playSound(clickSound);
+    playSound('click');
     if (!isTimerActive) setIsTimerActive(true);
 
     if (currentQuestion.type === selectedType) {
@@ -130,7 +156,7 @@ const WordClassificationGame = ({ data }) => {
       setScore(prev => prev + points);
       setCombo(prev => prev + 1);
       setFeedback({ type: 'correct' });
-      playSound(successSound);
+      playSound('success');
 
       setTimeout(() => {
         setFeedback(null);
@@ -141,7 +167,7 @@ const WordClassificationGame = ({ data }) => {
       // WRONG
       setCombo(0);
       setFeedback({ type: 'wrong' });
-      playSound(errorSound);
+      playSound('error');
 
       setTimeout(() => {
         setFeedback(null);
@@ -205,7 +231,7 @@ const WordClassificationGame = ({ data }) => {
                      whileHover={{ rotate: 180 }}
                      transition={{ duration: 0.5 }}
                      onClick={() => {
-                        playSound(clickSound);
+                        playSound('click');
                         setGameState('playing');
                      }} 
                      className="p-1.5 md:p-2 text-slate-400 hover:text-indigo-500 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5 rounded-lg transition-all shadow-sm"
@@ -400,7 +426,7 @@ const WordClassificationGame = ({ data }) => {
 
                    <button 
                       onClick={() => {
-                         playSound(clickSound);
+                         playSound('click');
                          handleStart();
                       }}
                       className="w-full max-w-[280px] md:max-w-sm py-4 md:py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl md:rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest shadow-2xl transition-all hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-2 overflow-hidden group"

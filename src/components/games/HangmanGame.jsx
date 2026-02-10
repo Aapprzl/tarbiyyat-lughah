@@ -33,9 +33,7 @@ const HangmanGame = ({ data }) => {
     const maxMistakes = 6;
 
     // Audio Refs
-    const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-    const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-    const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
+    const audioRefs = useRef({});
 
     useEffect(() => {
         const muted = window.localStorage.getItem('gameMuted') === 'true';
@@ -43,12 +41,38 @@ const HangmanGame = ({ data }) => {
         if (data?.questions) {
             initGame(data.questions);
         }
+
+        const sounds = {
+            success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+            error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+            click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+        };
+
+        const initialisedSounds = {};
+        Object.entries(sounds).forEach(([key, url]) => {
+            const audio = new Audio(url);
+            audio.preload = 'auto';
+            initialisedSounds[key] = audio;
+        });
+
+        audioRefs.current = initialisedSounds;
+
+        return () => {
+            Object.values(audioRefs.current).forEach(audio => {
+                audio.pause();
+                audio.src = '';
+                audio.load();
+            });
+        };
     }, [data]);
 
-    const playSound = (soundRef) => {
+    const playSound = (soundKey) => {
         if (isMuted) return;
-        soundRef.current.currentTime = 0;
-        soundRef.current.play().catch(() => {});
+        const audio = audioRefs.current[soundKey];
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
     }
 
     const initGame = (qs) => {
@@ -80,7 +104,7 @@ const HangmanGame = ({ data }) => {
         const newLetters = lettersToGuess.filter(l => !guessedLetters.includes(l));
         if (newLetters.length === 0) return;
 
-        playSound(clickSound);
+        playSound('click');
         const newGuessed = [...guessedLetters, ...newLetters];
         setGuessedLetters(newGuessed);
 
@@ -89,7 +113,7 @@ const HangmanGame = ({ data }) => {
         if (!anyCorrect) {
             const newMistakes = mistakes + 1;
             setMistakes(newMistakes);
-            playSound(errorSound);
+            playSound('error');
             if (newMistakes >= maxMistakes) {
                 setGameState('lost_round');
                 setTimeout(() => nextQuestion(), 2500);
@@ -99,7 +123,7 @@ const HangmanGame = ({ data }) => {
             if (isWin) {
                 setGameState('won_round');
                 setScore(prev => prev + 1);
-                playSound(successSound);
+                playSound('success');
                 confetti({
                     particleCount: 150,
                     spread: 70,

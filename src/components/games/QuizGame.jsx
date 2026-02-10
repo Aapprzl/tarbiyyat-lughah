@@ -26,20 +26,44 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
   const [isAnswered, setIsAnswered] = useState(false); 
   const [isMuted, setIsMuted] = useState(false);
 
+  // Audio Refs
+  const audioRefs = useRef({});
+
   useEffect(() => {
     const muted = window.localStorage.getItem('gameMuted') === 'true';
     setIsMuted(muted);
+
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
   }, []);
 
-  // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-
-  const playSound = (soundRef) => {
+  const playSound = (soundKey) => {
     if (isMuted) return;
-    soundRef.current.currentTime = 0;
-    soundRef.current.play().catch(() => {});
+    const audio = audioRefs.current[soundKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
   }
 
   const toggleMute = () => {
@@ -47,8 +71,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
     setIsMuted(newState);
     window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
     if (!newState) {
-       clickSound.current.currentTime = 0;
-       clickSound.current.play().catch(() => {});
+       playSound('click');
     }
   };
 
@@ -66,27 +89,27 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
     
     setSelectedOptionId(option.id);
     setIsAnswered(true);
-    playSound(clickSound);
+    playSound('click');
 
     if (option.isCorrect) {
       setScore(prev => prev + 1);
-      playSound(successSound);
+      playSound('success');
     } else {
-      playSound(errorSound);
+      playSound('error');
     }
   };
 
   const nextQuestion = () => {
     if (currentIndex < questions.length - 1) {
-      playSound(clickSound);
+      playSound('click');
       setCurrentIndex(prev => prev + 1);
       setSelectedOptionId(null);
       setIsAnswered(false);
     } else {
-      playSound(clickSound);
+      playSound('click');
       setShowResult(true);
       if (score >= questions.length * 0.7) {
-        playSound(successSound);
+        playSound('success');
         confetti({
           particleCount: 150,
           spread: 70,
@@ -98,7 +121,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
   };
 
   const resetGame = () => {
-    playSound(clickSound);
+    playSound('click');
     setCurrentIndex(0);
     setScore(0);
     setShowResult(false);

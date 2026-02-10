@@ -28,20 +28,44 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
     const [gameState, setGameState] = useState('playing'); // playing, finished
     const [isMuted, setIsMuted] = useState(false);
 
+    // Audio Refs
+    const audioRefs = useRef({});
+
     useEffect(() => {
         const muted = window.localStorage.getItem('gameMuted') === 'true';
         setIsMuted(muted);
+
+        const sounds = {
+            success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+            error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+            click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+        };
+
+        const initialisedSounds = {};
+        Object.entries(sounds).forEach(([key, url]) => {
+            const audio = new Audio(url);
+            audio.preload = 'auto';
+            initialisedSounds[key] = audio;
+        });
+
+        audioRefs.current = initialisedSounds;
+
+        return () => {
+            Object.values(audioRefs.current).forEach(audio => {
+                audio.pause();
+                audio.src = '';
+                audio.load();
+            });
+        };
     }, []);
 
-    // Audio Refs
-    const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-    const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-    const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-
-    const playSound = (soundRef) => {
+    const playSound = (soundKey) => {
         if (isMuted) return;
-        soundRef.current.currentTime = 0;
-        soundRef.current.play().catch(() => {});
+        const audio = audioRefs.current[soundKey];
+        if (audio) {
+            audio.currentTime = 0;
+            audio.play().catch(() => {});
+        }
     }
 
     const toggleMute = () => {
@@ -49,8 +73,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
         setIsMuted(newState);
         window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
         if (!newState) {
-            clickSound.current.currentTime = 0;
-            clickSound.current.play().catch(() => {});
+            playSound('click');
         }
     };
 
@@ -114,12 +137,12 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
 
         setMatches(newMatches);
         setAvailableAnswers(newPool);
-        playSound(clickSound);
+        playSound('click');
     };
 
     const handleItemClick = (item) => {
         if (isSubmitted || gameState === 'finished') return;
-        playSound(clickSound);
+        playSound('click');
         if (!selectedItem) {
             setSelectedItem(item);
             return;
@@ -223,11 +246,11 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
         setScore(correctCount);
         setIsSubmitted(true);
         if (correctCount === pairs.length) {
-            playSound(successSound);
+            playSound('success');
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#0d9488', '#14b8a6', '#5eead4'] });
             setTimeout(() => setGameState('finished'), 2000);
         } else {
-            playSound(errorSound);
+            playSound('error');
         }
     };
 
@@ -252,7 +275,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                 </div>
                 <button 
                     onClick={() => {
-                        playSound(clickSound);
+                        playSound('click');
                         resetGame();
                     }}
                     className="w-full max-w-sm py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 overflow-hidden group"
@@ -517,7 +540,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                          {!isSubmitted ? (
                              <button 
                                 onClick={() => {
-                                    playSound(clickSound);
+                                    playSound('click');
                                     handleSubmit();
                                 }} 
                                 disabled={Object.keys(matches).length === 0}
@@ -530,7 +553,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
                          ) : (
                              <button 
                                 onClick={() => {
-                                    playSound(clickSound);
+                                    playSound('click');
                                     resetGame();
                                 }} 
                                 className="w-full sm:w-80 py-4 md:py-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl md:rounded-[2rem] font-black text-xs md:text-sm uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 shadow-xl"

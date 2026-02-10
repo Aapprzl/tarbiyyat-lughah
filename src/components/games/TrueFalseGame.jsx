@@ -25,28 +25,45 @@ const TrueFalseGame = ({ questions = [], title = "Kilat Bahasa" }) => {
   const [isMuted, setIsMuted] = useState(false);
   const timerRef = useRef(null);
 
+  // Audio Refs
+  const audioRefs = useRef({});
+
   useEffect(() => {
     const muted = window.localStorage.getItem('gameMuted') === 'true';
     setIsMuted(muted);
+
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+      timerTick: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
   }, []);
 
-  // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-  const timerTickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'));
-
-  useEffect(() => {
-    if (gameState === 'playing' && questions.length > 0) {
-      startTimer();
-    }
-    return () => clearInterval(timerRef.current);
-  }, [currentIndex, gameState]);
-
-  const playSound = (soundRef) => {
+  const playSound = (soundKey) => {
     if (isMuted) return;
-    soundRef.current.currentTime = 0;
-    soundRef.current.play().catch(() => {});
+    const audio = audioRefs.current[soundKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
   }
 
   const toggleMute = () => {
@@ -65,7 +82,7 @@ const TrueFalseGame = ({ questions = [], title = "Kilat Bahasa" }) => {
           handleAnswer(null); // Timeout is wrong answer
           return 0;
         }
-        if (prev <= 4) playSound(timerTickSound);
+        if (prev <= 4) playSound('timerTick');
         return prev - 1;
       });
     }, 1000);
@@ -85,7 +102,7 @@ const TrueFalseGame = ({ questions = [], title = "Kilat Bahasa" }) => {
       const addedScore = 10 + (streak * 2); // Bonus for streaks
       setScore(prev => prev + addedScore);
       setStreak(prev => prev + 1);
-      playSound(successSound);
+      playSound('success');
       if (streak > 2) {
           confetti({
               particleCount: 40,
@@ -96,7 +113,7 @@ const TrueFalseGame = ({ questions = [], title = "Kilat Bahasa" }) => {
       }
     } else {
       setStreak(0);
-      playSound(errorSound);
+      playSound('error');
     }
 
     setTimeout(() => {

@@ -28,26 +28,44 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   const [showCelebration, setShowCelebration] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
+  // Audio Refs
+  const audioRefs = useRef({});
+
   useEffect(() => {
     const muted = window.localStorage.getItem('gameMuted') === 'true';
     setIsMuted(muted);
+
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
   }, []);
 
-  // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-
-  useEffect(() => {
-    if (questions && questions.length > 0) {
-      loadQuestion(0);
-    }
-  }, [questions]);
-
-  const playSound = (soundRef) => {
+  const playSound = (soundKey) => {
     if (isMuted) return;
-    soundRef.current.currentTime = 0;
-    soundRef.current.play().catch(() => {});
+    const audio = audioRefs.current[soundKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
   }
 
   const toggleMute = () => {
@@ -55,8 +73,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
     setIsMuted(newState);
     window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
     if (!newState) {
-      clickSound.current.currentTime = 0;
-      clickSound.current.play().catch(() => {});
+       playSound('click');
     }
   };
 
@@ -71,7 +88,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
     if (index >= questions.length) {
       setShowCelebration(true);
       if (score >= (questions.length * 10) * 0.7) {
-        playSound(successSound);
+        playSound('success');
         confetti({
           particleCount: 150,
           spread: 70,
@@ -118,7 +135,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
 
   const handleLetterClick = (letter, source) => {
     if (isCorrect) return;
-    playSound(clickSound);
+    playSound('click');
 
     if (source === 'pool') {
       const firstEmptyIndex = selectedLetters.findIndex(l => l === null);
@@ -159,7 +176,7 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
 
     if (userAnswer === correctAnswer) {
       setIsCorrect(true);
-      playSound(successSound);
+      playSound('success');
       
       // Auto-advance ke soal berikutnya setelah 1.5 detik
       setTimeout(() => {
@@ -167,18 +184,18 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
         loadQuestion(currentIndex + 1);
       }, 1500);
     } else {
-      playSound(errorSound);
+      playSound('error');
     }
   };
 
   const handleNext = () => {
-    playSound(clickSound);
+    playSound('click');
     setScore(s => s + 10);
     loadQuestion(currentIndex + 1);
   };
 
   const handleReset = () => {
-     playSound(clickSound);
+     playSound('click');
      if (!currentQuestion) return;
      
      let answer = currentQuestion.answer.replace(/\s/g, '');
@@ -195,6 +212,12 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
      setSelectedLetters(Array(letters.length).fill(null));
      setIsCorrect(false);
   };
+
+  useEffect(() => {
+    if (questions && questions.length > 0) {
+      loadQuestion(0);
+    }
+  }, [questions]);
 
   if (!questions || questions.length === 0) {
      return (

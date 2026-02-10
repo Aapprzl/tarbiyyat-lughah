@@ -48,6 +48,7 @@ import {
   LayoutGrid,
   Zap,
   FileText,
+  CloudRain,
 } from "lucide-react";
 
 const iconMap = {
@@ -72,6 +73,7 @@ import QuizGame from "../components/games/QuizGame";
 import AnagramGame from "../components/games/AnagramGame";
 import TrueFalseGame from "../components/games/TrueFalseGame";
 import UnjumbleGame from "../components/games/UnjumbleGame";
+import WordRainGame from "../components/games/WordRainGame";
 import SpinWheelGame from "../components/games/SpinWheelGame";
 import WordClassificationGame from "../components/games/WordClassificationGame";
 import HarakatGame from "../components/games/HarakatGame";
@@ -1003,6 +1005,8 @@ const ContentBlock = ({ block }) => {
         return <MemoryGame pairs={block.data.pairs} title={block.data.title} />;
     case 'hangman':
         return <HangmanGame data={block.data} />;
+    case 'wordrain':
+        return <WordRainGame data={block.data} title={block.data.title} />;
     default:
       return null;
   }

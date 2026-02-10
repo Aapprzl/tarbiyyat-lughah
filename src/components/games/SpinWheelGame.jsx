@@ -7,20 +7,44 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
   const [result, setResult] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
 
+  // Audio Refs
+  const audioRefs = useRef({});
+
   useEffect(() => {
     const muted = window.localStorage.getItem('gameMuted') === 'true';
     setIsMuted(muted);
+
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
   }, []);
 
-  // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
-
-  const playSound = (soundRef) => {
+  const playSound = (soundKey) => {
     if (isMuted) return;
-    soundRef.current.currentTime = 0;
-    soundRef.current.play().catch(() => {});
+    const audio = audioRefs.current[soundKey];
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
+    }
   }
 
   const toggleMute = () => {
@@ -28,8 +52,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
     setIsMuted(newState);
     window.localStorage.setItem('gameMuted', newState ? 'true' : 'false');
     if (!newState) {
-      clickSound.current.currentTime = 0;
-      clickSound.current.play().catch(() => {});
+      playSound('click');
     }
   };
   
@@ -137,7 +160,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
       
       setIsSpinning(true);
       setResult(null);
-      playSound(clickSound);
+      playSound('click');
 
       // Random huge velocity
       velocityRef.current = Math.random() * 0.3 + 0.4; // 0.4 to 0.7 rad/frame
@@ -154,7 +177,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
               animationRef.current = requestAnimationFrame(animate);
           } else {
               setIsSpinning(false);
-              playSound(successSound);
+              playSound('success');
               calculateResult();
           }
       };

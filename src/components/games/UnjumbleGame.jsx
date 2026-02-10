@@ -17,19 +17,43 @@ const UnjumbleGame = ({ data }) => {
   const [isMuted, setIsMuted] = useState(false);
 
   // Audio Refs
-  const successSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3'));
-  const errorSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3'));
-  const clickSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'));
+  const audioRefs = useRef({});
 
   useEffect(() => {
-     const muted = window.localStorage.getItem('gameMuted') === 'true';
-     setIsMuted(muted);
+    const muted = window.localStorage.getItem('gameMuted') === 'true';
+    setIsMuted(muted);
+
+    const sounds = {
+      success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
+    };
+
+    const initialisedSounds = {};
+    Object.entries(sounds).forEach(([key, url]) => {
+      const audio = new Audio(url);
+      audio.preload = 'auto';
+      initialisedSounds[key] = audio;
+    });
+
+    audioRefs.current = initialisedSounds;
+
+    return () => {
+      Object.values(audioRefs.current).forEach(audio => {
+        audio.pause();
+        audio.src = '';
+        audio.load();
+      });
+    };
   }, []);
 
-  const playSound = (soundRef) => {
+  const playSound = (soundKey) => {
      if (isMuted) return;
-     soundRef.current.currentTime = 0;
-     soundRef.current.play().catch(e => console.log('Audio Blocked'));
+     const audio = audioRefs.current[soundKey];
+     if (audio) {
+       audio.currentTime = 0;
+       audio.play().catch(e => console.log('Audio Blocked'));
+     }
   }
 
   // Helper to detect Arabic
@@ -76,7 +100,7 @@ const UnjumbleGame = ({ data }) => {
   };
 
   const handleWordClick = (word, source) => {
-    playSound(clickSound);
+    playSound('click');
     if (isCorrect === true) return; // Prevent creating mess after correct
 
     setIsCorrect(null); // Reset validation state on interaction
@@ -102,7 +126,7 @@ const UnjumbleGame = ({ data }) => {
       if (formedSentence === targetSentence) {
           setIsCorrect(true);
           setScore(s => s + 10);
-          playSound(successSound);
+          playSound('success');
           
           setTimeout(() => {
              if (currentQuestionIndex + 1 < questions.length) {
@@ -113,7 +137,7 @@ const UnjumbleGame = ({ data }) => {
           }, 1500);
       } else {
           setIsCorrect(false);
-          playSound(errorSound);
+          playSound('error');
       }
   };
 
@@ -123,7 +147,7 @@ const UnjumbleGame = ({ data }) => {
   };
 
   const handleReset = () => {
-      playSound(clickSound);
+      playSound('click');
       loadQuestion(currentQuestionIndex);
   };
 
@@ -273,7 +297,7 @@ const UnjumbleGame = ({ data }) => {
                             </button>
                             <button 
                                 onClick={() => {
-                                    playSound(clickSound);
+                                    playSound('click');
                                     checkAnswer();
                                 }}
                                 disabled={selectedWords.length === 0}
