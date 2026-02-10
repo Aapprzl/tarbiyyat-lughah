@@ -144,14 +144,14 @@ const UnjumbleGame = ({ data }) => {
   const currentQ = questions[currentQuestionIndex];
 
   return (
-    <div className="w-full max-w-4xl mx-auto my-8 font-sans">
-       <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden min-h-[600px] flex flex-col">
+    <div className="w-full max-w-4xl mx-auto my-0 font-sans px-0 md:px-0">
+       <div className="relative bg-[var(--color-bg-card)] rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl border-x-0 md:border-4 border-[var(--color-border)] overflow-hidden min-h-[600px] flex flex-col">
           
           {/* Decorative Top Border */}
           <div className="h-2 w-full bg-gradient-to-r from-emerald-400 to-indigo-500"></div>
 
           {/* Header Bar */}
-          <div className="bg-slate-50 dark:bg-slate-800/50 px-8 py-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-700">
+          <div className="bg-[var(--color-bg-muted)]/50 backdrop-blur-sm px-8 py-4 flex items-center justify-between border-b border-[var(--color-border)]">
              <div className="flex items-center gap-3">
                   <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400">
                       <Puzzle className="w-5 h-5" />

@@ -1,29 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Trash2, ChevronRight, Diamond, Crosshair, CheckSquare, Sliders, Orbit, X, Trophy, Gamepad as GamepadIcon, BookOpen } from 'lucide-react';
+import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Trash2, ChevronRight, Diamond, Crosshair, CheckSquare, Sliders, Orbit, X, Trophy, Gamepad as GamepadIcon, BookOpen, Puzzle, Dices, Joystick, Swords, Crown, Ghost, Brain, Heart, Gem, Medal, Zap, Star } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { Link } from 'react-router-dom';
 
 const iconMap = {
-  Gamepad2: Trophy, 
-  Star: Award, 
-  Box: Package, 
-  Activity: LineChart, 
-  Hash: Link2, 
-  Zap: Rocket, 
-  Bookmark: Pocket, 
-  Layout: LayoutGrid, 
-  Flag: Milestone, 
-  Target: Crosshair, 
-  ListChecks: CheckSquare, 
-  Settings: Sliders, 
-  Globe: Orbit, 
-  Sparkles: Diamond,
-  PlayCircle: GamepadIcon,
-  Play: GamepadIcon,
+  Trophy: Trophy,
+  Gamepad: GamepadIcon,
+  Puzzle: Puzzle,
+  Rocket: Rocket,
+  Target: Crosshair,
+  Zap: Zap,
+  Award: Award,
+  Star: Star,
+  Dices: Dices,
+  Joystick: Joystick,
+  Swords: Swords,
+  Shield: Milestone, // Using Milestone as Shield if Shield is missing or for Variety
+  Crown: Crown,
+  Ghost: Ghost,
+  Brain: Brain,
+  Heart: Heart,
+  Diamond: Gem,
+  Medal: Medal,
+  // Fallbacks
+  Gamepad2: Trophy,
+  Box: Package,
   BookOpen: BookOpen
 };
 
@@ -246,7 +251,7 @@ const AdminGames = () => {
                                 <div>
                                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Ikon</label>
                                   <div className="grid grid-cols-4 gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto">
-                                     {Object.keys(iconMap).map(iconName => {
+                                     {Object.keys(iconMap).filter(k => !['Gamepad2', 'Box', 'BookOpen'].includes(k)).map(iconName => {
                                         const IconComp = iconMap[iconName];
                                         const isSelected = categoryForm.icon === iconName;
                                         return (
@@ -255,11 +260,12 @@ const AdminGames = () => {
                                               type="button"
                                               onClick={() => setCategoryForm({ ...categoryForm, icon: iconName })}
                                               className={cn(
-                                                  "aspect-square rounded-lg flex items-center justify-center transition-colors",
+                                                  "aspect-square rounded-lg flex items-center justify-center transition-colors px-1",
                                                   isSelected 
                                                     ? "bg-teal-600 text-white" 
                                                     : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                                               )}
+                                              title={iconName}
                                            >
                                               <IconComp className="w-5 h-5" />
                                            </button>

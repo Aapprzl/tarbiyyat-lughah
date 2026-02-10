@@ -169,8 +169,8 @@ const HarakatGame = ({ data }) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-xl border border-slate-200 dark:border-white/10 flex flex-col overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto md:px-0">
+      <div className="bg-[var(--color-bg-card)] rounded-none md:rounded-[2.5rem] shadow-none md:shadow-xl border-x-0 md:border border-[var(--color-border)] flex flex-col overflow-hidden">
         {/* Animated Top Bar */}
         <div className="h-2 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-400 animate-gradient-x" />
 
@@ -179,7 +179,7 @@ const HarakatGame = ({ data }) => {
           showKeyboard ? "pb-4 md:pb-6" : "pb-10 md:pb-20"
         )}>
           {/* Header */}
-          <div className="flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-white/5 p-4 md:p-8 gap-4 bg-slate-50/50 dark:bg-black/10">
+          <div className="flex flex-col md:flex-row items-center justify-between border-b border-[var(--color-border)] p-4 md:p-8 gap-4 bg-[var(--color-bg-muted)]/50 dark:bg-black/10">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-teal-400 to-teal-600 rounded-2xl md:rounded-3xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
                   <Keyboard className="w-6 h-6 md:w-8 md:h-8" />
@@ -197,11 +197,11 @@ const HarakatGame = ({ data }) => {
               <div className="flex items-center gap-2 md:gap-4">
                 <button 
                   onClick={toggleMute}
-                  className="p-2 md:p-3 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 text-slate-500 hover:text-orange-500 transition-colors"
+                  className="p-2 md:p-3 bg-[var(--color-bg-card)] rounded-xl md:rounded-2xl shadow-sm border border-[var(--color-border)] text-slate-500 hover:text-orange-500 transition-colors"
                 >
                   {isMuted ? <VolumeX className="w-4 h-4 md:w-5 md:h-5" /> : <Volume2 className="w-4 h-4 md:w-5 md:h-5" />}
                 </button>
-                <div className="px-4 md:px-6 py-2 md:py-3 bg-white dark:bg-slate-800 rounded-xl md:rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 font-black text-[10px] md:text-xs text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                <div className="px-4 md:px-6 py-2 md:py-3 bg-[var(--color-bg-card)] rounded-xl md:rounded-2xl shadow-sm border border-[var(--color-border)] font-black text-[10px] md:text-xs text-slate-500 uppercase tracking-widest whitespace-nowrap">
                   Soal {currentIdx + 1} <span className="text-slate-300 mx-1">/</span> {questions.length}
                 </div>
               </div>

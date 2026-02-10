@@ -201,7 +201,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
   }
 
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] overflow-hidden flex flex-col items-center p-6">
+    <div className="bg-[var(--color-bg-card)] rounded-none md:rounded-2xl shadow-none md:shadow-sm border-x-0 md:border border-[var(--color-border)] overflow-hidden flex flex-col items-center p-6">
         
         <div className="w-full flex items-center justify-between mb-6 px-4">
             <h3 className="text-xl font-bold text-[var(--color-text-main)] flex items-center gap-2">

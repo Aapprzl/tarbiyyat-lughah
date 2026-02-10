@@ -158,7 +158,7 @@ const Library = () => {
                     href={book.pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-sky-500 dark:hover:bg-sky-500 hover:text-white transition-all shadow-xl shadow-slate-900/10 active:scale-95 group/btn"
+                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-sky-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-sky-600 transition-all shadow-xl shadow-sky-500/10 active:scale-95 group/btn"
                   >
                     <BookOpen className="w-4 h-4 group-hover/btn:rotate-12 transition-transform" />
                     <span className="font-arabic text-lg mt-1 mr-1">اقرأ الكتاب</span>

@@ -1,20 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Library, BookOpen, Telescope, MoveRight, Lock, Image as ImageIcon, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Gamepad as GamepadIcon } from 'lucide-react';
+import {
+  Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone,
+  CheckCircle2, Lock, ChevronRight, Search, Play, Trophy, Puzzle, Dices, Joystick, Swords, Crown,
+  Ghost, Brain, Heart, Gem, Medal, Zap, Star, Gamepad as GamepadIcon, Crosshair, BookOpen, MoveRight
+} from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen: Library, 
-  Box: Package, 
-  Activity: LineChart, 
-  Hash: Link2, 
-  Star: Award, 
-  Zap: Rocket, 
-  Bookmark: Pocket, 
-  Layout: LayoutGrid, 
-  Flag: Milestone, 
+  Trophy: Trophy,
+  Gamepad: GamepadIcon,
+  Puzzle: Puzzle,
+  Rocket: Rocket,
+  Target: Crosshair,
+  Zap: Zap,
+  Award: Award,
+  Star: Star,
+  Dices: Dices,
+  Joystick: Joystick,
+  Swords: Swords,
+  Shield: Milestone,
+  Crown: Crown,
+  Ghost: Ghost,
+  Brain: Brain,
+  Heart: Heart,
+  Diamond: Gem,
+  Medal: Medal,
+  // Existing ones
+  BookOpen: Library,
+  Star_Old: Award,
+  Box: Package,
+  Activity: LineChart,
+  Hash: Link2,
+  Zap_Old: Rocket,
+  Bookmark: Pocket,
+  Layout: LayoutGrid,
+  Flag: Milestone,
   Smile: Heart,
   PlayCircle: GamepadIcon,
   Play: GamepadIcon
@@ -212,7 +235,7 @@ const StoryCard = ({ topic, index, isLocked }) => {
           )}
 
           {/* Title Overlay on Banner */}
-          <div className="absolute bottom-0 left-0 right-0 p-6">
+          <div className="absolute bottom-0 left-0 right-0 px-6 pb-3 pt-10 bg-gradient-to-t from-black/60 to-transparent">
             <h3 
               className={cn(
                 "text-xl md:text-2xl font-black text-white drop-shadow-lg",

@@ -1,25 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library } from 'lucide-react';
+import {
+    Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
+    Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star
+} from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 const iconMap = {
-  BookOpen: Library, 
-  Box: Package, 
-  Activity: LineChart, 
-  Hash: Link2, 
-  Star: Award, 
-  Zap: Rocket, 
-  Bookmark: Pocket, 
-  Layout: LayoutGrid, 
-  Flag: Milestone, 
+  Trophy: Trophy,
+  Gamepad: GamepadIcon,
+  Puzzle: Puzzle,
+  Rocket: Rocket,
+  Target: Crosshair, // Or Crosshair if added to imports
+  Zap: Zap,
+  Award: Award,
+  Star: Star,
+  Dices: Dices,
+  Joystick: Joystick,
+  Swords: Swords,
+  Shield: ShieldCheck, // Assuming ShieldCheck is the intended icon for 'Shield'
+  Crown: Crown,
+  Ghost: Ghost,
+  Brain: Brain,
+  Heart: Heart,
+  Diamond: Gem,
+  Medal: Medal,
+  // Fallbacks
+  BookOpen: Library,
+  Box: Package,
+  Activity: LineChart,
+  Hash: Link2,
+  Bookmark: Pocket,
+  Layout: LayoutGrid,
+  Flag: Milestone,
   Smile: Heart,
   PlayCircle: GamepadIcon,
   Play: GamepadIcon,
-  Target: Crosshair, 
-  ListChecks: CheckSquare, 
   Settings: Sliders, 
   Globe: Orbit,
   Gamepad2: Trophy
@@ -90,8 +108,8 @@ const GameIndex = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">
         <div className="relative">
-            <div className="w-20 h-20 border-4 border-teal-500/20 border-t-teal-500 rounded-full animate-spin"></div>
-            <Trophy className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
+            <div className="w-20 h-20 border-4 border-rose-500/20 border-t-rose-500 rounded-full animate-spin"></div>
+            <Trophy className="absolute inset-0 m-auto w-8 h-8 text-rose-500 animate-pulse" />
         </div>
       </div>
     );
@@ -124,7 +142,7 @@ const GameIndex = () => {
               <section key={category.id} className="relative">
                   {/* Category Header */}
                   <div className="flex items-center gap-6 mb-10">
-                      <div className="w-16 h-16 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-teal-500/20 flex-shrink-0">
+                      <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-rose-500/20 flex-shrink-0">
                           <IconComp className="w-8 h-8" />
                       </div>
                       <div>

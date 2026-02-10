@@ -83,6 +83,7 @@ const WordClassificationGame = ({ data }) => {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
+             clearInterval(timer);
              handleFinish();
              return 0;
           }
@@ -91,7 +92,7 @@ const WordClassificationGame = ({ data }) => {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [gameState, timeLeft]);
+  }, [gameState, isTimerActive]);
 
 
   const handleStart = () => {
@@ -163,14 +164,14 @@ const WordClassificationGame = ({ data }) => {
   if (!data) return null;
 
   return (
-    <div className="w-full max-w-3xl mx-auto my-4 md:my-8 px-2 md:px-0">
-       <div className="relative bg-white dark:bg-slate-900/60 backdrop-blur-xl rounded-[2rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden min-h-[clamp(400px,65vh,550px)] flex flex-col select-none">
+    <div className="w-full max-w-3xl mx-auto my-0 md:my-8 px-0 md:px-0">
+       <div className="relative bg-[var(--color-bg-card)] backdrop-blur-xl rounded-none md:rounded-[2rem] shadow-none md:shadow-2xl border-x-0 md:border-4 border-[var(--color-border)] overflow-hidden min-h-[clamp(400px,65vh,550px)] flex flex-col select-none">
           
           {/* Animated Gradient Top Bar */}
           <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-violet-600 animate-gradient-x" />
 
           {/* Premium Header - More Compact */}
-          <div className="px-5 md:px-8 py-4 md:py-5 flex items-center justify-between border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-black/10">
+          <div className="px-5 md:px-8 py-4 md:py-5 flex items-center justify-between border-b border-[var(--color-border)] bg-[var(--color-bg-muted)]/50 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                   <div className="w-8 h-8 md:w-11 md:h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg md:rounded-xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
                       <Star className="w-4 h-4 md:w-5 md:h-5 fill-current" />
@@ -194,7 +195,7 @@ const WordClassificationGame = ({ data }) => {
                      className={cn(
                         "p-1.5 md:p-2 rounded-lg transition-all border",
                         isMuted 
-                          ? "text-slate-400 bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/5" 
+                          ? "text-slate-400 bg-[var(--color-bg-muted)]/50 border-[var(--color-border)]" 
                           : "text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100 dark:border-indigo-500/20 shadow-sm"
                      )}
                   >
@@ -228,7 +229,7 @@ const WordClassificationGame = ({ data }) => {
                   <motion.div 
                     animate={{ y: [0, -10, 0] }}
                     transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                    className="w-20 h-20 md:w-28 md:h-28 bg-white dark:bg-slate-800 rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center justify-center mb-6 relative border-2 border-slate-100 dark:border-slate-700"
+                    className="w-20 h-20 md:w-28 md:h-28 bg-[var(--color-bg-card)] rounded-[1.5rem] md:rounded-[2rem] shadow-2xl flex items-center justify-center mb-6 relative border-2 border-[var(--color-border)]"
                   >
                       <div className="absolute inset-0 bg-indigo-500/10 rounded-[1.5rem] md:rounded-[2rem] blur-xl" />
                       <Star className="w-10 h-10 md:w-14 md:h-14 text-indigo-500 fill-indigo-500/20" />

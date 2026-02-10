@@ -252,13 +252,13 @@ const AnagramGame = ({ questions = [], title = "Anagram" }) => {
   if (!currentQuestion) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 md:px-0 py-6">
-      <div className="relative bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden select-none">
+    <div className="w-full max-w-4xl mx-auto px-0 md:px-0 py-0 md:py-6">
+      <div className="relative bg-[var(--color-bg-card)] backdrop-blur-xl rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl border-x-0 md:border-4 border-[var(--color-border)] overflow-hidden select-none">
         {/* Decorative Top Bar */}
         <div className="h-2 w-full bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-600" />
 
         {/* Header Context */}
-        <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800/50 gap-6 bg-slate-50/50 dark:bg-black/10">
+        <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-[var(--color-border)] gap-6 bg-[var(--color-bg-muted)]/50 backdrop-blur-sm">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-teal-500/30">
               <Shuffle className="w-8 h-8" />

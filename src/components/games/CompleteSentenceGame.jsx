@@ -243,13 +243,13 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
   if (!currentSegments.length) return null;
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-2 md:px-0 py-6">
-      <div className="relative bg-white dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] shadow-2xl border-4 border-slate-100 dark:border-slate-800 overflow-hidden select-none">
+    <div className="w-full max-w-4xl mx-auto px-0 md:px-0 py-0 md:py-6">
+      <div className="relative bg-[var(--color-bg-card)] backdrop-blur-xl rounded-none md:rounded-[2.5rem] shadow-none md:shadow-2xl border-x-0 md:border-4 border-[var(--color-border)] overflow-hidden select-none">
         {/* Decorative Top Bar */}
         <div className="h-2 w-full bg-gradient-to-r from-blue-400 via-sky-500 to-indigo-500" />
 
         {/* Header Context */}
-        <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-slate-100 dark:border-slate-800/50 gap-6 bg-slate-50/50 dark:bg-black/10">
+        <div className="px-6 md:px-12 py-8 flex flex-col md:flex-row items-center justify-between border-b border-[var(--color-border)] gap-6 bg-[var(--color-bg-muted)]/50 backdrop-blur-sm">
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-3xl flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
               <MessageSquare className="w-8 h-8" />
@@ -268,11 +268,11 @@ const CompleteSentenceGame = ({ questions = [], title = "Lengkapi Kalimat" }) =>
           <div className="flex items-center gap-3">
             <button 
               onClick={toggleMute}
-              className="p-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 text-slate-500 hover:text-sky-500 transition-colors"
+              className="p-3 bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] text-slate-500 hover:text-sky-500 transition-colors"
             >
               {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
             </button>
-            <div className="px-6 py-3 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-white/5 font-black text-xs text-slate-500 uppercase tracking-widest">
+            <div className="px-6 py-3 bg-[var(--color-bg-card)] rounded-2xl shadow-sm border border-[var(--color-border)] font-black text-xs text-slate-500 uppercase tracking-widest">
                Kalimat {currentIndex + 1} <span className="text-slate-300 mx-1">/</span> {questions.length}
             </div>
           </div>

@@ -646,7 +646,7 @@ const MaterialDetailContent = () => {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="mx-4 md:mx-0 p-12 md:p-20 text-center bg-teal-50 dark:bg-teal-900/10 rounded-[3rem] border border-teal-100 dark:border-teal-900/30"
+          className="mx-4 md:mx-0 p-8 md:p-20 text-center bg-teal-50 dark:bg-teal-900/10 rounded-[2.5rem] md:rounded-[3rem] border border-teal-100 dark:border-teal-900/30"
         >
           <AlertCircle className="w-16 h-16 text-teal-400 mx-auto mb-8" />
           <h4 className="text-3xl font-black text-teal-900 dark:text-teal-100 mb-4 tracking-tight">
@@ -659,7 +659,7 @@ const MaterialDetailContent = () => {
         </motion.div>
       ) : isJson ? (
         /* STRUCTURED JSON CONTENT */
-        <div className="space-y-16 px-4 md:px-0">
+        <div className="space-y-16 px-0 md:px-0">
           {displayData.map((stage, stageIdx) => (
             <motion.div
               key={stage.id || stageIdx}
@@ -741,28 +741,30 @@ const ContentBlock = ({ block }) => {
     case "text": {
       const hasArabic = isArabic(block.data.content);
       return (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
-          {block.data?.title && (
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
-              <ClipboardList className="w-6 h-6 text-teal-500" />
-              {block.data.title}
-            </h3>
-          )}
-          <div 
-            className={cn(
-                "prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap",
-                hasArabic && "arabic-content dir-rtl"
+        <div className="px-4 md:px-0">
+          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+            {block.data?.title && (
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
+                <ClipboardList className="w-6 h-6 text-teal-500" />
+                {block.data.title}
+              </h3>
             )}
-          >
-            {block.data?.content}
+            <div 
+              className={cn(
+                  "prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap",
+                  hasArabic && "arabic-content dir-rtl"
+              )}
+            >
+              {block.data?.content}
+            </div>
           </div>
         </div>
       );
     }
     case "vocab":
       return (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between px-4 md:px-0">
+        <div className="space-y-6 px-4 md:px-0">
+          <div className="flex items-center justify-between px-0 md:px-0">
               <h4 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] font-sans flex items-center gap-3">
                 <Pocket className="w-4 h-4" /> Daftar Kosakata
               </h4>
@@ -771,11 +773,11 @@ const ContentBlock = ({ block }) => {
               </div>
           </div>
           
-          <div className="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+          <div className="bg-[var(--color-bg-card)] rounded-[2.5rem] border border-[var(--color-border)] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700">
+                  <tr className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)]">
                     <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest w-[12%] md:w-[10%] text-center">No</th>
                     <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest text-right">Kata / Frasa (Arab)</th>
                     <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Arti (Indo)</th>
@@ -822,8 +824,9 @@ const ContentBlock = ({ block }) => {
     case "alert": {
       const hasArabic = isArabic(block.data.content);
       return (
-        <div className="bg-teal-50 dark:bg-teal-900/10 border-l-8 border-teal-500 p-8 rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
-          <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
+        <div className="px-4 md:px-0">
+          <div className="bg-teal-500/5 border-l-8 border-teal-500 p-8 rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
+          <div className="w-12 h-12 bg-[var(--color-bg-card)] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
             <AlertCircle className="w-6 h-6 text-teal-500" />
           </div>
           <div className="flex-1">
@@ -838,11 +841,12 @@ const ContentBlock = ({ block }) => {
             </p>
           </div>
         </div>
+      </div>
       );
     }
     case "youtube":
       return (
-        <div className="space-y-6">
+        <div className="space-y-6 px-4 md:px-0">
           {block.data?.title && (
             <h4 className="text-xs font-black text-red-500 uppercase tracking-[0.3em] flex items-center gap-3">
               <Youtube className="w-4 h-4" /> {block.data.title}
@@ -878,7 +882,7 @@ const ContentBlock = ({ block }) => {
       );
     case "pdf":
       return (
-        <div className="space-y-6">
+        <div className="space-y-6 px-4 md:px-0">
           <div className="flex items-center justify-between px-4 md:px-0">
             <h4 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] flex items-center gap-3">
               <ClipboardList className="w-4 h-4" />{" "}
@@ -901,10 +905,12 @@ const ContentBlock = ({ block }) => {
       );
     case "audio":
       return (
-        <AudioPlayer
-          src={block.data?.url}
-          title={block.data?.title || "Audio Pembelajaran"}
-        />
+        <div className="px-4 md:px-0">
+          <AudioPlayer
+            src={block.data?.url}
+            title={block.data?.title || "Audio Pembelajaran"}
+          />
+        </div>
       );
     case "matchup":
       return (
