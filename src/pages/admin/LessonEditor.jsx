@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost, FileText, CloudRain } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost, FileText, CloudRain, Mountain } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -203,6 +203,14 @@ const LessonEditor = () => {
             : type === 'memory' ? { title: 'Permainan Memori', pairs: [{ id: 1, question: '', answer: '' }] }
             : type === 'hangman' ? { title: 'Tebak Huruf', questions: [] }
             : type === 'wordrain' ? { targetCategory: 'Isim (Kata Benda)', correctWords: ['كِتَابٌ', 'قَلَمٌ', 'بَيْتٌ'], distractorWords: ['يَأْكُلُ', 'يَشْرَبُ', 'عَلَى'], timeLimit: 60 }
+            : type === 'camelrace' ? { 
+                title: 'Balap Unta Sahara', 
+                goalDistance: 5000, 
+                questions: [
+                  { question: "Apa arti dari 'كِتَابٌ'?", options: ["Buku", "Meja", "Pena", "Kursi"], correct: "Buku" },
+                  { question: "Pilih kata 'Baitun' dalam bahasa Arab", options: ["بَيْتٌ", "بِنْتٌ", "بَابٌ", "بَلَدٌ"], correct: "بَيْتٌ" }
+                ] 
+              }
             : { title: '', content: '' }
     };
 
@@ -629,6 +637,7 @@ const LessonEditor = () => {
                                            <AddBlockButton onClick={() => addBlockToStage(stage.id, 'memory')} icon={LayoutGrid} label="Memori" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'hangman')} icon={Ghost} label="Algojo" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordrain')} icon={CloudRain} label="Hujan Kata" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
+                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'camelrace')} icon={Mountain} label="Balap Unta" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
                                         </>
                                   )}
                           </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
-    Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain
+    Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain, Mountain
 } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,6 +67,7 @@ const getTypeInfo = (type) => {
         case 'memory': return { label: 'Memori', color: 'violet', icon: LayoutGrid, gradientItems: 'from-violet-500/10 to-fuchsia-500/10' };
         case 'hangman': return { label: 'Algojo', color: 'rose', icon: Ghost, gradientItems: 'from-rose-500/10 to-slate-500/10' };
         case 'wordrain': return { label: 'Hujan Kata', color: 'sky', icon: CloudRain, gradientItems: 'from-sky-500/10 to-indigo-500/10' };
+        case 'camelrace': return { label: 'Balap Unta', color: 'amber', icon: Mountain, gradientItems: 'from-amber-500/10 to-orange-500/10' };
         default: return { label: 'Lainnya', color: 'slate', icon: Layers, gradientItems: 'from-slate-500/10 to-gray-500/10' };
     }
 };

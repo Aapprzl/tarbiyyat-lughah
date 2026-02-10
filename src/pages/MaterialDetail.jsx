@@ -49,6 +49,7 @@ import {
   Zap,
   FileText,
   CloudRain,
+  Mountain,
 } from "lucide-react";
 
 const iconMap = {
@@ -79,6 +80,7 @@ import WordClassificationGame from "../components/games/WordClassificationGame";
 import HarakatGame from "../components/games/HarakatGame";
 import MemoryGame from "../components/games/MemoryGame";
 import HangmanGame from "../components/games/HangmanGame";
+import CamelRaceGame from "../components/games/CamelRaceGame";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
 
@@ -182,6 +184,20 @@ const getTypeInfo = (type) => {
         color: "violet",
         icon: LayoutGrid,
         gradient: "from-violet-500 to-fuchsia-600",
+      };
+    case "wordrain":
+      return {
+        label: "Hujan Kata",
+        color: "sky",
+        icon: CloudRain,
+        gradient: "from-sky-400 to-indigo-600",
+      };
+    case "camelrace":
+      return {
+        label: "Balap Unta",
+        color: "amber",
+        icon: Mountain,
+        gradient: "from-amber-400 to-orange-600",
       };
     case "hangman":
       return {
@@ -1007,6 +1023,8 @@ const ContentBlock = ({ block }) => {
         return <HangmanGame data={block.data} />;
     case 'wordrain':
         return <WordRainGame data={block.data} title={block.data.title} />;
+    case 'camelrace':
+        return <CamelRaceGame data={block.data} title={block.data.title} />;
     default:
       return null;
   }
