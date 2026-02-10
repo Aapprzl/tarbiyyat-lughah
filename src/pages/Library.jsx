@@ -51,32 +51,51 @@ const Library = () => {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-32 px-4 md:px-6 overflow-hidden">
+    <div className="min-h-screen pt-20 md:pt-24 pb-24 md:pb-32 px-4 md:px-6 overflow-hidden">
       {/* Hero Header Removed as per user request */}
 
 
       {/* Control Bar */}
-      <div className="max-w-7xl mx-auto mb-12 flex flex-col lg:flex-row items-center gap-6">
-        {/* Search */}
-        <div className="relative w-full lg:w-96 group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-sky-500 transition-colors" />
-          <input 
-            type="text"
-            placeholder="Cari judul buku..."
-            className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl pl-14 pr-6 py-4 text-slate-900 dark:text-white outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/5 transition-all shadow-sm"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-          />
+      <div className="max-w-7xl mx-auto mb-8 md:mb-12 flex flex-col lg:flex-row items-stretch lg:items-center gap-4 md:gap-6">
+        {/* Search & View Switcher Mobile Row */}
+        <div className="flex items-center gap-3">
+            {/* Search */}
+            <div className="relative flex-1 group">
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-sky-500 transition-colors" />
+                <input 
+                    type="text"
+                    placeholder="Cari buku..."
+                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl pl-12 pr-4 py-3.5 md:py-4 text-sm md:text-base text-slate-900 dark:text-white outline-none focus:border-sky-500/50 focus:ring-4 focus:ring-sky-500/5 transition-all shadow-sm"
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                />
+            </div>
+
+            {/* View Switcher Mobile */}
+            <div className="flex lg:hidden bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
+                <button 
+                    onClick={() => setViewMode('shelf')}
+                    className={cn("p-2.5 rounded-xl transition-all", viewMode === 'shelf' ? "bg-white dark:bg-slate-800 shadow-sm text-sky-500" : "text-slate-400")}
+                >
+                    <LayoutGrid className="w-4 h-4" />
+                </button>
+                <button 
+                    onClick={() => setViewMode('list')}
+                    className={cn("p-2.5 rounded-xl transition-all", viewMode === 'list' ? "bg-white dark:bg-slate-800 shadow-sm text-sky-500" : "text-slate-400")}
+                >
+                    <List className="w-4 h-4" />
+                </button>
+            </div>
         </div>
 
         {/* Categories */}
-        <div className="flex-1 w-full overflow-x-auto pb-2 flex items-center gap-3 custom-scrollbar no-scrollbar">
+        <div className="flex-1 overflow-x-auto pb-2 flex items-center gap-2 md:gap-3 custom-scrollbar no-scrollbar scroll-smooth">
           {categories.map(cat => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
               className={cn(
-                "px-6 py-4 rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[10px] transition-all",
+                "px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all",
                 activeCategory === cat 
                   ? "bg-sky-500 text-white shadow-lg shadow-sky-500/20" 
                   : "bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-slate-700"
@@ -87,8 +106,8 @@ const Library = () => {
           ))}
         </div>
 
-        {/* View Switcher */}
-        <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
+        {/* View Switcher Desktop */}
+        <div className="hidden lg:flex bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800">
           <button 
             onClick={() => setViewMode('shelf')}
             className={cn("p-2 rounded-xl transition-all", viewMode === 'shelf' ? "bg-white dark:bg-slate-800 shadow-sm text-sky-500" : "text-slate-400")}
@@ -108,8 +127,10 @@ const Library = () => {
       <div className="max-w-7xl mx-auto">
         {filteredBooks.length > 0 ? (
           <div className={cn(
-            "grid gap-12",
-            viewMode === 'shelf' ? "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5" : "grid-cols-1"
+            "grid",
+            viewMode === 'shelf' 
+                ? "grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-12" 
+                : "grid-cols-1 gap-4 md:gap-6"
           )}>
             {filteredBooks.map((book, idx) => (
               <motion.div
@@ -125,20 +146,20 @@ const Library = () => {
                 {/* Book Representation */}
                 <div className={cn(
                   "relative transition-all duration-500 perspective-1000",
-                  viewMode === 'shelf' ? "w-full aspect-[3/4] mb-6 group-hover:scale-105 group-hover:-translate-y-2" : "w-32 aspect-[3/4] flex-shrink-0 mr-8"
+                  viewMode === 'shelf' ? "w-full aspect-[3/4] mb-4 md:mb-6 group-hover:scale-105 group-hover:-translate-y-2" : "w-20 md:w-32 aspect-[3/4] flex-shrink-0 mr-4 md:mr-8"
                 )}>
                   {/* Book Spine Shadow / 3D Effect */}
                   <div className="absolute inset-0 bg-slate-900 rounded-lg translate-y-2 translate-x-2 blur-xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
                   
                   {/* Cover */}
-                  <div className="absolute inset-0 rounded-lg overflow-hidden border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-slate-800 shadow-2xl preserve-3d group-hover:rotate-y-[-20deg] transition-transform duration-700">
+                  <div className="absolute inset-0 rounded-lg overflow-hidden border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-slate-800 shadow-2xl preserve-3d md:group-hover:rotate-y-[-20deg] transition-transform duration-700">
                     <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
                     {/* Glass Overlay on Cover */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none"></div>
                   </div>
 
                   {/* Book Side (The Page Stack Thickness) */}
-                  <div className="absolute top-0 right-0 h-full w-2 bg-slate-50 dark:bg-slate-700 origin-right rotate-y-[-90deg]"></div>
+                  <div className="absolute top-0 right-0 h-full w-1 md:w-2 bg-slate-50 dark:bg-slate-700 origin-right rotate-y-[-90deg]"></div>
                 </div>
 
                 {/* Content */}
@@ -146,23 +167,23 @@ const Library = () => {
                   "text-center w-full",
                   viewMode === 'list' && "text-left flex-1"
                 )}>
-                  <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
-                    <span className="px-2 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-[9px] font-black uppercase tracking-widest rounded-md">
+                  <div className="flex items-center justify-center lg:justify-start gap-2 mb-1.5 md:mb-2 text-center lg:text-left">
+                    <span className="px-2 py-0.5 bg-sky-500/10 text-sky-600 dark:text-sky-400 text-[8px] md:text-[9px] font-black uppercase tracking-widest rounded-md mx-auto lg:mx-0">
                       {book.category}
                     </span>
                   </div>
-                  <h3 className="text-2xl font-black font-arabic text-slate-900 dark:text-white mb-1 leading-[2] py-2 line-clamp-1" dir="rtl">{book.titleAr}</h3>
-                  <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6 truncate">{book.titleId}</h4>
+                  <h3 className="text-xl md:text-2xl font-black font-arabic text-slate-900 dark:text-white mb-0.5 md:mb-1 leading-[2] py-1 md:py-2 line-clamp-1" dir="rtl">{book.titleAr}</h3>
+                  <h4 className="text-[10px] md:text-sm font-medium text-slate-500 dark:text-slate-400 mb-4 md:mb-6 truncate">{book.titleId}</h4>
                   
                   <a 
                     href={book.pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 w-full py-4 bg-sky-500 text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-sky-600 transition-all shadow-xl shadow-sky-500/10 active:scale-95 group/btn"
+                    className="inline-flex items-center justify-center gap-2 w-full py-3.5 md:py-4 bg-sky-500 text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[8px] md:text-[10px] hover:bg-sky-600 transition-all shadow-xl shadow-sky-500/10 active:scale-95 group/btn"
                   >
-                    <BookOpen className="w-4 h-4 group-hover/btn:rotate-12 transition-transform" />
-                    <span className="font-arabic text-lg mt-1 mr-1">اقرأ الكتاب</span>
-                    <ChevronRight className="w-4 h-4" />
+                    <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover/btn:rotate-12 transition-transform" />
+                    <span className="font-arabic text-base md:text-lg mt-0.5 md:mt-1 mr-1">اقرأ الكتاب</span>
+                    <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   </a>
                 </div>
               </motion.div>

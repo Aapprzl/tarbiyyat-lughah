@@ -54,7 +54,7 @@ const getTypeInfo = (type) => {
         case 'matchup': return { label: 'Cocokkan', color: 'pink', icon: Shuffle, gradientItems: 'from-pink-500/10 to-rose-500/10' };
         case 'quiz': return { label: 'Kuis', color: 'emerald', icon: BrainCircuit, gradientItems: 'from-emerald-500/10 to-teal-500/10' };
         case 'anagram': return { label: 'Anagram', color: 'teal', icon: GripVertical, gradientItems: 'from-teal-500/10 to-emerald-500/10' }; // Keeping GripVertical as Tile metaphor
-        case 'completesentence': return { label: 'Lengkapi', color: 'blue', icon: CaseSensitive, gradientItems: 'from-blue-500/10 to-indigo-500/10' };
+        case 'completesentence': return { label: 'Kilat Bahasa', color: 'indigo', icon: Zap, gradientItems: 'from-indigo-500/10 to-azure-500/10' };
         case 'unjumble': return { label: 'Susun', color: 'purple', icon: StretchHorizontal, gradientItems: 'from-purple-500/10 to-violet-500/10' };
         case 'spinwheel': return { label: 'Putar', color: 'indigo', icon: RefreshCcw, gradientItems: 'from-indigo-500/10 to-cyan-500/10' };
         case 'youtube': return { label: 'Video', color: 'red', icon: Youtube, gradientItems: 'from-red-500/10 to-rose-500/10' };
@@ -64,6 +64,8 @@ const getTypeInfo = (type) => {
         case 'text': return { label: 'Bacaan', color: 'teal', icon: BookOpen, gradientItems: 'from-teal-500/10 to-emerald-500/10' };
         case 'wordclassification': return { label: 'Pilahan', color: 'rose', icon: ALargeSmall, gradientItems: 'from-rose-500/10 to-pink-500/10' };
         case 'harakat': return { label: 'Harakat', color: 'teal', icon: Vibrate, gradientItems: 'from-teal-500/10 to-emerald-500/10' };
+        case 'memory': return { label: 'Memori', color: 'violet', icon: BrainCircuit, gradientItems: 'from-violet-500/10 to-fuchsia-500/10' };
+        case 'hangman': return { label: 'Algojo', color: 'rose', icon: Ghost, gradientItems: 'from-rose-500/10 to-red-500/10' };
         default: return { label: 'Materi', color: 'slate', icon: FileText, gradientItems: 'from-slate-500/10 to-gray-500/10' };
     }
 };

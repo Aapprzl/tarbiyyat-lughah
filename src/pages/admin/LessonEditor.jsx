@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Upload } from 'lucide-react';
+import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
 import QuizGame from '../../components/games/QuizGame';
 import AnagramGame from '../../components/games/AnagramGame';
-import CompleteSentenceGame from '../../components/games/CompleteSentenceGame';
+import TrueFalseGame from '../../components/games/TrueFalseGame';
 import UnjumbleGame from '../../components/games/UnjumbleGame';
 import SpinWheelGame from '../../components/games/SpinWheelGame';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
@@ -194,11 +194,13 @@ const LessonEditor = () => {
               }
 
             : type === 'anagram' ? { title: 'Anagram', questions: [{ id: 1, answer: '', clue: '' }] }
-            : type === 'completesentence' ? { title: 'Lengkapi Kalimat', questions: [{ id: 1, text: '' }] }
+            : type === 'completesentence' ? { title: 'Kilat Bahasa', questions: [{ id: 1, text: '', translation: '', isCorrect: true }] }
             : type === 'unjumble' ? { title: 'Susun Kalimat', subtitle: 'Susunlah Kalimat Arab', questions: [{ id: 1, text: '', pattern: 'Kerja + Pelaku + Objek', clue: '' }] }
             : type === 'spinwheel' ? { title: 'Spin the Wheel', items: [{ id: 1, text: '' }, { id: 2, text: '' }] }
             : type === 'wordclassification' ? { title: 'Tebak Jenis Kata', timeLimit: 60, questions: [{ id: 1, text: 'كتاب', type: 'isim' }] }
             : type === 'harakat' ? { title: 'Lengkapi Harakat', subtitle: 'Lengkapi harakat pada kata berikut...', questions: [{ id: 1, text: 'يَأْكُلُ' }] }
+            : type === 'memory' ? { title: 'Permainan Memori', pairs: [{ id: 1, question: '', answer: '' }] }
+            : type === 'hangman' ? { title: 'Tebak Huruf', questions: [] }
             : { title: '', content: '' }
     };
 
@@ -617,11 +619,13 @@ const LessonEditor = () => {
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'quiz')} icon={HelpCircle} label="Quiz" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
 
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
-                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Type} label="Lengkapi" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Zap} label="Kilat Bahasa" color="text-indigo-600" bg="bg-indigo-50/50" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Susun Kata" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordclassification')} icon={Puzzle} label="Tebak Kata" color="text-rose-600" bg="bg-rose-50 dark:bg-rose-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'harakat')} icon={Keyboard} label="Harakat" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
-                                      </>
+                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'memory')} icon={LayoutGrid} label="Memori" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
+                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'hangman')} icon={Ghost} label="Algojo" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
+                                       </>
                                   )}
                           </div>
                       </div>

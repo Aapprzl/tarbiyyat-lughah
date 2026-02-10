@@ -46,6 +46,7 @@ import {
   Milestone, 
   Heart,
   LayoutGrid,
+  Zap,
 } from "lucide-react";
 
 const iconMap = {
@@ -68,11 +69,13 @@ import AudioPlayer from "../components/media/AudioPlayer";
 import MatchUpGame from "../components/games/MatchUpGame";
 import QuizGame from "../components/games/QuizGame";
 import AnagramGame from "../components/games/AnagramGame";
-import CompleteSentenceGame from "../components/games/CompleteSentenceGame";
+import TrueFalseGame from "../components/games/TrueFalseGame";
 import UnjumbleGame from "../components/games/UnjumbleGame";
 import SpinWheelGame from "../components/games/SpinWheelGame";
 import WordClassificationGame from "../components/games/WordClassificationGame";
 import HarakatGame from "../components/games/HarakatGame";
+import MemoryGame from "../components/games/MemoryGame";
+import HangmanGame from "../components/games/HangmanGame";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
 
@@ -102,10 +105,10 @@ const getTypeInfo = (type) => {
       };
     case "completesentence":
       return {
-        label: "Lengkapi",
-        color: "blue",
-        icon: Type,
-        gradient: "from-blue-400 to-indigo-600",
+        label: "Kilat Bahasa",
+        color: "indigo",
+        icon: Zap,
+        gradient: "from-indigo-500 to-azure-600",
       };
     case "unjumble":
       return {
@@ -166,9 +169,23 @@ const getTypeInfo = (type) => {
     case "harakat":
       return {
         label: "Harakat",
-        color: "teal",
+        color: "orange",
         icon: Keyboard,
-        gradient: "from-teal-400 to-emerald-600",
+        gradient: "from-orange-400 to-amber-600",
+      };
+    case "memory":
+      return {
+        label: "Memori",
+        color: "violet",
+        icon: LayoutGrid,
+        gradient: "from-violet-500 to-fuchsia-600",
+      };
+    case "hangman":
+      return {
+        label: "Tebak Huruf",
+        color: "red",
+        icon: Ghost,
+        gradient: "from-red-500 to-rose-600",
       };
     default:
       return {
@@ -930,7 +947,7 @@ const ContentBlock = ({ block }) => {
       );
     case "completesentence":
       return (
-        <CompleteSentenceGame
+        <TrueFalseGame
           questions={block.data?.questions}
           title={block.data?.title}
         />
@@ -945,6 +962,10 @@ const ContentBlock = ({ block }) => {
       return <WordClassificationGame data={block.data} />;
     case "harakat":
       return <HarakatGame data={block.data} />;
+    case 'memory':
+        return <MemoryGame pairs={block.data.pairs} title={block.data.title} />;
+    case 'hangman':
+        return <HangmanGame data={block.data} />;
     default:
       return null;
   }
