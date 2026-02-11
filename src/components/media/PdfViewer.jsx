@@ -1,6 +1,20 @@
 import React, { useMemo } from 'react';
-import { ClipboardList, AlertCircle } from 'lucide-react';
+import { 
+  ClipboardList, 
+  AlertCircle, 
+  ChevronLeft, 
+  ChevronRight, 
+  Maximize2, 
+  Download,
+  Loader2
+} from 'lucide-react';
 import { useTheme } from '../providers/ThemeProvider';
+import { cn } from '../../utils/cn';
+import * as pdfjs from 'pdfjs-dist';
+
+// Configure PDF.js Worker
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 // Helper: Convert base64 data URL to Blob URL
 const dataUrlToBlobUrl = (dataUrl) => {
@@ -20,6 +34,117 @@ const dataUrlToBlobUrl = (dataUrl) => {
   }
 };
 
+const CanvasPdf = ({ url, containerHeight }) => {
+  const [numPages, setNumPages] = React.useState(null);
+  const [currentPage, setCurrentPage] = React.useState(1);
+  const [loading, setLoading] = React.useState(true);
+  const canvasRef = React.useRef(null);
+  const renderTaskRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const loadPdf = async () => {
+      try {
+        setLoading(true);
+        const loadingTask = pdfjs.getDocument(url);
+        const pdf = await loadingTask.promise;
+        setNumPages(pdf.numPages);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error loading PDF:", err);
+        setLoading(false);
+      }
+    };
+    loadPdf();
+  }, [url]);
+
+  React.useEffect(() => {
+    const renderPage = async () => {
+      if (!numPages) return;
+      
+      try {
+        // Cancel existing render task
+        if (renderTaskRef.current) {
+          renderTaskRef.current.cancel();
+        }
+
+        const loadingTask = pdfjs.getDocument(url);
+        const pdf = await loadingTask.promise;
+        const page = await pdf.getPage(currentPage);
+        
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const context = canvas.getContext('2d');
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+
+        renderTaskRef.current = page.render(renderContext);
+        await renderTaskRef.current.promise;
+      } catch (err) {
+        if (err.name !== 'RenderingCancelledException') {
+          console.error("Error rendering page:", err);
+        }
+      }
+    };
+    renderPage();
+  }, [url, currentPage, numPages]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12" style={{ height: containerHeight }}>
+        <Loader2 className="w-10 h-10 text-teal-500 animate-spin mb-4" />
+        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Menyiapkan Dokumen...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col h-full bg-slate-100 dark:bg-slate-900/50">
+      <div className="flex-1 overflow-auto p-0 flex justify-center scrollbar-hide">
+        <canvas ref={canvasRef} className="shadow-2xl max-w-full h-auto" />
+      </div>
+
+      {/* Modern Compact Controls */}
+      <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div className="flex items-center gap-1">
+          <button 
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full disabled:opacity-30 transition-colors"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <span className="text-xs font-black text-slate-500 min-w-[60px] text-center uppercase tracking-widest">
+            {currentPage} / {numPages}
+          </span>
+          <button 
+            disabled={currentPage >= numPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full disabled:opacity-30 transition-colors"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        <a 
+          href={url} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="flex items-center gap-2 p-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-all font-black uppercase text-[10px] tracking-widest shadow-lg shadow-teal-500/20 active:scale-95"
+        >
+          <Maximize2 className="w-4 h-4" /> Fullscreen
+        </a>
+      </div>
+    </div>
+  );
+};
+
 const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName = 'document.pdf' }) => {
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = React.useState(false);
@@ -32,7 +157,6 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
     const checkMobile = () => {
        const userAgent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
        const mobile = Boolean(userAgent.match(/Android|BlackBerry|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i));
-       // Also check width just in case
        const smallScreen = window.innerWidth < 768;
        setIsMobile(mobile || smallScreen);
     };
@@ -73,42 +197,30 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
     );
   }
 
-  // Mobile Fallback: Direct Button
-  if (isMobile) {
-      return (
-        <div className="bg-[var(--color-bg-card)] rounded-xl border border-[var(--color-border)] p-8 flex flex-col items-center justify-center text-center shadow-sm" style={{ minHeight: 300 }}>
-             <div className="w-20 h-20 bg-red-100 dark:bg-red-900/30 rounded-2xl flex items-center justify-center mb-6 text-red-600 dark:text-red-400">
-                  <ClipboardList className="w-10 h-10" />
-             </div>
-             <h3 className="text-lg font-bold text-[var(--color-text-main)] mb-2">Materi PDF</h3>
-             <p className="text-[var(--color-text-muted)] mb-6 max-w-xs text-sm">
-                 Pratinjau PDF tidak tersedia di tampilan mobile. Silakan buka file untuk membaca.
-             </p>
-             <a 
-                href={blobUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                download={fileName} // Mobile browsers often prefer download for data URIs
-                className="bg-red-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-red-700 transition-transform active:scale-95 shadow-lg shadow-red-600/20 flex items-center"
-             >
-                 Buka File PDF
-             </a>
-        </div>
-      );
-  }
-
-  // Direct Render Mode (Desktop)
+  // Unified Renderer
   return (
-    <div className="bg-[var(--color-bg-card)] rounded-xl overflow-hidden border border-[var(--color-border)] shadow-sm" style={{ height }}>
-      <iframe 
-        src={`${blobUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-        className="w-full h-full bg-white"
-        style={{ 
-          height: '100%',
-          filter: theme === 'dark' ? 'invert(0.9) hue-rotate(180deg)' : 'none'
-        }}
-        title="PDF Viewer"
-      />
+    <div 
+      className={cn(
+        "bg-[var(--color-bg-card)] overflow-hidden transition-all",
+        isMobile 
+          ? "w-full border-y border-[var(--color-border)]" 
+          : "rounded-[2.5rem] border border-[var(--color-border)] shadow-xl hover:shadow-2xl"
+      )} 
+      style={{ height }}
+    >
+      {isMobile ? (
+        <CanvasPdf url={blobUrl} containerHeight={height} />
+      ) : (
+        <iframe 
+          src={`${blobUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+          className="w-full h-full bg-white transition-opacity duration-700"
+          style={{ 
+            height: '100%',
+            filter: theme === 'dark' ? 'invert(0.9) hue-rotate(180deg)' : 'none'
+          }}
+          title="PDF Viewer"
+        />
+      )}
     </div>
   );
 };

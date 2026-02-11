@@ -83,7 +83,7 @@ import HangmanGame from "../components/games/HangmanGame";
 import CamelRaceGame from "../components/games/CamelRaceGame";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
-import { wrapArabicText, isArabic as isArabicText } from "../utils/textUtils";
+import { wrapArabicText, isArabic } from "../utils/textUtils";
 
 const getTypeInfo = (type) => {
   switch (type) {
@@ -784,7 +784,7 @@ const MaterialDetailContent = () => {
   );
 };
 
-// isArabic is now imported as isArabicText
+// isArabic functionality
 
 const ContentBlock = ({ block }) => {
   if (!block || !block.data) return null;
@@ -822,7 +822,7 @@ const ContentBlock = ({ block }) => {
             <div 
               className={cn(
                   "prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap",
-                  isArabicText(block.data.content) && "arabic-content dir-rtl"
+                  isArabic(block.data.content) && "arabic-content dir-rtl"
               )}
             >
               {block.data?.content}
@@ -970,7 +970,7 @@ const ContentBlock = ({ block }) => {
       );
     case "pdf":
       return (
-        <div className="space-y-6 px-4 md:px-0">
+        <div className="space-y-6 md:px-0">
           <div className="flex items-center justify-between px-4 md:px-0">
             <h4 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] flex items-center gap-3">
               <ClipboardList className="w-4 h-4" />{" "}
