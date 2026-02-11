@@ -29,7 +29,8 @@ export const programsService = {
         topics (*)
       `)
       .eq('type', 'curriculum') // Filter only curriculum programs
-      .order('order_index');
+      .order('order_index')
+      .order('order_index', { foreignTable: 'topics' });
     
     if (error) throw error;
     return data || [];
@@ -64,6 +65,7 @@ export const programsService = {
         topics (*)
       `)
       .eq('id', programId)
+      .order('order_index', { foreignTable: 'topics' })
       .single();
     
     if (error) throw error;
@@ -81,6 +83,7 @@ export const programsService = {
         topics (*)
       `)
       .eq('slug', slug)
+      .order('order_index', { foreignTable: 'topics' })
       .single();
     
     if (error) throw error;

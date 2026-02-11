@@ -126,6 +126,7 @@ export const contentService = {
                 if (metadata.description !== undefined) updates.description = metadata.description;
                 if (metadata.thumbnail !== undefined) updates.thumbnail = metadata.thumbnail;
                 if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                if (metadata.order_index !== undefined) updates.order_index = metadata.order_index;
                 await contentServiceV2.topics.update(topicToUpdate, updates);
                 return true;
             }
@@ -147,6 +148,7 @@ export const contentService = {
                 if (metadata.description !== undefined) updates.description = metadata.description;
                 // Note: game_categories does not have a thumbnail column, skipping
                 if (metadata.hasOwnProperty('isLocked')) updates.is_locked = metadata.isLocked;
+                if (metadata.order_index !== undefined) updates.order_index = metadata.order_index;
                 await contentServiceV2.gameCategories.update(catToUpdate, updates);
                 return true;
             }

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Search, Lock, Unlock, X, Gamepad as GamepadIcon } from 'lucide-react';
+import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Search, Lock, Unlock, X, Gamepad as GamepadIcon, ArrowUp, ArrowDown } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -127,6 +127,38 @@ const AdminDashboard = () => {
       }
   };
 
+  const handleMoveTopic = async (sectionId, topicId, direction) => {
+    const allSections = [...curriculum, ...specialPrograms];
+    const section = allSections.find(s => s.id === sectionId);
+    if (!section || !section.topics) return;
+
+    const topicIndex = section.topics.findIndex(t => t.id === topicId);
+    if (topicIndex === -1) return;
+
+    const targetIndex = direction === 'up' ? topicIndex - 1 : topicIndex + 1;
+    if (targetIndex < 0 || targetIndex >= section.topics.length) return;
+
+    setLoading(true);
+    try {
+      const currentTopic = section.topics[topicIndex];
+      const targetTopic = section.topics[targetIndex];
+
+      const currentIdx = currentTopic.order_index !== undefined ? currentTopic.order_index : topicIndex;
+      const targetIdx = targetTopic.order_index !== undefined ? targetTopic.order_index : targetIndex;
+
+      await contentService.updateTopicMetadata(currentTopic.id, { order_index: targetIdx });
+      await contentService.updateTopicMetadata(targetTopic.id, { order_index: currentIdx });
+
+      toast.success('Urutan materi berhasil diperbarui!');
+      await loadData();
+    } catch (err) {
+      console.error("Order update failed:", err);
+      toast.error('Gagal memperbarui urutan materi');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleDeleteTopic = async (topicId) => {
       const ok = await confirm('Hapus materi ini secara permanen?', 'Hapus Materi');
       if (ok) {
@@ -220,6 +252,7 @@ const AdminDashboard = () => {
                         onEdit={() => openEditSection(section)}
                         onDelete={() => handleDeleteSection(section.id)}
                         onDeleteTopic={handleDeleteTopic}
+                        onMoveTopic={handleMoveTopic}
                         onReload={loadData}
                         onAddTopic={() => {
                             setSelectedSection(section.id);
@@ -401,7 +434,7 @@ const AdminDashboard = () => {
 };
 
 // Section Item Component
-const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic, onReload }) => {
+const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopic, onAddTopic, onReload, onMoveTopic }) => {
     const [isOpen, setIsOpen] = useState(false);
     const SectionIcon = iconMap[section.icon] || Library;
     const topicCount = section.topics?.length || 0;
@@ -532,12 +565,32 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         <div className="p-4 bg-slate-50 dark:bg-slate-900/50 space-y-2">
                         
                         {topicCount > 0 ? (
-                            section.topics.map((topic) => (
+                            section.topics.map((topic, index) => (
                                 <div 
                                     key={topic.id} 
                                     className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
                                 >
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
+                                        {/* Reorder Controls */}
+                                        <div className="flex flex-col border-r border-slate-100 dark:border-slate-700 pr-2 mr-1">
+                                            <button 
+                                                onClick={() => onMoveTopic && onMoveTopic(section.id, topic.id, 'up')}
+                                                disabled={index === 0}
+                                                className="p-0.5 text-slate-400 hover:text-teal-600 disabled:opacity-30 transition-colors"
+                                                title="Pindah ke Atas"
+                                            >
+                                                <ArrowUp className="w-3.5 h-3.5" />
+                                            </button>
+                                            <button 
+                                                onClick={() => onMoveTopic && onMoveTopic(section.id, topic.id, 'down')}
+                                                disabled={index === section.topics.length - 1}
+                                                className="p-0.5 text-slate-400 hover:text-teal-600 disabled:opacity-30 transition-colors"
+                                                title="Pindah ke Bawah"
+                                            >
+                                                <ArrowDown className="w-3.5 h-3.5" />
+                                            </button>
+                                        </div>
+
                                         <div className="w-8 h-8 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-lg flex items-center justify-center shrink-0">
                                             <Library className="w-4 h-4" />
                                         </div>
