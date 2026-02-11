@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { createHashRouter, RouterProvider, Navigate, Outlet } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import MaterialIndex from './pages/MaterialIndex';
@@ -27,6 +27,14 @@ import { ThemeProvider } from './components/providers/ThemeProvider';
 
 import Intro from './components/features/Intro';
 import ScrollToTop from './components/ui/ScrollToTop';
+
+// Helper component to wrap routes with ScrollToTop (since RouterProvider doesn't use standard Router wrapper)
+const RouterWrapper = () => (
+  <>
+    <ScrollToTop />
+    <Outlet />
+  </>
+);
 
 function App() {
   const [loading, setLoading] = React.useState(true);
@@ -67,6 +75,43 @@ function App() {
     setShowIntro(false);
   };
 
+  const router = React.useMemo(() => createHashRouter([
+    {
+      element: <RouterWrapper />,
+      children: [
+        {
+          path: "/",
+          element: <Layout />,
+          children: [
+            { index: true, element: <Home /> },
+            { path: "materi", element: <MaterialIndex /> },
+            { path: "permainan", element: <GameIndex /> },
+            { path: "materi/:topicId", element: <MaterialDetail /> },
+            { path: "program/:topicId", element: <MaterialDetail /> },
+            { path: "perpustakaan", element: <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}><Library /></Suspense> },
+            { path: "admin/login", element: <Suspense fallback={null}><LoginPage /></Suspense> },
+            {
+              path: "admin",
+              element: <Suspense fallback={null}><AdminLayout /></Suspense>,
+              children: [
+                { index: true, element: <Navigate to="dashboard" replace /> },
+                { path: "dashboard", element: <AdminDashboard /> },
+                { path: "programs", element: <AdminPrograms /> },
+                { path: "games", element: <AdminGames /> },
+                { path: "home-editor", element: <AdminHomeEditor /> },
+                { path: "library-manager", element: <LibraryManager /> },
+                { path: "intro-editor", element: <IntroEditor /> },
+                { path: "font-editor", element: <FontEditor /> },
+                { path: "edit/:topicId", element: <LessonEditor /> },
+              ]
+            },
+          ]
+        },
+        { path: "*", element: <Navigate to="/" replace /> }
+      ]
+    }
+  ]), []);
+
   if (loading) {
     const isDark = typeof window !== 'undefined' && localStorage.getItem('arp_theme') === 'dark';
     return (
@@ -85,44 +130,14 @@ function App() {
   return (
     <ThemeProvider>
       <ToastProvider>
-      <ConfirmProvider>
-        <FontProvider>
-          {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
-          <Router>
-            <ScrollToTop />
+        <ConfirmProvider>
+          <FontProvider>
+            {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Layout />}>
-                  <Route index element={<Home />} />
-                  <Route path="materi" element={<MaterialIndex />} />
-                  <Route path="permainan" element={<GameIndex />} /> {/* Added public route for games */}
-                  <Route path="materi/:topicId" element={<MaterialDetail />} />
-                  <Route path="program/:topicId" element={<MaterialDetail />} />
-                  <Route path="perpustakaan" element={<Library />} />
-
-                  {/* Admin Routes Integrated */}
-                  <Route path="admin/login" element={<LoginPage />} />
-                  <Route path="admin" element={<AdminLayout />}>
-                    <Route index element={<Navigate to="dashboard" replace />} />
-                    <Route path="dashboard" element={<AdminDashboard />} />
-                    <Route path="programs" element={<AdminPrograms />} />
-                    <Route path="games" element={<AdminGames />} /> {/* Added admin route for games */}
-                    <Route path="home-editor" element={<AdminHomeEditor />} />
-                    <Route path="library-manager" element={<LibraryManager />} />
-                    <Route path="intro-editor" element={<IntroEditor />} />
-                    <Route path="font-editor" element={<FontEditor />} />
-                    <Route path="edit/:topicId" element={<LessonEditor />} />
-                  </Route>
-                </Route>
-
-                {/* Fallback */}
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
+              <RouterProvider router={router} />
             </Suspense>
-          </Router>
-        </FontProvider>
-      </ConfirmProvider>
+          </FontProvider>
+        </ConfirmProvider>
       </ToastProvider>
     </ThemeProvider>
   );

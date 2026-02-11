@@ -44,7 +44,7 @@ const HangmanGame = ({ data }) => {
 
         const sounds = {
             success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
-            error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+            error: 'https://assets.mixkit.co/active_storage/sfx/2873/2873-preview.mp3',
             click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
         };
 

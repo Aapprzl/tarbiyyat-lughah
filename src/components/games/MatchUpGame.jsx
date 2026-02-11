@@ -37,7 +37,7 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
 
         const sounds = {
             success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
-            error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+            error: 'https://assets.mixkit.co/active_storage/sfx/2873/2873-preview.mp3',
             click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
         };
 
@@ -259,28 +259,28 @@ const MatchUpGame = ({ pairs = [], title = "Tantangan Pasangan" }) => {
             <motion.div 
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-[var(--color-bg-card)] rounded-[2.5rem] p-8 md:p-12 text-center shadow-2xl border-4 border-teal-500/20 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[450px] relative overflow-hidden"
+                className="bg-[var(--color-bg-card)] rounded-[2.5rem] p-6 md:p-10 text-center shadow-2xl border-4 border-teal-500/20 max-w-xl mx-auto flex flex-col items-center justify-center min-h-[380px] relative overflow-hidden"
             >
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 to-emerald-500" />
-                <div className="w-28 h-28 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-[2.5rem] flex items-center justify-center mb-8 shadow-xl shadow-teal-500/20 transform rotate-12 transition-transform hover:rotate-0 duration-500 cursor-pointer">
-                    <Trophy className="w-14 h-14 text-white" />
+                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-teal-400 to-emerald-500" />
+                <div className="w-20 h-20 bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-teal-500/20 transform rotate-12 transition-transform hover:rotate-0 duration-500 cursor-pointer">
+                    <Trophy className="w-10 h-10 text-white" />
                 </div>
-                <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-4 uppercase tracking-tighter">Misi Sempurna! 🎉</h2>
-                <p className="text-slate-500 dark:text-slate-400 mb-10 font-medium text-lg leading-relaxed">
+                <h2 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-3 uppercase tracking-tighter">Misi Sempurna! 🎉</h2>
+                <p className="text-slate-500 dark:text-slate-400 mb-8 font-medium text-sm md:text-base leading-relaxed max-w-md">
                     Kamu hebat! Semua pasangan telah terhubung dengan tepat. Terus asah kemampuanmu!
                 </p>
-                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-[2rem] p-10 mb-10 border border-slate-100 dark:border-white/5 w-full max-w-sm shadow-inner group">
-                    <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] mb-3 group-hover:text-teal-500 transition-colors">Hasil Belajar</div>
-                    <div className="text-7xl font-black text-teal-600 dark:text-teal-400 tracking-tighter tabular-nums">{score} <span className="text-2xl text-slate-300 dark:text-slate-600">/</span> {pairs.length}</div>
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 mb-8 border border-slate-100 dark:border-white/5 w-full max-w-xs shadow-inner group">
+                    <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-2 group-hover:text-teal-500 transition-colors">Hasil Belajar</div>
+                    <div className="text-5xl font-black text-teal-600 dark:text-teal-400 tracking-tighter tabular-nums">{score} <span className="text-xl text-slate-300 dark:text-slate-600">/</span> {pairs.length}</div>
                 </div>
                 <button 
                     onClick={() => {
                         playSound('click');
                         resetGame();
                     }}
-                    className="w-full max-w-sm py-5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-3xl font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 overflow-hidden group"
+                    className="w-full max-w-xs py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-black uppercase tracking-widest transition-all shadow-2xl shadow-slate-900/30 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 overflow-hidden group text-xs"
                 >
-                    <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform duration-700" />
+                    <RefreshCcw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" />
                     <span>Mulai Ulang Game</span>
                 </button>
             </motion.div>

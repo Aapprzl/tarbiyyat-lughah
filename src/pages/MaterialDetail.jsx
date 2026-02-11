@@ -846,7 +846,7 @@ const ContentBlock = ({ block }) => {
               </h3>
             )}
             <div 
-              className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[1.8] rictext-content"
+              className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[1.8] richtext-content"
               dangerouslySetInnerHTML={{ __html: block.data?.content }}
             />
           </div>
@@ -866,8 +866,8 @@ const ContentBlock = ({ block }) => {
           </div>
           
           <div className="md:bg-[var(--color-bg-card)] md:rounded-[2.5rem] md:border md:border-[var(--color-border)] overflow-hidden md:shadow-sm md:hover:shadow-xl transition-all duration-500">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto scrollbar-hide [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <table className="w-full text-left border-collapse table-fixed md:table-auto">
                 <thead>
                   <tr className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)]">
                     <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest w-[12%] md:w-[10%] text-center">No</th>

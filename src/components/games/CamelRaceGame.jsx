@@ -303,11 +303,13 @@ const CamelRaceGame = ({ data, title }) => {
                  <div className="absolute top-0 left-0 w-2 h-full bg-amber-500 group-hover:w-4 transition-all duration-300" />
                  <span className="text-[8px] md:text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.2em] mb-1 md:mb-2 block">Tantangan Kecepatan</span>
                  <h2 className={cn(
-                   "text-lg md:text-4xl font-black text-slate-900 dark:text-white px-2 md:px-4 leading-tight",
-                   isArabic(currentQuestion.question) ? "font-arabic leading-relaxed text-2xl md:text-5xl" : ""
-                 )}>
-                   {currentQuestion.question}
-                 </h2>
+                   "text-lg md:text-4xl font-black text-slate-900 dark:text-white px-2 md:px-4 leading-tight transition-all",
+                   isArabic(currentQuestion.question) ? "arabic-content leading-relaxed text-2xl md:text-5xl" : ""
+                 )}
+                 dir={isArabic(currentQuestion.question) ? 'rtl' : 'ltr'}
+               >
+                 {currentQuestion.question}
+               </h2>
                </div>
 
               {/* Options Grid */}
@@ -318,7 +320,8 @@ const CamelRaceGame = ({ data, title }) => {
                     onClick={() => handleAnswer(option)}
                     disabled={selectedOption !== null}
                      className={cn(
-                      "group relative p-3 md:p-5 rounded-xl md:rounded-[2rem] border-2 md:border-4 font-black text-sm md:text-xl uppercase tracking-tight transition-all active:scale-95 text-center overflow-hidden",
+                      "group relative p-3 md:p-5 rounded-xl md:rounded-[2rem] border-2 md:border-4 font-black transition-all active:scale-95 text-center overflow-hidden",
+                      isArabic(option) && "dir-rtl",
                       selectedOption === null 
                         ? "bg-white dark:bg-slate-700 border-amber-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-amber-500 hover:text-amber-700 dark:hover:text-white hover:bg-amber-50 dark:hover:bg-slate-600 shadow-md" 
                         : selectedOption === option 
@@ -331,7 +334,10 @@ const CamelRaceGame = ({ data, title }) => {
                     )}
                   >
                     <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <span className={isArabic(option) ? "font-arabic text-2xl md:text-3xl" : ""}>{option}</span>
+                    <span className={cn(
+                        "transition-all",
+                        isArabic(option) ? "arabic-content text-2xl md:text-3xl" : "text-sm md:text-xl uppercase tracking-tight"
+                    )}>{option}</span>
                     
                     {selectedOption === option && (
                       <div className="absolute top-2 right-2">

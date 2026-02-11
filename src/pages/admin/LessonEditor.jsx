@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
 import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost, FileText, CloudRain, Mountain } from 'lucide-react';
@@ -35,6 +35,52 @@ const LessonEditor = () => {
   const [isSpecialProgram, setIsSpecialProgram] = useState(false);
   const [pickerTab, setPickerTab] = useState('common'); // 'common' or 'game'
   const [lastSavedThumbnail, setLastSavedThumbnail] = useState(''); // Tracking state for cleanup
+  const [isDirty, setIsDirty] = useState(false);
+  const [pristineState, setPristineState] = useState('');
+
+  // Navigation Guard: Block navigation if dirty
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isDirty && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Handle Blocker State
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      const handleBlocked = async () => {
+        const ok = await confirm(
+          "Anda memiliki perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?",
+          "Perubahan Belum Disimpan"
+        );
+        if (ok) {
+          blocker.proceed();
+        } else {
+          blocker.reset();
+        }
+      };
+      handleBlocked();
+    }
+  }, [blocker, confirm]);
+
+  // Browser Navigation Guard: Tab close / refresh
+  useBeforeUnload(
+    React.useCallback(
+      (event) => {
+        if (isDirty) {
+          event.preventDefault();
+        }
+      },
+      [isDirty]
+    )
+  );
+
+  // Helper to get current data snapshot for comparison
+  const getDataSnapshot = () => JSON.stringify({
+    stages,
+    topicTitle,
+    topicDesc,
+    thumbnail
+  });
 
   // Helper to extract URLs (Firebase & Supabase)
   const extractUrls = (content) => {
@@ -146,6 +192,23 @@ const LessonEditor = () => {
     };
     init();
   }, [topicId]);
+
+  // Capture pristine state after loading is done
+  useEffect(() => {
+    if (!loading && !pristineState) {
+      setPristineState(getDataSnapshot());
+    }
+  }, [loading, pristineState]);
+
+  // Set isDirty when content changes relative to pristineState
+  useEffect(() => {
+    if (!loading && pristineState) {
+      const current = getDataSnapshot();
+      const hasPhysicalChanges = current !== pristineState;
+      const hasFilePending = !!thumbnailFile;
+      setIsDirty(hasPhysicalChanges || hasFilePending);
+    }
+  }, [stages, topicTitle, topicDesc, thumbnail, thumbnailFile, pristineState, loading]);
 
   // --- Stage Management ---
 
@@ -399,6 +462,14 @@ const LessonEditor = () => {
     }
     
     setSaving(false);
+    // Reset pristine state and dirty flag
+    setPristineState(JSON.stringify({
+        stages: processedStages,
+        topicTitle,
+        topicDesc,
+        thumbnail: thumbnailUrl
+    }));
+    setIsDirty(false);
     toast.success('Struktur tersimpan! Refresh halaman publik untuk melihat hasil.');
   };
 

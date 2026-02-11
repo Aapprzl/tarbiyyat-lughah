@@ -108,28 +108,28 @@ h4 {
 }
 
 .arabic-text {
-  font-family: var(--font-arabic);
-  font-size: var(--font-arabic-content-size);
+  font-family: var(--font-arabic) !important;
+  font-size: var(--font-arabic-content-size) !important;
   direction: rtl;
 }
 
 .arabic-title {
-  font-family: var(--font-arabic);
-  font-size: var(--font-arabic-title-size);
+  font-family: var(--font-arabic) !important;
+  font-size: var(--font-arabic-title-size) !important;
 }
 
 .arabic-content {
-  font-family: var(--font-arabic);
-  font-size: var(--font-arabic-content-size);
+  font-family: var(--font-arabic) !important;
+  font-size: var(--font-arabic-content-size) !important;
 }
 .arabic-sidebar {
-  font-family: var(--font-arabic);
-  font-size: var(--font-arabic-sidebar-size);
+  font-family: var(--font-arabic) !important;
+  font-size: var(--font-arabic-sidebar-size) !important;
 }
 
 .arabic-sidebar-content {
-  font-family: var(--font-arabic);
-  font-size: var(--font-arabic-sidebar-content-size);
+  font-family: var(--font-arabic) !important;
+  font-size: var(--font-arabic-sidebar-content-size) !important;
 }
 
 /* Explicit Utilities to bypass Tailwind Config lag */

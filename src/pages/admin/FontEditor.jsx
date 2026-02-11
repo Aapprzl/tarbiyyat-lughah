@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Type, Save, Eye, Sparkles, CircleCheckBig, ChevronRight, Monitor, Languages, Hash, Diamond } from 'lucide-react';
-import { useToast } from '../../components/ui/Toast';
+import { useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
+import { useToast, useConfirm } from '../../components/ui/Toast';
 import { useFont } from '../../components/providers/FontProvider';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -38,17 +39,67 @@ const FontEditor = () => {
   const [localConfig, setLocalConfig] = useState(null);
   const [saving, setSaving] = useState(false);
   const toast = useToast();
+  const confirm = useConfirm();
+  const [isDirty, setIsDirty] = useState(false);
+  const [pristineState, setPristineState] = useState('');
+
+  // Navigation Guard: Block navigation if dirty
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isDirty && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Handle Blocker State
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      const handleBlocked = async () => {
+        const ok = await confirm(
+          "Anda memiliki perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?",
+          "Perubahan Belum Disimpan"
+        );
+        if (ok) {
+          blocker.proceed();
+        } else {
+          blocker.reset();
+        }
+      };
+      handleBlocked();
+    }
+  }, [blocker, confirm]);
+
+  // Browser Navigation Guard: Tab close / refresh
+  useBeforeUnload(
+    React.useCallback(
+      (event) => {
+        if (isDirty) {
+          event.preventDefault();
+        }
+      },
+      [isDirty]
+    )
+  );
 
   useEffect(() => {
     if (config && !localConfig) {
       setLocalConfig({ ...config });
+      setPristineState(JSON.stringify(config));
     }
-  }, [config]);
+  }, [config, localConfig]);
+
+  // Detect changes relative to pristine state
+  useEffect(() => {
+    if (localConfig && pristineState) {
+      const current = JSON.stringify(localConfig);
+      setIsDirty(current !== pristineState);
+    }
+  }, [localConfig, pristineState]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
         await updateFontConfig(localConfig);
+        setPristineState(JSON.stringify(localConfig));
+        setIsDirty(false);
         toast.success('Tipografi portal berhasil diperbarui! ✨');
     } catch (err) {
         toast.error('Gagal menyimpan perubahan.');

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../media/PdfViewer';
@@ -556,7 +556,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         
                         <div className="space-y-2">
                           {q.options.map((opt, oIdx) => (
-                            <div key={oIdx} className="flex items-center gap-3">
+                            <div key={opt.id || oIdx} className="flex items-center gap-2">
                               <button 
                                 onClick={() => {
                                   const newQs = [...block.data.questions];
@@ -564,19 +564,22 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                   onUpdate({ ...block.data, questions: newQs });
                                 }}
                                 className={cn(
-                                  "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all",
+                                  "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0",
                                   opt.isCorrect ? "bg-teal-500 border-teal-500 text-white" : "border-slate-300 dark:border-white/10"
                                 )}
                               >
-                                {opt.isCorrect && <div className="w-2 h-2 bg-white rounded-full" />}
+                                {opt.isCorrect && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
                               </button>
                               <input 
                                 type="text" 
                                 placeholder="Pilihan jawaban..."
                                 className={cn(
-                                    "flex-1 bg-white dark:bg-white/5 px-4 py-2 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 transition-all",
+                                    "flex-1 bg-white dark:bg-white/5 px-4 py-2.5 rounded-xl text-xs outline-none border border-transparent focus:border-teal-500/50 transition-all",
                                     isArabic(opt.text) && "arabic-content"
                                 )}
+                                style={{
+                                    direction: isArabic(opt.text) ? 'rtl' : 'ltr'
+                                }}
                                 value={opt.text}
                                 onChange={(e) => {
                                   const newQs = [...block.data.questions];
@@ -584,8 +587,35 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                   onUpdate({ ...block.data, questions: newQs });
                                 }}
                               />
+                              {q.options.length > 2 && (
+                                <button 
+                                  onClick={() => {
+                                    const newQs = [...block.data.questions];
+                                    newQs[qIdx].options = q.options.filter((_, i) => i !== oIdx);
+                                    // If we removed the correct answer, set the first one as correct
+                                    if (opt.isCorrect && newQs[qIdx].options.length > 0) {
+                                      newQs[qIdx].options[0].isCorrect = true;
+                                    }
+                                    onUpdate({ ...block.data, questions: newQs });
+                                  }}
+                                  className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                                  title="Hapus Opsi"
+                                >
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
                             </div>
                           ))}
+                          <button 
+                            onClick={() => {
+                              const newQs = [...block.data.questions];
+                              newQs[qIdx].options = [...q.options, { id: Date.now(), text: '', isCorrect: false }];
+                              onUpdate({ ...block.data, questions: newQs });
+                            }}
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-black text-teal-600 dark:text-teal-400 hover:bg-teal-500/10 rounded-lg transition-all uppercase tracking-widest mt-2"
+                          >
+                             <Plus className="w-3 h-3" /> Tambah Opsi
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -1299,8 +1329,9 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                      type="text"
                                      className={cn(
                                        "w-full bg-transparent text-lg font-bold border-b border-slate-200 dark:border-white/10 pb-1 outline-none",
-                                       isArabic(q.question) && "arabic-content text-right"
-                                     )}
+                                       isArabic(q.question) && "arabic-content text-right transition-all"
+                                      )}
+                                      style={{ direction: isArabic(q.question) ? "rtl" : "ltr" }}
                                      placeholder="Apa arti dari..."
                                      value={q.question || ''}
                                      onChange={(e) => {
@@ -1317,9 +1348,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                          <input 
                                            type="text"
                                            className={cn(
-                                             "w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm pr-10",
-                                             q.correct === opt && opt !== "" ? "border-amber-500 ring-2 ring-amber-500/20" : ""
-                                           )}
+                                             "w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm pr-10 transition-all",
+                                              isArabic(opt) && "arabic-content",
+                                              q.correct === opt && opt !== "" ? "border-amber-500 ring-2 ring-amber-500/20" : ""
+                                            )}
+                                            style={{ direction: isArabic(opt) ? "rtl" : "ltr" }}
                                            placeholder={`Opsi ${oIdx + 1}`}
                                            value={opt}
                                            onChange={(e) => {
@@ -1339,7 +1372,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                               onUpdate({ ...block.data, questions: newQs });
                                            }}
                                            className={cn(
-                                             "absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-all",
+                                             "absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md transition-all z-10",
                                              q.correct === opt && opt !== "" ? "bg-amber-500 text-white" : "text-slate-300 hover:text-amber-500"
                                            )}
                                          >

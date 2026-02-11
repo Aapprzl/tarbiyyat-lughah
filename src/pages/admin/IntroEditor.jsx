@@ -13,14 +13,18 @@ import {
   ChevronRight,
   Sparkles
 } from 'lucide-react';
+import { useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
-import { useToast } from '../../components/ui/Toast';
+import { useToast, useConfirm } from '../../components/ui/Toast';
 import { cn } from '../../utils/cn';
 
 const IntroEditor = () => {
   const { success, error } = useToast();
+  const confirm = useConfirm();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  const [pristineState, setPristineState] = useState('');
   const [config, setConfig] = useState({
     intro_active: true,
     intro_title_ar: '',
@@ -29,11 +33,48 @@ const IntroEditor = () => {
     intro_button_text: ''
   });
 
+  // Navigation Guard: Block navigation if dirty
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      isDirty && currentLocation.pathname !== nextLocation.pathname
+  );
+
+  // Handle Blocker State
+  useEffect(() => {
+    if (blocker.state === "blocked") {
+      const handleBlocked = async () => {
+        const ok = await confirm(
+          "Anda memiliki perubahan yang belum disimpan. Yakin ingin meninggalkan halaman?",
+          "Perubahan Belum Disimpan"
+        );
+        if (ok) {
+          blocker.proceed();
+        } else {
+          blocker.reset();
+        }
+      };
+      handleBlocked();
+    }
+  }, [blocker, confirm]);
+
+  // Browser Navigation Guard: Tab close / refresh
+  useBeforeUnload(
+    React.useCallback(
+      (event) => {
+        if (isDirty) {
+          event.preventDefault();
+        }
+      },
+      [isDirty]
+    )
+  );
+
   useEffect(() => {
     const loadConfig = async () => {
       try {
         const data = await contentService.getIntroConfig();
         setConfig(data);
+        setPristineState(JSON.stringify(data));
       } catch (err) {
         error('Gagal memuat konfigurasi intro');
       } finally {
@@ -43,10 +84,20 @@ const IntroEditor = () => {
     loadConfig();
   }, []);
 
+  // Detect changes relative to pristine state
+  useEffect(() => {
+    if (!loading && pristineState) {
+      const current = JSON.stringify(config);
+      setIsDirty(current !== pristineState);
+    }
+  }, [config, pristineState, loading]);
+
   const handleSave = async () => {
     setSaving(true);
     try {
       await contentService.saveIntroConfig(config);
+      setPristineState(JSON.stringify(config));
+      setIsDirty(false);
       success('Konfigurasi Intro berhasil disimpan!');
     } catch (err) {
       error('Gagal menyimpan konfigurasi');

@@ -35,7 +35,7 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
 
     const sounds = {
       success: 'https://assets.mixkit.co/active_storage/sfx/601/601-preview.mp3',
-      error: 'https://assets.mixkit.co/active_storage/sfx/958/958-preview.mp3',
+      error: 'https://assets.mixkit.co/active_storage/sfx/2873/2873-preview.mp3',
       click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3'
     };
 
@@ -240,14 +240,22 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
 
                {/* Question Text */}
                <h4 
-                  className={`text-2xl md:text-4xl font-black text-slate-800 dark:text-white mb-10 leading-tight ${isArabic(currentQuestion.text) ? 'arabic-content text-right text-3xl md:text-5xl py-4 transition-all' : 'tracking-tighter'}`}
+                  className={cn(
+                    "font-black text-slate-800 dark:text-white mb-10 leading-tight transition-all",
+                    isArabic(currentQuestion.text) 
+                        ? 'arabic-content text-3xl md:text-5xl py-4 text-right' 
+                        : 'text-2xl md:text-4xl tracking-tighter'
+                  )}
                   dir={isArabic(currentQuestion.text) ? 'rtl' : 'ltr'}
                >
                   {currentQuestion.text}
                </h4>
-
+...
                {/* Options Grid */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+               <div className={cn(
+                  "grid grid-cols-1 gap-4 md:gap-6",
+                  currentQuestion.options?.length > 4 ? "md:grid-cols-3" : "md:grid-cols-2"
+               )}>
                   {currentQuestion.options.map((option, idx) => {
                      const isSelected = selectedOptionId === option.id;
                      const isCorrect = option.isCorrect;
@@ -279,19 +287,20 @@ const QuizGame = ({ questions = [], title = "Kuis Pilihan Ganda" }) => {
                          disabled={isAnswered}
                          className={cn(
                            "relative p-5 md:p-6 rounded-[1.5rem] md:rounded-3xl border-2 text-left transition-all flex items-center gap-5 group",
-                           stateClass
+                           stateClass,
+                           isArabic(option.text) && "dir-rtl"
                          )}
                        >
                           {icon}
                           <span className={cn(
-                             "flex-1 font-bold text-lg md:text-xl",
+                             "flex-1 font-bold",
                              isAnswered && isCorrect ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-100',
-                             isArabic(option.text) ? 'arabic-content text-2xl md:text-3xl pt-1 transition-all' : ''
+                             isArabic(option.text) ? 'arabic-content text-2xl md:text-3xl pt-1' : 'text-lg md:text-xl'
                           )}>
                             {option.text}
                           </span>
                           {!isAnswered && (
-                             <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-teal-500 group-hover:scale-150 transition-all" />
+                             <div className="w-2 h-2 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-teal-500 group-hover:scale-150 transition-all flex-shrink-0" />
                           )}
                        </motion.button>
                      );
