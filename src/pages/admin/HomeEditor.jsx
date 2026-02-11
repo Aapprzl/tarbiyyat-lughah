@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor, Info, MapPin } from 'lucide-react';
+import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor, Info, MapPin, Trophy, BookOpen, Gamepad2 } from 'lucide-react';
 import { useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { useToast, useConfirm } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,14 +9,33 @@ import { cn } from '../../utils/cn';
 
 // Helper to render icon by name
 const IconPreview = ({ name, className }) => {
-    const icons = { BookOpen: Library, Layout: LayoutGrid, Star: Award, Zap: Rocket, Activity: LineChart, Box: Package, Award: Medal, Hexagon, Layers, Smile: Heart };
+    const icons = { 
+        BookOpen: BookOpen, 
+        Trophy: Trophy, 
+        Gamepad2: Gamepad2, 
+        Library: Library, 
+        Layout: LayoutGrid, 
+        Star: Award, 
+        Zap: Rocket, 
+        Activity: LineChart, 
+        Box: Package, 
+        Award: Medal, 
+        Hexagon: Hexagon, 
+        Layers: Layers, 
+        Smile: Heart,
+        Target: Target,
+        Monitor: Monitor,
+        Orbit: Orbit
+    };
     const Icon = icons[name] || Library;
     return <Icon className={cn("w-6 h-6", className)} />;
 };
 
 const HomeEditor = () => {
   const [config, setConfig] = useState({
-    heroTitleArabic: '', heroTitleLatin: '', heroDescription: '', heroButtonText: '',
+    heroTitleArabic: '', heroTitleLatin: '', heroDescription: '', 
+    heroButton1Text: '', heroButton1Icon: 'BookOpen',
+    heroButton2Text: '', heroButton2Icon: 'Trophy',
     footerText: '', siteTitle: '', siteLogoType: 'icon', siteLogoIcon: 'BookOpen',
     siteLogoUrl: '', sidebarTitle: '', headerTitleSize: 'text-lg', sidebarTitleSize: 'text-xl'
   });
@@ -150,6 +169,7 @@ const HomeEditor = () => {
                         value={config.siteTitle || ''}
                         onChange={(e) => setConfig({...config, siteTitle: e.target.value})}
                         className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl px-6 py-4 text-slate-900 dark:text-white font-bold focus:ring-2 focus:ring-teal-500 shadow-sm outline-none transition-all font-arabic"
+                        style={{ fontFamily: 'var(--font-arabic)' }}
                         placeholder="Bahasa Arab Praktis"
                     />
                     <div className="flex flex-wrap items-center gap-3 px-2 md:px-4 justify-between sm:justify-end">
@@ -339,6 +359,7 @@ const HomeEditor = () => {
                         value={config.heroTitleArabic}
                         onChange={(e) => setConfig({...config, heroTitleArabic: e.target.value})}
                         className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-semibold text-right text-xl focus:ring-2 focus:ring-teal-500 outline-none transition-all dir-rtl arabic-title"
+                        style={{ fontFamily: 'var(--font-arabic)' }}
                         placeholder="تَعَلَّمِ اللُّغَةَ الْعَرَبِيَّةَ"
                     />
                 </div>
@@ -365,7 +386,98 @@ const HomeEditor = () => {
                     />
                 </div>
                 
-                {/* CTA Buttons Removed */}
+                
+                {/* --- Hero Buttons Management --- */}
+                <div className="pt-6 border-t border-slate-100 dark:border-slate-700 space-y-8">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] ml-4">Manajemen Tombol Hero</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Button 1 */}
+                        <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 space-y-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center text-white">
+                                    <span className="font-bold text-xs text-black">1</span>
+                                </div>
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Tombol Utama (Kiri)</h3>
+                            </div>
+
+                            <div className="space-y-4 font-arabic">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
+                                <input 
+                                    type="text" 
+                                    value={config.heroButton1Text || ''}
+                                    onChange={(e) => setConfig({...config, heroButton1Text: e.target.value})}
+                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-teal-500 font-arabic"
+                                    style={{ fontFamily: 'var(--font-arabic)' }}
+                                    placeholder="ابدأ الآن"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Pilih Ikon</label>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {['BookOpen', 'Library', 'Star', 'Zap', 'Activity', 'Target'].map(iconName => (
+                                        <button
+                                            key={iconName}
+                                            type="button"
+                                            onClick={() => setConfig({...config, heroButton1Icon: iconName})}
+                                            className={cn(
+                                                "aspect-square rounded-xl flex items-center justify-center transition-all border-2",
+                                                config.heroButton1Icon === iconName 
+                                                    ? "bg-teal-500 border-teal-500 text-white shadow-lg shadow-teal-500/20" 
+                                                    : "bg-white dark:bg-slate-800 border-transparent text-slate-400 hover:border-teal-500/30"
+                                            )}
+                                        >
+                                            <IconPreview name={iconName} className={config.heroButton1Icon === iconName ? "text-white w-5 h-5" : "text-slate-400 w-5 h-5"} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Button 2 */}
+                        <div className="p-6 bg-slate-50 dark:bg-slate-900 rounded-[2rem] border-2 border-slate-100 dark:border-slate-700 space-y-6">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-rose-500 rounded-lg flex items-center justify-center text-white">
+                                    <span className="font-bold text-xs text-black">2</span>
+                                </div>
+                                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Tombol Sekunder (Kanan)</h3>
+                            </div>
+
+                            <div className="space-y-4 font-arabic">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
+                                <input 
+                                    type="text" 
+                                    value={config.heroButton2Text || ''}
+                                    onChange={(e) => setConfig({...config, heroButton2Text: e.target.value})}
+                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-rose-500 font-arabic"
+                                    style={{ fontFamily: 'var(--font-arabic)' }}
+                                    placeholder="ادخل ساحة الألعاب"
+                                />
+                            </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Pilih Ikon</label>
+                                <div className="grid grid-cols-6 gap-2">
+                                    {['Trophy', 'Gamepad2', 'Orbit', 'Monitor', 'Hexagon', 'Smile'].map(iconName => (
+                                        <button
+                                            key={iconName}
+                                            type="button"
+                                            onClick={() => setConfig({...config, heroButton2Icon: iconName})}
+                                            className={cn(
+                                                "aspect-square rounded-xl flex items-center justify-center transition-all border-2",
+                                                config.heroButton2Icon === iconName 
+                                                    ? "bg-rose-500 border-rose-500 text-white shadow-lg shadow-rose-500/20" 
+                                                    : "bg-white dark:bg-slate-800 border-transparent text-slate-400 hover:border-rose-500/30"
+                                            )}
+                                        >
+                                            <IconPreview name={iconName} className={config.heroButton2Icon === iconName ? "text-white w-5 h-5" : "text-slate-400 w-5 h-5"} />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

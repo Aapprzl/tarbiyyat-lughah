@@ -134,7 +134,7 @@ h4 {
 
 /* Explicit Utilities to bypass Tailwind Config lag */
 .font-arabic {
-  font-family: var(--font-arabic);
+  font-family: var(--font-arabic) !important;
 }
 
 .dir-rtl {
