@@ -6,6 +6,7 @@ import MaterialIndex from './pages/MaterialIndex';
 import GameIndex from './pages/GameIndex';
 import MaterialDetail from './pages/MaterialDetail';
 const Library = lazy(() => import('./pages/Library'));
+const BookReader = lazy(() => import('./pages/BookReader'));
 
 
 // Lazy Load Admin Components to improve performance
@@ -89,6 +90,7 @@ function App() {
             { path: "materi/:topicId", element: <MaterialDetail /> },
             { path: "program/:topicId", element: <MaterialDetail /> },
             { path: "perpustakaan", element: <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}><Library /></Suspense> },
+            { path: "perpustakaan/baca", element: <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}><BookReader /></Suspense> },
             { path: "admin/login", element: <Suspense fallback={null}><LoginPage /></Suspense> },
             {
               path: "admin",

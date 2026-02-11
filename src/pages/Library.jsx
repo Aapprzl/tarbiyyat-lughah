@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Library as LibraryIcon, BookOpen, Search, Filter, ChevronRight, FileText, LayoutGrid, List, Sparkles, Loader2 } from 'lucide-react';
 import { contentService } from '../services/contentService';
@@ -175,16 +175,14 @@ const Library = () => {
                   <h3 className="text-xl md:text-2xl font-black font-arabic text-slate-900 dark:text-white mb-0.5 md:mb-1 leading-[2] py-1 md:py-2 line-clamp-1" dir="rtl">{book.titleAr}</h3>
                   <h4 className="text-[10px] md:text-sm font-medium text-slate-500 dark:text-slate-400 mb-4 md:mb-6 truncate">{book.titleId}</h4>
                   
-                  <a 
-                    href={book.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link 
+                    to={`/perpustakaan/baca?url=${encodeURIComponent(book.pdfUrl)}&titleAr=${encodeURIComponent(book.titleAr)}&titleId=${encodeURIComponent(book.titleId)}`}
                     className="inline-flex items-center justify-center gap-2 w-full py-3.5 md:py-4 bg-sky-500 text-white rounded-xl md:rounded-2xl font-black uppercase tracking-widest text-[8px] md:text-[10px] hover:bg-sky-600 transition-all shadow-xl shadow-sky-500/10 active:scale-95 group/btn"
                   >
                     <BookOpen className="w-3.5 h-3.5 md:w-4 md:h-4 group-hover/btn:rotate-12 transition-transform" />
                     <span className="font-arabic text-base md:text-lg mt-0.5 md:mt-1 mr-1">اقرأ الكتاب</span>
                     <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
-                  </a>
+                  </Link>
                 </div>
               </motion.div>
             ))}

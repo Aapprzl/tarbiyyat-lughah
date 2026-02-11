@@ -6,7 +6,10 @@ import {
   ChevronRight, 
   Maximize2, 
   Download,
-  Loader2
+  Loader2,
+  ZoomIn,
+  ZoomOut,
+  RotateCw
 } from 'lucide-react';
 import { useTheme } from '../providers/ThemeProvider';
 import { cn } from '../../utils/cn';
@@ -34,9 +37,10 @@ const dataUrlToBlobUrl = (dataUrl) => {
   }
 };
 
-const CanvasPdf = ({ url, containerHeight }) => {
+const CanvasPdf = ({ url, containerHeight, isMobile, onBack }) => {
   const [numPages, setNumPages] = React.useState(null);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [scale, setScale] = React.useState(0.6);
   const [loading, setLoading] = React.useState(true);
   const canvasRef = React.useRef(null);
   const renderTaskRef = React.useRef(null);
@@ -71,13 +75,20 @@ const CanvasPdf = ({ url, containerHeight }) => {
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(currentPage);
         
-        const viewport = page.getViewport({ scale: 1.5 });
+        const viewport = page.getViewport({ scale });
         const canvas = canvasRef.current;
         if (!canvas) return;
 
         const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+        
+        // Use devicePixelRatio for sharper rendering on high-DPI screens
+        const dpr = window.devicePixelRatio || 1;
+        canvas.height = viewport.height * dpr;
+        canvas.width = viewport.width * dpr;
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+
+        context.scale(dpr, dpr);
 
         const renderContext = {
           canvasContext: context,
@@ -93,7 +104,10 @@ const CanvasPdf = ({ url, containerHeight }) => {
       }
     };
     renderPage();
-  }, [url, currentPage, numPages]);
+  }, [url, currentPage, numPages, scale]);
+
+  const handleZoomIn = () => setScale(prev => Math.min(prev + 0.05, 3));
+  const handleZoomOut = () => setScale(prev => Math.max(prev - 0.05, 0.5));
 
   if (loading) {
     return (
@@ -106,46 +120,91 @@ const CanvasPdf = ({ url, containerHeight }) => {
 
   return (
     <div className="flex flex-col h-full bg-slate-100 dark:bg-slate-900/50">
-      <div className="flex-1 overflow-auto p-0 flex justify-center scrollbar-hide">
-        <canvas ref={canvasRef} className="shadow-2xl max-w-full h-auto" />
-      </div>
+      {/* Top Toolbar: Zoom Controls & Optional Back */}
+      <div className="p-2 md:p-3 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between z-10">
+        <div className="flex items-center gap-2 md:gap-4">
+            {onBack && (
+                <button 
+                    onClick={onBack}
+                    className="flex items-center gap-1.5 px-2 md:px-3 py-1.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-all text-slate-600 dark:text-slate-400 font-black uppercase text-[8px] md:text-[10px] tracking-widest border border-slate-200 dark:border-slate-800"
+                    title="Kembali"
+                >
+                    <ChevronLeft className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                    <span className="hidden sm:inline">Kembali</span>
+                </button>
+            )}
 
-      {/* Modern Compact Controls */}
-      <div className="p-4 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-1">
-          <button 
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage(p => p - 1)}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full disabled:opacity-30 transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <span className="text-xs font-black text-slate-500 min-w-[60px] text-center uppercase tracking-widest">
-            {currentPage} / {numPages}
-          </span>
-          <button 
-            disabled={currentPage >= numPages}
-            onClick={() => setCurrentPage(p => p + 1)}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full disabled:opacity-30 transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+            <div className="flex items-center gap-1 md:gap-2">
+                <button 
+                    onClick={handleZoomOut}
+                    disabled={scale <= 0.5}
+                    className="p-1.5 md:p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg disabled:opacity-30 transition-colors text-slate-600 dark:text-slate-400"
+                    title="Zoom Out"
+                >
+                    <ZoomOut className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+                <span className="text-[9px] md:text-[10px] font-black text-slate-500 min-w-[40px] md:min-w-[50px] text-center uppercase tracking-widest">
+                    {Math.round(scale * 100)}%
+                </span>
+                <button 
+                    onClick={handleZoomIn}
+                    disabled={scale >= 3}
+                    className="p-1.5 md:p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg disabled:opacity-30 transition-colors text-slate-600 dark:text-slate-400"
+                    title="Zoom In"
+                >
+                    <ZoomIn className="w-4 h-4 md:w-5 md:h-5" />
+                </button>
+            </div>
         </div>
 
         <a 
           href={url} 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center gap-2 p-3 bg-teal-500 text-white rounded-xl hover:bg-teal-600 transition-all font-black uppercase text-[10px] tracking-widest shadow-lg shadow-teal-500/20 active:scale-95"
+          className="flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all font-black uppercase text-[8px] md:text-[9px] tracking-widest active:scale-95"
         >
-          <Maximize2 className="w-4 h-4" /> Fullscreen
+          <Maximize2 className="w-3 md:w-3.5 h-3 md:h-3.5" /> 
+          <span className="hidden xs:inline">Fullscreen</span>
         </a>
+      </div>
+
+      <div className="flex-1 overflow-auto p-0 flex justify-center scrollbar-hide bg-slate-200 dark:bg-slate-950/50">
+        <canvas ref={canvasRef} className="shadow-2xl max-w-none h-auto" />
+      </div>
+
+      {/* Bottom Toolbar: Navigation */}
+      <div className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-center">
+        <div className="flex items-center gap-4">
+          <button 
+            disabled={currentPage <= 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="group flex items-center gap-2 px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+          >
+            <ChevronLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-slate-500">Prev</span>
+          </button>
+
+          <div className="px-4 py-2 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-slate-800">
+            <span className="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">
+              {currentPage} <span className="text-slate-400 mx-1">/</span> {numPages}
+            </span>
+          </div>
+
+          <button 
+            disabled={currentPage >= numPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="group flex items-center gap-2 px-4 py-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl disabled:opacity-30 transition-all"
+          >
+            <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest text-slate-500">Next</span>
+            <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
       </div>
     </div>
   );
 };
 
-const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName = 'document.pdf' }) => {
+const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName = 'document.pdf', onBack }) => {
   const { theme } = useTheme();
   const [isMobile, setIsMobile] = React.useState(false);
   
@@ -208,19 +267,7 @@ const PdfViewer = ({ src, fileUrl, height = 500, allowDownload = true, fileName 
       )} 
       style={{ height }}
     >
-      {isMobile ? (
-        <CanvasPdf url={blobUrl} containerHeight={height} />
-      ) : (
-        <iframe 
-          src={`${blobUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-          className="w-full h-full bg-white transition-opacity duration-700"
-          style={{ 
-            height: '100%',
-            filter: theme === 'dark' ? 'invert(0.9) hue-rotate(180deg)' : 'none'
-          }}
-          title="PDF Viewer"
-        />
-      )}
+      <CanvasPdf url={blobUrl} containerHeight={height} isMobile={isMobile} onBack={onBack} />
     </div>
   );
 };
