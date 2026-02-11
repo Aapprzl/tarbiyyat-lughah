@@ -172,7 +172,7 @@ const CamelRaceGame = ({ data, title }) => {
 
   return (
     <div className="w-full max-w-5xl mx-auto md:px-4 py-0 md:py-8 overflow-hidden touch-none">
-      <div className="bg-amber-50 dark:bg-slate-900 border-x-0 md:border-4 border-amber-800 rounded-none md:rounded-[3rem] shadow-none md:shadow-2xl overflow-hidden relative h-screen md:h-[75vh] md:min-h-[700px] flex flex-col font-sans">
+      <div className="bg-amber-50 dark:bg-slate-900 border-x-0 md:border-4 border-amber-800 rounded-none md:rounded-[3rem] shadow-none md:shadow-2xl overflow-hidden relative h-screen md:h-[80vh] md:min-h-[650px] flex flex-col font-sans">
         
         {/* Sky & Header */}
         <div className="bg-gradient-to-b from-sky-400 to-sky-300 dark:from-slate-800 dark:to-slate-900 p-3 md:p-6 flex items-center justify-between border-b-4 border-amber-900/20 z-20 relative text-amber-900 dark:text-amber-500">
@@ -208,7 +208,7 @@ const CamelRaceGame = ({ data, title }) => {
         </div>
 
         {/* Racing Track (Visual Parallax Area) */}
-        <div className="relative h-32 md:h-64 bg-gradient-to-b from-sky-300 via-orange-200 to-orange-300 dark:from-slate-900 dark:via-blue-900/40 dark:to-indigo-950 overflow-hidden border-b-4 border-amber-900/30 shrink-0">
+        <div className="relative h-28 md:h-44 bg-gradient-to-b from-sky-300 via-orange-200 to-orange-300 dark:from-slate-900 dark:via-blue-900/40 dark:to-indigo-950 overflow-hidden border-b-4 border-amber-900/30 shrink-0">
           
           {/* Parallax Layers */}
           <div 
@@ -220,22 +220,22 @@ const CamelRaceGame = ({ data, title }) => {
           />
           
           {/* Far Dunes */}
-          <div className="absolute bottom-0 w-[200%] h-32 flex items-end opacity-40 translate-x-[-10%] transition-transform duration-100 ease-linear" style={{ transform: `translateX(-${midgroundShift}%)` }}>
+          <div className="absolute bottom-0 w-[200%] h-24 flex items-end opacity-40 translate-x-[-10%] transition-transform duration-100 ease-linear" style={{ transform: `translateX(-${midgroundShift}%)` }}>
              <div className="w-full h-full bg-orange-400" style={{ clipPath: 'polygon(0 100%, 20% 40%, 40% 80%, 60% 30%, 80% 90%, 100% 50%, 100% 100%)' }} />
           </div>
 
           {/* Near Dunes */}
-          <div className="absolute bottom-0 w-[200%] h-20 flex items-end translate-x-[-5%] transition-transform duration-100 ease-linear" style={{ transform: `translateX(-${foregroundShift}%)` }}>
+          <div className="absolute bottom-0 w-[200%] h-16 flex items-end translate-x-[-5%] transition-transform duration-100 ease-linear" style={{ transform: `translateX(-${foregroundShift}%)` }}>
              <div className="w-full h-full bg-orange-500 shadow-2xl" style={{ clipPath: 'polygon(0 100%, 15% 50%, 30% 80%, 45% 40%, 70% 90%, 85% 60%, 100% 100%)' }} />
           </div>
 
           {/* Start/Finish Line Markers */}
           <div className="absolute bottom-4 flex items-center transition-all duration-100 ease-linear" style={{ left: `${(goalDistance - distance) / 10}px` }}>
-             <Flag className="w-12 h-12 text-rose-600 animate-bounce" />
+             <Flag className="w-10 h-10 text-rose-600 animate-bounce" />
           </div>
 
           {/* The Tracks */}
-          <div className="absolute bottom-0 w-full h-12 bg-amber-900/20 backdrop-blur-sm" />
+          <div className="absolute bottom-0 w-full h-10 bg-amber-900/20 backdrop-blur-sm" />
 
           {/* Camels */}
           {/* Opponent Camel */}
@@ -248,8 +248,8 @@ const CamelRaceGame = ({ data, title }) => {
             transition={{ y: { repeat: Infinity, duration: 0.4 } }}
           >
             <div className="relative group">
-               <div className="w-10 h-10 md:w-20 md:h-20 bg-rose-600 rounded-full flex items-center justify-center shadow-lg border-2 md:border-4 border-rose-400 rotate-12">
-                  <span className="text-white font-black text-base md:text-3xl font-arabic">🐪</span>
+               <div className="w-9 h-9 md:w-16 md:h-16 bg-rose-600 rounded-full flex items-center justify-center shadow-lg border-2 md:border-4 border-rose-400 rotate-12">
+                  <span className="text-white font-black text-sm md:text-2xl font-arabic">🐪</span>
                </div>
                <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-rose-700 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase">Lawan</div>
             </div>
@@ -267,17 +267,17 @@ const CamelRaceGame = ({ data, title }) => {
           >
             <div className="relative">
                <div className={cn(
-                 "w-12 h-12 md:w-24 md:h-24 bg-amber-500 rounded-full flex items-center justify-center shadow-2xl border-2 md:border-4 border-amber-300 transition-all duration-300",
+                 "w-10 h-10 md:w-20 md:h-20 bg-amber-500 rounded-full flex items-center justify-center shadow-2xl border-2 md:border-4 border-amber-300 transition-all duration-300",
                  speed > 200 ? "shadow-orange-500/50 scale-110" : ""
                )}>
-                  <span className="text-white font-black text-xl md:text-5xl font-arabic">🐪</span>
+                  <span className="text-white font-black text-lg md:text-4xl font-arabic">🐪</span>
                   {streak > 2 && (
                     <motion.div 
                       className="absolute -right-2 -top-2 bg-orange-500 rounded-full p-1 border-2 border-white"
                       animate={{ scale: [1, 1.3, 1] }}
                       transition={{ repeat: Infinity }}
                     >
-                      <Flame className="w-4 h-4 md:w-6 md:h-6 text-white" />
+                      <Flame className="w-4 h-4 md:w-5 md:h-5 text-white" />
                     </motion.div>
                   )}
                </div>
@@ -286,8 +286,8 @@ const CamelRaceGame = ({ data, title }) => {
                {/* Speed Particles */}
                {speed > 150 && (
                  <div className="absolute -left-10 top-1/2 flex gap-1 opacity-50">
-                    <div className="h-1 w-6 md:w-10 bg-white rounded-full animate-pulse" />
-                    <div className="h-1 w-4 md:w-6 bg-white rounded-full animate-pulse delay-75" />
+                    <div className="h-1 w-6 md:w-8 bg-white rounded-full animate-pulse" />
+                    <div className="h-1 w-4 md:w-5 bg-white rounded-full animate-pulse delay-75" />
                  </div>
                )}
             </div>
@@ -295,30 +295,30 @@ const CamelRaceGame = ({ data, title }) => {
         </div>
 
         {/* Question Area */}
-        <div className="flex-1 bg-amber-50 dark:bg-slate-800 p-3 md:p-8 flex flex-col gap-3 md:gap-8 overflow-y-auto transition-colors duration-500">
+        <div className="flex-1 bg-amber-50 dark:bg-slate-800 p-3 md:p-6 flex flex-col gap-3 md:gap-6 overflow-y-auto transition-colors duration-500">
           {gameState === 'playing' ? (
-            <div className="max-w-3xl mx-auto w-full flex flex-col gap-6 md:gap-10">
+            <div className="max-w-4xl mx-auto w-full flex flex-col gap-4 md:gap-6">
               {/* Question Card */}
-               <div className="bg-white dark:bg-slate-700/50 border-2 border-amber-200 dark:border-slate-600 p-4 md:p-10 rounded-[1.5rem] md:rounded-[3.5rem] text-center shadow-xl relative overflow-hidden group">
+               <div className="bg-white dark:bg-slate-700/50 border-2 border-amber-200 dark:border-slate-600 p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] text-center shadow-xl relative overflow-hidden group">
                  <div className="absolute top-0 left-0 w-2 h-full bg-amber-500 group-hover:w-4 transition-all duration-300" />
-                 <span className="text-[8px] md:text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.2em] mb-2 md:mb-4 block">Tantangan Kecepatan</span>
+                 <span className="text-[8px] md:text-xs font-black text-amber-600 dark:text-amber-500 uppercase tracking-[0.2em] mb-1 md:mb-2 block">Tantangan Kecepatan</span>
                  <h2 className={cn(
-                   "text-lg md:text-5xl font-black text-slate-900 dark:text-white px-2 md:px-4 leading-tight",
-                   isArabic(currentQuestion.question) ? "font-arabic leading-relaxed text-2xl md:text-6xl" : ""
+                   "text-lg md:text-4xl font-black text-slate-900 dark:text-white px-2 md:px-4 leading-tight",
+                   isArabic(currentQuestion.question) ? "font-arabic leading-relaxed text-2xl md:text-5xl" : ""
                  )}>
                    {currentQuestion.question}
                  </h2>
                </div>
 
               {/* Options Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                 {currentQuestion.options.map((option, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleAnswer(option)}
                     disabled={selectedOption !== null}
                      className={cn(
-                      "group relative p-3 md:p-6 rounded-xl md:rounded-3xl border-2 md:border-4 font-black text-sm md:text-2xl uppercase tracking-tight transition-all active:scale-95 text-center overflow-hidden",
+                      "group relative p-3 md:p-5 rounded-xl md:rounded-[2rem] border-2 md:border-4 font-black text-sm md:text-xl uppercase tracking-tight transition-all active:scale-95 text-center overflow-hidden",
                       selectedOption === null 
                         ? "bg-white dark:bg-slate-700 border-amber-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:border-amber-500 hover:text-amber-700 dark:hover:text-white hover:bg-amber-50 dark:hover:bg-slate-600 shadow-md" 
                         : selectedOption === option 
