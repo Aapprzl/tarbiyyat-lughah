@@ -565,7 +565,10 @@ const MaterialDetailContent = () => {
                   </span>
                   <Diamond className="w-3 h-3 text-teal-500" />
                 </div>
-                <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight arabic-text">
+                <h1 className={cn(
+                  "text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight",
+                  isArabic(topic?.title) ? "arabic-title dir-rtl" : "font-sans"
+                )}>
                   {topic?.title}
                 </h1>
               </div>
@@ -695,40 +698,53 @@ const MaterialDetailContent = () => {
         </motion.div>
       ) : isJson ? (
         /* STRUCTURED JSON CONTENT */
-        <div className="space-y-16 px-0 md:px-0">
-          {displayData.map((stage, stageIdx) => (
-            <motion.div
-              key={stage.id || stageIdx}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              className="relative"
+        <div className="px-0 md:px-0">
+          {/* Top Navigation */}
+          <div className="mb-12 px-4 md:px-0 flex justify-start animate-in fade-in slide-in-from-left-4 duration-1000">
+            <button
+              onClick={() => navigate("/materi")}
+              className="group flex items-center gap-3 px-6 py-3 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/5 rounded-2xl font-bold text-[10px] uppercase tracking-[0.2em] transition-all hover:bg-teal-500 hover:text-white dark:hover:bg-teal-500 hover:border-teal-500 shadow-sm hover:shadow-xl hover:shadow-teal-500/20 active:scale-95"
             >
-              <div className="flex items-center gap-6 mb-12">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-white/10"></div>
-                <div className="px-6 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">
-                  Tahap {stageIdx + 1}:{" "}
-                  {stage.title === "Materi Utama"
-                    ? "Pembelajaran"
-                    : stage.title}
-                </div>
-                <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200 dark:to-white/10"></div>
-              </div>
+              <MoveLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1.5" />
+              Kembali ke Daftar Materi
+            </button>
+          </div>
 
-              <div className="space-y-10">
-                {stage.items.map((block, bIdx) => (
-                  <ContentBlock key={block.id || bIdx} block={block} />
-                ))}
-                {stage.items.length === 0 && (
-                  <div className="text-center py-20 bg-slate-100 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-700">
-                    <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">
-                      Konten Belum Tersedia
-                    </p>
+          <div className="space-y-16">
+            {displayData.map((stage, stageIdx) => (
+              <motion.div
+                key={stage.id || stageIdx}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                className="relative"
+              >
+                <div className="flex items-center gap-6 mb-12">
+                  <div className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200 dark:to-white/10"></div>
+                  <div className="px-6 py-2 rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-[10px] font-black uppercase tracking-[0.3em] shadow-xl">
+                    Tahap {stageIdx + 1}:{" "}
+                    {stage.title === "Materi Utama"
+                      ? "Pembelajaran"
+                      : stage.title}
                   </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
+                  <div className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200 dark:to-white/10"></div>
+                </div>
+
+                <div className="space-y-10">
+                  {stage.items.map((block, bIdx) => (
+                    <ContentBlock key={block.id || bIdx} block={block} />
+                  ))}
+                  {stage.items.length === 0 && (
+                    <div className="text-center py-20 bg-slate-100 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-700">
+                      <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">
+                        Konten Belum Tersedia
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            ))}
+          </div>
 
           {/* Finish Section */}
           <div className="pt-20 text-center">
@@ -768,7 +784,11 @@ const MaterialDetailContent = () => {
 };
 
 // --- MODERN CONTENT BLOCK RENDERER ---
-const isArabic = (text) => /[\u0600-\u06FF]/.test(text || "");
+const isArabic = (text) => {
+  if (!text) return false;
+  const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  return arabicRegex.test(text);
+};
 
 const ContentBlock = ({ block }) => {
   if (!block || !block.data) return null;
@@ -778,7 +798,7 @@ const ContentBlock = ({ block }) => {
       if (block.data?.isRichText) {
         return (
           <div className="px-4 md:px-0">
-            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+            <div className="md:bg-[var(--color-bg-card)] md:border md:border-[var(--color-border)] md:rounded-[2.5rem] py-6 md:p-12 md:shadow-sm md:hover:shadow-xl transition-all group">
               {block.data?.title && (
                 <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
                   <FileText className="w-6 h-6 text-emerald-500" />
@@ -796,7 +816,7 @@ const ContentBlock = ({ block }) => {
       const hasArabic = isArabic(block.data.content);
       return (
         <div className="px-4 md:px-0">
-          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+          <div className="md:bg-[var(--color-bg-card)] md:border md:border-[var(--color-border)] md:rounded-[2.5rem] py-6 md:p-12 md:shadow-sm md:hover:shadow-xl transition-all group">
             {block.data?.title && (
               <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
                 <ClipboardList className="w-6 h-6 text-teal-500" />
@@ -818,7 +838,7 @@ const ContentBlock = ({ block }) => {
     case "richtext": {
       return (
         <div className="px-4 md:px-0">
-          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-xl transition-all group">
+          <div className="md:bg-[var(--color-bg-card)] md:border md:border-[var(--color-border)] md:rounded-[2.5rem] py-6 md:p-12 md:shadow-sm md:hover:shadow-xl transition-all group">
             {block.data?.title && (
               <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-8 tracking-tight flex items-center gap-3">
                 <FileText className="w-6 h-6 text-emerald-500" />
@@ -826,7 +846,7 @@ const ContentBlock = ({ block }) => {
               </h3>
             )}
             <div 
-              className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
+              className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[1.8] rictext-content"
               dangerouslySetInnerHTML={{ __html: block.data?.content }}
             />
           </div>
@@ -845,7 +865,7 @@ const ContentBlock = ({ block }) => {
               </div>
           </div>
           
-          <div className="bg-[var(--color-bg-card)] rounded-[2.5rem] border border-[var(--color-border)] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500">
+          <div className="md:bg-[var(--color-bg-card)] md:rounded-[2.5rem] md:border md:border-[var(--color-border)] overflow-hidden md:shadow-sm md:hover:shadow-xl transition-all duration-500">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -897,7 +917,7 @@ const ContentBlock = ({ block }) => {
       const hasArabic = isArabic(block.data.content);
       return (
         <div className="px-4 md:px-0">
-          <div className="bg-teal-500/5 border-l-8 border-teal-500 p-8 rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
+          <div className="bg-teal-500/5 border-l-8 border-teal-500 p-8 md:rounded-r-[2.5rem] flex items-start gap-6 shadow-sm">
           <div className="w-12 h-12 bg-[var(--color-bg-card)] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
             <AlertCircle className="w-6 h-6 text-teal-500" />
           </div>
@@ -924,7 +944,7 @@ const ContentBlock = ({ block }) => {
               <Youtube className="w-4 h-4" /> {block.data.title}
             </h4>
           )}
-          <div className="aspect-video bg-slate-900 rounded-[3rem] overflow-hidden shadow-2xl border-4 border-slate-200 dark:border-slate-700/50 relative group">
+          <div className="aspect-video bg-slate-900 rounded-2xl md:rounded-[3rem] overflow-hidden shadow-2xl md:border-4 border-slate-200 dark:border-slate-700/50 relative group">
             {(() => {
               const url = block.data?.url || "";
               let videoId = "";
@@ -970,7 +990,7 @@ const ContentBlock = ({ block }) => {
               </a>
             )}
           </div>
-          <div className="rounded-[3rem] overflow-hidden border border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-800">
+          <div className="md:rounded-[3rem] overflow-hidden md:border md:border-slate-200 md:dark:border-slate-700 md:shadow-xl bg-white dark:bg-slate-800">
             <PdfViewer fileUrl={block.data?.url} height={600} />
           </div>
         </div>
@@ -1031,9 +1051,9 @@ const ContentBlock = ({ block }) => {
 };
 
 const MaterialDetail = () => (
-  <ErrorBoundary>
-    <MaterialDetailContent />
-  </ErrorBoundary>
+    <ErrorBoundary>
+      <MaterialDetailContent />
+    </ErrorBoundary>
 );
 
 export default MaterialDetail;

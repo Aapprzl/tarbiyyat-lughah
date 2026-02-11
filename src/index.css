@@ -139,6 +139,36 @@ h4 {
 
 .dir-rtl {
   direction: rtl;
+  text-align: right;
+}
+
+/* Prose & RichText RTL Fixes */
+.prose .dir-rtl,
+.prose [dir="rtl"] {
+  text-align: right;
+  font-family: var(--font-arabic);
+}
+
+.prose .dir-rtl ul,
+.prose [dir="rtl"] ul,
+.prose .dir-rtl ol,
+.prose [dir="rtl"] ol {
+  padding-left: 0;
+  padding-right: 1.625em;
+}
+
+.prose .dir-rtl li,
+.prose [dir="rtl"] li {
+  padding-left: 0;
+  padding-right: 0.375em;
+}
+
+.prose .dir-rtl blockquote,
+.prose [dir="rtl"] blockquote {
+  border-left: none;
+  border-right: 4px solid var(--color-primary);
+  padding-left: 0;
+  padding-right: 1em;
 }
 
 .font-sans {

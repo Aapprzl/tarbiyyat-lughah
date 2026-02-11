@@ -1,5 +1,18 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { Bold, Italic, List, ListOrdered, Heading, Quote, Link as LinkIcon, Undo, Redo } from 'lucide-react';
+import { 
+    Bold, 
+    Italic, 
+    List, 
+    ListOrdered, 
+    Heading, 
+    Quote, 
+    Link as LinkIcon, 
+    Undo, 
+    Redo,
+    AlignLeft,
+    AlignRight,
+    Languages
+} from 'lucide-react';
 import DOMPurify from 'dompurify';
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
@@ -7,9 +20,13 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
   const [activeFormats, setActiveFormats] = useState({});
 
   useEffect(() => {
+    // Set default paragraph separator to 'p'
+    document.execCommand('defaultParagraphSeparator', false, 'p');
+  }, []);
+
+  useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
-      // Sanitize incoming value as well to be safe, though mainly we care about output
-      editorRef.current.innerHTML = value ? DOMPurify.sanitize(value) : '';
+      editorRef.current.innerHTML = value ? DOMPurify.sanitize(value) : '<p><br></p>';
     }
   }, [value]);
 
@@ -21,11 +38,19 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     }
   };
 
+  const handleFocus = () => {
+    if (editorRef.current && (editorRef.current.innerHTML === '' || editorRef.current.innerHTML === '<br>')) {
+      editorRef.current.innerHTML = '<p><br></p>';
+    }
+  };
+
   const handleSelectionChange = () => {
     updateActiveFormats();
   };
 
   const updateActiveFormats = () => {
+    if (!editorRef.current) return;
+
     const formats = {
       bold: document.queryCommandState('bold'),
       italic: document.queryCommandState('italic'),
@@ -33,17 +58,25 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
       insertOrderedList: document.queryCommandState('insertOrderedList'),
     };
     
-    // Check if current selection is in blockquote or link
+    // Check selection for complex states
     const selection = window.getSelection();
     if (selection.rangeCount > 0) {
       let node = selection.anchorNode;
+      if (node?.nodeType === 3) node = node.parentNode;
+
+      let directionFound = false;
       while (node && node !== editorRef.current) {
-        if (node.nodeName === 'BLOCKQUOTE') {
-          formats.blockquote = true;
+        if (node.nodeName === 'BLOCKQUOTE') formats.blockquote = true;
+        if (node.nodeName === 'A') formats.link = true;
+        
+        // Track Direction - Mutual Exclusivity and Closest takes precedence
+        if (!directionFound && node.getAttribute?.('dir')) {
+           const dir = node.getAttribute('dir');
+           if (dir === 'rtl') formats.rtl = true;
+           if (dir === 'ltr') formats.ltr = true;
+           directionFound = true;
         }
-        if (node.nodeName === 'A') {
-          formats.link = true;
-        }
+        
         node = node.parentNode;
       }
     }
@@ -64,8 +97,59 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     updateActiveFormats();
   };
 
+  const toggleDirection = (dir) => {
+    const selection = window.getSelection();
+    if (selection.rangeCount > 0) {
+      let node = selection.anchorNode;
+      if (node?.nodeType === 3) node = node.parentNode;
+
+      // Find the closest block element or parent
+      const blockTags = ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'BLOCKQUOTE', 'LI', 'UL', 'OL'];
+      let targetNode = node;
+      
+      while (targetNode && targetNode !== editorRef.current) {
+        if (blockTags.includes(targetNode.nodeName)) {
+          break;
+        }
+        targetNode = targetNode.parentNode;
+      }
+
+      // If we are at the top level or inside a list but not a specific item
+      if (targetNode === editorRef.current || !targetNode) {
+         document.execCommand('formatBlock', false, 'p');
+         const newSelection = window.getSelection();
+         let newNode = newSelection.anchorNode;
+         if (newNode?.nodeType === 3) newNode = newNode.parentNode;
+         while (newNode && newNode !== editorRef.current) {
+            if (blockTags.includes(newNode.nodeName)) {
+                targetNode = newNode;
+                break;
+            }
+            newNode = newNode.parentNode;
+         }
+      }
+
+      if (targetNode && targetNode !== editorRef.current) {
+         targetNode.setAttribute('dir', dir);
+         // Apply appropriate font-class or variable
+         if (dir === 'rtl') {
+            targetNode.classList.add('arabic-content', 'dir-rtl');
+            targetNode.style.textAlign = 'right';
+         } else {
+            targetNode.classList.remove('arabic-content', 'dir-rtl');
+            targetNode.style.textAlign = 'left';
+         }
+      }
+    }
+    handleInput();
+    
+    // Slight delay to ensure browser layout catches up for the cursor
+    setTimeout(() => {
+        editorRef.current?.focus();
+    }, 10);
+  };
+
   const toggleBlockquote = () => {
-    // If already in blockquote, convert to paragraph
     if (activeFormats.blockquote) {
       document.execCommand('formatBlock', false, 'p');
     } else {
@@ -87,7 +171,6 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
         return;
       }
 
-      // If selection looks like a URL, use it, otherwise use #
       if (!url.includes('.') || url.includes(' ')) {
         url = '#';
       } else if (!url.startsWith('http')) {
@@ -97,12 +180,7 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
       document.execCommand('createLink', false, url);
     }
     editorRef.current?.focus();
-    
-    // Trigger onChange
-    if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
-    }
-    updateActiveFormats();
+    handleInput();
   };
 
   const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
@@ -116,40 +194,42 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
       }`}
       title={title}
     >
-      {icon}
+      {React.cloneElement(icon, { className: "w-4 h-4" })}
     </button>
   );
 
   return (
     <>
-      <div className="border border-[var(--color-border)] rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500">
+      <div className="border border-[var(--color-border)] rounded-lg overflow-hidden focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500 bg-[var(--color-bg-card)]">
         {/* Toolbar */}
-        <div className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)] p-2 flex flex-wrap gap-1">
-          {formatButton(<Bold className="w-4 h-4" />, 'bold', 'Tebal (Ctrl+B)', null, activeFormats.bold)}
-          {formatButton(<Italic className="w-4 h-4" />, 'italic', 'Miring (Ctrl+I)', null, activeFormats.italic)}
+        <div className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)] p-2 flex flex-wrap gap-1 sticky top-0 z-10">
+          {formatButton(<Bold />, 'bold', 'Tebal (Ctrl+B)', null, activeFormats.bold)}
+          {formatButton(<Italic />, 'italic', 'Miring (Ctrl+I)', null, activeFormats.italic)}
           
-          <div className="w-px bg-gray-300 mx-1"></div>
+          <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<Heading className="w-4 h-4" />, 'formatBlock', 'Heading 2', 'h2')}
-          {formatButton(<Heading className="w-3 h-3" />, 'formatBlock', 'Heading 3', 'h3')}
+          {formatButton(<Heading />, 'formatBlock', 'Heading 2', 'h2')}
+          {formatButton(<Heading />, 'formatBlock', 'Heading 3', 'h3')}
           
-          <div className="w-px bg-gray-300 mx-1"></div>
+          <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<List className="w-4 h-4" />, 'insertUnorderedList', 'Daftar Bullet', null, activeFormats.insertUnorderedList)}
-          {formatButton(<ListOrdered className="w-4 h-4" />, 'insertOrderedList', 'Daftar Nomor', null, activeFormats.insertOrderedList)}
+          {formatButton(<List />, 'insertUnorderedList', 'Daftar Bullet', null, activeFormats.insertUnorderedList)}
+          {formatButton(<ListOrdered />, 'insertOrderedList', 'Daftar Nomor', null, activeFormats.insertOrderedList)}
           
-          <div className="w-px bg-gray-300 mx-1"></div>
+          <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<Quote className="w-4 h-4" />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
+          {formatButton(<AlignLeft />, null, 'Teks Kiri (LTR)', null, activeFormats.ltr, () => toggleDirection('ltr'))}
+          {formatButton(<AlignRight />, null, 'Teks Kanan (RTL)', null, activeFormats.rtl, () => toggleDirection('rtl'))}
           
-          <div className="w-px bg-gray-300 mx-1"></div>
-          
-          {formatButton(<LinkIcon className="w-4 h-4" />, null, 'Tautan (Toggle)', null, activeFormats.link, toggleLink)}
+          <div className="w-px bg-[var(--color-border)] mx-1"></div>
+
+          {formatButton(<Quote />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
+          {formatButton(<LinkIcon />, null, 'Tautan (Toggle)', null, activeFormats.link, toggleLink)}
           
           <div className="flex-1"></div>
           
-          {formatButton(<Undo className="w-4 h-4" />, 'undo', 'Undo (Ctrl+Z)')}
-          {formatButton(<Redo className="w-4 h-4" />, 'redo', 'Redo (Ctrl+Y)')}
+          {formatButton(<Undo />, 'undo', 'Undo (Ctrl+Z)')}
+          {formatButton(<Redo />, 'redo', 'Redo (Ctrl+Y)')}
         </div>
 
         {/* Editor */}
@@ -157,9 +237,10 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
           ref={editorRef}
           contentEditable
           onInput={handleInput}
-          className="w-full p-4 outline-none min-h-[300px] max-h-[600px] overflow-y-auto bg-[var(--color-bg-card)] text-[var(--color-text-main)] prose prose-teal dark:prose-invert max-w-none"
+          onFocus={handleFocus}
+          className="w-full p-6 outline-none min-h-[300px] max-h-[600px] overflow-y-auto bg-[var(--color-bg-card)] text-[var(--color-text-main)] prose prose-teal dark:prose-invert max-w-none font-sans"
           style={{
-            lineHeight: '1.6',
+            lineHeight: '1.8',
           }}
           data-placeholder={placeholder}
         />
@@ -171,6 +252,11 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
             opacity: 0.6;
           }
           
+          [contentEditable] p[dir="rtl"] {
+             text-align: right;
+             direction: rtl;
+          }
+
           [contentEditable] h2 {
             font-size: 1.5em;
             font-weight: bold;

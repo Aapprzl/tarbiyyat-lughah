@@ -87,8 +87,8 @@ const AdminLayout = () => {
           : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
       )}
     >
-      <Icon className="w-5 h-5" />
-      <span className="text-sm font-medium">{label}</span>
+      <Icon className="w-5 h-5 flex-shrink-0" />
+      <span className="text-sm font-medium arabic-sidebar-content">{label}</span>
     </NavLink>
   );
 
@@ -126,7 +126,7 @@ const AdminLayout = () => {
                    <Diamond className="w-5 h-5 text-white" />
                 </div>
              )}
-            <div>
+            <div className="arabic-sidebar">
               <h2 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">Admin Panel</h2>
               <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Tarbiyyat Al-Lughah</p>
             </div>

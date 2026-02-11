@@ -7,9 +7,7 @@ import { cn } from '../../utils/cn';
 
 const ARABIC_FAMILIES = [
   { name: 'Cairo', label: 'Cairo', style: "'Cairo', sans-serif" },
-  { name: 'Amiri', label: 'Amiri', style: "'Amiri', serif" },
   { name: 'Scheherazade New', label: 'Scheherazade', style: "'Scheherazade New', serif" },
-  { name: 'Almarai', label: 'Almarai', style: "'Almarai', sans-serif" },
   { name: 'Noto Naskh Arabic', label: 'KFGQPC / Noto Naskh', style: "'Noto Naskh Arabic', serif" },
   { name: 'El Messiri', label: 'El Messiri', style: "'El Messiri', sans-serif" },
   { name: 'Noto Sans Arabic', label: 'Noto Sans Arabic', style: "'Noto Sans Arabic', sans-serif" },

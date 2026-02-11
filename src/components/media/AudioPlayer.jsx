@@ -118,7 +118,7 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
   };
 
   return (
-    <div className="group relative bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-8 border border-slate-200 dark:border-white/10 w-full max-w-3xl mx-auto md:mx-0 shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden">
+    <div className="group relative md:bg-white/40 md:dark:bg-slate-900/40 md:backdrop-blur-xl md:rounded-[2.5rem] py-6 md:p-8 md:border md:border-slate-200 md:dark:border-white/10 w-full max-w-3xl mx-auto md:mx-0 md:shadow-xl md:hover:shadow-2xl transition-all duration-500 overflow-hidden">
         {/* Glow Effects */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -ml-16 -mb-16"></div>

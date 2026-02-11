@@ -218,7 +218,7 @@ const GameIndex = () => {
                                           <h3 className={cn(
                                             "font-black text-lg md:text-xl leading-tight line-clamp-2 transition-all",
                                             "text-slate-800 dark:text-slate-100",
-                                            isArabic(item.title) && "arabic-text"
+                                            isArabic(item.title) && "arabic-index-topic"
                                           )}>
                                               {item.title}
                                           </h3>

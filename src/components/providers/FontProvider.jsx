@@ -7,9 +7,7 @@ export const useFont = () => useContext(FontContext);
 
 const ARABIC_FAMILIES = [
   { name: 'Cairo', style: "'Cairo', sans-serif" },
-  { name: 'Amiri', style: "'Amiri', serif" },
   { name: 'Scheherazade New', style: "'Scheherazade New', serif" },
-  { name: 'Almarai', style: "'Almarai', sans-serif" },
   { name: 'Noto Naskh Arabic', style: "'Noto Naskh Arabic', serif" },
   { name: 'El Messiri', style: "'El Messiri', sans-serif" },
   { name: 'Noto Sans Arabic', style: "'Noto Sans Arabic', sans-serif" },
@@ -27,7 +25,7 @@ export const FontProvider = ({ children }) => {
   const [config, setConfig] = useState(() => {
     const cached = contentService.getFontConfigSync();
     return cached || {
-       fontFamily: 'Amiri',
+       fontFamily: 'Cairo',
        latinFontFamily: 'Plus Jakarta Sans',
        titleSize: 'text-4xl',
        contentSize: 'text-xl',
