@@ -33,9 +33,10 @@ const IconPreview = ({ name, className }) => {
 
 const HomeEditor = () => {
   const [config, setConfig] = useState({
-    heroTitleArabic: '', heroTitleLatin: '', heroDescription: '', 
-    heroButton1Text: '', heroButton1Icon: 'BookOpen',
-    heroButton2Text: '', heroButton2Icon: 'Trophy',
+    heroTitleArabic: '', heroTitleLatin: '', 
+    heroDescriptionArabic: '', heroDescriptionLatin: '',
+    heroButton1Text: '', heroButton1TextLatin: '', heroButton1Icon: 'BookOpen',
+    heroButton2Text: '', heroButton2TextLatin: '', heroButton2Icon: 'Trophy',
     footerText: '', siteTitle: '', siteLogoType: 'icon', siteLogoIcon: 'BookOpen',
     siteLogoUrl: '', sidebarTitle: '', headerTitleSize: 'text-lg', sidebarTitleSize: 'text-xl'
   });
@@ -374,16 +375,29 @@ const HomeEditor = () => {
                         placeholder="Belajar Bahasa Arab dengan Mudah"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase">Deskripsi Portal</label>
-                    <textarea 
-                        value={config.heroDescription}
-                        onChange={(e) => setConfig({...config, heroDescription: e.target.value})}
-                        rows="3"
-                        className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-colors leading-relaxed"
-                        style={{ fontFamily: 'var(--font-latin)' }}
-                        placeholder="Jelaskan secara singkat tentang website Anda..."
-                    />
+                <div className="space-y-4">
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-widest">Deskripsi Portal (Arabic)</label>
+                        <textarea 
+                            value={config.heroDescriptionArabic || ''}
+                            onChange={(e) => setConfig({...config, heroDescriptionArabic: e.target.value})}
+                            rows="2"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-colors leading-relaxed text-right font-arabic"
+                            style={{ fontFamily: 'var(--font-arabic)', direction: 'rtl' }}
+                            placeholder="...اكتب الوصف باللغة العربية هنا"
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-widest">Deskripsi Portal (Latin)</label>
+                        <textarea 
+                            value={config.heroDescriptionLatin || ''}
+                            onChange={(e) => setConfig({...config, heroDescriptionLatin: e.target.value})}
+                            rows="2"
+                            className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-3 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-teal-500 outline-none transition-colors leading-relaxed font-latin"
+                            style={{ fontFamily: 'var(--font-latin)' }}
+                            placeholder="Tulis deskripsi dalam bahasa Indonesia/Latin di sini..."
+                        />
+                    </div>
                 </div>
                 
                 
@@ -400,16 +414,29 @@ const HomeEditor = () => {
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Tombol Utama (Kiri)</h3>
                             </div>
 
-                            <div className="space-y-4 font-arabic">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
-                                <input 
-                                    type="text" 
-                                    value={config.heroButton1Text || ''}
-                                    onChange={(e) => setConfig({...config, heroButton1Text: e.target.value})}
-                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-teal-500 font-arabic"
-                                    style={{ fontFamily: 'var(--font-arabic)' }}
-                                    placeholder="ابدأ الآن"
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
+                                    <input 
+                                        type="text" 
+                                        value={config.heroButton1Text || ''}
+                                        onChange={(e) => setConfig({...config, heroButton1Text: e.target.value})}
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-teal-500 font-arabic"
+                                        style={{ fontFamily: 'var(--font-arabic)' }}
+                                        placeholder="ابدأ Sekarang"
+                                    />
+                                </div>
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Latin)</label>
+                                    <input 
+                                        type="text" 
+                                        value={config.heroButton1TextLatin || ''}
+                                        onChange={(e) => setConfig({...config, heroButton1TextLatin: e.target.value})}
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-teal-500 font-latin"
+                                        style={{ fontFamily: 'var(--font-latin)' }}
+                                        placeholder="Start Now"
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-4">
@@ -443,16 +470,29 @@ const HomeEditor = () => {
                                 <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">Tombol Sekunder (Kanan)</h3>
                             </div>
 
-                            <div className="space-y-4 font-arabic">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
-                                <input 
-                                    type="text" 
-                                    value={config.heroButton2Text || ''}
-                                    onChange={(e) => setConfig({...config, heroButton2Text: e.target.value})}
-                                    className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-rose-500 font-arabic"
-                                    style={{ fontFamily: 'var(--font-arabic)' }}
-                                    placeholder="ادخل ساحة الألعاب"
-                                />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Arabic)</label>
+                                    <input 
+                                        type="text" 
+                                        value={config.heroButton2Text || ''}
+                                        onChange={(e) => setConfig({...config, heroButton2Text: e.target.value})}
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold text-right outline-none focus:ring-2 focus:ring-rose-500 font-arabic"
+                                        style={{ fontFamily: 'var(--font-arabic)' }}
+                                        placeholder="ادخل ساحة الألعاب"
+                                    />
+                                </div>
+                                <div className="space-y-4">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-2">Teks Tombol (Latin)</label>
+                                    <input 
+                                        type="text" 
+                                        value={config.heroButton2TextLatin || ''}
+                                        onChange={(e) => setConfig({...config, heroButton2TextLatin: e.target.value})}
+                                        className="w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-3 text-slate-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-rose-500 font-latin"
+                                        style={{ fontFamily: 'var(--font-latin)' }}
+                                        placeholder="Game Arena"
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-4">

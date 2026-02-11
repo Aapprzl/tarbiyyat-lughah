@@ -95,9 +95,24 @@ const Home = () => {
             </h2>
           </div>
 
-          <p className="font-medium text-[var(--color-text-muted)] text-base md:text-xl max-w-2xl leading-relaxed mt-4 md:mt-4 drop-shadow-sm px-4 md:px-0" style={{ fontFamily: 'var(--font-latin)' }}>
-            {config.heroDescription}
-          </p>
+          <div className="flex flex-col gap-3 mt-4 md:mt-6 px-4 md:px-0 max-w-3xl mx-auto opacity-80">
+            {config.heroDescriptionArabic && (
+              <p 
+                className="text-xl md:text-2xl text-[var(--color-text-main)] font-light leading-relaxed" 
+                style={{ fontFamily: 'var(--font-arabic)' }}
+              >
+                {config.heroDescriptionArabic}
+              </p>
+            )}
+            {config.heroDescriptionLatin && (
+              <p 
+                className="text-sm md:text-base text-[var(--color-text-muted)] font-light leading-relaxed max-w-2xl mx-auto italic" 
+                style={{ fontFamily: 'var(--font-latin)' }}
+              >
+                {config.heroDescriptionLatin}
+              </p>
+            )}
+          </div>
 
           <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mt-10 md:mt-12 w-full md:w-auto px-6 md:px-0">
             <Link 
@@ -113,9 +128,16 @@ const Home = () => {
                 )}
               </div>
               
-              <span className="relative z-10 text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
-                {config.heroButton1Text || 'ابدأ الآن'}
-              </span>
+              <div className="flex flex-col items-start relative z-10">
+                <span className="text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
+                  {config.heroButton1Text || 'ابدأ الآن'}
+                </span>
+                {config.heroButton1TextLatin && (
+                  <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 group-hover:text-white/80 transition-colors -mt-1" style={{ fontFamily: 'var(--font-latin)' }}>
+                    {config.heroButton1TextLatin}
+                  </span>
+                )}
+              </div>
             </Link>
  
             <Link 
@@ -131,9 +153,16 @@ const Home = () => {
                 )}
               </div>
               
-              <span className="relative z-10 text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
-                {config.heroButton2Text || 'ادخل ساحة الألعاب'}
-              </span>
+              <div className="flex flex-col items-start relative z-10">
+                <span className="text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
+                  {config.heroButton2Text || 'ادخل ساحة الألعاب'}
+                </span>
+                {config.heroButton2TextLatin && (
+                  <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 group-hover:text-white/80 transition-colors -mt-1" style={{ fontFamily: 'var(--font-latin)' }}>
+                    {config.heroButton2TextLatin}
+                  </span>
+                )}
+              </div>
             </Link>
           </div>
         </motion.div>
