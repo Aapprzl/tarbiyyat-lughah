@@ -6,6 +6,7 @@ import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket,
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { isArabic } from '../../utils/textUtils';
 
 const iconMap = {
   BookOpen: Library, 
@@ -22,11 +23,7 @@ const iconMap = {
   Play: GamepadIcon
 };
 
-const isArabic = (text) => {
-  if (!text) return false;
-  const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-  return arabicRegex.test(text);
-};
+// isArabic is now imported from '../../utils/textUtils'
 
 const AdminDashboard = () => {
   const [curriculum, setCurriculum] = useState([]);
@@ -280,8 +277,10 @@ const AdminDashboard = () => {
                                         type="text" 
                                         value={newSectionTitle}
                                         onChange={(e) => setNewSectionTitle(e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
-                                        style={{ fontFamily: 'var(--font-latin)' }}
+                                        className={cn(
+                                          "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all",
+                                          isArabic(newSectionTitle) && "font-arabic text-lg dir-rtl !text-left py-1"
+                                        )}
                                         placeholder="Contoh: Shorof Dasar"
                                         autoFocus
                                         required
@@ -293,8 +292,10 @@ const AdminDashboard = () => {
                                       <textarea 
                                         value={newSectionDesc}
                                         onChange={(e) => setNewSectionDesc(e.target.value)}
-                                        className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none h-24 resize-none"
-                                        style={{ fontFamily: 'var(--font-latin)' }}
+                                        className={cn(
+                                          "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none h-24 resize-none transition-all",
+                                          isArabic(newSectionDesc) && "font-arabic text-base dir-rtl !text-left py-1"
+                                        )}
                                         placeholder="Deskripsi singkat tentang kategori ini..."
                                       />
                                    </div>
@@ -361,12 +362,8 @@ const AdminDashboard = () => {
                       type="text" 
                       className={cn(
                         "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all",
-                        isArabic(newTopicTitle) && "arabic-index-topic"
+                        isArabic(newTopicTitle) && "font-arabic text-lg dir-rtl !text-left py-1"
                       )}
-                      style={{ 
-                        fontFamily: isArabic(newTopicTitle) ? 'var(--font-arabic)' : 'var(--font-latin)',
-                        direction: isArabic(newTopicTitle) ? 'rtl' : 'ltr'
-                      }}
                       placeholder="Contoh: Bab 1 - Pengenalan"
                       value={newTopicTitle}
                       onChange={e => setNewTopicTitle(e.target.value)}
@@ -414,8 +411,23 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
         e.stopPropagation();
         setToggling(true);
         try {
-            await contentService.updateSection(section.id, { isLocked: !section.isLocked });
-            onReload();
+            const nextLockedStatus = !section.isLocked;
+            
+            // First update the section status
+            await contentService.updateSection(section.id, { isLocked: nextLockedStatus });
+            
+            // Then sync status to all topics immediately
+            if (section.topics && section.topics.length > 0) {
+                // Using map for individual updates as current API handles individual topic metadata
+                await Promise.all(section.topics.map(topic => 
+                    contentService.updateTopicMetadata(topic.id, { isLocked: nextLockedStatus })
+                ));
+            }
+            
+            // Reload dashboard data to reflect changes
+            await onReload();
+            setToggling(false);
+            return; // Exit early to avoid redundant toggling state set (since we reload)
         } finally {
             setToggling(false);
         }
@@ -432,19 +444,39 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+        <div className={cn(
+            "bg-white dark:bg-slate-800 rounded-lg border transition-all duration-300",
+            section.isLocked 
+                ? "border-amber-200 dark:border-amber-900/50 shadow-sm shadow-amber-500/5" 
+                : "border-slate-200 dark:border-slate-700"
+        )}>
             <div 
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-4 p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                className={cn(
+                    "flex items-center gap-4 p-4 cursor-pointer rounded-t-lg transition-colors",
+                    section.isLocked 
+                        ? "hover:bg-amber-50/50 dark:hover:bg-amber-900/10" 
+                        : "hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                )}
             >
                 {/* Icon */}
-                <div className="w-12 h-12 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-lg flex items-center justify-center shrink-0">
-                    <SectionIcon className="w-6 h-6" />
+                <div className={cn(
+                    "w-12 h-12 rounded-lg flex items-center justify-center shrink-0 transition-all duration-300",
+                    section.isLocked 
+                        ? "bg-amber-500 text-white shadow-lg shadow-amber-500/20 scale-105" 
+                        : "bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400"
+                )}>
+                    {section.isLocked ? <Lock className="w-6 h-6" /> : <SectionIcon className="w-6 h-6" />}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-slate-900 dark:text-white truncate">{section.title}</h3>
+                    <h3 className={cn(
+                        "text-lg font-semibold text-slate-900 dark:text-white truncate transition-all",
+                        isArabic(section.title) && "font-arabic text-xl dir-rtl !text-left py-1"
+                    )}>
+                        {section.title}
+                    </h3>
                     <p className="text-sm text-slate-500 truncate">
                         {topicCount} Materi
                         {section.isLocked && ' • Terkunci'}
@@ -457,9 +489,9 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                         onClick={toggleLock}
                         disabled={toggling}
                         className={cn(
-                            "p-2 rounded-lg transition-colors",
+                            "p-2 rounded-lg transition-all duration-300",
                             section.isLocked 
-                            ? "text-amber-600 bg-amber-50 dark:bg-amber-900/20" 
+                            ? "text-amber-600 bg-amber-100 dark:bg-amber-900/40 ring-2 ring-amber-500/20 shadow-sm shadow-amber-500/10" 
                             : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
                         )}
                         title={section.isLocked ? "Buka Kunci" : "Kunci Kategori"}
@@ -506,15 +538,15 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                     className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
                                 >
                                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                                        <div className={cn(
-                                            "w-8 h-8 rounded-lg flex items-center justify-center shrink-0",
-                                            topic.isLocked 
-                                                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600" 
-                                                : "bg-teal-50 dark:bg-teal-900/30 text-teal-600"
-                                        )}>
-                                            {topic.isLocked ? <Lock className="w-4 h-4" /> : <Library className="w-4 h-4" />}
+                                        <div className="w-8 h-8 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-lg flex items-center justify-center shrink-0">
+                                            <Library className="w-4 h-4" />
                                         </div>
-                                        <span className="font-medium text-slate-900 dark:text-white arabic-index-topic transition-all leading-tight">{topic.title}</span>
+                                        <span className={cn(
+                                            "font-medium text-slate-900 dark:text-white transition-all leading-tight",
+                                            isArabic(topic.title) && "font-arabic text-lg dir-rtl !text-left py-1"
+                                        )}>
+                                            {topic.title}
+                                        </span>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
                                         <button 

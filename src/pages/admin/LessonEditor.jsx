@@ -15,6 +15,7 @@ import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { BlockEditor, AddBlockButton } from '../../components/admin/BlockEditor';
+import { isArabic } from '../../utils/textUtils';
 
 const LessonEditor = () => {
   const { topicId } = useParams();
@@ -483,7 +484,7 @@ const LessonEditor = () => {
   return (
     <div className="pb-16">
        {/* Header */}
-      <div className="flex items-center justify-between mb-6 sticky top-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm z-30 py-3 px-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+      <div className="flex items-center justify-between mb-6 sticky top-4 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm z-30 py-5 px-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
         <div className="flex items-center flex-1 gap-3 min-w-0">
             <button 
                 onClick={() => navigate(isSpecialProgram ? '/admin/games' : '/admin/dashboard')} 
@@ -497,14 +498,20 @@ const LessonEditor = () => {
                   type="text" 
                   value={topicTitle}
                   onChange={(e) => setTopicTitle(e.target.value)}
-                  className="text-xl font-bold text-slate-900 dark:text-white bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate arabic-index-topic transition-all"
+                  className={cn(
+                    "text-xl font-bold text-slate-900 dark:text-white bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate transition-all",
+                    isArabic(topicTitle) && "font-arabic text-2xl dir-rtl !text-left py-2"
+                  )}
                   placeholder="Judul Materi..."
                 />
                 <input 
                   type="text" 
                   value={topicDesc}
                   onChange={(e) => setTopicDesc(e.target.value)}
-                  className="text-sm text-slate-500 bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate"
+                  className={cn(
+                    "text-sm text-slate-500 bg-transparent border-none outline-none w-full placeholder-slate-300 p-0 focus:ring-0 truncate",
+                    isArabic(topicDesc) && "font-arabic text-base dir-rtl !text-left py-1"
+                  )}
                   placeholder="Deskripsi singkat..."
                 />
             </div>

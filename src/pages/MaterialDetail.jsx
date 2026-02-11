@@ -83,6 +83,7 @@ import HangmanGame from "../components/games/HangmanGame";
 import CamelRaceGame from "../components/games/CamelRaceGame";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
+import { wrapArabicText, isArabic as isArabicText } from "../utils/textUtils";
 
 const getTypeInfo = (type) => {
   switch (type) {
@@ -783,12 +784,7 @@ const MaterialDetailContent = () => {
   );
 };
 
-// --- MODERN CONTENT BLOCK RENDERER ---
-const isArabic = (text) => {
-  if (!text) return false;
-  const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-  return arabicRegex.test(text);
-};
+// isArabic is now imported as isArabicText
 
 const ContentBlock = ({ block }) => {
   if (!block || !block.data) return null;
@@ -807,7 +803,7 @@ const ContentBlock = ({ block }) => {
               )}
               <div 
                 className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: block.data?.content }}
+                dangerouslySetInnerHTML={{ __html: wrapArabicText(block.data?.content) }}
               />
             </div>
           </div>
@@ -826,7 +822,7 @@ const ContentBlock = ({ block }) => {
             <div 
               className={cn(
                   "prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[2] whitespace-pre-wrap",
-                  hasArabic && "arabic-content dir-rtl"
+                  isArabicText(block.data.content) && "arabic-content dir-rtl"
               )}
             >
               {block.data?.content}
@@ -847,7 +843,7 @@ const ContentBlock = ({ block }) => {
             )}
             <div 
               className="prose prose-lg prose-teal dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-medium leading-[1.8] richtext-content"
-              dangerouslySetInnerHTML={{ __html: block.data?.content }}
+              dangerouslySetInnerHTML={{ __html: wrapArabicText(block.data?.content) }}
             />
           </div>
         </div>

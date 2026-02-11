@@ -25,36 +25,6 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
 
-  // Sophisticated Waveform Visualizer
-  const [bars, setBars] = useState(new Array(32).fill(15));
-  const animationRef = useRef(null);
-
-  useEffect(() => {
-    if (isPlaying) {
-      const animate = () => {
-        // Generate a more "fluid" waveform look
-        setBars(prev => prev.map((h, i) => {
-           const target = Math.max(15, Math.random() * 80);
-           return h + (target - h) * 0.2; // Smooth interpolation
-        }));
-        animationRef.current = requestAnimationFrame(animate);
-      };
-      animate();
-    } else {
-      cancelAnimationFrame(animationRef.current);
-      // Gently return to baseline instead of instant snap
-      const reset = () => {
-         setBars(prev => {
-            const next = prev.map(h => h + (15 - h) * 0.1);
-            if (next.every(h => Math.abs(h - 15) < 1)) return new Array(32).fill(15);
-            animationRef.current = requestAnimationFrame(reset);
-            return next;
-         });
-      };
-      reset();
-    }
-    return () => cancelAnimationFrame(animationRef.current);
-  }, [isPlaying]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
@@ -118,7 +88,7 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
   };
 
   return (
-    <div className="group relative md:bg-white/40 md:dark:bg-slate-900/40 md:backdrop-blur-xl md:rounded-[2.5rem] py-6 md:p-8 md:border md:border-slate-200 md:dark:border-white/10 w-full max-w-3xl mx-auto md:mx-0 md:shadow-xl md:hover:shadow-2xl transition-all duration-500 overflow-hidden">
+    <div className="group relative md:bg-white/40 md:dark:bg-slate-900/40 md:backdrop-blur-xl md:rounded-[2.5rem] py-6 md:p-8 md:border md:border-slate-200 md:dark:border-white/10 w-full mx-auto md:mx-0 md:shadow-xl md:hover:shadow-2xl transition-all duration-500 overflow-hidden">
         {/* Glow Effects */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -ml-16 -mb-16"></div>
@@ -137,31 +107,9 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
                         </h4>
                         <div className="flex items-center gap-2">
                              <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></div>
-                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Audio Lesson Block</span>
+                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Audio Lesson</span>
                         </div>
                     </div>
-                </div>
-
-                {/* Waveform Visualizer */}
-                <div className="h-20 bg-slate-50 dark:bg-black/20 rounded-[1.5rem] flex items-center justify-center gap-[3px] px-6 border border-slate-100 dark:border-white/5 relative overflow-hidden group/viz">
-                    {bars.map((height, i) => (
-                        <motion.div 
-                            key={i} 
-                            className="w-1.5 bg-gradient-to-t from-teal-500 to-emerald-400 rounded-full"
-                            animate={{ 
-                                height: `${height}%`,
-                                opacity: isPlaying ? 1 : 0.3
-                            }}
-                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                        />
-                    ))}
-                    {!isPlaying && currentTime === 0 && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-white/10 dark:bg-black/10 backdrop-blur-[1px] opacity-0 group-hover/viz:opacity-100 transition-opacity">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-teal-600 dark:text-teal-400 bg-white dark:bg-slate-800 px-4 py-1.5 rounded-full shadow-sm">
-                                Ready to Play
-                            </span>
-                        </div>
-                    )}
                 </div>
             </div>
 

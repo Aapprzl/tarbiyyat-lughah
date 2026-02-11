@@ -39,6 +39,7 @@ const transformProgramsToOldFormat = (programs) => {
         desc: program.description,
         icon: program.icon,
         color: program.color,
+        isLocked: program.is_locked || false,
         topics: (program.topics || []).map(topic => ({
             id: topic.slug,
             title: topic.title,
@@ -360,10 +361,7 @@ export const contentService = {
     // LESSON CONTENT MANAGEMENT
     // ============================================
 
-    isValidUUID(uuid) {
-        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        return uuidRegex.test(uuid);
-    },
+    // isValidUUID helper - standardized to one location
 
     async getLessonContent(topicId) {
         try {
@@ -689,9 +687,9 @@ export const contentService = {
             const dbUpdates = {};
             if (metadata.title !== undefined) dbUpdates.title = metadata.title;
             if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
-            if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
             if (metadata.description !== undefined) dbUpdates.description = metadata.description;
-            // Note: game_categories does not have thumbnail or is_locked columns
+            if (metadata.isLocked !== undefined) dbUpdates.is_locked = metadata.isLocked;
+            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
 
             await contentServiceV2.gameCategories.update(categoryUuid, dbUpdates);
             return true;
@@ -817,9 +815,9 @@ export const contentService = {
             const dbUpdates = {};
             if (metadata.title !== undefined) dbUpdates.title = metadata.title;
             if (metadata.icon !== undefined) dbUpdates.icon = metadata.icon;
-            if (metadata.desc !== undefined) dbUpdates.description = metadata.desc;
             if (metadata.description !== undefined) dbUpdates.description = metadata.description;
-            // Note: programs usually doesn't have is_locked, though topics do
+            if (metadata.isLocked !== undefined) dbUpdates.is_locked = metadata.isLocked;
+            if (metadata.hasOwnProperty('isLocked')) dbUpdates.is_locked = metadata.isLocked;
 
             await contentServiceV2.programs.update(programUuid, dbUpdates);
             return true;

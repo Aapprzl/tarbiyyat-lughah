@@ -123,8 +123,14 @@ const MaterialIndex = () => {
           <div className="flex items-center gap-6 px-4 md:px-0">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent to-teal-500/30"></div>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-teal-500/20">
+              <div className={cn(
+                "w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl transition-all duration-300",
+                section.isLocked 
+                    ? "bg-amber-500 shadow-amber-500/20 scale-105" 
+                    : "bg-teal-500 shadow-teal-500/20"
+              )}>
                 {(() => {
+                  if (section.isLocked) return <Lock className="w-6 h-6" />;
                   const IconComp = iconMap[section.icon] || Library;
                   return <IconComp className="w-6 h-6" />;
                 })()}

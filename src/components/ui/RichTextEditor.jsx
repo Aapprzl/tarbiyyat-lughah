@@ -13,6 +13,7 @@ import {
     AlignRight,
     Languages
 } from 'lucide-react';
+import { wrapArabicText } from '../../utils/textUtils';
 import DOMPurify from 'dompurify';
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
@@ -32,8 +33,11 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
 
   const handleInput = () => {
     if (editorRef.current) {
+      // We don't wrap live while typing to avoid cursor issues
+      // But we wrap the output for the parent
       const cleanHTML = DOMPurify.sanitize(editorRef.current.innerHTML);
-      onChange(cleanHTML);
+      const wrappedHTML = wrapArabicText(cleanHTML);
+      onChange(wrappedHTML);
       updateActiveFormats();
     }
   };
