@@ -54,7 +54,7 @@ const getTypeInfo = (type) => {
         case 'matchup': return { label: 'Cocokkan', color: 'pink', icon: Shuffle, gradientItems: 'from-pink-500/10 to-rose-500/10' };
         case 'quiz': return { label: 'Kuis', color: 'emerald', icon: BrainCircuit, gradientItems: 'from-emerald-500/10 to-teal-500/10' };
         case 'anagram': return { label: 'Anagram', color: 'teal', icon: GripVertical, gradientItems: 'from-teal-500/10 to-emerald-500/10' }; // Keeping GripVertical as Tile metaphor
-        case 'completesentence': return { label: 'Kilat Bahasa', color: 'indigo', icon: Zap, gradientItems: 'from-indigo-500/10 to-azure-500/10' };
+        case 'completesentence': return { label: 'Kilat Bahasa', color: 'indigo', icon: Zap, gradientItems: 'from-indigo-500/10 to-blue-500/10' };
         case 'unjumble': return { label: 'Susun', color: 'purple', icon: StretchHorizontal, gradientItems: 'from-purple-500/10 to-violet-500/10' };
         case 'spinwheel': return { label: 'Putar', color: 'indigo', icon: RefreshCcw, gradientItems: 'from-indigo-500/10 to-cyan-500/10' };
         case 'youtube': return { label: 'Video', color: 'red', icon: Youtube, gradientItems: 'from-red-500/10 to-rose-500/10' };
