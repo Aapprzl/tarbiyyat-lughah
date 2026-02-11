@@ -4,6 +4,7 @@ import * as LucideIcons from 'lucide-react';
 import { ArrowRight, Sun, Moon, Sparkles } from 'lucide-react';
 import { useTheme } from '../providers/ThemeProvider';
 import { cn } from '../../utils/cn';
+import { isArabic } from '../../utils/textUtils';
 
 const FadeText = ({ texts, duration = 5000 }) => {
   const [index, setIndex] = useState(0);
@@ -24,7 +25,12 @@ const FadeText = ({ texts, duration = 5000 }) => {
           animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
           exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
-          className="text-slate-500 dark:text-slate-400 font-medium text-lg md:text-xl text-center px-4"
+          className={cn(
+            "text-slate-500 dark:text-slate-400 font-medium text-center px-4 transition-all duration-300",
+            isArabic(texts[index]) 
+              ? "text-xl md:text-2xl font-arabic leading-relaxed" 
+              : "text-lg md:text-xl font-latin"
+          )}
         >
           {texts[index]}
         </motion.p>
@@ -136,7 +142,7 @@ const Intro = ({ onEnter, config, homeConfig }) => {
               initial={{ opacity: 0, filter: 'blur(10px)', y: 20 }}
               animate={{ opacity: 1, filter: 'blur(0px)', y: 0 }}
               transition={{ delay: 0.5, duration: 1 }}
-              className="text-6xl md:text-8xl font-black text-slate-900 dark:text-white mb-4 arabic-title tracking-tight"
+              className="text-5xl md:text-7xl font-black text-slate-900 dark:text-white mb-6 font-arabic tracking-tight leading-tight"
             >
               {introData.titleAr}
             </motion.h1>
