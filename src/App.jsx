@@ -29,10 +29,12 @@ import { ThemeProvider } from './components/providers/ThemeProvider';
 import Intro from './components/features/Intro';
 import ScrollToTop from './components/ui/ScrollToTop';
 import PWAInstallPrompt from './components/ui/PWAInstallPrompt';
+import Analytics from './components/ui/Analytics';
 
 // Helper component to wrap routes with ScrollToTop (since RouterProvider doesn't use standard Router wrapper)
 const RouterWrapper = () => (
   <>
+    <Analytics />
     <ScrollToTop />
     <Outlet />
   </>
