@@ -69,6 +69,7 @@ const iconMap = {
 import { contentService } from "../services/contentService";
 import PdfViewer from "../components/media/PdfViewer";
 import AudioPlayer from "../components/media/AudioPlayer";
+import ImageViewer from "../components/media/ImageViewer";
 import MatchUpGame from "../components/games/MatchUpGame";
 import QuizGame from "../components/games/QuizGame";
 import AnagramGame from "../components/games/AnagramGame";
@@ -854,7 +855,7 @@ const ContentBlock = ({ block }) => {
         <div className="space-y-6 px-4 md:px-0">
           <div className="flex items-center justify-between px-0 md:px-0">
               <h4 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] font-sans flex items-center gap-3">
-                <Pocket className="w-4 h-4" /> Daftar Kosakata
+                <Pocket className="w-4 h-4" /> {block.data?.title || "Daftar Kosakata"}
               </h4>
               <div className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">
                 {block.data?.items?.length || 0} Kata
@@ -989,6 +990,16 @@ const ContentBlock = ({ block }) => {
           <div className="md:rounded-[3rem] overflow-hidden md:border md:border-slate-200 md:dark:border-slate-700 md:shadow-xl bg-white dark:bg-slate-800">
             <PdfViewer fileUrl={block.data?.url} height={600} />
           </div>
+        </div>
+      );
+    case "image":
+      return (
+        <div className="px-4 md:px-0">
+          <ImageViewer 
+            src={block.data?.url} 
+            title={block.data?.title || ""} 
+            alt={block.data?.title}
+          />
         </div>
       );
     case "audio":

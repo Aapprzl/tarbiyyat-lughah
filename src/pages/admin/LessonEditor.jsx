@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, MoveLeft, Plus, Type, Table, AlertCircle, Trash2, GripVertical, Youtube, ClipboardList, Layers, X, ChevronDown, ChevronUp, Music, Puzzle, HelpCircle, RefreshCcw, ShieldCheck, MoveRight, Circle, Keyboard, Image as ImageIcon, Heart, LayoutGrid, Zap, Upload, Ghost, FileText, CloudRain, Mountain } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Save, Upload } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -257,7 +257,7 @@ const LessonEditor = () => {
                     ] 
                 }] 
               }
-
+            : type === 'image' ? { url: '', caption: '' }
             : type === 'anagram' ? { title: 'Anagram', questions: [{ id: 1, answer: '', clue: '' }] }
             : type === 'completesentence' ? { title: 'Kilat Bahasa', questions: [{ id: 1, text: '', translation: '', isCorrect: true }] }
             : type === 'unjumble' ? { title: 'Susun Kalimat', subtitle: 'Susunlah Kalimat Arab', questions: [{ id: 1, text: '', pattern: 'Kerja + Pelaku + Objek', clue: '' }] }
@@ -388,6 +388,18 @@ const LessonEditor = () => {
                 } catch (e) {
                     console.error("Audio Upload Failed", e);
                     toast.error(`Gagal upload Audio ${block.data.fileName}`);
+                    return block;
+                }
+            }
+            // Image Upload
+            if (block.type === 'image' && block.data.rawFile) {
+                try {
+                    const downloadUrl = await storageService.uploadFile(block.data.rawFile, 'materials/images');
+                    const { rawFile, ...restData } = block.data;
+                    return { ...block, data: { ...restData, url: downloadUrl } };
+                } catch (e) {
+                    console.error("Image Upload Failed", e);
+                    toast.error(`Gagal upload Gambar ${block.data.fileName}`);
                     return block;
                 }
             }
@@ -699,6 +711,7 @@ const LessonEditor = () => {
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'audio')} icon={Music} label="Audio" color="text-violet-600" bg="bg-violet-50 dark:bg-violet-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'image')} icon={ImageIcon} label="Gambar" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'pdf')} icon={ClipboardList} label="File" color="text-blue-600" bg="bg-blue-50 dark:bg-blue-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'richtext')} icon={FileText} label="Rich Text" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
                                       </>

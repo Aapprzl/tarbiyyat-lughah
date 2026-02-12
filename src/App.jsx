@@ -28,6 +28,7 @@ import { ThemeProvider } from './components/providers/ThemeProvider';
 
 import Intro from './components/features/Intro';
 import ScrollToTop from './components/ui/ScrollToTop';
+import PWAInstallPrompt from './components/ui/PWAInstallPrompt';
 
 // Helper component to wrap routes with ScrollToTop (since RouterProvider doesn't use standard Router wrapper)
 const RouterWrapper = () => (
@@ -135,6 +136,7 @@ function App() {
         <ConfirmProvider>
           <FontProvider>
             {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
+            <PWAInstallPrompt />
             <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}>
               <RouterProvider router={router} />
             </Suspense>

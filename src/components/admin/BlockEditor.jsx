@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../media/PdfViewer';
 import AudioPlayer from '../media/AudioPlayer';
+import ImageViewer from '../media/ImageViewer';
 import RichTextEditor from '../ui/RichTextEditor';
 
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
@@ -42,6 +43,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'youtube': return { icon: Youtube, label: 'Video', color: 'text-red-600', bg: 'bg-red-50' };
             case 'audio': return { icon: Music, label: 'Audio', color: 'text-violet-600', bg: 'bg-violet-50' };
             case 'pdf': return { icon: ClipboardList, label: 'File', color: 'text-blue-600', bg: 'bg-blue-50' };
+            case 'image': return { icon: ImageIcon, label: 'Gambar', color: 'text-pink-600', bg: 'bg-pink-50' };
             case 'richtext': return { icon: FileText, label: 'Rich Text', color: 'text-emerald-600', bg: 'bg-emerald-50' };
             case 'matchup': return { icon: Puzzle, label: 'Match Up', color: 'text-pink-600', bg: 'bg-pink-50' };
             case 'quiz': return { icon: HelpCircle, label: 'Quiz', color: 'text-teal-600', bg: 'bg-teal-50' };
@@ -74,6 +76,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             youtube: 'from-red-500 to-rose-600',
             audio: 'from-violet-500 to-purple-600',
             pdf: 'from-blue-500 to-cyan-600',
+            image: 'from-pink-500 to-indigo-600',
             vocab: 'from-indigo-500 to-slate-800',
             text: 'from-teal-400 to-emerald-600',
             wordrain: 'from-sky-400 to-indigo-600',
@@ -244,7 +247,15 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
 
               {/* --- VOCAB BLOCK --- */}
               {block.type === 'vocab' && (
-                <div>
+                <div className="space-y-4">
+                  <input 
+                    type="text" 
+                    placeholder="Judul Daftar Kosakata (Opsional)..."
+                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 outline-none text-sm placeholder-[var(--color-text-muted)]/50 focus:border-indigo-500/50 transition-colors"
+                    value={block.data.title || ''}
+                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                  />
+                  <div>
                      {block.data.items?.map((item, idx) => (
                      <div key={idx} className="flex gap-2 mb-2">
                         <input 
@@ -287,6 +298,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                    >
                      + Tambah Baris
                    </button>
+                  </div>
                 </div>
               )}
 
@@ -363,6 +375,48 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                    {block.data.url && (
                      <div className="mt-3">
                         <AudioPlayer src={block.data.url} title={block.data.title} />
+                     </div>
+                   )}
+                </div>
+              )}
+
+              {/* --- IMAGE BLOCK --- */}
+              {block.type === 'image' && (
+                <div className="space-y-3">
+                  <input 
+                    type="text" 
+                    placeholder="Judul Gambar (Opsional)..."
+                    className="w-full font-bold text-[var(--color-text-main)] bg-transparent border-b border-[var(--color-border)] pb-1 text-sm outline-none placeholder-[var(--color-text-muted)]/50"
+                    value={block.data.title || ''}
+                    onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                  />
+                   <div className="flex gap-2 items-center p-3 bg-[var(--color-bg-muted)] rounded-lg border border-[var(--color-border)] border-dashed">
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          className="block w-full text-xs text-[var(--color-text-muted)] file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:bg-pink-50 dark:file:bg-pink-900/30 file:text-pink-600 dark:file:text-pink-400 hover:file:bg-pink-100 dark:hover:file:bg-pink-900/50 cursor-pointer"
+                          onChange={(e) => {
+                             const file = e.target.files[0];
+                             if (file) {
+                                if (file.size > 2 * 1024 * 1024) { 
+                                   toast.warning("Ukuran gambar maksimal 2MB."); return;
+                                }
+                                const objectUrl = URL.createObjectURL(file);
+                                onUpdate({ 
+                                    ...block.data, 
+                                    url: objectUrl, 
+                                    fileName: file.name,
+                                    rawFile: file 
+                                });
+                             }
+                          }}
+                        />
+                   </div>
+                   
+                   {/* Preview */}
+                   {block.data.url && (
+                     <div className="mt-3">
+                        <ImageViewer src={block.data.url} title={block.data.title} className="max-w-xs mx-auto" />
                      </div>
                    )}
                 </div>
