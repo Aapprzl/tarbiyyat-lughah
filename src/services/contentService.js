@@ -691,6 +691,7 @@ export const contentService = {
                     id: block.id,
                     title: block.data?.title || block.type, // Fallback to type if no title
                     type: block.type, // 'quiz', 'matchup', etc.
+                    data: block.data, // Include data for focus mode rendering
                     thumbnail: block.data?.thumbnail,
                     isLocked: false // Games usually don't have individual locks in this view
                 })),

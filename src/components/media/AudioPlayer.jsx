@@ -14,69 +14,46 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
+import { useAudio } from '../providers/AudioProvider';
+
 const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [speed, setSpeed] = useState(1);
-  const [volume, setVolume] = useState(1);
-  const [isMuted, setIsMuted] = useState(false);
-  const [isLooping, setIsLooping] = useState(false);
+  const { 
+    currentTrack, 
+    isPlaying: globalIsPlaying, 
+    progress: globalProgress, 
+    currentTime: globalCurrentTime,
+    duration: globalDuration,
+    playTrack, 
+    togglePlay: globalTogglePlay,
+    seek: globalSeek,
+    speed,
+    setSpeed, // Assuming I add this to provider or use local if specific
+    volume,
+    setVolume,
+    isMuted,
+    setIsMuted
+  } = useAudio();
 
+  // Determine if THIS instance is the one playing globally
+  const isSelected = currentTrack?.src === src;
+  
+  // Use global state if selected, otherwise local/default
+  const isPlaying = isSelected ? globalIsPlaying : false;
+  const progress = isSelected ? globalProgress : 0;
+  const currentTime = isSelected ? globalCurrentTime : 0;
+  const duration = isSelected ? globalDuration : 0;
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
+  const handleTogglePlay = () => {
+    if (isSelected) {
+      globalTogglePlay();
     } else {
-      audioRef.current.play().catch(e => console.error("Playback failed:", e));
-    }
-  };
-
-  const skip = (amount) => {
-    if (!audioRef.current) return;
-    audioRef.current.currentTime = Math.max(0, Math.min(audioRef.current.duration, audioRef.current.currentTime + amount));
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      const curr = audioRef.current.currentTime;
-      const total = audioRef.current.duration;
-      setCurrentTime(curr);
-      setDuration(total || 0);
-      setProgress((curr / total) * 100);
+      playTrack({ src, title });
     }
   };
 
   const handleSeek = (e) => {
-    if (!audioRef.current) return;
-    const newTime = (e.target.value / 100) * audioRef.current.duration;
-    audioRef.current.currentTime = newTime;
-    setProgress(e.target.value);
-  };
-
-  const toggleSpeed = () => {
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const nextSpeed = speeds[(speeds.indexOf(speed) + 1) % speeds.length];
-    setSpeed(nextSpeed);
-    if (audioRef.current) audioRef.current.playbackRate = nextSpeed;
-  };
-
-  const toggleMute = () => {
-    if (!audioRef.current) return;
-    audioRef.current.muted = !isMuted;
-    setIsMuted(!isMuted);
-  };
-
-  const handleVolumeChange = (e) => {
-    const v = parseFloat(e.target.value);
-    setVolume(v);
-    if (audioRef.current) {
-        audioRef.current.volume = v;
-        audioRef.current.muted = v === 0;
-        setIsMuted(v === 0);
+    if (isSelected) {
+      globalSeek(e.target.value);
     }
   };
 
@@ -106,8 +83,10 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
                             {title}
                         </h4>
                         <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></div>
-                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Audio Lesson</span>
+                             <div className={cn("w-1.5 h-1.5 rounded-full bg-teal-500", isPlaying && "animate-pulse")}></div>
+                             <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                {isPlaying ? "Sedang Diputar" : "Audio Lesson"}
+                             </span>
                         </div>
                     </div>
                 </div>
@@ -117,46 +96,10 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
             <div className="w-full md:w-64 space-y-6">
                 <div className="flex items-center justify-center gap-4">
                     <button 
-                        onClick={() => skip(-10)}
-                        className="p-2 text-slate-400 hover:text-teal-500 transition-all active:scale-90"
-                        title="Mundur 10 detik"
-                    >
-                        <SkipBack className="w-5 h-5" />
-                    </button>
-
-                    <button 
-                        onClick={togglePlay}
+                        onClick={handleTogglePlay}
                         className="w-16 h-16 rounded-3xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-slate-900/20 dark:shadow-white/10"
                     >
                         {isPlaying ? <Pause className="w-7 h-7 fill-current" /> : <Play className="w-7 h-7 fill-current ml-1" />}
-                    </button>
-
-                    <button 
-                        onClick={() => skip(10)}
-                        className="p-2 text-slate-400 hover:text-teal-500 transition-all active:scale-90"
-                        title="Maju 10 detik"
-                    >
-                        <SkipForward className="w-5 h-5" />
-                    </button>
-                </div>
-
-                {/* Speed & Loop Row */}
-                <div className="flex items-center justify-center gap-6">
-                    <button 
-                        onClick={toggleSpeed}
-                        className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-teal-500 transition-all bg-slate-100 dark:bg-white/5 px-3 py-1.5 rounded-full"
-                    >
-                        {speed}x Speed
-                    </button>
-                    <button 
-                        onClick={() => setIsLooping(!isLooping)}
-                        className={cn(
-                            "p-2 rounded-full transition-all",
-                            isLooping ? "bg-teal-500 text-white shadow-lg shadow-teal-500/20" : "text-slate-400 hover:text-slate-600"
-                        )}
-                        title="Ulangi otomatis"
-                    >
-                        {isLooping ? <Repeat1 className="w-4 h-4" /> : <Repeat className="w-4 h-4" />}
                     </button>
                 </div>
             </div>
@@ -181,37 +124,29 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
                         max="100"
                         value={progress || 0}
                         onChange={handleSeek}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-default"
+                        disabled={!isSelected}
                     />
                 </div>
             </div>
 
-            {/* Volume Control */}
+            {/* Volume Control (Only show for selected or desktop) */}
             <div className="flex items-center gap-4 bg-slate-50 dark:bg-black/20 px-4 py-2 rounded-2xl border border-slate-100 dark:border-white/5">
-                <button onClick={toggleMute} className="text-slate-400 hover:text-teal-500 transition-all">
-                    {isMuted || volume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                <button onClick={() => isSelected && setIsMuted(!isMuted)} className="text-slate-400 hover:text-teal-500 transition-all">
+                    {(isSelected && isMuted) || (isSelected && volume === 0) ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
                 <input
                     type="range"
                     min="0"
                     max="1"
                     step="0.1"
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolumeChange}
+                    value={isSelected ? (isMuted ? 0 : volume) : 1}
+                    onChange={(e) => isSelected && setVolume(parseFloat(e.target.value))}
                     className="w-20 h-1 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                    disabled={!isSelected}
                 />
             </div>
         </div>
-
-        <audio 
-            ref={audioRef} 
-            src={src} 
-            loop={isLooping}
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={() => !isLooping && setIsPlaying(false)}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-        />
     </div>
   );
 };

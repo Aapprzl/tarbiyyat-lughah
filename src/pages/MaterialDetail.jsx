@@ -518,15 +518,22 @@ const MaterialDetailContent = () => {
   }
 
   // --- NEW: FOCUSED ITEM VIEW ---
-  if (targetItemId && isJson) {
+  if (targetItemId) {
     // Find the specific item
     let foundItem = null;
+    
+    // 1. Search in displayData (Structured Content)
     for (const stage of displayData) {
       const item = stage.items?.find((i) => String(i.id) === targetItemId);
       if (item) {
         foundItem = item;
         break;
       }
+    }
+
+    // 2. Search in categoryTopics (Game Lists/Special Programs)
+    if (!foundItem && isCategoryView) {
+      foundItem = categoryTopics.find((i) => String(i.id) === targetItemId);
     }
 
     if (foundItem) {
@@ -543,7 +550,7 @@ const MaterialDetailContent = () => {
               </button>
               <div>
                 <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  {foundItem.data?.title || "Fokus Materi"}
+                  {foundItem.data?.title || foundItem.title || "Fokus Materi"}
                 </h3>
                 <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                   {topic?.title}

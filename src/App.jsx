@@ -40,6 +40,9 @@ const RouterWrapper = () => (
   </>
 );
 
+import { AudioProvider } from './components/providers/AudioProvider';
+import GlobalAudioBar from './components/ui/GlobalAudioBar';
+
 function App() {
   const [loading, setLoading] = React.useState(true);
   const [introConfig, setIntroConfig] = React.useState(null);
@@ -137,11 +140,14 @@ function App() {
       <ToastProvider>
         <ConfirmProvider>
           <FontProvider>
-            {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
-            <PWAInstallPrompt />
-            <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}>
-              <RouterProvider router={router} />
-            </Suspense>
+            <AudioProvider>
+              {showIntro && <Intro onEnter={handleEnterWebsite} config={introConfig} homeConfig={homeConfig} />}
+              <PWAInstallPrompt />
+              <Suspense fallback={<div className="flex items-center justify-center min-h-screen bg-[var(--color-bg-main)] text-slate-400 font-bold uppercase tracking-widest text-xs">Memuat...</div>}>
+                <RouterProvider router={router} />
+              </Suspense>
+              <GlobalAudioBar />
+            </AudioProvider>
           </FontProvider>
         </ConfirmProvider>
       </ToastProvider>
