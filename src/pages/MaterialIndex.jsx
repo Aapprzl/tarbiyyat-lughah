@@ -8,6 +8,8 @@ import {
 import { contentService } from '../services/contentService';
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
+import { useRealtimeCurriculum } from '../hooks/useRealtimeCurriculum';
+import { useCallback } from 'react';
 
 const iconMap = {
   Trophy: Trophy,
@@ -73,8 +75,32 @@ const MaterialIndex = () => {
       }
       setLoading(false);
     };
-    loadData();
-  }, [searchQuery]);
+  loadData();
+}, [searchQuery]);
+
+// Handle realtime updates with a stable callback
+const handleRealtimeUpdate = useCallback((type, payload) => {
+  const reloadData = async () => {
+    try {
+      const curr = await contentService.getCurriculum();
+      if (searchQuery) {
+        const lowerQuery = searchQuery.toLowerCase();
+        const filteredCurr = curr.map(section => ({
+          ...section,
+          topics: section.topics.filter(t => t.title.toLowerCase().includes(lowerQuery))
+        })).filter(section => section.topics.length > 0);
+        setSections(filteredCurr);
+      } else {
+        setSections(curr);
+      }
+    } catch (e) {
+      console.error("Failed to reload materi index", e);
+    }
+  };
+  reloadData();
+}, [searchQuery]);
+
+useRealtimeCurriculum(handleRealtimeUpdate);
 
   if (loading) {
     return (
@@ -102,6 +128,7 @@ const MaterialIndex = () => {
 
   return (
     <motion.div 
+      key={(sections || []).map(s => s.id + '-' + (s.topics?.length || 0)).join('|')}
       variants={containerVariants}
       initial="hidden"
       animate="visible"

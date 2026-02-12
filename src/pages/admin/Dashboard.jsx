@@ -621,9 +621,10 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                             Edit
                                         </Link>
                                         <button 
-                                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                                            title="Hapus"
-                                            onClick={() => onDeleteTopic && onDeleteTopic(topic.id)}
+                                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                            title={topic.id ? "Hapus" : "Data korup (tidak bisa dihapus)"}
+                                            onClick={() => topic.id && onDeleteTopic && onDeleteTopic(topic.id)}
+                                            disabled={!topic.id}
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

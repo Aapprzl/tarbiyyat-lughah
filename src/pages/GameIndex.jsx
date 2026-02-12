@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
@@ -7,6 +7,7 @@ import {
 import { contentService } from '../services/contentService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
+import { useRealtimeCurriculum } from '../hooks/useRealtimeCurriculum';
 
 const iconMap = {
   Trophy: Trophy,
@@ -77,20 +78,40 @@ const getTypeInfo = (type) => {
 const GameIndex = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const categoriesRef = useRef([]);
+  
+  const loadData = useCallback(async (retryCount = 0) => {
+    try {
+      const gamesData = await contentService.getSpecialPrograms();
+      
+      const totalNewItems = (gamesData || []).reduce((acc, cat) => acc + (cat.items?.length || 0), 0);
+      const prevItems = (categoriesRef.current || []).reduce((acc, cat) => acc + (cat.items?.length || 0), 0);
+
+      // PROTECTION: If we had items before, but the database says 0 now, 
+      // we DON'T update the state. We wait and try again.
+      if (totalNewItems === 0 && prevItems > 0 && retryCount < 3) {
+        setTimeout(() => loadData(retryCount + 1), 2000); 
+        return;
+      }
+      
+      categoriesRef.current = gamesData;
+      setCategories(gamesData);
+    } catch (err) {
+      console.error('Failed to load games:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []); 
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const gamesData = await contentService.getSpecialPrograms();
-        setCategories(gamesData);
-      } catch (err) {
-        console.error('Failed to load games:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     loadData();
-  }, []);
+  }, [loadData]);
+
+  // Handle realtime updates
+  useRealtimeCurriculum(useCallback((type, payload) => {
+    // Refresh for any change in games or lock status
+    loadData();
+  }, [loadData]));
 
   // Handle Hash Scroll
   useEffect(() => {
@@ -119,6 +140,9 @@ const GameIndex = () => {
     );
   }
 
+  // Calculate visible categories (those that actually have content)
+  const visibleCategories = categories.filter(cat => (cat.items?.length > 0) || (cat.topics?.length > 0));
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -136,14 +160,13 @@ const GameIndex = () => {
         
 
         <div className="space-y-24">
-        {categories.map((category, idx) => {
+        {visibleCategories.map((category) => {
             const IconComp = iconMap[category.icon] || Trophy;
             // Use items if available, or empty array
             const items = category.items || [];
-            if (items.length === 0 && (!category.topics || category.topics.length === 0)) return null;
 
             return (
-              <section key={category.id} className="relative">
+              <section key={category.id} id={category.id} className="relative">
                   {/* Category Header */}
                   <div className="flex items-center gap-6 mb-10">
                       <div className="w-16 h-16 bg-rose-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-rose-500/20 flex-shrink-0">
@@ -175,12 +198,13 @@ const GameIndex = () => {
 
                   {/* Items Grid */}
                   <motion.div 
+                    key={(items || []).map(i => i.id).join('-')}
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
                     className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6"
                   >
-                      {items.map((item, itemIdx) => {
+                      {items.map((item) => {
                           const typeInfo = getTypeInfo(item.type);
                           const TypeIcon = typeInfo.icon;
                           
@@ -199,7 +223,7 @@ const GameIndex = () => {
                                   {/* Inner Surface Wrapper - Handles Background & Clipping */}
                                   <div className={cn(
                                       "w-full h-full rounded-[1.8rem] overflow-hidden flex flex-col justify-between relative",
-                                      category.isLocked ? "bg-slate-200 dark:bg-slate-800" : "bg-slate-100 dark:bg-slate-800"
+                                      category.isLocked ? "bg-slate-200 dark:bg-slate-800" : "bg-white dark:bg-slate-800"
                                   )}>
                                       {/* Background Decorations */}
                                       <div className={cn(
@@ -263,8 +287,12 @@ const GameIndex = () => {
         })}
         </div>
 
-            {categories.length === 0 && (
-            <motion.div variants={itemVariants} className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700">
+        {visibleCategories.length === 0 && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700 mt-12"
+            >
                <Trophy className="w-20 h-20 text-slate-200 mx-auto mb-6" />
                <h3 className="text-2xl font-black text-slate-900 dark:text-white mb-2">Belum ada Permainan</h3>
                <p className="text-slate-500 font-medium">Instruktur sedang menyiapkan tantangan baru untukmu.</p>

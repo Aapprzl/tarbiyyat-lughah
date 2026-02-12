@@ -28,7 +28,7 @@ export const programsService = {
         *,
         topics (*)
       `)
-      .eq('type', 'curriculum') // Filter only curriculum programs
+      .or('type.eq.curriculum,type.is.null') // Include both explicit 'curriculum' and legacy/untyped records
       .order('order_index')
       .order('order_index', { foreignTable: 'topics' });
     
@@ -103,7 +103,8 @@ export const programsService = {
         icon: programData.icon,
         color: programData.color,
         order_index: programData.order_index || 0,
-        is_active: programData.is_active !== false
+        is_active: programData.is_active !== false,
+        type: programData.type || 'curriculum'
       }])
       .select()
       .single();

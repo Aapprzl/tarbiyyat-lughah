@@ -34,21 +34,31 @@ const saveToStorage = (key, value) => {
 // Transform programs from new schema to old curriculum format
 const transformProgramsToOldFormat = (programs) => {
     return programs.map(program => ({
-        id: program.slug,
+        id: program.slug || program.id,
         title: program.title,
         desc: program.description,
         icon: program.icon,
         color: program.color,
         isLocked: program.is_locked || false,
-        topics: (program.topics || []).map(topic => ({
-            id: topic.slug,
-            title: topic.title,
-            subtitle: topic.subtitle,
-            desc: topic.description,
-            thumbnail: topic.thumbnail,
-            isLocked: topic.is_locked,
-            type: 'grammar' // Default type
-        }))
+        topics: (program.topics || []).map(topic => {
+            const topicId = topic.slug || topic.id;
+            
+            // STRICT VALIDATION: If the resulting ID is missing, skip this topic
+            if (!topicId) {
+                console.warn('[contentService] Skipping corrupt topic (No ID/Slug resolved):', topic);
+                return null;
+            }
+
+            return {
+                id: topicId,
+                title: topic.title,
+                subtitle: topic.subtitle,
+                desc: topic.description,
+                thumbnail: topic.thumbnail,
+                isLocked: topic.is_locked,
+                type: 'grammar' // Default type
+            };
+        }).filter(t => t !== null) // Remove invalid topics
     }));
 };
 
@@ -238,7 +248,8 @@ export const contentService = {
                 description: desc,
                 icon: iconName,
                 color: '#14b8a6', 
-                order_index: nextOrder
+                order_index: nextOrder,
+                type: 'curriculum'
             });
             
             return {
@@ -255,7 +266,19 @@ export const contentService = {
         }
     },
 
-    async deleteTopic(sectionId, topicId) {
+    async deleteTopic(topicId) {
+
+        
+        // Handle potential legacy calls passing (sectionId, topicId)
+        if (arguments.length > 1) {
+             topicId = arguments[1];
+        }
+
+        if (!topicId) {
+            console.error('[contentService] Delete aborted: topicId is missing/undefined');
+            return false;
+        }
+
         try {
             // 1. Try to find as a Curriculum Topic (by ID or Slug)
             const isUUID = this.isValidUUID(topicId);
@@ -263,45 +286,65 @@ export const contentService = {
             if (isUUID) topicQuery = topicQuery.eq('id', topicId);
             else topicQuery = topicQuery.eq('slug', topicId);
 
-            const { data: topics } = await topicQuery.limit(1);
+            const { data: topics, error: findError } = await topicQuery.limit(1);
             
-            if (topics && topics.length > 0) {
+            if (findError) {
+                console.error('[contentService] Error finding topic:', findError);
+            }
+
+             if (topics && topics.length > 0) {
                  const topic = topics[0];
-                 console.log(`[contentService] Deleting topic ${topic.id}...`);
                  
-                 if (topic.thumbnail) await storageService.deleteFile(topic.thumbnail);
+                 if (topic.thumbnail) {
+                    await storageService.deleteFile(topic.thumbnail);
+                 }
 
                  const lessonContent = await this.getLessonContent(topic.id);
-                 if (lessonContent) await storageService.deleteAllFilesFromContent(lessonContent);
+                 if (lessonContent) {
+                    await storageService.deleteAllFilesFromContent(lessonContent);
+                 }
 
                  await contentServiceV2.topics.delete(topic.id);
                  return true;
             }
 
             // 2. Try to find as a Game Block (Special Program Item)
-            // In the dashboard, game items from special programs are passed here too
-            let gameQuery = supabase.from('blocks_game').select('id, data');
-            if (isUUID) gameQuery = gameQuery.eq('id', topicId);
-            // blocks_game doesn't have a slug, usually accessed by ID
-            
-            const { data: gameBlocks } = await gameQuery.limit(1);
-            if (gameBlocks && gameBlocks.length > 0) {
-                const block = gameBlocks[0];
-                console.log(`[contentService] Deleting game block ${block.id}...`);
+            // MUST be a valid UUID to be a game block
+            if (isUUID) { 
+                let gameQuery = supabase.from('blocks_game').select('id, data').eq('id', topicId);
                 
-                // Content cleanup for the block's data (includes thumbnail)
-                if (block.data) await storageService.deleteAllFilesFromContent(block.data);
+                const { data: gameBlocks, error: findGameError } = await gameQuery.limit(1);
+                
+                if (findGameError) {
+                    console.error('[contentService] Error finding game block:', findGameError);
+                }
 
-                // Delete from DB (manual delete since it's a specific block)
-                await supabase.from('blocks_game').delete().eq('id', block.id);
-                return true;
-            }
+                if (gameBlocks && gameBlocks.length > 0) {
+                    const block = gameBlocks[0];
+                    
+                    // Content cleanup for the block's data (includes thumbnail)
+                    if (block.data) await storageService.deleteAllFilesFromContent(block.data);
+
+                    // Delete from DB (manual delete since it's a specific block)
+                    const { error: deleteError } = await supabase.from('blocks_game').delete().eq('id', block.id);
+                    
+                    if (deleteError) {
+                        console.error('[contentService] Failed to delete game block:', deleteError);
+                        throw deleteError;
+                    }
+                    
+
+
+                    return true;
+                }
+            } 
 
             console.warn(`[contentService] Topic/Game not found for deletion: ${topicId}`);
             return false;
         } catch (error) {
             console.error('[contentService] Error deleting topic:', error);
-            return false;
+            // Re-throw to let the UI know it failed!
+            throw error; 
         }
     },
 
@@ -321,7 +364,6 @@ export const contentService = {
             
             if (programs && programs.length > 0) {
                 const programId = programs[0].id;
-                console.log(`[contentService] Deleting section ${programId} (Slug: ${sectionId})...`);
 
                 // 2. Fetch all topics in this program to clean up thumbnails
                 const { data: topics } = await supabase
@@ -649,7 +691,8 @@ export const contentService = {
                     id: block.id,
                     title: block.data?.title || block.type, // Fallback to type if no title
                     type: block.type, // 'quiz', 'matchup', etc.
-                    thumbnail: block.data?.thumbnail
+                    thumbnail: block.data?.thumbnail,
+                    isLocked: false // Games usually don't have individual locks in this view
                 })),
                 blockCount: cat.blocks ? cat.blocks.length : 0
             }));

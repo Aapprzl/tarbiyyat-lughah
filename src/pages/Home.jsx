@@ -9,6 +9,8 @@ import { SplitText } from '../components/animations/SplitText';
 import { BentoGrid, BentoGridItem } from '../components/animations/BentoGrid';
 import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
+import { useRealtimeCurriculum } from '../hooks/useRealtimeCurriculum';
+import { useCallback } from 'react';
 
 const iconMap = {
   BookOpen: Library, 
@@ -27,24 +29,24 @@ const Home = () => {
   const [config, setConfig] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const loadData = useCallback(async () => {
+    try {
+      const [progs, conf] = await Promise.all([
+        contentService.getSpecialPrograms(),
+        contentService.getHomeConfig()
+      ]);
+      
+      setSpecialPrograms(progs);
+      setConfig(conf);
+    } catch (err) {
+      console.error("Home data load error", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
-    const load = async () => {
-      try {
-        // Parallelize all API calls for faster loading
-        const [progs, conf] = await Promise.all([
-          contentService.getSpecialPrograms(),
-          contentService.getHomeConfig()
-        ]);
-        
-        setSpecialPrograms(progs);
-        setConfig(conf);
-      } catch (err) {
-        console.error("Home data load error", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
+    loadData();
 
     // Handle scroll to programs if coming from BottomBar on another page
     const searchParams = new URLSearchParams(window.location.hash.split('?')[1]);
@@ -53,7 +55,22 @@ const Home = () => {
         document.querySelector('#special-programs-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 500);
     }
+  }, [loadData]);
+
+  // Handle realtime updates with a stable callback
+  const handleRealtimeUpdate = useCallback((type, payload) => {
+    const reloadPrograms = async () => {
+      try {
+        const progs = await contentService.getSpecialPrograms();
+        setSpecialPrograms(progs);
+      } catch (err) {
+        console.error("Home realtime reload error", err);
+      }
+    };
+    reloadPrograms();
   }, []);
+
+  useRealtimeCurriculum(handleRealtimeUpdate);
 
   if (loading || !config) return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-slate-50 dark:bg-[var(--color-bg-main)]">

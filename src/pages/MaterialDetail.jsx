@@ -6,6 +6,8 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
+import { useCallback } from "react";
+import { useRealtimeCurriculum } from "../hooks/useRealtimeCurriculum";
 import {
   MoveLeft,
   Library,
@@ -277,111 +279,129 @@ const MaterialDetailContent = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [lockMeta, setLockMeta] = useState(null);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        window.scrollTo(0, 0);
-        setIsCategoryView(false);
-        setIsGame(false);
-        setCategoryTopics([]);
+  const loadData = useCallback(async (silent = false) => {
+    try {
+      if (!silent) setLoading(true);
+      if (!silent) window.scrollTo(0, 0);
+      
+      // Only reset these if we are doing a full load, otherwise we might flicker.
+      // But for safety to ensure correct view mode, we re-evaluate.
+      // We'll trust the logic below to set them correctly.
+      
+      const curr = await contentService.getCurriculum();
+      let foundTopic = null;
+      let foundSection = null;
 
-        const curr = await contentService.getCurriculum();
-        let foundTopic = null;
-        let foundSection = null;
+      for (const section of curr) {
+        const t = section.topics.find(
+          (t) => t.id.toLowerCase() === topicId.toLowerCase(),
+        );
+        if (t) {
+          foundTopic = t;
+          foundSection = section;
+          break;
+        }
+      }
 
-        for (const section of curr) {
-          const t = section.topics.find(
-            (t) => t.id.toLowerCase() === topicId.toLowerCase(),
-          );
-          if (t) {
-            foundTopic = t;
-            foundSection = section;
-            break;
+      const progs = await contentService.getSpecialPrograms();
+
+      if (!foundTopic) {
+        // 1. Direct Category Match (New Structure)
+        const directCat = progs.find((p) => p.id === topicId);
+        if (directCat) {
+          foundTopic = directCat;
+          foundSection = {
+            title: "Program Khusus",
+            icon: directCat.icon,
+            isLocked: directCat.isLocked,
+          };
+          if (!silent) setIsGame(true);
+          // If it has topics, it MIGHT be hybrid, but we treat it as Content Container now
+        } else {
+          // 2. Fallback Topic Match
+          for (const category of progs) {
+            if (category.topics) {
+              const t = category.topics.find(
+                (t) => t.id.toLowerCase() === topicId.toLowerCase(),
+              );
+              if (t) {
+                foundTopic = t;
+                foundSection = {
+                  title: category.title,
+                  icon: category.icon,
+                  isLocked: category.isLocked,
+                };
+                if (!silent) setIsGame(true);
+                break;
+              }
+            }
           }
         }
 
         if (!foundTopic) {
-          const progs = await contentService.getSpecialPrograms();
-
-          // 1. Direct Category Match (New Structure)
-          const directCat = progs.find((p) => p.id === topicId);
-          if (directCat) {
-            foundTopic = directCat;
-            foundSection = {
-              title: "Program Khusus",
-              icon: directCat.icon,
-              isLocked: directCat.isLocked,
-            };
+          const foundCategory = progs.find(
+            (c) => c.id.toLowerCase() === topicId.toLowerCase(),
+          );
+          if (foundCategory) {
+            foundTopic = foundCategory;
+            setIsCategoryView(true);
             setIsGame(true);
-            // If it has topics, it MIGHT be hybrid, but we treat it as Content Container now
-          } else {
-            // 2. Fallback Topic Match
-            for (const category of progs) {
-              if (category.topics) {
-                const t = category.topics.find(
-                  (t) => t.id.toLowerCase() === topicId.toLowerCase(),
-                );
-                if (t) {
-                  foundTopic = t;
-                  foundSection = {
-                    title: category.title,
-                    icon: category.icon,
-                    isLocked: category.isLocked,
-                  };
-                  setIsGame(true);
-                  break;
-                }
-              }
-            }
-          }
-
-          if (!foundTopic) {
-            const foundCategory = progs.find(
-              (c) => c.id.toLowerCase() === topicId.toLowerCase(),
-            );
-            if (foundCategory) {
-              foundTopic = foundCategory;
-              setIsCategoryView(true);
-              setIsGame(true);
-              setCategoryTopics(foundCategory.topics || []);
-              foundSection = {
-                title: "Program Unggulan",
-                icon: "Star",
-                isLocked: foundCategory.isLocked,
-              };
-            }
+            setCategoryTopics(foundCategory.items || foundCategory.topics || []); // Prefer items for games
+            foundSection = {
+              title: "Program Unggulan",
+              icon: "Star",
+              isLocked: foundCategory.isLocked,
+            };
           }
         }
-
-        if (foundTopic) {
-          // Check if Topic or Section is Locked
-          if (foundTopic.isLocked || (foundSection && foundSection.isLocked)) {
-            setIsLocked(true);
-            setLockMeta({
-              title: foundTopic.title,
-              type: foundTopic.isLocked ? "Topik" : "Kategori",
-            });
-            setLoading(false);
-            return;
-          }
-
-          setTopic(foundTopic);
-          setParentSection(foundSection);
-        }
-
-        if (foundTopic && !isCategoryView) {
-          const data = await contentService.getLessonContent(topicId);
-          setContent(data);
-        }
-      } catch (err) {
-        console.error("Error loading material:", err);
-      } finally {
-        setLoading(false);
       }
-    };
-    load();
+
+      if (foundTopic) {
+        // Check if Topic or Section is Locked
+        if (foundTopic.isLocked || (foundSection && foundSection.isLocked)) {
+          setIsLocked(true);
+          setLockMeta({
+            title: foundTopic.title,
+            type: foundTopic.isLocked ? "Topik" : "Kategori",
+          });
+          setLoading(false);
+          return;
+        }
+
+        setTopic(foundTopic);
+        setParentSection(foundSection);
+
+        // If it's a category view (Game List), update specific state
+        // This is crucial for the "Add Topic" -> "Appear" flow
+        if (progs.find(c => c.id.toLowerCase() === topicId.toLowerCase())) {
+            setIsCategoryView(true);
+            setCategoryTopics(foundTopic.items || foundTopic.topics || []);
+        }
+      }
+
+      if (foundTopic && !isCategoryView) {
+        // Only fetch content if NOT a category view
+        // Is it safe to skip content fetch on silent update?
+        // Yes, likely logic updates mainly the list/metadata.
+        const data = await contentService.getLessonContent(topicId);
+        setContent(data);
+      }
+    } catch (err) {
+      console.error("Error loading material:", err);
+    } finally {
+      setLoading(false);
+    }
   }, [topicId]);
+
+  useEffect(() => {
+    loadData(false);
+  }, [loadData]);
+
+  // Handle realtime updates
+  useRealtimeCurriculum(useCallback((type, payload) => {
+    // Silent reload to prevent full screen spinner
+    loadData(true);
+  }, [loadData]));
 
   // NEW: Early return for Loading + Focused Item to prevent Layout Shift
   // Also updated to handle general loading to prevent Header blinking
@@ -587,6 +607,7 @@ const MaterialDetailContent = () => {
       {isCategoryView ? (
         /* CATEGORY LANDING PAGE (GRID VIEW) */
         <motion.div
+          key={(categoryTopics || []).map(t => t.id).join('-')}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="space-y-6 px-4 md:px-0 mt-20"
@@ -787,8 +808,21 @@ const MaterialDetailContent = () => {
 
 // isArabic functionality
 
-const ContentBlock = ({ block }) => {
-  if (!block || !block.data) return null;
+const ContentBlock = ({ block: rawBlock }) => {
+  if (!rawBlock || !rawBlock.data) return null;
+  
+  // Safe parsing for data
+  let data = rawBlock.data;
+  if (typeof data === 'string') {
+      try {
+          data = JSON.parse(data);
+      } catch (e) {
+          console.error('[ContentBlock] Failed to parse data:', e);
+          return null; // Invalid JSON
+      }
+  }
+
+  const block = { ...rawBlock, data };
 
   switch (block.type) {
     case "text": {
