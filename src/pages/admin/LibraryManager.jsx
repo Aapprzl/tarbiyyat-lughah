@@ -10,6 +10,7 @@ import * as pdfjs from 'pdfjs-dist';
 
 // Use a more reliable worker source compatible with Vite and pdfjs-dist v5
 // This uses the local worker file from the package via Vite's URL import
+import { supabase } from '../../supabaseClient';
 import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -34,6 +35,52 @@ const LibraryManager = () => {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const channelId = `library-changes-${Date.now()}`;
+    
+    const channel = supabase
+      .channel(channelId)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', 
+          schema: 'public',
+          table: 'site_config'
+        },
+        (payload) => {
+          const key = payload.new?.config_key || payload.old?.config_key;
+          if (!['library_books', 'library'].includes(key)) return;
+
+          if (!payload.new) return;
+
+          let newVal = payload.new.config_value;
+          if (typeof newVal === 'string') {
+            try { newVal = JSON.parse(newVal); } catch (e) { /* ignore */ }
+          }
+
+          if (key === 'library_books') {
+            const booksArr = Array.isArray(newVal) ? newVal : [];
+            setBooks([...booksArr]); 
+          } else if (key === 'library') {
+            const newCategories = newVal?.categories || (Array.isArray(newVal) ? newVal : []); 
+            setCategories([...newCategories]);
+            
+            setFormData(prev => {
+              if (!prev.category || !newCategories.includes(prev.category)) {
+                return { ...prev, category: newCategories[0] || '' };
+              }
+              return prev;
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadData = async () => {
@@ -117,7 +164,7 @@ const LibraryManager = () => {
       const thumbFile = new File([thumbnailBlob], `${formData.pdfFile.name}_thumb.jpg`, { type: 'image/jpeg' });
       const coverUrl = await storageService.uploadFile(thumbFile, 'materials/covers');
 
-      // 4. Save to Firestore
+      // 4. Save
       setProgress(95);
       const bookData = {
         titleAr: formData.titleAr,
@@ -128,7 +175,9 @@ const LibraryManager = () => {
         createdAt: new Date().toISOString()
       };
 
-      await contentService.addBook(bookData);
+      const result = await contentService.addBook(bookData);
+      setBooks(prev => [result, ...prev]); // Optimistic Update
+
       success('Buku berhasil ditambahkan!');
       setIsAdding(false);
       setFormData({ 
@@ -137,7 +186,6 @@ const LibraryManager = () => {
         category: categories[0] || '', 
         pdfFile: null 
       });
-      loadData();
     } catch (err) {
       console.error(err);
       error('Gagal mengunggah buku');
@@ -152,14 +200,18 @@ const LibraryManager = () => {
 
     if (confirmed) {
       try {
+        // Optimistic Update
+        setBooks(prev => prev.filter(b => b.id !== book.id));
+        
         await contentService.deleteBook(book.id);
         success('Buku berhasil dihapus');
-        loadData();
       } catch (err) {
         error('Gagal menghapus buku');
+        loadData(); // Rollback on error
       }
     }
   };
+
 
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return;
@@ -171,7 +223,7 @@ const LibraryManager = () => {
     const updatedCategories = [...categories, newCategory.trim()];
     try {
       await contentService.saveLibraryConfig({ categories: updatedCategories });
-      setCategories(updatedCategories);
+      setCategories(updatedCategories); // Optimistic update
       setNewCategory('');
       success('Kategori berhasil ditambahkan');
     } catch (err) {
@@ -192,7 +244,7 @@ const LibraryManager = () => {
       const updatedCategories = categories.filter(c => c !== catToDelete);
       try {
         await contentService.saveLibraryConfig({ categories: updatedCategories });
-        setCategories(updatedCategories);
+        setCategories(updatedCategories); // Optimistic update
         success('Kategori berhasil dihapus');
       } catch (err) {
         error('Gagal menghapus kategori');
@@ -216,7 +268,6 @@ const LibraryManager = () => {
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Perpustakaan Digital</h1>
           <p className="text-sm text-slate-500 mt-1">Kelola buku PDF dan kategori</p>
         </div>
-        
         <button 
           onClick={() => setIsAdding(!isAdding)}
           className={cn(
@@ -254,22 +305,35 @@ const LibraryManager = () => {
           </div>
 
           <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
-            {categories.map(cat => (
-              <div key={cat} className="group flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-teal-500/30 transition-colors">
-                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{cat}</span>
-                <button 
-                  onClick={() => handleDeleteCategory(cat)}
-                  className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-md transition-all"
+            <AnimatePresence mode="popLayout">
+              {categories.map(cat => (
+                <motion.div 
+                  key={cat}
+                  layout
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.5 }}
+                  className="group flex items-center gap-2 bg-white dark:bg-slate-800 px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-teal-500/30 transition-colors"
                 >
-                  <Trash2 className="w-3 h-3" />
-                </button>
-              </div>
-            ))}
+                  <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{cat}</span>
+                  <button 
+                    onClick={() => handleDeleteCategory(cat)}
+                    className="p-1 opacity-0 group-hover:opacity-100 hover:bg-red-500/10 text-slate-400 hover:text-red-500 rounded-md transition-all"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+                </motion.div>
+              ))}
+            </AnimatePresence>
             {categories.length === 0 && (
-              <div className="w-full text-center py-8">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="w-full text-center py-8"
+              >
                 <AlertCircle className="w-8 h-8 text-slate-300 dark:text-slate-700 mx-auto mb-2" />
                 <p className="text-xs text-slate-400 font-medium">Belum ada kategori</p>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
@@ -395,45 +459,51 @@ const LibraryManager = () => {
           </AnimatePresence>
 
           {/* Book Grid */}
-          <div className="grid sm:grid-cols-2 gap-6">
-            {books.map((book) => (
-              <div 
-                key={book.id}
-                className="group bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-teal-500/30 transition-colors"
-              >
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-24 h-32 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
-                    <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="px-2 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-md">
-                        {book.category}
-                      </span>
+          <div className="grid sm:grid-cols-2 gap-6 relative">
+            <AnimatePresence mode="popLayout">
+              {books.map((book) => (
+                <motion.div 
+                  key={book.id}
+                  layout
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  className="group bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 hover:border-teal-500/30 transition-colors"
+                >
+                  <div className="flex items-start gap-4 mb-6">
+                    <div className="w-24 h-32 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
+                      <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
                     </div>
-                    <h3 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight mb-1 truncate arabic-title transition-all" dir="rtl">{book.titleAr}</h3>
-                    <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">{book.titleId}</h4>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="px-2 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-md">
+                          {book.category}
+                        </span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white leading-tight mb-1 truncate arabic-title transition-all" dir="rtl">{book.titleAr}</h3>
+                      <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 line-clamp-2">{book.titleId}</h4>
+                    </div>
                   </div>
-                </div>
 
-                <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                  <a 
-                    href={book.pdfUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-medium text-xs rounded-lg transition-colors"
-                  >
-                    <FileText className="w-4 h-4" /> Buka PDF
-                  </a>
-                  <button 
-                    onClick={() => handleDelete(book)}
-                    className="p-2 flex items-center justify-center bg-red-500/5 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            ))}
+                  <div className="flex items-center gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <a 
+                      href={book.pdfUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 py-2 bg-slate-50 dark:bg-slate-800 hover:bg-teal-500 hover:text-white text-slate-600 dark:text-slate-400 font-medium text-xs rounded-lg transition-colors"
+                    >
+                      <FileText className="w-4 h-4" /> Buka PDF
+                    </a>
+                    <button 
+                      onClick={() => handleDelete(book)}
+                      className="p-2 flex items-center justify-center bg-red-500/5 text-red-400 hover:bg-red-500 hover:text-white rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
 
           {books.length === 0 && !loading && (

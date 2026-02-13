@@ -184,9 +184,15 @@ useRealtimeCurriculum(handleRealtimeUpdate);
 
           {/* Story Cards Grid */}
           {section.topics?.length === 0 ? (
-            <div className="text-center py-12 px-6 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 mx-4 md:mx-0">
-              <p className="text-slate-400 font-bold text-sm" style={{ fontFamily: 'var(--font-latin)' }}>Belum ada materi pelajaran.</p>
-            </div>
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="text-center py-12 px-6 rounded-[2rem] border-2 border-dashed border-slate-200 dark:border-slate-800 mx-4 md:mx-0 bg-slate-50/50 dark:bg-slate-900/50"
+            >
+              <BookOpen className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+              <p className="text-slate-400 font-bold text-sm" style={{ fontFamily: 'var(--font-latin)' }}>Pelajaran belum tersedia di kategori ini.</p>
+            </motion.div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 md:px-0">
               {section.topics?.map((topic, idx) => (
@@ -201,6 +207,26 @@ useRealtimeCurriculum(handleRealtimeUpdate);
           )}
         </section>
       ))}
+
+      {/* Global Empty State */}
+      {sections.length === 0 && !loading && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-center py-32 bg-white dark:bg-slate-800 rounded-[4rem] border border-dashed border-slate-300 dark:border-slate-700 mt-12 overflow-hidden relative group"
+        >
+           <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+           <div className="relative z-10">
+             <div className="w-24 h-24 bg-teal-500/10 rounded-[2.5rem] flex items-center justify-center mx-auto mb-8 shadow-2xl transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6">
+                <BookOpen className="w-12 h-12 text-teal-500" />
+             </div>
+             <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-3" style={{ fontFamily: 'var(--font-latin)' }}>Belum ada Materi</h3>
+             <p className="text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto" style={{ fontFamily: 'var(--font-latin)' }}>
+               Instruktur sedang menyiapkan materi baru untukmu.
+             </p>
+           </div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

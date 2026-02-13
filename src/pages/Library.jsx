@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Library as LibraryIcon, BookOpen, Search, Filter, ChevronRight, FileText, LayoutGrid, List, Sparkles, Loader2 } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { cn } from '../utils/cn';
+import { supabase } from '../supabaseClient';
 
 const Library = () => {
   const [books, setBooks] = useState([]);
@@ -15,6 +16,45 @@ const Library = () => {
 
   useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    const channelId = `public-library-changes-${Date.now()}`;
+    
+    const channel = supabase
+      .channel(channelId)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', 
+          schema: 'public',
+          table: 'site_config'
+        },
+        (payload) => {
+          const key = payload.new?.config_key || payload.old?.config_key;
+          if (!['library_books', 'library'].includes(key)) return;
+
+          if (!payload.new) return;
+
+          let newVal = payload.new.config_value;
+          if (typeof newVal === 'string') {
+            try { newVal = JSON.parse(newVal); } catch (e) { /* ignore */ }
+          }
+
+          if (key === 'library_books') {
+            const booksArr = Array.isArray(newVal) ? newVal : [];
+            setBooks([...booksArr]); 
+          } else if (key === 'library') {
+            const rawCategories = newVal?.categories || (Array.isArray(newVal) ? newVal : []); 
+            setCategories(['Semua', ...rawCategories]);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const loadData = async () => {
@@ -90,20 +130,26 @@ const Library = () => {
 
         {/* Categories */}
         <div className="flex-1 overflow-x-auto pb-2 flex items-center gap-2 md:gap-3 custom-scrollbar no-scrollbar scroll-smooth">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={cn(
-                "px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all",
-                activeCategory === cat 
-                  ? "bg-sky-500 text-white shadow-lg shadow-sky-500/20" 
-                  : "bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-slate-700"
-              )}
-            >
-              {cat}
-            </button>
-          ))}
+          <AnimatePresence mode="popLayout">
+            {categories.map(cat => (
+              <motion.button
+                key={cat}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                onClick={() => setActiveCategory(cat)}
+                className={cn(
+                  "px-4 md:px-6 py-3 md:py-4 rounded-xl md:rounded-2xl whitespace-nowrap font-black uppercase tracking-widest text-[9px] md:text-[10px] transition-all",
+                  activeCategory === cat 
+                    ? "bg-sky-500 text-white shadow-lg shadow-sky-500/20" 
+                    : "bg-white dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white border border-slate-200 dark:border-slate-700"
+                )}
+              >
+                {cat}
+              </motion.button>
+            ))}
+          </AnimatePresence>
         </div>
 
         {/* View Switcher Desktop */}
@@ -127,22 +173,29 @@ const Library = () => {
       <div className="max-w-7xl mx-auto">
         {filteredBooks.length > 0 ? (
           <div className={cn(
-            "grid",
+            "grid relative",
             viewMode === 'shelf' 
                 ? "grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6 md:gap-12" 
                 : "grid-cols-1 gap-4 md:gap-6"
           )}>
-            {filteredBooks.map((book, idx) => (
-              <motion.div
-                key={book.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                className={cn(
-                  "group relative",
-                  viewMode === 'shelf' ? "flex flex-col items-center" : "flex items-center bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-700"
-                )}
-              >
+            <AnimatePresence mode="popLayout">
+              {filteredBooks.map((book, idx) => (
+                <motion.div
+                  key={book.id}
+                  layout
+                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
+                  transition={{ 
+                    layout: { duration: 0.3 },
+                    opacity: { duration: 0.2 },
+                    y: { type: "spring", stiffness: 300, damping: 25 }
+                  }}
+                  className={cn(
+                    "group relative",
+                    viewMode === 'shelf' ? "flex flex-col items-center" : "flex items-center bg-white dark:bg-slate-800 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-700"
+                  )}
+                >
                 {/* Book Representation */}
                 <div className={cn(
                   "relative transition-all duration-500 perspective-1000",
@@ -186,6 +239,7 @@ const Library = () => {
                 </div>
               </motion.div>
             ))}
+            </AnimatePresence>
           </div>
         ) : (
           <div className="py-32 text-center bg-slate-50 dark:bg-slate-800 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-700">

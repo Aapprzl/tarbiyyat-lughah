@@ -9,7 +9,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { wrapArabicText, isArabic } from '../../utils/textUtils';
+import { wrapArabicText, isArabic, getDirection } from '../../utils/textUtils';
 
 const InteractiveStoryGame = ({ data = {}, title }) => {
     const [currentSceneKey, setCurrentSceneKey] = useState('start');
@@ -350,7 +350,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                     transition={{ duration: 1.2, ease: "easeOut" }}
                                                     className={cn(
                                                         "text-lg md:text-2xl leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
-                                                        isArabic(segment) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-black"
+                                                        getDirection(segment) === 'rtl' ? "text-right dir-rtl leading-[2] font-medium" : "text-left dir-ltr font-black"
                                                     )}
                                                     dangerouslySetInnerHTML={{ __html: wrapArabicText(segment) }}
                                                 />

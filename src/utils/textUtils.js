@@ -68,3 +68,27 @@ export const isArabic = (text) => {
   const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   return arabicRegex.test(text);
 };
+
+/**
+ * Detects the first character with "strong" directionality.
+ * Returns 'rtl' if it's Arabic, 'ltr' otherwise.
+ */
+export const getDirection = (text) => {
+  if (!text || typeof text !== 'string') return 'ltr';
+  
+  // Rule: If it contains ANY Latin characters, we treat it as LTR (Mixed Format)
+  // as per user request to favor LTR even if there is Arabic text in certain parts.
+  const hasLatin = /[a-zA-Z]/.test(text);
+  if (hasLatin) return 'ltr';
+
+  // If no Latin, check for the first strong character (usually Arabic for RTL)
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    // Arabic, Hebrew, etc.
+    if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\u0590-\u05FF]/.test(char)) return 'rtl';
+    // If we find a Latin character (already covered by hasLatin but for completeness)
+    if (/[a-zA-Z\u00C0-\u00FF\u0100-\u017F]/.test(char)) return 'ltr';
+  }
+
+  return 'ltr'; // Fallback
+};
