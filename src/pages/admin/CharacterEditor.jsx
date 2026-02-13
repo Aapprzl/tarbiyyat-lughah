@@ -42,8 +42,8 @@ const CharacterEditor = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            if (file.size > 500 * 1024) {
-                warning('Ukuran gambar maksimal 500KB');
+            if (file.size > 1024 * 1024) {
+                warning('Ukuran gambar maksimal 1MB');
                 return;
             }
             const url = URL.createObjectURL(file);
