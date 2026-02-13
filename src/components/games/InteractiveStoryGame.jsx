@@ -4,33 +4,32 @@ import {
   ChevronRight, 
   RefreshCcw, 
   History, 
-  Volume2, 
-  VolumeX, 
-  Info,
-  Clock,
-  Sparkles,
   User,
-  MessageSquare
+  MessageSquare,
+  Sparkles
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { wrapArabicText } from '../../utils/textUtils';
 
-const InteractiveStoryGame = ({ 
-  data = {
-    title: "Kisah Interaktif",
-    startScene: "start",
-    scenes: {}
-  }
-}) => {
-    const { title, startScene, scenes = {} } = data;
-    const [currentSceneKey, setCurrentSceneKey] = useState(startScene || Object.keys(scenes)[0]);
-    const [history, setHistory] = useState([]);
-    const [isMuted, setIsMuted] = useState(false);
-    const [isTyping, setIsTyping] = useState(false);
+const InteractiveStoryGame = ({ data = {}, title }) => {
+    const [currentSceneKey, setCurrentSceneKey] = useState('start');
     const [displayText, setDisplayText] = useState('');
+    const [isTyping, setIsTyping] = useState(false);
+    const [history, setHistory] = useState([]);
     const scrollRef = useRef(null);
 
-    const currentScene = scenes[currentSceneKey] || { text: "Error: Scene not found.", options: [] };
-    
+    const scenes = data.scenes || {};
+    const currentScene = scenes[currentSceneKey] || { 
+        text: "Pilih aksi untuk memulai...", 
+        options: [],
+        character: null 
+    };
+
+    // Process narrative text for mixed fonts (Arabic/Latin)
+    const processedText = useMemo(() => {
+        return wrapArabicText(displayText);
+    }, [displayText]);
+
     // Auto-scroll to bottom as text types
     useEffect(() => {
         if (scrollRef.current) {
@@ -42,42 +41,32 @@ const InteractiveStoryGame = ({
     useEffect(() => {
         if (!currentScene.text) return;
         
-        setIsTyping(true);
+        let index = 0;
         setDisplayText('');
+        setIsTyping(true);
         
-        let i = 0;
-        const textToType = currentScene.text;
-        const speed = 30; // ms per character
-
-        const timer = setInterval(() => {
-            if (i < textToType.length) {
-                setDisplayText(prev => prev + textToType.charAt(i));
-                i++;
+        const text = currentScene.text;
+        const interval = setInterval(() => {
+            if (index < text.length) {
+                setDisplayText(prev => prev + text.charAt(index));
+                index++;
             } else {
                 setIsTyping(false);
-                clearInterval(timer);
+                clearInterval(interval);
             }
-        }, speed);
+        }, 30);
 
-        return () => clearInterval(timer);
-    }, [currentSceneKey, currentScene.text]);
+        return () => clearInterval(interval);
+    }, [currentScene.text]);
 
-    const handleOptionClick = (nextScene) => {
-        if (isTyping) {
-            // Skip typing
-            setDisplayText(currentScene.text);
-            setIsTyping(false);
-            return;
-        }
-        
-        if (nextScene && scenes[nextScene]) {
-            setHistory([...history, currentSceneKey]);
-            setCurrentSceneKey(nextScene);
-        }
+    const handleOptionClick = (nextKey) => {
+        if (isTyping) return;
+        setHistory(prev => [...prev, currentSceneKey]);
+        setCurrentSceneKey(nextKey);
     };
 
     const resetStory = () => {
-        setCurrentSceneKey(startScene || Object.keys(scenes)[0]);
+        setCurrentSceneKey('start');
         setHistory([]);
     };
 
@@ -91,7 +80,7 @@ const InteractiveStoryGame = ({
     };
 
     return (
-        <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] flex flex-col">
+        <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] md:min-h-[750px] flex flex-col transition-all duration-300">
             <div className="bg-white dark:bg-slate-900 rounded-none md:rounded-[3rem] shadow-2xl border-x-0 md:border-4 border-slate-200 dark:border-slate-800 overflow-hidden relative flex-1 flex flex-col transition-colors duration-500">
                 
                 {/* 1. Background Layer */}
@@ -131,14 +120,14 @@ const InteractiveStoryGame = ({
                         <button 
                             onClick={goBack}
                             disabled={history.length === 0}
-                            className="p-2.5 bg-slate-900/5 dark:bg-white/10 backdrop-blur-md rounded-xl text-slate-700 dark:text-white hover:bg-slate-900/10 dark:hover:bg-white/20 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-20 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                            className="p-2.5 bg-slate-100 dark:bg-white/10 backdrop-blur-md rounded-xl text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/10 transition-all disabled:opacity-20 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest shadow-sm"
                         >
                             <History className="w-4 h-4" />
                             <span className="hidden sm:inline">Back</span>
                         </button>
                         <button 
                             onClick={resetStory}
-                            className="p-2.5 bg-slate-900/5 dark:bg-white/10 backdrop-blur-md rounded-xl text-slate-700 dark:text-white hover:bg-slate-900/10 dark:hover:bg-white/20 border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest"
+                            className="p-2.5 bg-slate-100 dark:bg-white/10 backdrop-blur-md rounded-xl text-slate-700 dark:text-white hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/10 transition-all flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest shadow-sm"
                         >
                             <RefreshCcw className="w-4 h-4" />
                             <span className="hidden sm:inline">Reset</span>
@@ -147,7 +136,7 @@ const InteractiveStoryGame = ({
                 </div>
 
                 {/* 3. Character Sprite Layer */}
-                <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none pb-48 md:pb-64">
+                <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-[200px]">
                     <AnimatePresence mode="wait">
                         {currentScene.character && (
                             <motion.div 
@@ -160,7 +149,7 @@ const InteractiveStoryGame = ({
                             >
                                 <img 
                                     src={currentScene.character.image} 
-                                    className="max-h-[80%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                                    className="max-h-full md:max-h-[110%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all"
                                     alt={currentScene.character.name}
                                 />
                             </motion.div>
@@ -169,7 +158,7 @@ const InteractiveStoryGame = ({
                 </div>
 
                 {/* 4. Bottom Dialogue & UI Overlay */}
-                <div className="absolute inset-x-0 bottom-0 z-30 p-4 md:p-8 pt-0">
+                <div className="relative z-30 p-4 md:p-8 pt-0">
                     
                     {/* Scene Transition Text / Narration */}
                     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
@@ -178,7 +167,7 @@ const InteractiveStoryGame = ({
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col max-h-[40vh] md:max-h-[50vh] transition-colors duration-500"
+                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col max-h-[30vh] md:max-h-[40vh] transition-colors duration-500"
                         >
                             {/* Accent Glow */}
                             <div className="absolute -top-10 -left-10 w-40 h-40 bg-teal-500/10 blur-[50px] pointer-events-none" />
@@ -195,6 +184,7 @@ const InteractiveStoryGame = ({
                             <div 
                                 ref={scrollRef}
                                 className="relative z-10 overflow-y-auto pr-2 custom-scrollbar scroll-smooth"
+                                style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                             >
                                 <style>{`
                                     .custom-scrollbar::-webkit-scrollbar {
@@ -215,14 +205,14 @@ const InteractiveStoryGame = ({
                                         background: rgba(20, 184, 166, 0.5);
                                     }
                                 `}</style>
-                                <div className="min-h-[80px] md:min-h-[100px]">
-                                    <p className={cn(
+                                <div className="min-h-[60px] md:min-h-[80px]">
+                                    <div className={cn(
                                         "text-lg md:text-2xl font-bold leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
-                                        currentScene.arabic ? "font-arabic text-3xl md:text-4xl text-right dir-rtl leading-[1.8]" : "font-sans tracking-tight"
+                                        currentScene.arabic && "text-right dir-rtl leading-[1.8]"
                                     )}>
-                                        {displayText}
+                                        <span dangerouslySetInnerHTML={{ __html: processedText }} />
                                         {isTyping && <span className="inline-block w-2 h-5 md:w-3 md:h-6 bg-teal-400 ml-1 animate-pulse" />}
-                                    </p>
+                                    </div>
                                 </div>
                             </div>
 
@@ -240,7 +230,7 @@ const InteractiveStoryGame = ({
                         </motion.div>
 
                         {/* Options Layer */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pb-4">
                             <AnimatePresence mode="popLayout">
                                 {!isTyping && currentScene.options && currentScene.options.map((option, idx) => (
                                     <motion.button
@@ -252,13 +242,15 @@ const InteractiveStoryGame = ({
                                         whileTap={{ scale: 0.98 }}
                                         onClick={() => handleOptionClick(option.nextScene)}
                                         className="flex items-center justify-between px-6 py-4 md:py-5 bg-white/50 dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl md:rounded-[1.5rem] text-left transition-all group shadow-sm hover:shadow-md hover:border-teal-500/30"
+                                        style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                                     >
-                                        <span className={cn(
-                                            "text-sm md:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400",
-                                            option.arabic && "font-arabic text-lg md:text-xl text-right flex-1"
-                                        )}>
-                                            {option.text}
-                                        </span>
+                                        <span 
+                                            className={cn(
+                                                "text-sm md:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400",
+                                                option.arabic && "text-right flex-1"
+                                            )}
+                                            dangerouslySetInnerHTML={{ __html: wrapArabicText(option.text) }}
+                                        />
                                         <ChevronRight className="w-5 h-5 text-teal-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
                                     </motion.button>
                                 ))}

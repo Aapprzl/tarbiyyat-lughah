@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
 import { 
   Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
-  Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain, Mountain
+  Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain, Mountain, Plus, Edit2, Trash2, X
 } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
