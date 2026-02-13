@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Trash2, ChevronRight, Diamond, Crosshair, CheckSquare, Sliders, Orbit, X, Trophy, Gamepad as GamepadIcon, BookOpen, Puzzle, Dices, Joystick, Swords, Crown, Ghost, Brain, Heart, Gem, Medal, Zap, Star } from 'lucide-react';
+import { 
+  Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
+  Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain, Mountain
+} from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -26,6 +29,8 @@ const iconMap = {
   Heart: Heart,
   Diamond: Gem,
   Medal: Medal,
+  Search: Search,
+  Telescope: Telescope,
   // Fallbacks
   Gamepad2: Trophy,
   Box: Package,

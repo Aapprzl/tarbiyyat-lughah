@@ -84,7 +84,8 @@ import HarakatGame from "../components/games/HarakatGame";
 import MemoryGame from "../components/games/MemoryGame";
 import HangmanGame from "../components/games/HangmanGame";
 import CamelRaceGame from "../components/games/CamelRaceGame";
-import WordDetectiveGame from "../components/games/WordDetectiveGame";
+import WordDetectiveGame from '../components/games/WordDetectiveGame';
+import InteractiveStoryGame from '../components/games/InteractiveStoryGame';
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
 import { wrapArabicText, isArabic } from "../utils/textUtils";
@@ -97,6 +98,20 @@ const getTypeInfo = (type) => {
         color: "pink",
         icon: Puzzle,
         gradient: "from-pink-500 to-rose-600",
+      };
+    case "worddetective":
+      return {
+        label: "Detektif Kata",
+        color: "emerald",
+        icon: Search,
+        gradient: "from-emerald-400 to-teal-600",
+      };
+    case "interactivestory":
+      return {
+        label: "Pilih Jalur",
+        color: "teal",
+        icon: Telescope,
+        gradient: "from-teal-400 to-emerald-600",
       };
     case "quiz":
       return {
@@ -1096,6 +1111,8 @@ const ContentBlock = ({ block: rawBlock }) => {
         return <CamelRaceGame data={block.data} title={block.data.title} />;
     case 'worddetective':
         return <WordDetectiveGame data={block.data} title={block.data.title} />;
+    case 'interactivestory':
+        return <InteractiveStoryGame data={block.data} />;
     default:
       return null;
   }

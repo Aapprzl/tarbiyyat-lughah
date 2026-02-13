@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../media/PdfViewer';
@@ -59,6 +59,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             case 'wordrain': return { icon: CloudRain, label: 'Hujan Kata', color: 'text-sky-600', bg: 'bg-sky-50', gradient: 'from-sky-500 to-indigo-600' };
             case 'camelrace': return { icon: Mountain, label: 'Balap Unta', color: 'text-amber-600', bg: 'bg-amber-50', gradient: 'from-amber-400 to-orange-600' };
             case 'worddetective': return { icon: Search, label: 'Detektif Kata', color: 'text-emerald-600', bg: 'bg-emerald-50', gradient: 'from-emerald-400 to-teal-600' };
+            case 'interactivestory': return { icon: Telescope, label: 'Pilih Jalur', color: 'text-teal-600', bg: 'bg-teal-50', gradient: 'from-teal-400 to-emerald-600' };
             default: return { icon: Circle, label: 'Unknown', color: 'text-gray-600', bg: 'bg-gray-50', gradient: 'from-slate-400 to-slate-600' };
         }
     };
@@ -82,7 +83,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             text: 'from-teal-400 to-emerald-600',
             wordrain: 'from-sky-400 to-indigo-600',
             camelrace: 'from-amber-500 to-orange-600',
-            worddetective: 'from-emerald-400 to-teal-600'
+            worddetective: 'from-emerald-400 to-teal-600',
+            interactivestory: 'from-teal-400 to-emerald-600'
         };
         return { ...base, gradient: base.gradient || gradients[type] || 'from-slate-400 to-slate-600' };
     };
@@ -221,7 +223,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         className="overflow-hidden"
                     >
                         <div className="px-4 md:px-8 pb-6 md:pb-8 pt-4 border-t border-slate-100 dark:border-white/[0.08]">
-                            
+                           
               {(block.type === 'text' && !block.data?.isRichText) && (
                 <div className="space-y-3">
                   <input 
@@ -1647,6 +1649,216 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                         onChange={(e) => onUpdate({ ...block.data, timeLimit: parseInt(e.target.value) || 60 })}
                       />
                    </div>
+                 </div>
+               )}
+
+               {/* --- INTERACTIVE STORY BLOCK --- */}
+               {block.type === 'interactivestory' && (
+                 <div className="space-y-8">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Cerita</label>
+                       <input 
+                         type="text" 
+                         placeholder="Kisah di Madinah..."
+                         className="w-full font-black text-xl text-teal-500 bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none px-1"
+                         value={block.data.title || ''}
+                         onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
+                       />
+                    </div>
+
+                    <div className="p-4 bg-teal-50 dark:bg-teal-500/5 rounded-3xl border border-teal-200 dark:border-teal-500/20 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                          <Settings className="w-4 h-4 text-teal-500" />
+                          <label className="text-xs font-bold text-slate-600 dark:text-slate-300">ID Scene Awal</label>
+                       </div>
+                       <input 
+                         type="text" 
+                         className="w-32 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs font-black text-center"
+                         value={block.data.startScene || 'start'}
+                         onChange={(e) => onUpdate({ ...block.data, startScene: e.target.value })}
+                       />
+                    </div>
+
+                    <div className="space-y-6">
+                       <div className="flex items-center justify-between px-1">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Daftar Scene ({Object.keys(block.data.scenes || {}).length})</label>
+                          <button 
+                            onClick={() => {
+                               const sceneId = `scene_${Date.now()}`;
+                               onUpdate({ 
+                                 ...block.data, 
+                                 scenes: { 
+                                   ...(block.data.scenes || {}), 
+                                   [sceneId]: { text: '', options: [{ text: 'Lanjut', nextScene: '' }] } 
+                                 } 
+                               });
+                            }}
+                            className="text-[10px] font-black uppercase text-teal-500 hover:text-teal-600 transition-colors"
+                          >+ Tambah Scene Baru</button>
+                       </div>
+
+                       <div className="space-y-4">
+                          {Object.entries(block.data.scenes || {}).map(([sKey, sData]) => (
+                            <div key={sKey} className="group/scene bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] overflow-hidden transition-all hover:border-teal-500/30">
+                               <div className="p-6 space-y-6">
+                                  {/* Scene Header */}
+                                  <div className="flex items-center justify-between">
+                                     <div className="flex items-center gap-3">
+                                        <div className="px-3 py-1 bg-teal-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-teal-500/20">
+                                           ID: {sKey}
+                                        </div>
+                                        {sKey === block.data.startScene && (
+                                           <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 uppercase tracking-tighter italic">START SCENE</span>
+                                        )}
+                                     </div>
+                                     <button 
+                                       onClick={() => {
+                                          const newScenes = { ...block.data.scenes };
+                                          delete newScenes[sKey];
+                                          onUpdate({ ...block.data, scenes: newScenes });
+                                       }}
+                                       className="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/scene:opacity-100"
+                                     >
+                                        <Trash2 className="w-4 h-4" />
+                                     </button>
+                                  </div>
+
+                                  {/* Narrative Text */}
+                                  <div className="space-y-2">
+                                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Teks Narasi / Dialog</label>
+                                     <textarea 
+                                       placeholder="Tulis apa yang terjadi di scene ini..."
+                                       className={cn(
+                                         "w-full h-24 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-sm outline-none focus:ring-2 focus:ring-teal-500/50 transition-all",
+                                         isArabic(sData.text) && "arabic-content text-right"
+                                       )}
+                                       style={{ direction: isArabic(sData.text) ? 'rtl' : 'ltr' }}
+                                       value={sData.text || ''}
+                                       onChange={(e) => {
+                                          const newScenes = { ...block.data.scenes };
+                                          newScenes[sKey] = { ...sData, text: e.target.value };
+                                          onUpdate({ ...block.data, scenes: newScenes });
+                                       }}
+                                     />
+                                  </div>
+
+                                  {/* Visual Assets (Background & Character) */}
+                                  <div className="grid md:grid-cols-2 gap-4">
+                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+                                           <ImageIcon className="w-3 h-3" /> Background URL (Opsional)
+                                        </label>
+                                        <input 
+                                          type="text"
+                                          placeholder="https://..."
+                                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
+                                          value={sData.background || ''}
+                                          onChange={(e) => {
+                                             const newScenes = { ...block.data.scenes };
+                                             newScenes[sKey] = { ...sData, background: e.target.value };
+                                             onUpdate({ ...block.data, scenes: newScenes });
+                                          }}
+                                        />
+                                     </div>
+                                     <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
+                                           <User className="w-3 h-3" /> Nama Karakter & Foto (Opsional)
+                                        </label>
+                                        <div className="flex gap-2">
+                                           <input 
+                                             type="text"
+                                             placeholder="Nama"
+                                             className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
+                                             value={sData.character?.name || ''}
+                                             onChange={(e) => {
+                                                const newScenes = { ...block.data.scenes };
+                                                newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), name: e.target.value } };
+                                                onUpdate({ ...block.data, scenes: newScenes });
+                                             }}
+                                           />
+                                           <input 
+                                             type="text"
+                                             placeholder="Foto URL"
+                                             className="flex-[1.5] bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
+                                             value={sData.character?.image || ''}
+                                             onChange={(e) => {
+                                                const newScenes = { ...block.data.scenes };
+                                                newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), image: e.target.value } };
+                                                onUpdate({ ...block.data, scenes: newScenes });
+                                             }}
+                                           />
+                                        </div>
+                                     </div>
+                                  </div>
+
+                                  {/* Navigation Options */}
+                                  <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/5">
+                                     <label className="text-[10px] font-black text-teal-600 uppercase tracking-widest px-1">Pilihan Jalur (Options)</label>
+                                     <div className="space-y-2">
+                                        {(sData.options || []).map((opt, oIdx) => (
+                                          <div key={oIdx} className="flex gap-3 items-center group/opt">
+                                             <div className="flex-1 bg-slate-50 dark:bg-black/10 rounded-2xl p-3 flex gap-4">
+                                                <input 
+                                                  type="text"
+                                                  placeholder="Teks Pilihan..."
+                                                  className={cn(
+                                                    "flex-[1.5] bg-transparent text-xs font-bold outline-none",
+                                                    isArabic(opt.text) && "arabic-content text-right"
+                                                  )}
+                                                  value={opt.text || ''}
+                                                  onChange={(e) => {
+                                                     const newScenes = { ...block.data.scenes };
+                                                     const newOpts = [...(newScenes[sKey].options || [])];
+                                                     newOpts[oIdx] = { ...newOpts[oIdx], text: e.target.value };
+                                                     newScenes[sKey].options = newOpts;
+                                                     onUpdate({ ...block.data, scenes: newScenes });
+                                                  }}
+                                                />
+                                                <div className="w-px h-6 bg-slate-200 dark:bg-white/10" />
+                                                <div className="flex-1 flex items-center gap-2">
+                                                   <LinkIcon className="w-3 h-3 text-slate-400" />
+                                                   <input 
+                                                     type="text"
+                                                     placeholder="ID Scene Tujuan"
+                                                     className="w-full bg-transparent text-xs font-black text-teal-500 outline-none"
+                                                     value={opt.nextScene || ''}
+                                                     onChange={(e) => {
+                                                        const newScenes = { ...block.data.scenes };
+                                                        const newOpts = [...(newScenes[sKey].options || [])];
+                                                        newOpts[oIdx] = { ...newOpts[oIdx], nextScene: e.target.value };
+                                                        newScenes[sKey].options = newOpts;
+                                                        onUpdate({ ...block.data, scenes: newScenes });
+                                                     }}
+                                                   />
+                                                </div>
+                                             </div>
+                                             <button 
+                                               onClick={() => {
+                                                  const newScenes = { ...block.data.scenes };
+                                                  newScenes[sKey].options = sData.options.filter((_, i) => i !== oIdx);
+                                                  onUpdate({ ...block.data, scenes: newScenes });
+                                               }}
+                                               className="p-2 text-slate-300 hover:text-red-500 opacity-0 group-hover/opt:opacity-100 transition-all"
+                                             >
+                                                <Trash2 className="w-3.5 h-3.5" />
+                                             </button>
+                                          </div>
+                                        ))}
+                                        <button 
+                                          onClick={() => {
+                                             const newScenes = { ...block.data.scenes };
+                                             newScenes[sKey].options = [...(sData.options || []), { text: '', nextScene: '' }];
+                                             onUpdate({ ...block.data, scenes: newScenes });
+                                          }}
+                                          className="w-full py-2 bg-slate-50 dark:bg-white/5 border border-dashed border-teal-200 dark:border-teal-500/20 rounded-xl text-[10px] font-black uppercase text-teal-500 hover:bg-teal-50 transition-all"
+                                        >+ Tambah Pilihan</button>
+                                     </div>
+                                  </div>
+                               </div>
+                            </div>
+                          ))}
+                       </div>
+                    </div>
                  </div>
                )}
 
