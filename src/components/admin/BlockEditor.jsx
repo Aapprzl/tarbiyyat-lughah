@@ -1843,7 +1843,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                          
                                          <div className="relative group/char">
                                              <select 
-                                                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20"
+                                                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20 dark:text-white transition-all hover:bg-white dark:hover:bg-slate-800"
                                                 value={sData.character?.id || ''}
                                                 onChange={(e) => {
                                                     const selected = globalCharacters.find(c => c.id === e.target.value);
@@ -1855,12 +1855,14 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                     onUpdate({ ...block.data, scenes: newScenes });
                                                 }}
                                              >
-                                                <option value="">Pilih Karakter...</option>
+                                                <option value="" className="bg-white dark:bg-slate-900 text-slate-400">Pilih Karakter...</option>
                                                 {globalCharacters.map(char => (
-                                                    <option key={char.id} value={char.id}>{char.name} ({char.role})</option>
+                                                    <option key={char.id} value={char.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium">
+                                                        {char.name} — {char.role}
+                                                    </option>
                                                 ))}
                                              </select>
-                                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
                                                  <ChevronDown className="w-4 h-4" />
                                              </div>
                                          </div>
@@ -1868,19 +1870,19 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                          <AnimatePresence>
                                             {sData.character && (
                                                 <motion.div 
-                                                    initial={{ opacity: 0, scale: 0.95 }}
-                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                    animate={{ opacity: 1, y: 0, scale: 1 }}
                                                     exit={{ opacity: 0, scale: 0.95 }}
-                                                    className="p-3 bg-teal-500/5 dark:bg-teal-500/10 rounded-2xl border border-teal-500/20 flex items-center gap-4 group/preview relative overflow-hidden"
+                                                    className="p-4 bg-white dark:bg-slate-900/40 rounded-[2rem] border border-slate-200 dark:border-white/5 flex items-center gap-4 group/preview relative overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
                                                 >
-                                                    <div className="absolute top-0 right-0 p-1 opacity-0 group-hover/preview:opacity-100 transition-opacity">
-                                                        <Sparkles className="w-3 h-3 text-teal-500 animate-pulse" />
+                                                    {/* Background Accent */}
+                                                    <div className="absolute -top-10 -right-10 w-24 h-24 bg-teal-500/5 dark:bg-teal-500/10 blur-2xl rounded-full" />
+                                                    
+                                                    <div className="w-14 h-14 bg-slate-50 dark:bg-black/20 rounded-2xl overflow-hidden border border-slate-100 dark:border-white/5 shrink-0 flex items-center justify-center relative z-10">
+                                                        <img src={sData.character.image} className="w-full h-full object-contain p-2 hover:scale-110 transition-transform duration-500" />
                                                     </div>
-                                                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-teal-500/20 shrink-0">
-                                                        <img src={sData.character.image} className="w-full h-full object-contain p-1" />
-                                                    </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <div className="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest">Karakter Terpilih</div>
+                                                    <div className="flex-1 min-w-0 relative z-10">
+                                                        <div className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-0.5">Scene Character</div>
                                                         <div className="text-sm font-black text-slate-800 dark:text-white truncate">{sData.character.name}</div>
                                                     </div>
                                                     <button 
@@ -1889,7 +1891,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                             newScenes[sKey] = { ...sData, character: null };
                                                             onUpdate({ ...block.data, scenes: newScenes });
                                                         }}
-                                                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                                        className="p-2.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-xl transition-all relative z-10"
+                                                        title="Ganti Karakter"
                                                     >
                                                         <X className="w-4 h-4" />
                                                     </button>
