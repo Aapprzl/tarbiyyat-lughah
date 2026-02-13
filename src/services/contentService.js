@@ -686,6 +686,26 @@ export const contentService = {
         }
     },
 
+    async getBackgrounds() {
+        try {
+            const backgrounds = await contentServiceV2.siteConfig.get('interactive_story_backgrounds');
+            return Array.isArray(backgrounds) ? backgrounds : [];
+        } catch (error) {
+            console.error('[contentService] Error fetching backgrounds:', error);
+            return [];
+        }
+    },
+
+    async saveBackgrounds(backgrounds) {
+        try {
+            await contentServiceV2.siteConfig.save('interactive_story_backgrounds', backgrounds, 'Interactive story background library');
+            return true;
+        } catch (error) {
+            console.error('[contentService] Error saving backgrounds:', error);
+            throw error;
+        }
+    },
+
      // ============================================
     // GAME MANAGEMENT (Updated to use new Tables)
     // ============================================

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { useTheme } from '../providers/ThemeProvider';
-import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash, Monitor } from 'lucide-react';
+import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash, Monitor, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
@@ -145,7 +145,7 @@ const AdminLayout = () => {
           <NavItem to="/admin/intro-editor" icon={Monitor} label="Manajemen Intro" />
           
           <div className="pt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 px-3">Sistem & Aset</div>
-          <NavItem to="/admin/characters" icon={CircleUser} label="Manajemen Karakter" />
+          <NavItem to="/admin/assets" icon={Layers} label="Pustaka Aset" />
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
           
           <div className="pt-6 px-3">

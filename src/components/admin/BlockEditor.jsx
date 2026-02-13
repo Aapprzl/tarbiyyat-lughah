@@ -26,14 +26,19 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
 const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst, isLast, toast }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [globalCharacters, setGlobalCharacters] = useState([]);
+    const [globalBackgrounds, setGlobalBackgrounds] = useState([]);
 
     useEffect(() => {
         if (block.type === 'interactivestory') {
-            const fetchChars = async () => {
-                const chars = await contentService.getCharacters();
+            const fetchAssets = async () => {
+                const [chars, bgs] = await Promise.all([
+                    contentService.getCharacters(),
+                    contentService.getBackgrounds()
+                ]);
                 setGlobalCharacters(chars);
+                setGlobalBackgrounds(bgs);
             };
-            fetchChars();
+            fetchAssets();
         }
     }, [block.type]);
 
@@ -1767,68 +1772,68 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
 
                                   {/* Visual Assets (Background & Character) */}
                                    <div className="grid md:grid-cols-2 gap-6">
-                                      <div className="space-y-3">
+                                      <div className="space-y-4">
                                          <div className="flex items-center justify-between px-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                               <ImageIcon className="w-3 h-3" /> Background Image
+                                               <ImageIcon className="w-3 h-3" /> Pilih Background Scene
                                             </label>
-                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded">Rekomendasi: 1280x720, Max 1MB</span>
+                                            <button 
+                                                onClick={() => window.open('#/admin/assets', '_blank')}
+                                                className="text-[9px] font-bold text-teal-500 hover:text-teal-600 uppercase tracking-tighter"
+                                            >+ Tambah Baru</button>
                                          </div>
                                          
-                                         <div className="relative group/upload h-24 bg-slate-50 dark:bg-black/20 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden transition-all hover:border-teal-500/50">
-                                            {sData.background ? (
-                                                <div className="relative w-full h-full group">
-                                                    <img src={sData.background} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
-                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                                        <label className="p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform">
-                                                            <ImageIcon className="w-4 h-4 text-teal-500" />
-                                                            <input 
-                                                                type="file" accept="image/*" className="hidden"
-                                                                onChange={(e) => {
-                                                                    const file = e.target.files[0];
-                                                                    if (file) {
-                                                                        if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
-                                                                        const url = URL.createObjectURL(file);
-                                                                        const newScenes = { ...block.data.scenes };
-                                                                        newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
-                                                                        onUpdate({ ...block.data, scenes: newScenes });
-                                                                    }
-                                                                }}
-                                                            />
-                                                        </label>
+                                         <div className="relative group/bg">
+                                             <select 
+                                                className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20 dark:text-white transition-all hover:bg-white dark:hover:bg-slate-800"
+                                                value={globalBackgrounds.find(b => b.image === sData.background)?.id || ''}
+                                                onChange={(e) => {
+                                                    const selected = globalBackgrounds.find(b => b.id === e.target.value);
+                                                    const newScenes = { ...block.data.scenes };
+                                                    newScenes[sKey] = { 
+                                                        ...sData, 
+                                                        background: selected ? selected.image : '' 
+                                                    };
+                                                    onUpdate({ ...block.data, scenes: newScenes });
+                                                }}
+                                             >
+                                                <option value="" className="bg-white dark:bg-slate-900 text-slate-400">Pilih Background...</option>
+                                                {globalBackgrounds.map(bg => (
+                                                    <option key={bg.id} value={bg.id} className="bg-white dark:bg-slate-900 text-slate-800 dark:text-white font-medium">
+                                                        {bg.name}
+                                                    </option>
+                                                ))}
+                                             </select>
+                                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
+                                                 <ChevronDown className="w-4 h-4" />
+                                             </div>
+                                         </div>
+
+                                         <AnimatePresence>
+                                            {sData.background && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                    className="relative aspect-video bg-slate-100 dark:bg-black/20 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-sm group/bg-prev"
+                                                >
+                                                    <img src={sData.background} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                         <button 
                                                             onClick={() => {
                                                                 const newScenes = { ...block.data.scenes };
-                                                                newScenes[sKey] = { ...sData, background: '', backgroundFile: null };
+                                                                newScenes[sKey] = { ...sData, background: '' };
                                                                 onUpdate({ ...block.data, scenes: newScenes });
                                                             }}
-                                                            className="p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:text-red-500 hover:scale-110 transition-transform"
+                                                            className="p-3 bg-white dark:bg-slate-800 rounded-2xl text-red-500 shadow-xl hover:scale-110 transition-transform"
                                                         >
-                                                            <X className="w-4 h-4" />
+                                                            <X className="w-5 h-5" />
                                                         </button>
                                                     </div>
-                                                </div>
-                                            ) : (
-                                                 <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-teal-500/5 transition-colors">
-                                                     <ImageIcon className="w-6 h-6 text-slate-300 mb-1" />
-                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Pilih Gambar</span>
-                                                     <input 
-                                                         type="file" accept="image/*" className="hidden"
-                                                         onChange={(e) => {
-                                                             const file = e.target.files[0];
-                                                             if (file) {
-                                                                 if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
-                                                                 const url = URL.createObjectURL(file);
-                                                                 const newScenes = { ...block.data.scenes };
-                                                                 newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
-                                                                 onUpdate({ ...block.data, scenes: newScenes });
-                                                             }
-                                                         }}
-                                                     />
-                                                 </label>
-                                             )}
-                                          </div>
-                                       </div>
+                                                </motion.div>
+                                            )}
+                                         </AnimatePresence>
+                                      </div>
 
                                        <div className="space-y-4">
                                          <div className="flex items-center justify-between px-1">

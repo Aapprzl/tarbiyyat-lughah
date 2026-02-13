@@ -20,7 +20,7 @@ const LessonEditor = lazy(() => import('./pages/admin/LessonEditor'));
 const FontEditor = lazy(() => import('./pages/admin/FontEditor'));
 const LibraryManager = lazy(() => import('./pages/admin/LibraryManager'));
 const IntroEditor = lazy(() => import('./pages/admin/IntroEditor'));
-const CharacterEditor = lazy(() => import('./pages/admin/CharacterEditor'));
+const AssetLibrary = lazy(() => import('./pages/admin/AssetLibrary'));
 
 import { contentService } from './services/contentService';
 import { ToastProvider, ConfirmProvider } from './components/ui/Toast';
@@ -111,7 +111,7 @@ function App() {
                 { path: "library-manager", element: <LibraryManager /> },
                 { path: "intro-editor", element: <IntroEditor /> },
                 { path: "font-editor", element: <FontEditor /> },
-                { path: "characters", element: <CharacterEditor /> },
+                { path: "assets", element: <AssetLibrary /> },
                 { path: "edit/:topicId", element: <LessonEditor /> },
               ]
             },

@@ -32,12 +32,21 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         return wrapArabicText(displayText);
     }, [displayText]);
 
-    // Auto-scroll to bottom as text types
+    // Auto-scroll to bottom as text animates
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            const scrollContainer = scrollRef.current;
+            const scroll = () => {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            };
+            const interval = setInterval(scroll, 100);
+            const timeout = setTimeout(() => clearInterval(interval), 3000);
+            return () => {
+                clearInterval(interval);
+                clearTimeout(timeout);
+            };
         }
-    }, [displayText]);
+    }, [currentSceneKey]);
 
     // Helper to preload images
     const preloadImage = (url) => {
@@ -66,27 +75,23 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         initLoad();
     }, []);
 
-    // Typewriter effect
+    // Split narrative text into sentences or segments for staggered fade-in
+    const textSegments = useMemo(() => {
+        if (!currentScene.text) return [];
+        return currentScene.text
+            .split(/(?<=[.!?؟])\s+|\n+/)
+            .filter(segment => segment.trim().length > 0);
+    }, [currentScene.text]);
+
+    // Handle typing state for UI feedback
     useEffect(() => {
         if (isInitialLoading || isSceneLoading || !currentScene.text) return;
-        
-        let index = 0;
-        setDisplayText('');
         setIsTyping(true);
-        
-        const text = currentScene.text;
-        const interval = setInterval(() => {
-            if (index <= text.length) {
-                setDisplayText(text.substring(0, index));
-                index++;
-            } else {
-                setIsTyping(false);
-                clearInterval(interval);
-            }
-        }, 30);
-
-        return () => clearInterval(interval);
-    }, [currentScene.text, isInitialLoading, isSceneLoading]);
+        // Set typing to false after a reasonable delay for the full sequence
+        const duration = Math.min(textSegments.length * 800 + 1000, 5000);
+        const timer = setTimeout(() => setIsTyping(false), duration);
+        return () => clearTimeout(timer);
+    }, [currentSceneKey, isInitialLoading, isSceneLoading, textSegments.length]);
 
     const handleOptionClick = async (nextKey) => {
         if (isTyping || isSceneLoading) return;
@@ -139,6 +144,54 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         }
     };
 
+    const backgroundLayer = useMemo(() => (
+        <div className="absolute inset-0 z-0 overflow-hidden">
+            <AnimatePresence>
+                <motion.div 
+                    key={currentSceneKey + "_bg"}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                >
+                    {currentScene.background ? (
+                        <img 
+                            src={currentScene.background} 
+                            className="w-full h-full object-cover brightness-[0.8] dark:brightness-[0.4] contrast-[1.1]" 
+                            alt="Background"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-gradient-to-b from-slate-100 to-white dark:from-slate-800 dark:to-slate-950" />
+                    )}
+                </motion.div>
+            </AnimatePresence>
+        </div>
+    ), [currentSceneKey, currentScene.background]);
+
+    const characterLayer = useMemo(() => (
+        <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-0 overflow-hidden">
+            <AnimatePresence>
+                {currentScene.character && (
+                    <motion.div 
+                        key={currentScene.character.image}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 1.05 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        className="w-full max-w-sm md:max-w-md h-full flex items-end justify-center px-4 absolute bottom-0"
+                    >
+                        <img 
+                            src={currentScene.character.image} 
+                            className="max-h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+                            alt={currentScene.character.name}
+                        />
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    ), [currentScene.character]);
+
     if (isInitialLoading) {
         return (
             <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] md:min-h-[750px] flex items-center justify-center">
@@ -162,8 +215,8 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
     }
 
     return (
-        <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] md:min-h-[750px] flex flex-col transition-all duration-300">
-            <div className="bg-white dark:bg-slate-900 rounded-none md:rounded-[3rem] shadow-2xl border-x-0 md:border-4 border-slate-200 dark:border-slate-800 overflow-hidden relative flex-1 flex flex-col transition-colors duration-500">
+        <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-[600px] md:h-[800px] flex flex-col">
+            <div className="bg-white dark:bg-slate-900 rounded-none md:rounded-[3rem] shadow-2xl border-x-0 md:border-4 border-slate-200 dark:border-slate-800 overflow-hidden relative flex-1 flex flex-col">
                 
                 {/* Scene Loading Overlay */}
                 <AnimatePresence>
@@ -179,29 +232,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                     )}
                 </AnimatePresence>
                 
-                {/* 1. Background Layer */}
-                <div className="absolute inset-0 z-0 overflow-hidden">
-                    <AnimatePresence>
-                        <motion.div 
-                            key={currentSceneKey + "_bg"}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 1.2, ease: "easeInOut" }}
-                            className="absolute inset-0"
-                        >
-                            {currentScene.background ? (
-                                <img 
-                                    src={currentScene.background} 
-                                    className="w-full h-full object-cover brightness-[0.8] dark:brightness-[0.4] contrast-[1.1]" 
-                                    alt="Background"
-                                />
-                            ) : (
-                                <div className="w-full h-full bg-gradient-to-b from-slate-100 to-white dark:from-slate-800 dark:to-slate-950" />
-                            )}
-                        </motion.div>
-                    </AnimatePresence>
-                </div>
+                {backgroundLayer}
 
                 {/* 2. Top UI Controls */}
                 <div className="relative z-20 px-6 py-5 flex items-center justify-between pointer-events-none">
@@ -231,27 +262,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                     </div>
                 </div>
 
-                {/* 3. Character Sprite Layer */}
-                <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-[200px] overflow-hidden">
-                    <AnimatePresence>
-                        {currentScene.character && (
-                            <motion.div 
-                                key={currentScene.character.image}
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 1.05 }}
-                                transition={{ duration: 0.6, ease: "easeOut" }}
-                                className="w-full max-w-sm md:max-w-md h-full flex items-end justify-center px-4 absolute bottom-0"
-                            >
-                                <img 
-                                    src={currentScene.character.image} 
-                                    className="max-h-full md:max-h-[110%] object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all"
-                                    alt={currentScene.character.name}
-                                />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </div>
+                {characterLayer}
 
                 {/* 4. Bottom Dialogue & UI Overlay */}
                 <div className="relative z-30 p-4 md:p-8 pt-0">
@@ -263,7 +274,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col max-h-[30vh] md:max-h-[40vh] transition-colors duration-500"
+                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col max-h-[180px] md:max-h-[250px] transition-colors duration-500"
                         >
                             {/* Accent Glow */}
                             <div className="absolute -top-10 -left-10 w-40 h-40 bg-teal-500/10 blur-[50px] pointer-events-none" />
@@ -302,13 +313,35 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                     }
                                 `}</style>
                                 <div className="min-h-[60px] md:min-h-[80px]">
-                                    <div className={cn(
-                                        "text-lg md:text-2xl leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
-                                        isArabic(currentScene.text) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-bold"
-                                    )}>
-                                        <span dangerouslySetInnerHTML={{ __html: processedText }} />
-                                        {isTyping && <span className="inline-block w-2 h-5 md:w-3 md:h-6 bg-teal-400 ml-1 animate-pulse" />}
-                                    </div>
+                                        <motion.div 
+                                            key={currentSceneKey + "_narrative"}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={{
+                                                visible: {
+                                                    transition: {
+                                                        staggerChildren: 0.8
+                                                    }
+                                                }
+                                            }}
+                                            className="space-y-4"
+                                        >
+                                            {textSegments.map((segment, idx) => (
+                                                <motion.div
+                                                    key={idx}
+                                                    variants={{
+                                                        hidden: { opacity: 0, y: 10, filter: 'blur(10px)' },
+                                                        visible: { opacity: 1, y: 0, filter: 'blur(0px)' }
+                                                    }}
+                                                    transition={{ duration: 1.2, ease: "easeOut" }}
+                                                    className={cn(
+                                                        "text-lg md:text-2xl leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
+                                                        isArabic(segment) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-bold"
+                                                    )}
+                                                    dangerouslySetInnerHTML={{ __html: wrapArabicText(segment) }}
+                                                />
+                                            ))}
+                                        </motion.div>
                                 </div>
                             </div>
 
