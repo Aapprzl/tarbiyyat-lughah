@@ -405,6 +405,53 @@ const LessonEditor = () => {
                     return block;
                 }
             }
+
+            // Interactive Story Uploads
+            if (block.type === 'interactivestory') {
+                const newScenes = { ...(block.data.scenes || {}) };
+                let hasChanges = false;
+
+                for (const sKey in newScenes) {
+                    const scene = { ...newScenes[sKey] };
+                    let sceneChanged = false;
+
+                    // Background File Upload
+                    if (scene.backgroundFile) {
+                        try {
+                            const url = await storageService.uploadFile(scene.backgroundFile, 'materials/story/backgrounds');
+                            scene.background = url;
+                            delete scene.backgroundFile;
+                            sceneChanged = true;
+                            hasChanges = true;
+                        } catch (e) {
+                            console.error("Story Background Upload Failed", e);
+                            toast.error(`Gagal upload background scene ${sKey}`);
+                        }
+                    }
+
+                    // Character Image File Upload
+                    if (scene.character?.imageFile) {
+                        try {
+                            const url = await storageService.uploadFile(scene.character.imageFile, 'materials/story/characters');
+                            scene.character = { ...scene.character, image: url };
+                            delete scene.character.imageFile;
+                            sceneChanged = true;
+                            hasChanges = true;
+                        } catch (e) {
+                            console.error("Story Character Upload Failed", e);
+                            toast.error(`Gagal upload foto karakter di scene ${sKey}`);
+                        }
+                    }
+
+                    if (sceneChanged) {
+                        newScenes[sKey] = scene;
+                    }
+                }
+
+                if (hasChanges) {
+                    return { ...block, data: { ...block.data, scenes: newScenes } };
+                }
+            }
             return block;
         }));
         return { ...stage, items: processedItems };

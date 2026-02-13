@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import PdfViewer from '../media/PdfViewer';
@@ -1703,14 +1703,25 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                <div className="p-6 space-y-6">
                                   {/* Scene Header */}
                                   <div className="flex items-center justify-between">
-                                     <div className="flex items-center gap-3">
-                                        <div className="px-3 py-1 bg-teal-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-teal-500/20">
-                                           ID: {sKey}
-                                        </div>
-                                        {sKey === block.data.startScene && (
-                                           <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 uppercase tracking-tighter italic">START SCENE</span>
-                                        )}
-                                     </div>
+                                      <div className="flex items-center gap-3">
+                                         <div className="px-3 py-1 bg-teal-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-teal-500/20 flex items-center gap-2">
+                                            ID: {sKey}
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    navigator.clipboard.writeText(sKey);
+                                                    toast.success("ID disalin ke clipboard!");
+                                                }}
+                                                className="hover:text-white/70 transition-colors p-0.5"
+                                                title="Salin ID"
+                                            >
+                                                <Copy className="w-3 h-3" />
+                                            </button>
+                                         </div>
+                                         {sKey === block.data.startScene && (
+                                            <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 uppercase tracking-tighter italic">START SCENE</span>
+                                         )}
+                                      </div>
                                      <button 
                                        onClick={() => {
                                           const newScenes = { ...block.data.scenes };
@@ -1730,7 +1741,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                        placeholder="Tulis apa yang terjadi di scene ini..."
                                        className={cn(
                                          "w-full h-24 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-sm outline-none focus:ring-2 focus:ring-teal-500/50 transition-all",
-                                         isArabic(sData.text) && "arabic-content text-right"
+                                         isArabic(sData.text) && "arabic-content text-right leading-[2]"
                                        )}
                                        style={{ direction: isArabic(sData.text) ? 'rtl' : 'ltr' }}
                                        value={sData.text || ''}
@@ -1743,53 +1754,156 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                   </div>
 
                                   {/* Visual Assets (Background & Character) */}
-                                  <div className="grid md:grid-cols-2 gap-4">
-                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
-                                           <ImageIcon className="w-3 h-3" /> Background URL (Opsional)
-                                        </label>
-                                        <input 
-                                          type="text"
-                                          placeholder="https://..."
-                                          className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
-                                          value={sData.background || ''}
-                                          onChange={(e) => {
-                                             const newScenes = { ...block.data.scenes };
-                                             newScenes[sKey] = { ...sData, background: e.target.value };
-                                             onUpdate({ ...block.data, scenes: newScenes });
-                                          }}
-                                        />
-                                     </div>
-                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1 flex items-center gap-2">
-                                           <User className="w-3 h-3" /> Nama Karakter & Foto (Opsional)
-                                        </label>
-                                        <div className="flex gap-2">
-                                           <input 
-                                             type="text"
-                                             placeholder="Nama"
-                                             className="flex-1 bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
-                                             value={sData.character?.name || ''}
-                                             onChange={(e) => {
-                                                const newScenes = { ...block.data.scenes };
-                                                newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), name: e.target.value } };
-                                                onUpdate({ ...block.data, scenes: newScenes });
-                                             }}
-                                           />
-                                           <input 
-                                             type="text"
-                                             placeholder="Foto URL"
-                                             className="flex-[1.5] bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:ring-1 focus:ring-teal-500"
-                                             value={sData.character?.image || ''}
-                                             onChange={(e) => {
-                                                const newScenes = { ...block.data.scenes };
-                                                newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), image: e.target.value } };
-                                                onUpdate({ ...block.data, scenes: newScenes });
-                                             }}
-                                           />
-                                        </div>
-                                     </div>
-                                  </div>
+                                   <div className="grid md:grid-cols-2 gap-6">
+                                      <div className="space-y-3">
+                                         <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                               <ImageIcon className="w-3 h-3" /> Background Image
+                                            </label>
+                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded">Rekomendasi: 1280x720, Max 1MB</span>
+                                         </div>
+                                         
+                                         <div className="relative group/upload h-24 bg-slate-50 dark:bg-black/20 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden transition-all hover:border-teal-500/50">
+                                            {sData.background ? (
+                                                <div className="relative w-full h-full group">
+                                                    <img src={sData.background} className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                                        <label className="p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform">
+                                                            <ImageIcon className="w-4 h-4 text-teal-500" />
+                                                            <input 
+                                                                type="file" accept="image/*" className="hidden"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files[0];
+                                                                    if (file) {
+                                                                        if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
+                                                                        const url = URL.createObjectURL(file);
+                                                                        const newScenes = { ...block.data.scenes };
+                                                                        newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
+                                                                        onUpdate({ ...block.data, scenes: newScenes });
+                                                                    }
+                                                                }}
+                                                            />
+                                                        </label>
+                                                        <button 
+                                                            onClick={() => {
+                                                                const newScenes = { ...block.data.scenes };
+                                                                newScenes[sKey] = { ...sData, background: '', backgroundFile: null };
+                                                                onUpdate({ ...block.data, scenes: newScenes });
+                                                            }}
+                                                            className="p-2 bg-white dark:bg-slate-800 rounded-full shadow-lg hover:text-red-500 hover:scale-110 transition-transform"
+                                                        >
+                                                            <X className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-teal-500/5 transition-colors">
+                                                    <ImageIcon className="w-6 h-6 text-slate-300 mb-1" />
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Pilih Gambar</span>
+                                                    <input 
+                                                        type="file" accept="image/*" className="hidden"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files[0];
+                                                            if (file) {
+                                                                if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
+                                                                const url = URL.createObjectURL(file);
+                                                                const newScenes = { ...block.data.scenes };
+                                                                newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
+                                                                onUpdate({ ...block.data, scenes: newScenes });
+                                                            }
+                                                        }}
+                                                    />
+                                                </label>
+                                            )}
+                                         </div>
+                                      </div>
+
+                                      <div className="space-y-3">
+                                         <div className="flex items-center justify-between px-1">
+                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                               <User className="w-3 h-3" /> Character & Photo
+                                            </label>
+                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded">PNG Transparent, Max 500KB</span>
+                                         </div>
+                                         
+                                         <div className="flex gap-4 items-start">
+                                            {/* Character Image Upload */}
+                                            <div className="w-20 h-24 bg-slate-50 dark:bg-black/20 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shrink-0 flex items-center justify-center relative group/char transition-all hover:border-teal-500/50">
+                                                {sData.character?.image ? (
+                                                    <div className="relative w-full h-full group">
+                                                        <img src={sData.character.image} className="w-full h-full object-contain opacity-80" />
+                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
+                                                            <label className="cursor-pointer">
+                                                                <ImageIcon className="w-4 h-4 text-white" />
+                                                                <input 
+                                                                    type="file" accept="image/*" className="hidden"
+                                                                    onChange={(e) => {
+                                                                        const file = e.target.files[0];
+                                                                        if (file) {
+                                                                            if (file.size > 500 * 1024) return toast.warning("Maksimal 500KB");
+                                                                            const url = URL.createObjectURL(file);
+                                                                            const newScenes = { ...block.data.scenes };
+                                                                            newScenes[sKey] = { 
+                                                                                ...sData, 
+                                                                                character: { ...(sData.character || {}), image: url, imageFile: file } 
+                                                                            };
+                                                                            onUpdate({ ...block.data, scenes: newScenes });
+                                                                        }
+                                                                    }}
+                                                                />
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                ) : (
+                                                    <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
+                                                        <User className="w-5 h-5 text-slate-300" />
+                                                        <input 
+                                                            type="file" accept="image/*" className="hidden"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files[0];
+                                                                if (file) {
+                                                                    if (file.size > 500 * 1024) return toast.warning("Maksimal 500KB");
+                                                                    const url = URL.createObjectURL(file);
+                                                                    const newScenes = { ...block.data.scenes };
+                                                                    newScenes[sKey] = { 
+                                                                        ...sData, 
+                                                                        character: { ...(sData.character || {}), image: url, imageFile: file } 
+                                                                    };
+                                                                    onUpdate({ ...block.data, scenes: newScenes });
+                                                                }
+                                                            }}
+                                                        />
+                                                    </label>
+                                                )}
+                                            </div>
+
+                                            {/* Character Name */}
+                                            <div className="flex-1 space-y-2">
+                                                <input 
+                                                  type="text"
+                                                  placeholder="Nama Karakter"
+                                                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-teal-500 font-bold"
+                                                  value={sData.character?.name || ''}
+                                                  onChange={(e) => {
+                                                     const newScenes = { ...block.data.scenes };
+                                                     newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), name: e.target.value } };
+                                                     onUpdate({ ...block.data, scenes: newScenes });
+                                                  }}
+                                                />
+                                                {sData.character?.image && (
+                                                    <button 
+                                                        onClick={() => {
+                                                            const newScenes = { ...block.data.scenes };
+                                                            newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), image: '', imageFile: null } };
+                                                            onUpdate({ ...block.data, scenes: newScenes });
+                                                        }}
+                                                        className="text-[9px] font-black uppercase text-red-500 hover:underline"
+                                                    >Hapus Foto</button>
+                                                )}
+                                            </div>
+                                         </div>
+                                      </div>
+                                   </div>
 
                                   {/* Navigation Options */}
                                   <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/5">
@@ -1803,7 +1917,7 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                   placeholder="Teks Pilihan..."
                                                   className={cn(
                                                     "flex-[1.5] bg-transparent text-xs font-bold outline-none",
-                                                    isArabic(opt.text) && "arabic-content text-right"
+                                                    isArabic(opt.text) && "arabic-content text-right leading-[2]"
                                                   )}
                                                   value={opt.text || ''}
                                                   onChange={(e) => {

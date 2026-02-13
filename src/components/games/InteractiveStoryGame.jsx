@@ -9,13 +9,15 @@ import {
   Sparkles
 } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { wrapArabicText } from '../../utils/textUtils';
+import { wrapArabicText, isArabic } from '../../utils/textUtils';
 
 const InteractiveStoryGame = ({ data = {}, title }) => {
     const [currentSceneKey, setCurrentSceneKey] = useState('start');
     const [displayText, setDisplayText] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [history, setHistory] = useState([]);
+    const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const [isSceneLoading, setIsSceneLoading] = useState(false);
     const scrollRef = useRef(null);
 
     const scenes = data.scenes || {};
@@ -37,9 +39,36 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         }
     }, [displayText]);
 
+    // Helper to preload images
+    const preloadImage = (url) => {
+        return new Promise((resolve) => {
+            if (!url) resolve();
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // Resolve anyway to not block forever
+        });
+    };
+
+    // Initial Load
+    useEffect(() => {
+        const initLoad = async () => {
+            const startScene = scenes['start'];
+            if (startScene) {
+                await Promise.all([
+                    preloadImage(startScene.background),
+                    preloadImage(startScene.character?.image)
+                ]);
+            }
+            // Artificial delay for premium feel
+            setTimeout(() => setIsInitialLoading(false), 1000);
+        };
+        initLoad();
+    }, []);
+
     // Typewriter effect
     useEffect(() => {
-        if (!currentScene.text) return;
+        if (isInitialLoading || isSceneLoading || !currentScene.text) return;
         
         let index = 0;
         setDisplayText('');
@@ -47,8 +76,8 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         
         const text = currentScene.text;
         const interval = setInterval(() => {
-            if (index < text.length) {
-                setDisplayText(prev => prev + text.charAt(index));
+            if (index <= text.length) {
+                setDisplayText(text.substring(0, index));
                 index++;
             } else {
                 setIsTyping(false);
@@ -57,42 +86,109 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         }, 30);
 
         return () => clearInterval(interval);
-    }, [currentScene.text]);
+    }, [currentScene.text, isInitialLoading, isSceneLoading]);
 
-    const handleOptionClick = (nextKey) => {
-        if (isTyping) return;
-        setHistory(prev => [...prev, currentSceneKey]);
-        setCurrentSceneKey(nextKey);
-    };
-
-    const resetStory = () => {
-        setCurrentSceneKey('start');
-        setHistory([]);
-    };
-
-    const goBack = () => {
-        if (history.length > 0) {
-            const newHistory = [...history];
-            const prev = newHistory.pop();
-            setHistory(newHistory);
-            setCurrentSceneKey(prev);
+    const handleOptionClick = async (nextKey) => {
+        if (isTyping || isSceneLoading) return;
+        
+        const nextScene = scenes[nextKey];
+        if (nextScene) {
+            setIsSceneLoading(true);
+            await Promise.all([
+                preloadImage(nextScene.background),
+                preloadImage(nextScene.character?.image)
+            ]);
+            setHistory(prev => [...prev, currentSceneKey]);
+            setCurrentSceneKey(nextKey);
+            setIsSceneLoading(false);
         }
     };
+
+    const resetStory = async () => {
+        if (isSceneLoading) return;
+        setIsSceneLoading(true);
+        const startScene = scenes['start'];
+        if (startScene) {
+            await Promise.all([
+                preloadImage(startScene.background),
+                preloadImage(startScene.character?.image)
+            ]);
+        }
+        setCurrentSceneKey('start');
+        setHistory([]);
+        setIsSceneLoading(false);
+    };
+
+    const goBack = async () => {
+        if (history.length > 0 && !isSceneLoading) {
+            const newHistory = [...history];
+            const prevKey = newHistory.pop();
+            
+            setIsSceneLoading(true);
+            const prevScene = scenes[prevKey];
+            if (prevScene) {
+                await Promise.all([
+                    preloadImage(prevScene.background),
+                    preloadImage(prevScene.character?.image)
+                ]);
+            }
+            
+            setHistory(newHistory);
+            setCurrentSceneKey(prevKey);
+            setIsSceneLoading(false);
+        }
+    };
+
+    if (isInitialLoading) {
+        return (
+            <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] md:min-h-[750px] flex items-center justify-center">
+                <div className="text-center space-y-6">
+                    <div className="relative w-20 h-20 mx-auto">
+                        <div className="absolute inset-0 border-4 border-teal-500/20 rounded-full" />
+                        <div className="absolute inset-0 border-4 border-t-teal-500 rounded-full animate-spin" />
+                        <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
+                    </div>
+                    <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-widest">
+                            Menyiapkan Cerita
+                        </h3>
+                        <p className="text-slate-400 text-xs font-medium uppercase tracking-tighter">
+                            Membuat dunia imajinasimu...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-5xl mx-auto py-0 md:py-8 h-full min-h-[500px] md:min-h-[750px] flex flex-col transition-all duration-300">
             <div className="bg-white dark:bg-slate-900 rounded-none md:rounded-[3rem] shadow-2xl border-x-0 md:border-4 border-slate-200 dark:border-slate-800 overflow-hidden relative flex-1 flex flex-col transition-colors duration-500">
                 
+                {/* Scene Loading Overlay */}
+                <AnimatePresence>
+                    {isSceneLoading && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="absolute inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center"
+                        >
+                            <div className="w-8 h-8 border-3 border-white/20 border-t-white rounded-full animate-spin" />
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+                
                 {/* 1. Background Layer */}
-                <div className="absolute inset-0 z-0">
-                    <AnimatePresence mode="wait">
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                    <AnimatePresence>
                         <motion.div 
                             key={currentSceneKey + "_bg"}
-                            initial={{ opacity: 0, scale: 1.1 }}
-                            animate={{ opacity: 1, scale: 1 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            transition={{ duration: 0.8 }}
-                            className="w-full h-full"
+                            transition={{ duration: 1.2, ease: "easeInOut" }}
+                            className="absolute inset-0"
                         >
                             {currentScene.background ? (
                                 <img 
@@ -136,16 +232,16 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                 </div>
 
                 {/* 3. Character Sprite Layer */}
-                <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-[200px]">
-                    <AnimatePresence mode="wait">
+                <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-[200px] overflow-hidden">
+                    <AnimatePresence>
                         {currentScene.character && (
                             <motion.div 
                                 key={currentScene.character.image}
-                                initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, y: 30 }}
-                                transition={{ type: "spring", stiffness: 100, damping: 20 }}
-                                className="w-full max-w-sm md:max-w-md h-full flex items-end justify-center px-4"
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 1.05 }}
+                                transition={{ duration: 0.6, ease: "easeOut" }}
+                                className="w-full max-w-sm md:max-w-md h-full flex items-end justify-center px-4 absolute bottom-0"
                             >
                                 <img 
                                     src={currentScene.character.image} 
@@ -207,8 +303,8 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                 `}</style>
                                 <div className="min-h-[60px] md:min-h-[80px]">
                                     <div className={cn(
-                                        "text-lg md:text-2xl font-bold leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
-                                        currentScene.arabic && "text-right dir-rtl leading-[1.8]"
+                                        "text-lg md:text-2xl leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
+                                        isArabic(currentScene.text) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-bold"
                                     )}>
                                         <span dangerouslySetInnerHTML={{ __html: processedText }} />
                                         {isTyping && <span className="inline-block w-2 h-5 md:w-3 md:h-6 bg-teal-400 ml-1 animate-pulse" />}
@@ -246,12 +342,12 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                     >
                                         <span 
                                             className={cn(
-                                                "text-sm md:text-base font-black text-slate-800 dark:text-white uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400",
-                                                option.arabic && "text-right flex-1"
+                                                "text-sm md:text-base uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400 w-full",
+                                                isArabic(option.text) ? "text-right dir-rtl leading-[1.8] font-medium" : "text-left font-black"
                                             )}
                                             dangerouslySetInnerHTML={{ __html: wrapArabicText(option.text) }}
                                         />
-                                        <ChevronRight className="w-5 h-5 text-teal-400 group-hover:translate-x-1 transition-transform shrink-0 ml-2" />
+                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-teal-500 group-hover:translate-x-1 transition-all shrink-0" />
                                     </motion.button>
                                 ))}
                             </AnimatePresence>
