@@ -217,10 +217,16 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                         <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-teal-500 animate-pulse" />
                     </div>
                     <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-widest">
+                        <h3 
+                            className="text-xl font-bold text-slate-800 dark:text-white uppercase tracking-widest"
+                            style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
+                        >
                             Menyiapkan Cerita
                         </h3>
-                        <p className="text-slate-400 text-xs font-medium uppercase tracking-tighter">
+                        <p 
+                            className="text-slate-400 text-xs font-medium uppercase tracking-tighter"
+                            style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
+                        >
                             Membuat dunia imajinasimu...
                         </p>
                     </div>
@@ -253,7 +259,10 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                 <div className="relative z-20 px-6 py-5 flex items-center justify-between pointer-events-none">
                     <div className="flex items-center gap-3">
                         <div className="w-1.5 h-6 bg-teal-500 rounded-full" />
-                        <h2 className="text-slate-800 dark:text-white font-black uppercase tracking-tighter text-sm md:text-lg opacity-80 transition-colors">
+                        <h2 
+                            className="text-slate-800 dark:text-white font-black uppercase tracking-tighter text-sm md:text-lg opacity-80 transition-colors"
+                            style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
+                        >
                             {title || "Pilih Jalur"}
                         </h2>
                     </div>
@@ -304,6 +313,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, x: 10 }}
                                         className="absolute top-0 left-6 -translate-y-1/2 flex items-center gap-2 px-4 py-1.5 bg-teal-500 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-teal-500/30 z-20"
+                                        style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                                     >
                                         <User className="w-3 h-3" />
                                         {currentBubble.character.name}
@@ -364,6 +374,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                             whileHover={{ x: 5 }}
                                             onClick={handleNextBubble}
                                             className="flex items-center gap-2 px-5 py-2 bg-teal-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-teal-600 transition-all shadow-lg shadow-teal-500/20 active:scale-95 group"
+                                            style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                                         >
                                             Lanjut
                                             <ChevronRight className="w-4 h-4" />
@@ -406,6 +417,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                     whileTap={{ scale: 0.98 }}
                                                     onClick={() => setCurrentBubbleIndex(bOpt.nextBubbleIndex)}
                                                     className="flex items-center justify-between px-4 py-3 bg-teal-500/10 dark:bg-teal-500/5 border border-teal-500/20 rounded-xl text-left transition-colors group"
+                                                    style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                                                 >
                                                     <span 
                                                         className={cn(
