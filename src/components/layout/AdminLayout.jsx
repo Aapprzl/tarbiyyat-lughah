@@ -145,6 +145,7 @@ const AdminLayout = () => {
           <NavItem to="/admin/intro-editor" icon={Monitor} label="Manajemen Intro" />
           
           <div className="pt-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-2 px-3">Sistem & Aset</div>
+          <NavItem to="/admin/characters" icon={CircleUser} label="Manajemen Karakter" />
           <NavItem to="/admin/font-editor" icon={Type} label="Font Arab" />
           
           <div className="pt-6 px-3">

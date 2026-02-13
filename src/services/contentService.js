@@ -662,6 +662,30 @@ export const contentService = {
         }
     },
 
+    // ============================================
+    // CHARACTER MANAGEMENT (Global Assets)
+    // ============================================
+
+    async getCharacters() {
+        try {
+            const characters = await contentServiceV2.siteConfig.get('interactive_story_characters');
+            return Array.isArray(characters) ? characters : [];
+        } catch (error) {
+            console.error('[contentService] Error fetching characters:', error);
+            return [];
+        }
+    },
+
+    async saveCharacters(characters) {
+        try {
+            await contentServiceV2.siteConfig.save('interactive_story_characters', characters, 'Interactive story character library');
+            return true;
+        } catch (error) {
+            console.error('[contentService] Error saving characters:', error);
+            throw error;
+        }
+    },
+
      // ============================================
     // GAME MANAGEMENT (Updated to use new Tables)
     // ============================================

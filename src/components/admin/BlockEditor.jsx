@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon, Copy } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon, Copy, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { contentService } from '../../services/contentService';
 import PdfViewer from '../media/PdfViewer';
 import AudioPlayer from '../media/AudioPlayer';
 import ImageViewer from '../media/ImageViewer';
@@ -24,6 +25,17 @@ const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
 
 const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst, isLast, toast }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [globalCharacters, setGlobalCharacters] = useState([]);
+
+    useEffect(() => {
+        if (block.type === 'interactivestory') {
+            const fetchChars = async () => {
+                const chars = await contentService.getCharacters();
+                setGlobalCharacters(chars);
+            };
+            fetchChars();
+        }
+    }, [block.type]);
 
     // Helper to detect Arabic
     const isArabic = (text) => {
@@ -1797,111 +1809,93 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-teal-500/5 transition-colors">
-                                                    <ImageIcon className="w-6 h-6 text-slate-300 mb-1" />
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Pilih Gambar</span>
-                                                    <input 
-                                                        type="file" accept="image/*" className="hidden"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files[0];
-                                                            if (file) {
-                                                                if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
-                                                                const url = URL.createObjectURL(file);
-                                                                const newScenes = { ...block.data.scenes };
-                                                                newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
-                                                                onUpdate({ ...block.data, scenes: newScenes });
-                                                            }
-                                                        }}
-                                                    />
-                                                </label>
-                                            )}
-                                         </div>
-                                      </div>
+                                                 <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-teal-500/5 transition-colors">
+                                                     <ImageIcon className="w-6 h-6 text-slate-300 mb-1" />
+                                                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Pilih Gambar</span>
+                                                     <input 
+                                                         type="file" accept="image/*" className="hidden"
+                                                         onChange={(e) => {
+                                                             const file = e.target.files[0];
+                                                             if (file) {
+                                                                 if (file.size > 1024 * 1024) return toast.warning("Maksimal 1MB");
+                                                                 const url = URL.createObjectURL(file);
+                                                                 const newScenes = { ...block.data.scenes };
+                                                                 newScenes[sKey] = { ...sData, background: url, backgroundFile: file };
+                                                                 onUpdate({ ...block.data, scenes: newScenes });
+                                                             }
+                                                         }}
+                                                     />
+                                                 </label>
+                                             )}
+                                          </div>
+                                       </div>
 
-                                      <div className="space-y-3">
+                                       <div className="space-y-4">
                                          <div className="flex items-center justify-between px-1">
                                             <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                               <User className="w-3 h-3" /> Character & Photo
+                                               <User className="w-3 h-3" /> Pilih Karakter Scene
                                             </label>
-                                            <span className="text-[9px] font-bold text-slate-400 bg-slate-100 dark:bg-white/5 px-2 py-0.5 rounded">PNG Transparent, Max 500KB</span>
+                                            <button 
+                                                onClick={() => window.open('#/admin/characters', '_blank')}
+                                                className="text-[9px] font-bold text-teal-500 hover:text-teal-600 uppercase tracking-tighter"
+                                            >+ Tambah Baru</button>
                                          </div>
                                          
-                                         <div className="flex gap-4 items-start">
-                                            {/* Character Image Upload */}
-                                            <div className="w-20 h-24 bg-slate-50 dark:bg-black/20 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl overflow-hidden shrink-0 flex items-center justify-center relative group/char transition-all hover:border-teal-500/50">
-                                                {sData.character?.image ? (
-                                                    <div className="relative w-full h-full group">
-                                                        <img src={sData.character.image} className="w-full h-full object-contain opacity-80" />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20">
-                                                            <label className="cursor-pointer">
-                                                                <ImageIcon className="w-4 h-4 text-white" />
-                                                                <input 
-                                                                    type="file" accept="image/*" className="hidden"
-                                                                    onChange={(e) => {
-                                                                        const file = e.target.files[0];
-                                                                        if (file) {
-                                                                            if (file.size > 500 * 1024) return toast.warning("Maksimal 500KB");
-                                                                            const url = URL.createObjectURL(file);
-                                                                            const newScenes = { ...block.data.scenes };
-                                                                            newScenes[sKey] = { 
-                                                                                ...sData, 
-                                                                                character: { ...(sData.character || {}), image: url, imageFile: file } 
-                                                                            };
-                                                                            onUpdate({ ...block.data, scenes: newScenes });
-                                                                        }
-                                                                    }}
-                                                                />
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer">
-                                                        <User className="w-5 h-5 text-slate-300" />
-                                                        <input 
-                                                            type="file" accept="image/*" className="hidden"
-                                                            onChange={(e) => {
-                                                                const file = e.target.files[0];
-                                                                if (file) {
-                                                                    if (file.size > 500 * 1024) return toast.warning("Maksimal 500KB");
-                                                                    const url = URL.createObjectURL(file);
-                                                                    const newScenes = { ...block.data.scenes };
-                                                                    newScenes[sKey] = { 
-                                                                        ...sData, 
-                                                                        character: { ...(sData.character || {}), image: url, imageFile: file } 
-                                                                    };
-                                                                    onUpdate({ ...block.data, scenes: newScenes });
-                                                                }
-                                                            }}
-                                                        />
-                                                    </label>
-                                                )}
-                                            </div>
+                                         <div className="relative group/char">
+                                             <select 
+                                                className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20"
+                                                value={sData.character?.id || ''}
+                                                onChange={(e) => {
+                                                    const selected = globalCharacters.find(c => c.id === e.target.value);
+                                                    const newScenes = { ...block.data.scenes };
+                                                    newScenes[sKey] = { 
+                                                        ...sData, 
+                                                        character: selected ? { id: selected.id, name: selected.name, image: selected.image } : null 
+                                                    };
+                                                    onUpdate({ ...block.data, scenes: newScenes });
+                                                }}
+                                             >
+                                                <option value="">Pilih Karakter...</option>
+                                                {globalCharacters.map(char => (
+                                                    <option key={char.id} value={char.id}>{char.name} ({char.role})</option>
+                                                ))}
+                                             </select>
+                                             <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                 <ChevronDown className="w-4 h-4" />
+                                             </div>
+                                         </div>
 
-                                            {/* Character Name */}
-                                            <div className="flex-1 space-y-2">
-                                                <input 
-                                                  type="text"
-                                                  placeholder="Nama Karakter"
-                                                  className="w-full bg-slate-50 dark:bg-black/20 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm outline-none focus:ring-1 focus:ring-teal-500 font-bold"
-                                                  value={sData.character?.name || ''}
-                                                  onChange={(e) => {
-                                                     const newScenes = { ...block.data.scenes };
-                                                     newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), name: e.target.value } };
-                                                     onUpdate({ ...block.data, scenes: newScenes });
-                                                  }}
-                                                />
-                                                {sData.character?.image && (
+                                         <AnimatePresence>
+                                            {sData.character && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, scale: 0.95 }}
+                                                    animate={{ opacity: 1, scale: 1 }}
+                                                    exit={{ opacity: 0, scale: 0.95 }}
+                                                    className="p-3 bg-teal-500/5 dark:bg-teal-500/10 rounded-2xl border border-teal-500/20 flex items-center gap-4 group/preview relative overflow-hidden"
+                                                >
+                                                    <div className="absolute top-0 right-0 p-1 opacity-0 group-hover/preview:opacity-100 transition-opacity">
+                                                        <Sparkles className="w-3 h-3 text-teal-500 animate-pulse" />
+                                                    </div>
+                                                    <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-teal-500/20 shrink-0">
+                                                        <img src={sData.character.image} className="w-full h-full object-contain p-1" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest">Karakter Terpilih</div>
+                                                        <div className="text-sm font-black text-slate-800 dark:text-white truncate">{sData.character.name}</div>
+                                                    </div>
                                                     <button 
                                                         onClick={() => {
                                                             const newScenes = { ...block.data.scenes };
-                                                            newScenes[sKey] = { ...sData, character: { ...(sData.character || {}), image: '', imageFile: null } };
+                                                            newScenes[sKey] = { ...sData, character: null };
                                                             onUpdate({ ...block.data, scenes: newScenes });
                                                         }}
-                                                        className="text-[9px] font-black uppercase text-red-500 hover:underline"
-                                                    >Hapus Foto</button>
-                                                )}
-                                            </div>
-                                         </div>
+                                                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </motion.div>
+                                            )}
+                                         </AnimatePresence>
                                       </div>
                                    </div>
 
