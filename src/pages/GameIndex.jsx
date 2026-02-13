@@ -69,6 +69,7 @@ const getTypeInfo = (type) => {
         case 'hangman': return { label: 'Algojo', color: 'rose', icon: Ghost, gradientItems: 'from-rose-500/10 to-slate-500/10' };
         case 'wordrain': return { label: 'Hujan Kata', color: 'sky', icon: CloudRain, gradientItems: 'from-sky-500/10 to-indigo-500/10' };
         case 'camelrace': return { label: 'Balap Unta', color: 'amber', icon: Mountain, gradientItems: 'from-amber-500/10 to-orange-500/10' };
+        case 'worddetective': return { label: 'Detektif Kata', color: 'emerald', icon: Search, gradientItems: 'from-emerald-500/10 to-teal-500/10' };
         default: return { label: 'Lainnya', color: 'slate', icon: Layers, gradientItems: 'from-slate-500/10 to-gray-500/10' };
     }
 };

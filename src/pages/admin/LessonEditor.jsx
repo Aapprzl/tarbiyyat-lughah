@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Save, Upload } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Save, Upload, Search } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -275,6 +275,7 @@ const LessonEditor = () => {
                   { question: "Pilih kata 'Baitun' dalam bahasa Arab", options: ["بَيْتٌ", "بِنْتٌ", "بَابٌ", "بَلَدٌ"], correct: "بَيْتٌ" }
                 ] 
               }
+            : type === 'worddetective' ? { title: 'Detektif Kata', text: '', questions: [{ id: 1, clue: '', answer: '' }] }
             : { title: '', content: '' }
     };
 
@@ -729,6 +730,7 @@ const LessonEditor = () => {
                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'hangman')} icon={Ghost} label="Algojo" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />
                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordrain')} icon={CloudRain} label="Hujan Kata" color="text-sky-600" bg="bg-sky-50 dark:bg-sky-500/10" />
                                              <AddBlockButton onClick={() => addBlockToStage(stage.id, 'camelrace')} icon={Mountain} label="Balap Unta" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
+                                             <AddBlockButton onClick={() => addBlockToStage(stage.id, 'worddetective')} icon={Search} label="Detektif Kata" color="text-emerald-600" bg="bg-emerald-50 dark:bg-emerald-500/10" />
                                         </>
                                   )}
                           </div>

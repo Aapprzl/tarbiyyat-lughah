@@ -84,6 +84,7 @@ import HarakatGame from "../components/games/HarakatGame";
 import MemoryGame from "../components/games/MemoryGame";
 import HangmanGame from "../components/games/HangmanGame";
 import CamelRaceGame from "../components/games/CamelRaceGame";
+import WordDetectiveGame from "../components/games/WordDetectiveGame";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
 import { wrapArabicText, isArabic } from "../utils/textUtils";
@@ -1093,6 +1094,8 @@ const ContentBlock = ({ block: rawBlock }) => {
         return <WordRainGame data={block.data} title={block.data.title} />;
     case 'camelrace':
         return <CamelRaceGame data={block.data} title={block.data.title} />;
+    case 'worddetective':
+        return <WordDetectiveGame data={block.data} title={block.data.title} />;
     default:
       return null;
   }
