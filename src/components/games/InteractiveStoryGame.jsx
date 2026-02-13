@@ -13,12 +13,11 @@ import { wrapArabicText, isArabic } from '../../utils/textUtils';
 
 const InteractiveStoryGame = ({ data = {}, title }) => {
     const [currentSceneKey, setCurrentSceneKey] = useState('start');
-    const [displayText, setDisplayText] = useState('');
+    const [currentBubbleIndex, setCurrentBubbleIndex] = useState(0);
     const [isTyping, setIsTyping] = useState(false);
     const [history, setHistory] = useState([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const [isSceneLoading, setIsSceneLoading] = useState(false);
-    const scrollRef = useRef(null);
 
     const scenes = data.scenes || {};
     const currentScene = scenes[currentSceneKey] || { 
@@ -27,25 +26,26 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         character: null 
     };
 
-    // Process narrative text for mixed fonts (Arabic/Latin)
-    const processedText = useMemo(() => {
-        return wrapArabicText(displayText);
-    }, [displayText]);
-
-    // Auto-scroll to bottom as text animates
-    useEffect(() => {
-        if (scrollRef.current) {
-            const scrollContainer = scrollRef.current;
-            const scroll = () => {
-                scrollContainer.scrollTop = scrollContainer.scrollHeight;
-            };
-            const interval = setInterval(scroll, 100);
-            const timeout = setTimeout(() => clearInterval(interval), 3000);
-            return () => {
-                clearInterval(interval);
-                clearTimeout(timeout);
-            };
+    // Derived: Bubbles (Handle backward compatibility)
+    const currentBubbles = useMemo(() => {
+        if (currentScene.bubbles && Array.isArray(currentScene.bubbles) && currentScene.bubbles.length > 0) {
+            return currentScene.bubbles;
         }
+        // Fallback for legacy data or incomplete scenes
+        if (currentScene.text || currentScene.character) {
+            return [{ text: currentScene.text || '', character: currentScene.character }];
+        }
+        return [{ text: '...', character: null }];
+    }, [currentScene]);
+
+    // Ensure index is always valid
+    const safeBubbleIndex = Math.min(currentBubbleIndex, currentBubbles.length - 1);
+    const currentBubble = currentBubbles[safeBubbleIndex] || { text: '...', character: null };
+    const isLastBubble = safeBubbleIndex === currentBubbles.length - 1;
+
+    // Reset bubble index immediately when scene key changes to avoid stale index frames
+    useEffect(() => {
+        setCurrentBubbleIndex(0);
     }, [currentSceneKey]);
 
     // Helper to preload images
@@ -55,7 +55,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
             const img = new Image();
             img.src = url;
             img.onload = () => resolve();
-            img.onerror = () => resolve(); // Resolve anyway to not block forever
+            img.onerror = () => resolve();
         });
     };
 
@@ -64,49 +64,59 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         const initLoad = async () => {
             const startScene = scenes['start'];
             if (startScene) {
+                const bubbles = startScene.bubbles || (startScene.text ? [{ text: startScene.text, character: startScene.character }] : []);
+                const firstChar = bubbles[0]?.character?.image || startScene.character?.image;
                 await Promise.all([
                     preloadImage(startScene.background),
-                    preloadImage(startScene.character?.image)
+                    preloadImage(firstChar)
                 ]);
             }
-            // Artificial delay for premium feel
-            setTimeout(() => setIsInitialLoading(false), 1000);
+            setTimeout(() => setIsInitialLoading(false), 800);
         };
         initLoad();
     }, []);
 
-    // Split narrative text into sentences or segments for staggered fade-in
+    // Split narrative text into segments for staggered fade-in
     const textSegments = useMemo(() => {
-        if (!currentScene.text) return [];
-        return currentScene.text
+        if (!currentBubble.text) return [];
+        return currentBubble.text
             .split(/(?<=[.!?؟])\s+|\n+/)
             .filter(segment => segment.trim().length > 0);
-    }, [currentScene.text]);
+    }, [currentBubble.text]);
 
     // Handle typing state for UI feedback
     useEffect(() => {
-        if (isInitialLoading || isSceneLoading || !currentScene.text) return;
+        if (isInitialLoading || isSceneLoading || !currentBubble.text) return;
         setIsTyping(true);
-        // Set typing to false after a reasonable delay for the full sequence
-        const duration = Math.min(textSegments.length * 800 + 1000, 5000);
+        const duration = Math.min(textSegments.length * 800 + 400, 4000);
         const timer = setTimeout(() => setIsTyping(false), duration);
         return () => clearTimeout(timer);
-    }, [currentSceneKey, isInitialLoading, isSceneLoading, textSegments.length]);
+    }, [currentSceneKey, currentBubbleIndex, isInitialLoading, isSceneLoading, textSegments.length]);
 
     const handleOptionClick = async (nextKey) => {
-        if (isTyping || isSceneLoading) return;
+        if (isTyping || isSceneLoading || !isLastBubble) return;
         
         const nextScene = scenes[nextKey];
         if (nextScene) {
             setIsSceneLoading(true);
+            const bubbles = nextScene.bubbles || (nextScene.text ? [{ text: nextScene.text, character: nextScene.character }] : []);
+            const nextChar = bubbles[0]?.character?.image || nextScene.character?.image;
+            
             await Promise.all([
                 preloadImage(nextScene.background),
-                preloadImage(nextScene.character?.image)
+                preloadImage(nextChar)
             ]);
+
             setHistory(prev => [...prev, currentSceneKey]);
             setCurrentSceneKey(nextKey);
+            setCurrentBubbleIndex(0);
             setIsSceneLoading(false);
         }
+    };
+
+    const handleNextBubble = () => {
+        if (isTyping || isSceneLoading || isLastBubble) return;
+        setCurrentBubbleIndex(prev => prev + 1);
     };
 
     const resetStory = async () => {
@@ -114,12 +124,15 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         setIsSceneLoading(true);
         const startScene = scenes['start'];
         if (startScene) {
+            const bubbles = startScene.bubbles || (startScene.text ? [{ text: startScene.text, character: startScene.character }] : []);
+            const firstChar = bubbles[0]?.character?.image || startScene.character?.image;
             await Promise.all([
                 preloadImage(startScene.background),
-                preloadImage(startScene.character?.image)
+                preloadImage(firstChar)
             ]);
         }
         setCurrentSceneKey('start');
+        setCurrentBubbleIndex(0);
         setHistory([]);
         setIsSceneLoading(false);
     };
@@ -132,14 +145,16 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
             setIsSceneLoading(true);
             const prevScene = scenes[prevKey];
             if (prevScene) {
+                const prevChar = prevScene.bubbles?.[0]?.character?.image || prevScene.character?.image;
                 await Promise.all([
                     preloadImage(prevScene.background),
-                    preloadImage(prevScene.character?.image)
+                    preloadImage(prevChar)
                 ]);
             }
             
             setHistory(newHistory);
             setCurrentSceneKey(prevKey);
+            setCurrentBubbleIndex(0);
             setIsSceneLoading(false);
         }
     };
@@ -171,26 +186,26 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
 
     const characterLayer = useMemo(() => (
         <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-0 overflow-hidden">
-            <AnimatePresence>
-                {currentScene.character && (
+            <AnimatePresence mode="wait">
+                {currentBubble.character && (
                     <motion.div 
-                        key={currentScene.character.image}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 1.05 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        key={currentBubble.character.image}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 1.05, y: 10 }}
+                        transition={{ duration: 0.6, ease: "easeOut" }}
                         className="w-full max-w-sm md:max-w-md h-full flex items-end justify-center px-4 absolute bottom-0"
                     >
                         <img 
-                            src={currentScene.character.image} 
+                            src={currentBubble.character.image} 
                             className="max-h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
-                            alt={currentScene.character.name}
+                            alt={currentBubble.character.name}
                         />
                     </motion.div>
                 )}
             </AnimatePresence>
         </div>
-    ), [currentScene.character]);
+    ), [currentBubble.character]);
 
     if (isInitialLoading) {
         return (
@@ -272,49 +287,38 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                         
                         {/* Dialogue Box */}
                         <motion.div 
+                            key={currentSceneKey + "_bubble_" + safeBubbleIndex}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col max-h-[180px] md:max-h-[250px] transition-colors duration-500"
+                            className="bg-white/90 dark:bg-slate-950/80 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-[2rem] p-6 md:p-8 shadow-2xl relative group flex flex-col transition-colors duration-500"
                         >
                             {/* Accent Glow */}
                             <div className="absolute -top-10 -left-10 w-40 h-40 bg-teal-500/10 blur-[50px] pointer-events-none" />
                             
                             {/* Character Name Badge */}
-                            {currentScene.character && (
-                                <div className="absolute top-0 left-6 -translate-y-1/2 flex items-center gap-2 px-4 py-1.5 bg-teal-500 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-teal-500/30 z-20">
-                                    <User className="w-3 h-3" />
-                                    {currentScene.character.name}
-                                </div>
-                            )}
+                            <AnimatePresence mode="wait">
+                                {currentBubble.character && (
+                                    <motion.div 
+                                        key={currentBubble.character.name}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 10 }}
+                                        className="absolute top-0 left-6 -translate-y-1/2 flex items-center gap-2 px-4 py-1.5 bg-teal-500 rounded-full text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-teal-500/30 z-20"
+                                    >
+                                        <User className="w-3 h-3" />
+                                        {currentBubble.character.name}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
 
-                            {/* Dialogue Text - Scrollable Container */}
+                            {/* Dialogue Text Container */}
                             <div 
-                                ref={scrollRef}
-                                className="relative z-10 overflow-y-auto pr-2 custom-scrollbar scroll-smooth"
+                                className="relative z-10"
                                 style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                             >
-                                <style>{`
-                                    .custom-scrollbar::-webkit-scrollbar {
-                                        width: 4px;
-                                    }
-                                    .custom-scrollbar::-webkit-scrollbar-track {
-                                        background: rgba(0, 0, 0, 0.05);
-                                        border-radius: 10px;
-                                    }
-                                    .dark .custom-scrollbar::-webkit-scrollbar-track {
-                                        background: rgba(255, 255, 255, 0.05);
-                                    }
-                                    .custom-scrollbar::-webkit-scrollbar-thumb {
-                                        background: rgba(20, 184, 166, 0.3);
-                                        border-radius: 10px;
-                                    }
-                                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                                        background: rgba(20, 184, 166, 0.5);
-                                    }
-                                `}</style>
                                 <div className="min-h-[60px] md:min-h-[80px]">
                                         <motion.div 
-                                            key={currentSceneKey + "_narrative"}
+                                            key={currentSceneKey + "_bubble_" + safeBubbleIndex + "_segments"}
                                             initial="hidden"
                                             animate="visible"
                                             variants={{
@@ -336,7 +340,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                     transition={{ duration: 1.2, ease: "easeOut" }}
                                                     className={cn(
                                                         "text-lg md:text-2xl leading-relaxed text-slate-800 dark:text-white/90 transition-colors",
-                                                        isArabic(segment) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-bold"
+                                                        isArabic(segment) ? "text-right dir-rtl leading-[2] font-medium" : "text-left font-black"
                                                     )}
                                                     dangerouslySetInnerHTML={{ __html: wrapArabicText(segment) }}
                                                 />
@@ -345,44 +349,130 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                 </div>
                             </div>
 
-                            {/* Indicator */}
-                            {!isTyping && (
-                                <motion.div 
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    className="pt-4 flex items-center justify-end gap-2 text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors"
-                                >
-                                    <MessageSquare className="w-3 h-3" />
-                                    Pilih Jalurmu
-                                </motion.div>
-                            )}
+                            {/* Indicator / Controls */}
+                            <div className="mt-6 flex flex-col gap-4 border-t border-slate-100 dark:border-white/5 pt-4 shrink-0">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2 text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                        <MessageSquare className="w-3 h-3" />
+                                        {isLastBubble ? "Pilih Jalurmu" : `Dialog ${safeBubbleIndex + 1}/${currentBubbles.length}`}
+                                    </div>
+
+                                    {!isTyping && !isLastBubble && (!currentBubble.options || currentBubble.options.length === 0) && (
+                                        <motion.button
+                                            initial={{ opacity: 0, x: 20 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            whileHover={{ x: 5 }}
+                                            onClick={handleNextBubble}
+                                            className="flex items-center gap-2 px-5 py-2 bg-teal-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-teal-600 transition-all shadow-lg shadow-teal-500/20 active:scale-95 group"
+                                        >
+                                            Lanjut
+                                            <ChevronRight className="w-4 h-4" />
+                                        </motion.button>
+                                    )}
+                                </div>
+
+                                {/* Internal Bubble Options (Jump within same scene) */}
+                                <AnimatePresence mode="wait">
+                                    {!isTyping && currentBubble.options && currentBubble.options.length > 0 && (
+                                        <motion.div 
+                                            key={`internal_opts_${safeBubbleIndex}`}
+                                            initial="hidden"
+                                            animate="visible"
+                                            variants={{
+                                                hidden: { opacity: 0 },
+                                                visible: {
+                                                    opacity: 1,
+                                                    transition: {
+                                                        staggerChildren: 0.1,
+                                                        delayChildren: 0.1
+                                                    }
+                                                }
+                                            }}
+                                            className="grid grid-cols-1 sm:grid-cols-2 gap-2"
+                                        >
+                                            {currentBubble.options.map((bOpt, idx) => (
+                                                <motion.button
+                                                    key={idx}
+                                                    variants={{
+                                                        hidden: { opacity: 0, y: 15, scale: 0.98 },
+                                                        visible: { opacity: 1, y: 0, scale: 1 }
+                                                    }}
+                                                    transition={{ 
+                                                        type: "spring",
+                                                        stiffness: 400,
+                                                        damping: 30
+                                                    }}
+                                                    whileHover={{ scale: 1.02, backgroundColor: "rgba(20, 184, 166, 0.15)" }}
+                                                    whileTap={{ scale: 0.98 }}
+                                                    onClick={() => setCurrentBubbleIndex(bOpt.nextBubbleIndex)}
+                                                    className="flex items-center justify-between px-4 py-3 bg-teal-500/10 dark:bg-teal-500/5 border border-teal-500/20 rounded-xl text-left transition-colors group"
+                                                >
+                                                    <span 
+                                                        className={cn(
+                                                            "text-[10px] font-black uppercase tracking-tight text-teal-700 dark:text-teal-400 leading-none",
+                                                            isArabic(bOpt.text) && "arabic-content text-right dir-rtl leading-[1.2] pb-0.5"
+                                                        )}
+                                                    >
+                                                        {bOpt.text}
+                                                    </span>
+                                                    <ChevronRight className="w-3 h-3 text-teal-500 group-hover:translate-x-1 transition-transform" />
+                                                </motion.button>
+                                            ))}
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </motion.div>
 
-                        {/* Options Layer */}
+                        {/* Options Layer (Scene Navigation) */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pb-4">
                             <AnimatePresence mode="popLayout">
-                                {!isTyping && currentScene.options && currentScene.options.map((option, idx) => (
-                                    <motion.button
-                                        key={currentSceneKey + "_opt_" + idx}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: idx * 0.1 }}
-                                        whileHover={{ scale: 1.02, backgroundColor: "rgba(20, 184, 166, 0.08)" }}
-                                        whileTap={{ scale: 0.98 }}
-                                        onClick={() => handleOptionClick(option.nextScene)}
-                                        className="flex items-center justify-between px-6 py-4 md:py-5 bg-white/50 dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl md:rounded-[1.5rem] text-left transition-all group shadow-sm hover:shadow-md hover:border-teal-500/30"
-                                        style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
+                                {!isTyping && isLastBubble && (!currentBubble.options || currentBubble.options.length === 0) && currentScene.options && (
+                                    <motion.div 
+                                        key={currentSceneKey + "_opts_container"}
+                                        initial="hidden"
+                                        animate="visible"
+                                        variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: {
+                                                opacity: 1,
+                                                transition: {
+                                                    staggerChildren: 0.12
+                                                }
+                                            }
+                                        }}
+                                        className="contents"
                                     >
-                                        <span 
-                                            className={cn(
-                                                "text-sm md:text-base uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400 w-full",
-                                                isArabic(option.text) ? "text-right dir-rtl leading-[1.8] font-medium" : "text-left font-black"
-                                            )}
-                                            dangerouslySetInnerHTML={{ __html: wrapArabicText(option.text) }}
-                                        />
-                                        <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-teal-500 group-hover:translate-x-1 transition-all shrink-0" />
-                                    </motion.button>
-                                ))}
+                                        {currentScene.options.map((option, idx) => (
+                                            <motion.button
+                                                key={idx}
+                                                variants={{
+                                                    hidden: { opacity: 0, x: -15, scale: 0.98 },
+                                                    visible: { opacity: 1, x: 0, scale: 1 }
+                                                }}
+                                                transition={{ 
+                                                    type: "spring",
+                                                    stiffness: 350,
+                                                    damping: 25
+                                                }}
+                                                whileHover={{ scale: 1.02, backgroundColor: "rgba(20, 184, 166, 0.08)" }}
+                                                whileTap={{ scale: 0.98 }}
+                                                onClick={() => handleOptionClick(option.nextScene)}
+                                                className="flex items-center justify-between px-6 py-4 md:py-5 bg-white/50 dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl md:rounded-[1.5rem] text-left transition-all group shadow-sm hover:shadow-md hover:border-teal-500/30"
+                                                style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
+                                            >
+                                                <span 
+                                                    className={cn(
+                                                        "text-sm md:text-base uppercase tracking-tight transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400 w-full",
+                                                        isArabic(option.text) ? "text-right dir-rtl leading-[1.8] font-medium" : "text-left font-black"
+                                                    )}
+                                                    dangerouslySetInnerHTML={{ __html: wrapArabicText(option.text) }}
+                                                />
+                                                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-teal-500 group-hover:translate-x-1 transition-all shrink-0" />
+                                            </motion.button>
+                                        ))}
+                                    </motion.div>
+                                )}
                             </AnimatePresence>
                         </div>
                     </div>
