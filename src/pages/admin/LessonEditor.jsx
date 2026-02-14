@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Save, Upload, Search, Telescope } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, ChevronUp, ChevronDown, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Save, Upload, Search, Telescope, GitGraph } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -242,8 +242,9 @@ const LessonEditor = () => {
   const addBlockToStage = (stageId, type) => {
     const newBlock = {
       id: Date.now(),
-      type: type === 'richtext' ? 'text' : type,
+      type: (type === 'richtext' || type === 'mindmap') ? 'text' : type,
       data: type === 'richtext' ? { title: '', content: '', isRichText: true }
+            : type === 'mindmap' ? { title: '', nodes: [{ id: 'n1', text: 'Topik Utama', parentId: null, color: 'teal' }], isMindMap: true }
             : type === 'vocab' ? { items: [{ arab: '', indo: '' }] } 
             : type === 'matchup' ? { title: 'Pasangkan', pairs: [{ id: 1, question: '', answer: '' }] }
             : type === 'quiz' ? { 
@@ -755,7 +756,8 @@ const LessonEditor = () => {
                           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
                                   {pickerTab === 'common' ? (
                                       <>
-                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks" color="text-teal-600" bg="bg-teal-50 dark:bg-teal-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'mindmap')} icon={GitGraph} label="Peta Pikiran" color="text-teal-600" bg="bg-teal-50 dark:bg-teal-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'text')} icon={Type} label="Teks Bebas" color="text-slate-600" bg="bg-slate-50 dark:bg-slate-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'vocab')} icon={Table} label="Kosakata" color="text-indigo-600" bg="bg-indigo-50 dark:bg-indigo-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'alert')} icon={AlertCircle} label="Info" color="text-amber-600" bg="bg-amber-50 dark:bg-amber-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'youtube')} icon={Youtube} label="Video" color="text-red-600" bg="bg-red-50 dark:bg-red-500/10" />

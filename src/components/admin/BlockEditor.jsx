@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon, Copy, Sparkles, MessageSquare } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Circle, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, CheckCircle2, Image as ImageIcon, Mountain, X, Search, Telescope, User, Settings, Link as LinkIcon, Copy, Sparkles, MessageSquare, GitGraph } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { isArabic } from '../../utils/textUtils';
 import { contentService } from '../../services/contentService';
@@ -7,7 +7,7 @@ import PdfViewer from '../media/PdfViewer';
 import AudioPlayer from '../media/AudioPlayer';
 import ImageViewer from '../media/ImageViewer';
 import RichTextEditor from '../ui/RichTextEditor';
-import { InteractiveStoryBlock } from './blocks/InteractiveStoryBlock';
+import { MindMapBlock } from './blocks/MindMapBlock';
 import { BlockWrapper } from './blocks/BlockWrapper';
 
 const AddBlockButton = ({ onClick, icon: Icon, label, color, bg }) => (
@@ -46,8 +46,11 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
         if (type === 'text' && data?.isRichText) {
             return { icon: FileText, label: 'Rich Text', color: 'text-emerald-600', bg: 'bg-emerald-50' };
         }
+        if (type === 'text' && data?.isMindMap) {
+            return { icon: GitGraph, label: 'Peta Pikiran', color: 'text-teal-600', bg: 'bg-teal-50' };
+        }
         switch(type) {
-            case 'text': return { icon: Type, label: 'Teks', color: 'text-teal-600', bg: 'bg-teal-50' };
+            case 'text': return { icon: Type, label: 'Teks Bebas', color: 'text-slate-600', bg: 'bg-slate-50' };
             case 'vocab': return { icon: Table, label: 'Kosakata', color: 'text-indigo-600', bg: 'bg-indigo-50' };
             case 'alert': return { icon: AlertCircle, label: 'Info', color: 'text-amber-600', bg: 'bg-amber-50' };
             case 'youtube': return { icon: Youtube, label: 'Video', color: 'text-red-600', bg: 'bg-red-50' };
@@ -90,7 +93,8 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             pdf: 'from-blue-500 to-cyan-600',
             image: 'from-pink-500 to-indigo-600',
             vocab: 'from-indigo-500 to-slate-800',
-            text: 'from-teal-400 to-emerald-600',
+            mindmap: 'from-teal-400 to-emerald-600',
+            text: 'from-slate-400 to-slate-600',
             wordrain: 'from-sky-400 to-indigo-600',
             camelrace: 'from-amber-500 to-orange-600',
             worddetective: 'from-emerald-400 to-teal-600',
@@ -130,8 +134,16 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
             onDelete={onRemove}
             onUpdate={onUpdate}
         >
-                           
-              {(block.type === 'text' && !block.data?.isRichText) && (
+               {/* --- MIND MAP BLOCK --- */}
+               {(block.type === 'mindmap' || (block.type === 'text' && block.data?.isMindMap)) && (
+                 <MindMapBlock 
+                   data={block.data} 
+                   onUpdate={onUpdate} 
+                 />
+               )}
+
+               {/* --- TEXT BLOCK --- */}
+               {(block.type === 'text' && !block.data?.isRichText && !block.data?.isMindMap) && (
                 <div className="space-y-3">
                   <input 
                     type="text" 

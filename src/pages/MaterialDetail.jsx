@@ -52,6 +52,13 @@ import {
   FileText,
   CloudRain,
   Mountain,
+  GitGraph,
+  Search,
+  Telescope,
+  Ghost,
+  ZoomIn,
+  ZoomOut,
+  Maximize,
 } from "lucide-react";
 
 const iconMap = {
@@ -90,7 +97,16 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils/cn";
 import { wrapArabicText, isArabic } from "../utils/textUtils";
 
-const getTypeInfo = (type) => {
+const getTypeInfo = (type, data) => {
+  if (type === "text" && data?.isMindMap) {
+    return {
+      label: "Peta Pikiran",
+      color: "teal",
+      icon: GitGraph,
+      gradient: "from-teal-400 to-emerald-600",
+    };
+  }
+
   switch (type) {
     case "matchup":
       return {
@@ -142,6 +158,13 @@ const getTypeInfo = (type) => {
         icon: Puzzle,
         gradient: "from-emerald-400 to-indigo-600",
       };
+    case "mindmap":
+      return {
+        label: "Peta Pikiran",
+        color: "teal",
+        icon: GitGraph,
+        gradient: "from-teal-400 to-emerald-600",
+      };
     case "spinwheel":
       return {
         label: "Roda Putar",
@@ -179,10 +202,10 @@ const getTypeInfo = (type) => {
       };
     case "text":
       return {
-        label: "Bacaan",
-        color: "teal",
+        label: "Teks Bebas",
+        color: "slate",
         icon: Type,
-        gradient: "from-teal-400 to-emerald-600",
+        gradient: "from-slate-400 to-slate-600",
       };
     case "wordclassification":
       return {
@@ -649,7 +672,7 @@ const MaterialDetailContent = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               {topic.items.map((item, itemIdx) => {
-                const typeInfo = getTypeInfo(item.type);
+                const typeInfo = getTypeInfo(item.type, item.data);
                 const TypeIcon = typeInfo.icon;
 
                 return (
@@ -848,7 +871,269 @@ const ContentBlock = ({ block: rawBlock }) => {
   const block = { ...rawBlock, data };
 
   switch (block.type) {
-    case "text": {
+    case 'mindmap':
+    case 'text': {
+      if (block.type === 'mindmap' || (block.type === 'text' && block.data?.isMindMap)) {
+        const { nodes = [], title } = block.data;
+        const rootNode = nodes.find(n => !n.parentId);
+        
+        const renderNodeMobile = (node, depth = 0) => {
+          const children = nodes.filter(n => n.parentId === node.id);
+          const colorClass = {
+            teal: 'border-teal-500 text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-500/10',
+            emerald: 'border-emerald-500 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10',
+            cyan: 'border-cyan-500 text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-500/10',
+            sky: 'border-sky-500 text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-500/10',
+            blue: 'border-blue-500 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-500/10',
+            indigo: 'border-indigo-500 text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-500/10',
+            violet: 'border-violet-500 text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-500/10',
+            purple: 'border-purple-500 text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-500/10',
+            fuchsia: 'border-fuchsia-500 text-fuchsia-700 dark:text-fuchsia-300 bg-fuchsia-50 dark:bg-fuchsia-500/10',
+            pink: 'border-pink-500 text-pink-700 dark:text-pink-300 bg-pink-50 dark:bg-pink-500/10',
+            rose: 'border-rose-500 text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-500/10',
+            orange: 'border-orange-500 text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-500/10',
+            amber: 'border-amber-500 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-500/10',
+            slate: 'border-slate-500 text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-500/10',
+          }[node.color] || 'border-slate-300 bg-white';
+
+          const rootColorClass = {
+            teal: 'bg-teal-50 dark:bg-teal-500/10 border-teal-500 text-teal-700 dark:text-teal-300 shadow-teal-500/20',
+            emerald: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/20',
+            cyan: 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-500 text-cyan-700 dark:text-cyan-300 shadow-cyan-500/20',
+            sky: 'bg-sky-50 dark:bg-sky-500/10 border-sky-500 text-sky-700 dark:text-sky-300 shadow-sky-500/20',
+            blue: 'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300 shadow-blue-500/20',
+            indigo: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-indigo-500/20',
+            violet: 'bg-violet-50 dark:bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-300 shadow-violet-500/20',
+            purple: 'bg-purple-50 dark:bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-300 shadow-purple-500/20',
+            fuchsia: 'bg-fuchsia-50 dark:bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-700 dark:text-fuchsia-300 shadow-fuchsia-500/20',
+            pink: 'bg-pink-50 dark:bg-pink-500/10 border-pink-500 text-pink-700 dark:text-pink-300 shadow-pink-500/20',
+            rose: 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-300 shadow-rose-500/20',
+            orange: 'bg-orange-50 dark:bg-orange-500/10 border-orange-500 text-orange-700 dark:text-orange-300 shadow-orange-500/20',
+            amber: 'bg-amber-50 dark:bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 shadow-amber-500/20',
+            slate: 'bg-slate-50 dark:bg-slate-500/10 border-slate-500 text-slate-700 dark:text-slate-300 shadow-slate-500/20',
+          }[node.color || 'slate'];
+
+          return (
+            <div key={node.id} className="space-y-3">
+              <div 
+                style={{ marginLeft: `${depth}rem` }}
+                className={cn(
+                  "p-4 rounded-2xl border-2 shadow-sm transition-all",
+                  node.parentId === null ? cn("shadow-xl", rootColorClass) : colorClass
+                )}
+              >
+                {node.label && (
+                  <div className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-1 flex items-center gap-2">
+                    <div className="w-4 h-px bg-current opacity-30" />
+                    {node.label}
+                  </div>
+                )}
+                <div className={cn("font-bold text-sm", isArabic(node.text) && "arabic-content text-xl text-right")}>
+                  {node.text}
+                </div>
+              </div>
+              {children.length > 0 && (
+                <div className="space-y-3 relative">
+                  <div 
+                    className="absolute top-0 bottom-0 w-0.5 bg-slate-200 dark:bg-white/10" 
+                    style={{ left: `${depth + 1}rem` }}
+                  />
+                  {children.map(child => renderNodeMobile(child, depth + 1.5))}
+                </div>
+              )}
+            </div>
+          );
+        };
+
+        const renderNodeDesktop = (node, isRoot = false) => {
+          const children = nodes.filter(n => n.parentId === node.id);
+          const colorClass = {
+            teal: 'bg-teal-50 dark:bg-teal-500/10 border-teal-500 text-teal-700 dark:text-teal-300 shadow-teal-500/20',
+            emerald: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/20',
+            cyan: 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-500 text-cyan-700 dark:text-cyan-300 shadow-cyan-500/20',
+            sky: 'bg-sky-50 dark:bg-sky-500/10 border-sky-500 text-sky-700 dark:text-sky-300 shadow-sky-500/20',
+            blue: 'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300 shadow-blue-500/20',
+            indigo: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-indigo-500/20',
+            violet: 'bg-violet-50 dark:bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-300 shadow-violet-500/20',
+            purple: 'bg-purple-50 dark:bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-300 shadow-purple-500/20',
+            fuchsia: 'bg-fuchsia-50 dark:bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-700 dark:text-fuchsia-300 shadow-fuchsia-500/20',
+            pink: 'bg-pink-50 dark:bg-pink-500/10 border-pink-500 text-pink-700 dark:text-pink-300 shadow-pink-500/20',
+            rose: 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-300 shadow-rose-500/20',
+            orange: 'bg-orange-50 dark:bg-orange-500/10 border-orange-500 text-orange-700 dark:text-orange-300 shadow-orange-500/20',
+            amber: 'bg-amber-50 dark:bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 shadow-amber-500/20',
+            slate: 'bg-slate-50 dark:bg-slate-500/10 border-slate-500 text-slate-700 dark:text-slate-300 shadow-slate-500/20',
+          }[node.color] || 'border-slate-300 bg-white';
+
+          const rootColorClass = {
+            teal: 'bg-teal-50 dark:bg-teal-500/10 border-teal-500 text-teal-700 dark:text-teal-300 shadow-teal-500/20',
+            emerald: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-emerald-500/20',
+            cyan: 'bg-cyan-50 dark:bg-cyan-500/10 border-cyan-500 text-cyan-700 dark:text-cyan-300 shadow-cyan-500/20',
+            sky: 'bg-sky-50 dark:bg-sky-500/10 border-sky-500 text-sky-700 dark:text-sky-300 shadow-sky-500/20',
+            blue: 'bg-blue-50 dark:bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300 shadow-blue-500/20',
+            indigo: 'bg-indigo-50 dark:bg-indigo-500/10 border-indigo-500 text-indigo-700 dark:text-indigo-300 shadow-indigo-500/20',
+            violet: 'bg-violet-50 dark:bg-violet-500/10 border-violet-500 text-violet-700 dark:text-violet-300 shadow-violet-500/20',
+            purple: 'bg-purple-50 dark:bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-300 shadow-purple-500/20',
+            fuchsia: 'bg-fuchsia-50 dark:bg-fuchsia-500/10 border-fuchsia-500 text-fuchsia-700 dark:text-fuchsia-300 shadow-fuchsia-500/20',
+            pink: 'bg-pink-50 dark:bg-pink-500/10 border-pink-500 text-pink-700 dark:text-pink-300 shadow-pink-500/20',
+            rose: 'bg-rose-50 dark:bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-300 shadow-rose-500/20',
+            orange: 'bg-orange-50 dark:bg-orange-500/10 border-orange-500 text-orange-700 dark:text-orange-300 shadow-orange-500/20',
+            amber: 'bg-amber-50 dark:bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-300 shadow-amber-500/20',
+            slate: 'bg-slate-50 dark:bg-slate-500/10 border-slate-500 text-slate-700 dark:text-slate-300 shadow-slate-500/20',
+          }[node.color || 'slate'];
+
+          return (
+            <div key={node.id} className="flex flex-col items-center flex-1">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className={cn(
+                  "px-6 py-4 rounded-[2rem] shadow-xl text-center min-w-[160px] relative z-10 transition-transform hover:scale-105 border-2",
+                  isRoot ? rootColorClass : cn("text-white", colorClass)
+                )}
+              >
+                <span className={cn("font-black text-sm block", isArabic(node.text) && "arabic-content text-2xl")}>
+                  {node.text}
+                </span>
+              </motion.div>
+
+              {children.length > 0 && (
+                (() => {
+                  const numChildren = children.length;
+                  // Dynamic gap: more children = smaller gap (min 2rem, max 4rem)
+                  const gapX = Math.max(2, 6 - numChildren) + 'rem';
+                  // Dynamic slot width: allow shrinking when dense
+                  const slotWidth = numChildren > 4 ? '120px' : '160px';
+
+                  return (
+                    <div 
+                      className="pt-12 relative grid transition-all duration-500 justify-items-center"
+                      style={{ 
+                        gridTemplateColumns: `repeat(${numChildren}, minmax(${slotWidth}, 1fr))`,
+                        gap: `0 ${gapX}`
+                      }}
+                    >
+                      {/* SVG Layer for Lines */}
+                      <svg 
+                        className="absolute top-0 left-0 w-full h-12 pointer-events-none overflow-visible"
+                      viewBox="0 0 100 100"
+                      preserveAspectRatio="none"
+                    >
+                      {children.map((child, i) => {
+                        const xEnd = (100 / children.length) * (i + 0.5);
+                        return (
+                          <path 
+                            key={`line-${child.id}`}
+                            d={`M 50 0 C 50 50, ${xEnd} 50, ${xEnd} 100`}
+                            className="stroke-slate-200 dark:stroke-white/10 fill-none"
+                            strokeWidth="3"
+                            strokeLinecap="round"
+                            vectorEffect="non-scaling-stroke"
+                            style={{ translate: '0 -1px' }}
+                          />
+                        );
+                      })}
+                    </svg>
+
+                    {/* HTML Layer for Labels (Avoids SVG Stretching) */}
+                    <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible">
+                      {children.map((child, i) => {
+                        if (!child.label) return null;
+                        const xEnd = (100 / children.length) * (i + 0.5);
+                        return (
+                          <div 
+                            key={`label-${child.id}`}
+                            className="absolute flex justify-center items-center h-12"
+                            style={{ 
+                              left: `${(50 + xEnd) / 2}%`,
+                              top: '0',
+                              transform: 'translateX(-50%)',
+                            }}
+                          >
+                            <span 
+                              className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tight text-slate-500 border border-slate-200 dark:border-white/10 shadow-sm whitespace-nowrap"
+                              style={{ fontFamily: 'var(--font-latin)' }}
+                            >
+                              {child.label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {children.map(child => renderNodeDesktop(child))}
+                  </div>
+                );
+              })())}
+            </div>
+          );
+        };
+
+        const [zoom, setZoom] = useState(1);
+        const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
+        const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
+        const handleResetZoom = () => setZoom(1);
+
+        return (
+          <div className="space-y-8 px-4 md:px-0 relative group/mindmap">
+            <div className="flex items-center justify-between">
+              {title && (
+                <h4 className="text-xs font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.3em] flex items-center gap-3">
+                  <GitGraph className="w-4 h-4" /> {title}
+                </h4>
+              )}
+              
+              {/* Zoom Controls */}
+              <div className="hidden md:flex items-center gap-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-full p-1 shadow-sm opacity-0 group-hover/mindmap:opacity-100 transition-opacity duration-300">
+                <button 
+                  onClick={handleZoomOut}
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-500 dark:text-slate-400 transition-colors"
+                  title="Zoom Out"
+                >
+                  <ZoomOut className="w-4 h-4" />
+                </button>
+                <div className="px-2 text-[10px] font-black text-slate-400 w-10 text-center">
+                  {Math.round(zoom * 100)}%
+                </div>
+                <button 
+                  onClick={handleZoomIn}
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-500 dark:text-slate-400 transition-colors"
+                  title="Zoom In"
+                >
+                  <ZoomIn className="w-4 h-4" />
+                </button>
+                <div className="w-px h-3 bg-slate-200 dark:bg-white/10 mx-1" />
+                <button 
+                  onClick={handleResetZoom}
+                  className="p-1.5 hover:bg-slate-100 dark:hover:bg-white/5 rounded-full text-slate-500 dark:text-slate-400 transition-colors"
+                  title="Reset Zoom"
+                >
+                  <Maximize className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="md:bg-slate-50/50 dark:md:bg-white/5 md:border-2 md:border-dashed md:border-slate-200 dark:md:border-white/10 md:rounded-[3rem] p-4 md:p-12 overflow-x-auto scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-white/10">
+              <div 
+                className="hidden md:flex flex-col items-center min-w-max px-24 py-12 mx-auto origin-top transition-transform duration-300 ease-out"
+                style={{ transform: `scale(${zoom})` }}
+              >
+                {rootNode ? renderNodeDesktop(rootNode, true) : (
+                  <div className="text-slate-400 font-bold italic">Peta pikiran belum dikonfigurasi.</div>
+                )}
+              </div>
+
+              <div className="md:hidden space-y-4">
+                {rootNode ? renderNodeMobile(rootNode) : (
+                  <div className="text-slate-400 font-bold italic">Peta pikiran belum dikonfigurasi.</div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      }
+      
+      // Default text rendering
       if (block.data?.isRichText) {
         return (
           <div className="px-4 md:px-0">
@@ -1076,7 +1361,6 @@ const ContentBlock = ({ block: rawBlock }) => {
       return (
         <QuizGame questions={block.data?.questions} title={block.data?.title} />
       );
-
     case "anagram":
       return (
         <AnagramGame
@@ -1102,17 +1386,17 @@ const ContentBlock = ({ block: rawBlock }) => {
     case "harakat":
       return <HarakatGame data={block.data} />;
     case 'memory':
-        return <MemoryGame pairs={block.data.pairs} title={block.data.title} />;
+      return <MemoryGame pairs={block.data.pairs} title={block.data.title} />;
     case 'hangman':
-        return <HangmanGame data={block.data} />;
+      return <HangmanGame data={block.data} />;
     case 'wordrain':
-        return <WordRainGame data={block.data} title={block.data.title} />;
+      return <WordRainGame data={block.data} title={block.data.title} />;
     case 'camelrace':
-        return <CamelRaceGame data={block.data} title={block.data.title} />;
+      return <CamelRaceGame data={block.data} title={block.data.title} />;
     case 'worddetective':
-        return <WordDetectiveGame data={block.data} title={block.data.title} />;
+      return <WordDetectiveGame data={block.data} title={block.data.title} />;
     case 'interactivestory':
-        return <InteractiveStoryGame data={block.data} />;
+      return <InteractiveStoryGame data={block.data} />;
     default:
       return null;
   }
