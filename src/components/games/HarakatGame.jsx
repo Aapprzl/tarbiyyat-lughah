@@ -230,20 +230,12 @@ const HarakatGame = ({ data }) => {
               </div>
             </div>
 
-            <div className="p-6 md:p-12">
-              <div className="mb-8 md:mb-12 text-center max-w-xl mx-auto">
-                <div className="inline-block px-3 md:px-4 py-1.5 bg-teal-500/10 dark:bg-teal-500/20 rounded-full mb-3 md:mb-4">
-                  <span className="text-[8px] md:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-[0.2em]">{data.category || 'Misi Utama'}</span>
-                </div>
-                <h1 className="text-2xl md:text-5xl font-black text-slate-900 dark:text-white uppercase leading-tight tracking-tighter">
-                  Lengkapi <span className="text-teal-500 italic">Harakat</span>
-                </h1>
-              </div>
+            <div className="p-4 md:p-8">
             {!showKeyboard && (
               <motion.p 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="text-slate-500 dark:text-slate-400 text-xs md:text-base font-medium max-w-md mx-auto leading-relaxed"
+                className="text-slate-500 dark:text-slate-400 text-xs md:text-sm font-medium max-w-md mx-auto leading-relaxed text-center mb-6"
               >
                 {data.subtitle || 'Uji kemampuan bahasa Arabmu dengan mengisi harakat yang hilang pada kata di bawah ini.'}
               </motion.p>
@@ -268,7 +260,7 @@ const HarakatGame = ({ data }) => {
               </label>
               <div className={cn(
                 "bg-slate-50 dark:bg-slate-800/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center transition-all duration-500",
-                showKeyboard ? "p-4 md:p-6 min-h-[100px] md:min-h-[140px]" : "p-8 min-h-[160px] md:min-h-[200px]"
+                showKeyboard ? "p-3 md:p-4 min-h-[80px] md:min-h-[110px]" : "p-6 md:p-8 min-h-[120px] md:min-h-[160px]"
               )}>
                  <div className={cn(
                    "font-bold arabic-content text-slate-700 dark:text-slate-200 transition-all",
@@ -284,7 +276,7 @@ const HarakatGame = ({ data }) => {
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-2">Jawabanmu</label>
               <div className={cn(
                 "flex-1 bg-white dark:bg-slate-800 rounded-3xl border-2 flex items-center justify-center transition-all duration-500",
-                showKeyboard ? "p-4 md:p-6 min-h-[100px] md:min-h-[140px]" : "p-8 min-h-[160px] md:min-h-[200px]",
+                showKeyboard ? "p-3 md:p-4 min-h-[80px] md:min-h-[110px]" : "p-6 md:p-8 min-h-[120px] md:min-h-[160px]",
                 isCorrect === true ? "border-emerald-500 ring-4 ring-emerald-500/10" :
                 isCorrect === false ? "border-red-500 animate-shake" :
                 "border-slate-200 dark:border-slate-700 shadow-inner"
@@ -305,21 +297,98 @@ const HarakatGame = ({ data }) => {
             </div>
           </div>
 
+
+          {/* Integrated Standard Virtual Keyboard */}
+          <AnimatePresence>
+            {showKeyboard && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                className="-mx-5 md:mx-auto w-[calc(100%+2.5rem)] md:w-full max-w-3xl bg-slate-100/50 dark:bg-[#2d3243]/90 backdrop-blur-xl rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl mb-8"
+              >
+                <div className="px-1.5 py-3 md:p-6 space-y-2 md:space-y-4">
+                  {/* Harakat Row (Top) */}
+                  <div className="flex justify-center gap-1 md:gap-1.5 bg-black/5 dark:bg-black/10 rounded-xl p-1 md:p-1.5">
+                    {HARAKAT.map((h, i) => (
+                      <button
+                        key={i}
+                        onClick={() => handleKeyClick(h.char)}
+                        className="flex-1 h-10 md:h-12 bg-white dark:bg-[#e2e8f0] hover:bg-slate-50 dark:hover:bg-white active:bg-slate-100 dark:active:bg-slate-300 text-slate-900 dark:text-[#2d3243] rounded-lg text-lg md:text-xl font-bold arabic-content transition-all active:scale-95 shadow-sm"
+                      >
+                        {h.char}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Character Rows */}
+                  <div className="space-y-1 md:space-y-2">
+                    {ARABIC_KEYBOARD.map((row, rowIdx) => (
+                      <div key={rowIdx} className="flex justify-center gap-0.5 md:gap-2">
+                        {row.map((char, charIdx) => (
+                          <button
+                            key={charIdx}
+                            onClick={() => handleKeyClick(char)}
+                            className="flex-1 h-10 md:h-12 bg-white dark:bg-[#e2e8f0] hover:bg-slate-50 dark:hover:bg-white active:bg-slate-100 dark:active:bg-slate-300 text-slate-900 dark:text-[#2d3243] rounded-lg text-lg md:text-xl font-medium transition-colors shadow-sm"
+                          >
+                            {char}
+                          </button>
+                        ))}
+                        {rowIdx === ARABIC_KEYBOARD.length - 1 && (
+                          <button
+                            onClick={handleDelete}
+                            className="w-12 md:w-16 h-10 md:h-12 bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-lg flex items-center justify-center transition-colors shadow-sm"
+                          >
+                            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                              <path d="M22,3H7C6.31,3 5.77,3.35 5.41,3.88L0,12L5.41,20.11C5.77,20.64 6.31,21 7,21H22A2,2 0 0,0 24,19V5A2,2 0 0,0 22,3M19,15.59L17.59,17L14,13.41L10.41,17L9,15.59L12.59,12L9,8.41L10.41,7L14,10.59L17.59,7L19,8.41L15.41,12L19,15.59Z" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bottom Row */}
+                  <div className="flex gap-1 md:gap-2">
+                    <button
+                      onClick={() => handleKeyClick(' ')}
+                      className="flex-1 h-10 md:h-12 bg-white dark:bg-[#e2e8f0] hover:bg-slate-50 dark:hover:bg-white active:bg-slate-100 dark:active:bg-slate-300 text-slate-900 dark:text-[#2d3243] rounded-lg text-xs md:text-sm font-bold flex items-center justify-center font-arabic tracking-widest transition-colors shadow-sm"
+                    >
+                      مسافة
+                    </button>
+
+                    <button
+                      onClick={checkAnswer}
+                      className="w-14 md:w-24 h-10 md:h-12 bg-[#0d9488] hover:bg-[#0f766e] text-white rounded-lg flex items-center justify-center active:scale-95 transition-all shadow-sm"
+                    >
+                      <svg viewBox="0 0 24 24" className="w-6 h-6 md:w-7 md:h-7 fill-none stroke-current stroke-3">
+                        <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* Action Area */}
           <div className="flex flex-col items-center gap-4">
-            <button 
-              onClick={() => {
-                playSound('click');
-                setShowKeyboard(!showKeyboard);
-              }}
-              className="group flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl transition-all"
-            >
-              <Keyboard className="w-4 h-4 text-slate-500" />
-              <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">
-                {showKeyboard ? 'Selesai Mengetik' : 'Tampilkan Keyboard'}
-              </span>
-              <ChevronUp className={cn("w-3 h-3 text-slate-400 transition-transform", !showKeyboard && "rotate-180")} />
-            </button>
+            {!showKeyboard && (
+              <button 
+                onClick={() => {
+                  playSound('click');
+                  setShowKeyboard(true);
+                }}
+                className="group flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl transition-all"
+              >
+                <Keyboard className="w-4 h-4 text-slate-500" />
+                <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-widest">
+                  Tampilkan Keyboard
+                </span>
+                <ChevronUp className="w-3 h-3 text-slate-400 rotate-180 transition-transform" />
+              </button>
+            )}
 
             {!showKeyboard && (
               <motion.button 
@@ -338,99 +407,21 @@ const HarakatGame = ({ data }) => {
           </div>
         </div>
 
-        {/* Custom Virtual Keyboard */}
-        <AnimatePresence>
-          {showKeyboard && (
-            <motion.div 
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-slate-200 dark:border-white/10 shadow-inner overflow-hidden"
-            >
-              <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-3">
-                <div className="flex items-center justify-between mb-1">
-                   <div className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                      <div className="w-1 px-0.5 h-3 bg-teal-500 rounded-full" />
-                      Arabic Keyboard
-                   </div>
-                   <button onClick={() => {
-                      playSound('click');
-                      setShowKeyboard(false);
-                    }} className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg transition-colors">
-                      <X className="w-4 h-4 text-slate-400" />
-                   </button>
-                </div>
-
-                {/* Harakat Row */}
-                <div className="grid grid-cols-8 gap-1 md:gap-2 mb-2">
-                   {HARAKAT.map((h, i) => (
-                      <button 
-                        key={i}
-                        onClick={() => handleKeyClick(h.char)}
-                        className="h-9 md:h-12 bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300 rounded-lg md:rounded-xl text-lg md:text-2xl font-bold arabic-content hover:scale-105 active:scale-95 transition-all shadow-sm border border-orange-200 dark:border-orange-500/20"
-                        title={h.name}
-                      >
-                        {h.char}
-                      </button>
-                   ))}
-                </div>
-
-                {/* Character Rows */}
-                {ARABIC_KEYBOARD.map((row, rowIdx) => (
-                  <div key={rowIdx} className="flex justify-center gap-1 md:gap-2">
-                    {row.map((char, charIdx) => (
-                      <button 
-                        key={charIdx}
-                        onClick={() => handleKeyClick(char)}
-                        className="flex-1 h-9 md:h-12 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded-lg md:rounded-xl text-base md:text-xl font-bold arabic-content hover:scale-105 active:scale-90 transition-all shadow-sm border border-slate-200 dark:border-slate-700 min-w-[20px]"
-                      >
-                        {char}
-                      </button>
-                    ))}
-                  </div>
-                ))}
-
-                {/* Special Row */}
-                <div className="flex gap-2">
-                   <button 
-                     onClick={() => handleKeyClick(' ')}
-                     className="flex-[4] h-10 md:h-12 bg-slate-400 dark:bg-slate-700 text-white rounded-lg md:rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-500 transition-all shadow-lg active:scale-95"
-                   >
-                     Spasi
-                   </button>
-                   <button 
-                     onClick={handleDelete}
-                     className="flex-1 h-10 md:h-12 bg-white dark:bg-slate-800 text-slate-500 rounded-lg md:rounded-xl flex items-center justify-center hover:text-red-500 transition-all border border-slate-200 dark:border-slate-700 shadow-sm active:scale-95"
-                   >
-                     <ArrowLeft className="w-5 h-5 md:w-6 md:h-6" />
-                   </button>
-                   <button 
-                     onClick={checkAnswer}
-                     className="flex-1 h-10 md:h-12 bg-orange-500 text-white rounded-lg md:rounded-xl flex items-center justify-center hover:bg-orange-600 transition-all border border-orange-400 shadow-sm active:scale-95"
-                   >
-                     <CheckCircle2 className="w-5 h-5 md:w-6 md:h-6" />
-                   </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-      
-      {/* Progress Footer */}
-      <div className="mt-8 flex items-center justify-between px-6">
-          <div className="flex gap-2">
-            {questions.map((_, i) => (
-              <div key={i} className={cn(
-                "h-1.5 rounded-full transition-all",
-                i === currentIdx ? "w-8 bg-orange-500" : 
-                i < currentIdx ? "w-4 bg-emerald-500" : "w-4 bg-slate-200 dark:bg-slate-800"
-              )} />
-            ))}
-          </div>
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            {currentIdx + 1} / {questions.length} Soal
-          </span>
+        {/* Progress Footer */}
+        <div className="mt-8 flex items-center justify-between px-6 pb-8 border-t border-[var(--color-border)] pt-8">
+            <div className="flex gap-2">
+              {questions.map((_, i) => (
+                <div key={i} className={cn(
+                  "h-1.5 rounded-full transition-all",
+                  i === currentIdx ? "w-8 bg-orange-500" : 
+                  i < currentIdx ? "w-4 bg-emerald-500" : "w-4 bg-slate-200 dark:bg-slate-800"
+                )} />
+              ))}
+            </div>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+              {currentIdx + 1} / {questions.length} Soal
+            </span>
+        </div>
       </div>
     </div>
   );
