@@ -1209,9 +1209,8 @@ const ContentBlock = ({ block: rawBlock }) => {
               <table className="w-full text-left border-collapse table-fixed md:table-auto">
                 <thead>
                   <tr className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)]">
-                    <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest w-[12%] md:w-[10%] text-center">No</th>
-                    <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest text-right">Kata / Frasa (Arab)</th>
                     <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Arti (Indo)</th>
+                    <th className="px-4 md:px-8 py-4 md:py-5 text-[9px] md:text-[10px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest text-right">Kata / Frasa (Arab)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -1224,8 +1223,10 @@ const ContentBlock = ({ block: rawBlock }) => {
                       transition={{ delay: idx * 0.05 }}
                       className="group odd:bg-slate-50/50 dark:odd:bg-white/[0.02] hover:bg-teal-50/30 dark:hover:bg-teal-500/5 transition-colors"
                     >
-                      <td className="px-4 md:px-8 py-4 md:py-6 text-[10px] md:text-xs font-bold text-slate-400 text-center">
-                        {String(idx + 1).padStart(2, '0')}
+                      <td className="px-4 md:px-8 py-4 md:py-6">
+                        <span className="text-xs md:text-base font-bold text-slate-600 dark:text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                          {item.indo}
+                        </span>
                       </td>
                       <td className="px-4 md:px-8 py-4 md:py-6 text-right">
                         <span className={cn(
@@ -1234,11 +1235,6 @@ const ContentBlock = ({ block: rawBlock }) => {
                           item.arab?.length < 30 ? "text-2xl md:text-3xl" : "text-xl md:text-xl"
                         )}>
                           {item.arab}
-                        </span>
-                      </td>
-                      <td className="px-4 md:px-8 py-4 md:py-6">
-                        <span className="text-xs md:text-base font-bold text-slate-600 dark:text-slate-300 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                          {item.indo}
                         </span>
                       </td>
                     </motion.tr>

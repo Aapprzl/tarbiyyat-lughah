@@ -181,6 +181,17 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                   <div>
                      {block.data.items?.map((item, idx) => (
                      <div key={idx} className="flex gap-2 mb-2">
+                         <input 
+                          type="text"
+                          className="w-1/2 p-2 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded border-none outline-none text-sm focus:ring-1 focus:ring-teal-200"
+                          placeholder="Indo"
+                          value={item.indo}
+                          onChange={(e) => {
+                             const newItems = [...block.data.items];
+                             newItems[idx].indo = e.target.value;
+                             onUpdate({ ...block.data, items: newItems });
+                          }}
+                        />
                         <input 
                           type="text"
                           className="w-1/2 p-3 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded-xl text-right arabic-content transition-all border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-teal-500/50"
@@ -192,17 +203,6 @@ const BlockEditor = ({ block, onRemove, onUpdate, onMoveUp, onMoveDown, isFirst,
                           onChange={(e) => {
                              const newItems = [...block.data.items];
                              newItems[idx].arab = e.target.value;
-                             onUpdate({ ...block.data, items: newItems });
-                          }}
-                        />
-                         <input 
-                          type="text"
-                          className="w-1/2 p-2 bg-[var(--color-bg-muted)] text-[var(--color-text-main)] rounded border-none outline-none text-sm focus:ring-1 focus:ring-teal-200"
-                          placeholder="Indo"
-                          value={item.indo}
-                          onChange={(e) => {
-                             const newItems = [...block.data.items];
-                             newItems[idx].indo = e.target.value;
                              onUpdate({ ...block.data, items: newItems });
                           }}
                         />
