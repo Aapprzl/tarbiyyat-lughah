@@ -127,7 +127,6 @@ h4 {
 
 .arabic-text {
   font-family: var(--font-arabic) !important;
-  font-size: var(--font-arabic-content-size) !important;
   direction: rtl;
 }
 

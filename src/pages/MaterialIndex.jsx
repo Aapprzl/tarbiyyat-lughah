@@ -246,92 +246,129 @@ const StoryCard = ({ topic, index, isLocked }) => {
   return (
     <motion.div
       variants={cardVariants}
-      className="group"
+      className="group h-full"
     >
-      <Link 
-        to={isLocked ? '#' : `/materi/${topic.id}`}
+      <div 
         className={cn(
-          "block relative rounded-[2rem] overflow-hidden transition-all duration-300 shadow-lg",
-          isLocked 
-            ? "cursor-not-allowed grayscale opacity-60" 
-            : "hover:shadow-2xl hover:-translate-y-2 active:scale-[0.98]"
+          "relative block w-full h-[20rem] overflow-hidden rounded-[2.5rem] transition-all duration-500",
+          "bg-slate-900 shadow-xl border border-slate-200 dark:border-slate-800",
+          isLocked ? "grayscale opacity-80" : "shadow-lg hover:shadow-xl dark:shadow-slate-900/50"
         )}
       >
-        {/* Banner/Thumbnail */}
-        <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-teal-500 via-emerald-500 to-teal-600">
-          {topic.thumbnail ? (
-            <>
-              <img 
-                src={topic.thumbnail} 
-                alt={topic.title}
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              {/* Overlay Gradient for Text Readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-            </>
-          ) : (
-            <>
-              {/* Fallback Gradient Background */}
-              <div className="absolute inset-0 opacity-20">
-                <div className="absolute top-0 left-0 w-32 h-32 bg-white rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl" />
-                <div className="absolute bottom-0 right-0 w-40 h-40 bg-black rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
-              </div>
-              
-              {/* Fallback Icon */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="p-8 bg-white/10 backdrop-blur-md rounded-[2rem] border border-white/20 shadow-2xl">
-                  <BookOpen className="w-16 h-16 text-white drop-shadow-lg" />
-                </div>
-              </div>
-            </>
-          )}
-
-          {/* Lock Indicator */}
-          {isLocked && (
-            <div className="absolute top-4 right-4 w-10 h-10 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center">
-              <Lock className="w-5 h-5 text-white" />
-            </div>
-          )}
-
-          {/* Title Overlay on Banner */}
-          <div className="absolute bottom-0 left-0 right-0 px-6 pb-3 pt-10 bg-gradient-to-t from-black/60 to-transparent">
-            <h3 
-              className={cn(
-                "text-xl md:text-2xl font-black text-white drop-shadow-lg",
-                hasArabic ? "arabic-text dir-rtl leading-[1.4] py-1" : "font-sans leading-tight"
-              )}
-              dir={hasArabic ? "rtl" : "ltr"}
-            >
-              {topic.title}
-            </h3>
-          </div>
-        </div>
-
-        {/* Card Content Below Banner */}
-        <div className="bg-white dark:bg-slate-800 p-6">
-          {/* Description */}
-          {topic.description && (
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-3 mb-4 font-medium" style={{ fontFamily: 'var(--font-latin)' }}>
-              {topic.description}
-            </p>
-          )}
-
-          {/* Read Button */}
-          <button 
-            disabled={isLocked}
-            className={cn(
-              "w-full px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2",
-              isLocked
-                ? "bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed"
-                : "bg-teal-500 text-white shadow-lg shadow-teal-500/20 hover:bg-teal-600 hover:scale-105 active:scale-95"
+        {/* Layer 1: Background Image (Thumbnail) or Fallback Gradient */}
+        <div className="absolute inset-0 z-0">
+            {topic.thumbnail ? (
+                <img 
+                    src={topic.thumbnail} 
+                    alt={topic.title}
+                    className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:blur-sm"
+                />
+            ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-800 to-slate-900" />
             )}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span className={cn(isLocked ? "font-sans" : "font-arabic text-lg mt-0.5")}>{isLocked ? "Terkunci" : "اقرأ القصة"}</span>
-            {!isLocked && <MoveRight className="w-4 h-4" />}
-          </button>
+            
+            {/* Dark Gradient Overlay for Text Readability - Updated for Title Visibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/40 to-slate-900/30 opacity-60 transition-opacity duration-500 group-hover:opacity-80"/>
+            
+            {/* Top Gradient specifically for Title */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-transparent opacity-80" />
         </div>
-      </Link>
+
+        {/* Level 2: 3D Round Blob Frame (Original Layout, High Contrast) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-10">
+            {/* Blob 1 - Bottom Right Large - Teal/Emerald Gradient */}
+            <div className={cn(
+                "absolute -bottom-[34rem] -right-[24rem] w-[40rem] h-[40rem] rounded-full transition-all duration-700",
+                "bg-gradient-to-br from-teal-400 to-emerald-600 shadow-2xl shadow-teal-900/50",
+                "border-t border-white/20 backdrop-blur-sm",
+                !isLocked && "group-hover:translate-x-4 group-hover:translate-y-4 group-hover:scale-105"
+            )} />
+            
+            {/* Blob 2 - Bottom Right Small - Emerald/Cyan */}
+            <div className={cn(
+                "absolute -bottom-8 -right-8 w-24 h-24 rounded-full transition-all duration-700 delay-100",
+                "bg-gradient-to-tl from-emerald-300 to-cyan-400 shadow-lg shadow-emerald-900/40",
+                "border border-white/10 opacity-90",
+                !isLocked && "group-hover:-translate-y-2 group-hover:scale-110"
+            )} />
+            
+             {/* Blob 3 - Top Right - Teal Darker */}
+            <div className={cn(
+                "absolute -top-24 -right-24 w-56 h-56 rounded-full transition-all duration-700",
+                "bg-gradient-to-bl from-teal-500 to-emerald-700 shadow-xl shadow-teal-900/40 opacity-90",
+                "border-b border-white/10",
+                 !isLocked && "group-hover:-translate-y-2 group-hover:translate-x-2"
+            )} />
+            
+            {/* Blob 4 - Top Left - Cyan/Teal */}
+            <div className={cn(
+                "absolute -top-16 -left-16 w-40 h-40 rounded-full transition-all duration-700",
+                "bg-gradient-to-tr from-cyan-500 to-teal-600 shadow-lg shadow-cyan-900/40 opacity-80",
+                !isLocked && "group-hover:translate-x-2"
+            )} />
+        </div>
+
+        {/* Content Container */}
+        <div className="relative z-20 flex flex-col justify-between h-full px-6 pt-6 pb-2 pointer-events-none">
+            <div className="flex flex-col gap-1 pointer-events-auto flex-grow">
+                {/* Topic Title */}
+                <h3 
+                  className={cn(
+                    "font-black tracking-tight text-white drop-shadow-lg filter",
+                    hasArabic ? "text-3xl sm:text-4xl arabic-text dir-rtl leading-relaxed py-1" : "text-2xl sm:text-3xl font-sans leading-[1.1]"
+                  )}
+                  dir={hasArabic ? "rtl" : "ltr"}
+                >
+                  {topic.title}
+                </h3>
+                
+                {/* Description - Dynamic Sizing & Full Visibility */}
+                {(topic.desc || topic.description) && (
+                  <p 
+                    className={cn(
+                        "font-medium text-slate-200 drop-shadow-sm opacity-90",
+                        // Optimized Dynamic Font Sizing Logic - Even wider thresholds
+                        (topic.desc || topic.description).length > 250 ? "text-xs leading-tight" :
+                        (topic.desc || topic.description).length > 180 ? "text-sm leading-snug" :
+                        "text-base leading-relaxed"
+                    )}
+                    style={{ fontFamily: 'var(--font-latin)' }}
+                  >
+                    {topic.desc || topic.description}
+                  </p>
+                )}
+            </div>
+
+            {/* Action Area */}
+            <div className="pt-0 pointer-events-auto">
+                {isLocked ? (
+                  <button 
+                      disabled
+                      className={cn(
+                      "w-full py-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-3",
+                      "bg-slate-800/50 text-slate-400 border border-slate-700/50 backdrop-blur-sm cursor-not-allowed"
+                      )}
+                  >
+                      <Lock className="w-4 h-4" />
+                      <span className="font-sans">Terkunci</span>
+                  </button>
+                ) : (
+                  <Link 
+                      to={`/materi/${topic.id}`}
+                      className={cn(
+                      "w-full py-4 rounded-full font-bold text-sm transition-all flex items-center justify-center gap-3",
+                      "bg-teal-500/80 hover:bg-teal-500/90 backdrop-blur-md border border-white/20",
+                      "text-white shadow-xl shadow-teal-900/30 hover:shadow-teal-500/30 hover:scale-[1.02] active:scale-95"
+                      )}
+                  >
+                      <BookOpen className="w-4 h-4" />
+                      <span className="font-arabic text-lg mt-0.5">اقرأ الدرس</span>
+                      <MoveRight className="w-4 h-4" />
+                  </Link>
+                )}
+            </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
