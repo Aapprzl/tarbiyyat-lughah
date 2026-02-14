@@ -115,7 +115,7 @@ const BottomBar = () => {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 100, opacity: 0, scale: 0.8 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-            className="flex items-center gap-0.5 md:gap-1 p-1.5 md:p-2 bg-white/90 dark:bg-slate-900/95 backdrop-blur-3xl border border-slate-200 dark:border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] pointer-events-auto relative group"
+            className="flex items-center gap-0.5 md:gap-1 p-1.5 md:p-2 bg-white/40 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/40 dark:border-white/10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.2)] pointer-events-auto relative group"
           >
             {navItems.map((item) => {
               let isActive;
@@ -209,7 +209,7 @@ const BottomBar = () => {
             whileTap={{ scale: 0.9 }}
             onClick={() => setIsVisible(true)}
             className={cn(
-              "fixed bottom-6 right-1 z-[110] bg-teal-600 text-white shadow-2xl shadow-teal-500/30 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto",
+              "fixed bottom-6 right-1 z-[110] bg-teal-500/80 dark:bg-teal-600/60 backdrop-blur-xl text-white shadow-2xl shadow-teal-500/30 rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing pointer-events-auto border border-white/20",
               isDesktop ? "w-16 h-16" : "w-14 h-14"
             )}
           >
