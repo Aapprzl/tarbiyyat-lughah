@@ -35,30 +35,29 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Daftar Scene ({Object.keys(block.data.scenes || {}).length})</label>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {Object.entries(block.data.scenes || {}).map(([sKey, sData]) => (
-                    <div key={sKey} className="group/scene bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-[2.5rem] overflow-hidden transition-all hover:border-teal-500/30">
-                        <div className="p-6 space-y-6">
+                    <div key={sKey} className="group/scene bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden transition-all hover:border-teal-500/30">
+                        <div className="p-3.5 space-y-4">
                             {/* Scene Header */}
                             <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                    <div className="px-3 py-1 bg-teal-500 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg shadow-teal-500/20 flex items-center gap-2">
+                                <div className="flex items-center gap-2">
+                                    <div className="px-2 py-0.5 bg-teal-500 text-white text-[9px] font-bold rounded-lg uppercase tracking-widest shadow-sm shadow-teal-500/20 flex items-center gap-2">
                                         ID: {sKey}
                                         <button 
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 navigator.clipboard.writeText(sKey);
-                                                // toast.success("ID disalin ke clipboard!");
                                                 alert("ID disalin ke clipboard!");
                                             }}
                                             className="hover:text-white/70 transition-colors p-0.5"
                                             title="Salin ID"
                                         >
-                                            <Copy className="w-3 h-3" />
+                                            <Copy className="w-2.5 h-2.5" />
                                         </button>
                                     </div>
                                     {sKey === block.data.startScene && (
-                                        <span className="text-[10px] font-bold text-teal-600 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-100 uppercase tracking-tighter italic">START SCENE</span>
+                                        <span className="text-[9px] font-bold text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-2 py-0.5 rounded-lg border border-teal-100 dark:border-teal-500/20 uppercase tracking-tighter italic">START</span>
                                     )}
                                 </div>
                                 <button 
@@ -67,27 +66,27 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                         delete newScenes[sKey];
                                         onUpdate({ ...block.data, scenes: newScenes });
                                     }}
-                                    className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                                    className="p-1 text-slate-300 hover:text-red-500 transition-colors"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                             </div>
 
                             {/* Common Scene background */}
-                            <div className="space-y-4 pb-6 border-b border-slate-100 dark:border-white/5">
+                            <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-white/5">
                                 <div className="flex items-center justify-between px-1">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                        <ImageIcon className="w-3 h-3 text-teal-500" /> Background Utama Scene
+                                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <ImageIcon className="w-3 h-3 text-teal-500" /> Background Utama
                                     </label>
                                     <button 
                                         onClick={() => window.open('#/admin/assets', '_blank')}
-                                        className="text-[9px] font-bold text-teal-500 hover:text-teal-600 uppercase tracking-tighter"
+                                        className="text-[8px] font-bold text-teal-500 hover:text-teal-600 uppercase tracking-tighter"
                                     >+ Tambah Aset</button>
                                 </div>
-                                <div className="grid md:grid-cols-2 gap-4">
+                                <div className="grid md:grid-cols-2 gap-3">
                                     <div className="relative group/bg">
                                         <select 
-                                            className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20 dark:text-white transition-all hover:bg-white dark:hover:bg-slate-800"
+                                            className="w-full bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 text-[11px] font-bold outline-none appearance-none cursor-pointer focus:border-teal-500/50 dark:text-white transition-all hover:bg-white dark:hover:bg-slate-800"
                                             value={globalBackgrounds.find(b => b.image === sData.background)?.id || ''}
                                             onChange={(e) => {
                                                 const selected = globalBackgrounds.find(b => b.id === e.target.value);
@@ -106,8 +105,8 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                 </option>
                                             ))}
                                         </select>
-                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-slate-500">
-                                            <ChevronDown className="w-4 h-4" />
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                            <ChevronDown className="w-3 h-3" />
                                         </div>
                                     </div>
                                     <AnimatePresence>
@@ -135,29 +134,29 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                 </div>
                             </div>
 
-                            {/* Dialogue Sequence (Multi-Bubble) */}
-                            <div className="space-y-4 pt-4">
+                             {/* Dialogue Sequence (Multi-Bubble) */}
+                            <div className="space-y-3">
                                 <div className="flex items-center justify-between px-1">
-                                    <label className="text-[10px] font-black text-teal-600 uppercase tracking-widest flex items-center gap-2">
+                                    <label className="text-[9px] font-bold text-teal-600 uppercase tracking-widest flex items-center gap-2">
                                         <MessageSquare className="w-3 h-3" /> Urutan Dialog / Bubble
                                     </label>
                                 </div>
 
-                                <div className="space-y-6">
+                                <div className="space-y-4">
                                     {(sData.bubbles || (sData.text ? [{ text: sData.text, character: sData.character }] : [])).map((bubble, bIdx) => (
                                         <motion.div 
                                             key={bIdx}
                                             initial={{ opacity: 0, x: -10 }}
                                             animate={{ opacity: 1, x: 0 }}
-                                            className="relative p-5 bg-slate-50 dark:bg-black/10 rounded-[2rem] border border-slate-100 dark:border-white/5 space-y-4 group/bubble"
+                                            className="relative p-3.5 bg-slate-50 dark:bg-black/10 rounded-xl border border-slate-100 dark:border-white/5 space-y-3 group/bubble"
                                         >
                                             {/* Bubble Header / Controls */}
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <div className="w-6 h-6 bg-teal-500/10 rounded-full flex items-center justify-center text-[10px] font-black text-teal-600">
+                                                    <div className="w-5 h-5 bg-teal-500/10 rounded-full flex items-center justify-center text-[9px] font-bold text-teal-600">
                                                         {bIdx + 1}
                                                     </div>
-                                                    <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Urutan Dialog</span>
+                                                    <span className="text-[8px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Urutan Dialog</span>
                                                 </div>
                                                 <button 
                                                     onClick={() => {
@@ -173,15 +172,15 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                 </button>
                                             </div>
 
-                                            {/* Bubble Content */}
-                                            <div className="grid md:grid-cols-3 gap-6">
-                                                <div className="md:col-span-2 space-y-4">
-                                                    <div className="space-y-2">
-                                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1">Teks Dialog</label>
+                                             {/* Bubble Content */}
+                                            <div className="grid md:grid-cols-3 gap-4">
+                                                <div className="md:col-span-2 space-y-3">
+                                                    <div className="space-y-1">
+                                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-1">Teks Dialog</label>
                                                         <textarea 
                                                             placeholder="Tulis dialog..."
                                                             className={cn(
-                                                                "w-full h-32 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-4 text-xs font-bold outline-none focus:ring-2 focus:ring-teal-500/20 transition-all",
+                                                                "w-full h-24 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl p-3 text-[11px] font-bold outline-none focus:border-teal-500/50 transition-all",
                                                                 getDirection(bubble.text) === 'rtl' && "arabic-content leading-[2]"
                                                             )}
                                                             style={{ 
@@ -200,10 +199,10 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                     </div>
 
                                                     {/* Internal Bubble Options */}
-                                                    <div className="space-y-3 bg-white/40 dark:bg-black/20 p-4 rounded-2xl border border-dotted border-slate-200 dark:border-white/10">
+                                                    <div className="space-y-2 bg-white/40 dark:bg-black/20 p-3 rounded-xl border border-dotted border-slate-200 dark:border-white/10">
                                                         <div className="flex items-center justify-between">
-                                                            <label className="text-[9px] font-black text-teal-600/70 uppercase tracking-widest px-1 flex items-center gap-2">
-                                                                <Plus className="w-3 h-3" /> Pilihan Internal (Lompat ke Dialog Lain)
+                                                            <label className="text-[8px] font-bold text-teal-600/70 uppercase tracking-widest px-1 flex items-center gap-2">
+                                                                <Plus className="w-3 h-3" /> Pilihan Internal
                                                             </label>
                                                             <button 
                                                                 onClick={() => {
@@ -214,13 +213,13 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                                     newScenes[sKey] = { ...sData, bubbles };
                                                                     onUpdate({ ...block.data, scenes: newScenes });
                                                                 }}
-                                                                className="text-[8px] font-black uppercase text-teal-600 hover:text-teal-700 transition-colors"
+                                                                className="text-[8px] font-bold uppercase text-teal-600 hover:text-teal-700 transition-colors"
                                                             >
-                                                                + Tambah Opsi
+                                                                + Tambah
                                                             </button>
                                                         </div>
                                                         
-                                                        <div className="space-y-2">
+                                                        <div className="space-y-1.5">
                                                             {(bubble.options || []).map((bOpt, boIdx) => {
                                                                 const availableBubbles = (sData.bubbles || []).map((_, i) => i);
                                                                 return (
@@ -229,7 +228,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                                             type="text"
                                                                             placeholder="Teks Opsi..."
                                                                             className={cn(
-                                                                                "flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-[10px] font-bold outline-none focus:ring-2 focus:ring-teal-500/20",
+                                                                                "flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1 text-[10px] font-bold outline-none focus:border-teal-500/50",
                                                                                 getDirection(bOpt.text) === 'rtl' && "arabic-content text-right dir-rtl leading-none pb-1"
                                                                             )}
                                                                             style={{ 
@@ -247,9 +246,9 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                                                 onUpdate({ ...block.data, scenes: newScenes });
                                                                             }}
                                                                         />
-                                                                        <div className="relative w-24">
+                                                                        <div className="relative w-20">
                                                                             <select 
-                                                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-[9px] font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20"
+                                                                                className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 rounded-lg px-2 py-1 text-[9px] font-bold outline-none appearance-none cursor-pointer focus:border-teal-500/50"
                                                                                 value={bOpt.nextBubbleIndex || 0}
                                                                                 onChange={(e) => {
                                                                                     const newScenes = { ...block.data.scenes };
@@ -265,7 +264,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                                                     <option key={idx} value={idx}>Dialog {idx + 1}</option>
                                                                                 ))}
                                                                             </select>
-                                                                            <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400 pointer-events-none" />
+                                                                            <ChevronDown className="absolute right-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-slate-400 pointer-events-none" />
                                                                         </div>
                                                                         <button 
                                                                             onClick={() => {
@@ -287,12 +286,12 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="space-y-4">
+                                                <div className="space-y-3">
                                                     <div className="relative group/char">
-                                                        <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest px-1 block mb-2">Karakter</label>
+                                                        <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-1 block mb-1.5">Karakter</label>
                                                         <div className="relative">
                                                             <select 
-                                                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl p-3 text-[10px] font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-teal-500/20 dark:text-white transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
+                                                                className="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-xl p-2.5 text-[10px] font-bold outline-none appearance-none cursor-pointer focus:border-teal-500/50 dark:text-white transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
                                                                 value={bubble.character?.id || ''}
                                                                 onChange={(e) => {
                                                                     const selected = globalCharacters.find(c => c.id === e.target.value);
@@ -311,7 +310,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                                     <option key={char.id} value={char.id}>{char.name}</option>
                                                                 ))}
                                                             </select>
-                                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                                            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                                                                 <ChevronDown className="w-3 h-3" />
                                                             </div>
                                                         </div>
@@ -341,25 +340,25 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                             delete newScenes[sKey].character;
                                             onUpdate({ ...block.data, scenes: newScenes });
                                         }}
-                                        className="w-full mt-2 py-4 flex items-center justify-center gap-2 bg-slate-100 dark:bg-white/5 border-2 border-dashed border-teal-500/30 rounded-[2rem] text-[10px] font-black uppercase text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all group"
+                                        className="w-full mt-1.5 py-4 flex items-center justify-center gap-2 bg-slate-100 dark:bg-white/5 border border-dashed border-teal-500/30 rounded-xl text-[9px] font-bold uppercase text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all group"
                                     >
-                                        <Plus className="w-4 h-4 group-hover:scale-125 transition-transform" /> Tambah Bubble Baru
+                                        <Plus className="w-3 h-3 group-hover:scale-125 transition-transform" /> Tambah Bubble
                                     </button>
                                 </div>
                             </div>
 
                             {/* Navigation Options */}
-                            <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-white/5">
-                                <label className="text-[10px] font-black text-teal-600 uppercase tracking-widest px-1">Pilihan Jalur (Options)</label>
-                                <div className="space-y-2">
+                            <div className="space-y-3 pt-3 border-t border-slate-100 dark:border-white/5">
+                                <label className="text-[9px] font-bold text-teal-600 uppercase tracking-widest px-1">Pilihan Jalur Cerita</label>
+                                <div className="space-y-1.5">
                                     {(sData.options || []).map((opt, oIdx) => (
-                                        <div key={oIdx} className="flex gap-3 items-center group/opt">
-                                            <div className="flex-1 bg-slate-50 dark:bg-black/10 rounded-2xl p-3 flex gap-4">
+                                        <div key={oIdx} className="flex gap-2 items-center group/opt">
+                                            <div className="flex-1 bg-slate-50 dark:bg-black/10 rounded-xl p-2 flex gap-3 border border-transparent hover:border-teal-500/30 transition-all">
                                                 <input 
                                                     type="text"
                                                     placeholder="Teks Pilihan..."
                                                     className={cn(
-                                                        "flex-[1.5] bg-transparent text-xs font-bold outline-none",
+                                                        "flex-[1.5] bg-transparent text-[11px] font-bold outline-none",
                                                         getDirection(opt.text) === 'rtl' && "arabic-content text-right leading-[2]"
                                                     )}
                                                     value={opt.text || ''}
@@ -371,13 +370,13 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                         onUpdate({ ...block.data, scenes: newScenes });
                                                     }}
                                                 />
-                                                <div className="w-px h-6 bg-slate-200 dark:bg-white/10" />
+                                                <div className="w-px h-5 bg-slate-200 dark:bg-white/10" />
                                                 <div className="flex-1 flex items-center gap-2">
                                                     <LinkIcon className="w-3 h-3 text-slate-400" />
                                                     <input 
                                                         type="text"
                                                         placeholder="ID Scene Tujuan"
-                                                        className="w-full bg-transparent text-xs font-black text-teal-500 outline-none"
+                                                        className="w-full bg-transparent text-[10px] font-black text-teal-600 outline-none"
                                                         value={opt.nextScene || ''}
                                                         onChange={(e) => {
                                                             const newScenes = { ...block.data.scenes };
@@ -395,7 +394,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                     newScenes[sKey].options = sData.options.filter((_, i) => i !== oIdx);
                                                     onUpdate({ ...block.data, scenes: newScenes });
                                                 }}
-                                                className="p-2 text-slate-300 hover:text-red-500 opacity-0 group-hover/opt:opacity-100 transition-all"
+                                                className="p-1.5 text-slate-300 hover:text-red-500 opacity-0 group-hover/opt:opacity-100 transition-all"
                                             >
                                                 <Trash2 className="w-3.5 h-3.5" />
                                             </button>
@@ -407,7 +406,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                             newScenes[sKey].options = [...(sData.options || []), { text: '', nextScene: '' }];
                                             onUpdate({ ...block.data, scenes: newScenes });
                                         }}
-                                        className="w-full py-2 bg-slate-50 dark:bg-white/5 border border-dashed border-teal-200 dark:border-teal-500/20 rounded-xl text-[10px] font-black uppercase text-teal-500 hover:bg-teal-50 transition-all"
+                                        className="w-full py-2 bg-slate-50 dark:bg-white/5 border border-dashed border-teal-200 dark:border-teal-500/20 rounded-lg text-[9px] font-bold uppercase text-teal-500 hover:bg-teal-50 transition-all"
                                     >+ Tambah Pilihan</button>
                                 </div>
                             </div>
@@ -426,7 +425,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                         } 
                         });
                     }}
-                    className="w-full mt-4 py-5 flex items-center justify-center gap-3 bg-slate-100 dark:bg-white/5 border-2 border-dashed border-teal-500/30 rounded-[2.5rem] text-[10px] font-black uppercase tracking-widest text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all group shadow-sm"
+                    className="w-full py-4 flex items-center justify-center gap-3 bg-slate-100 dark:bg-white/5 border border-dashed border-teal-500/30 rounded-xl text-[10px] font-bold uppercase tracking-widest text-teal-600 hover:bg-teal-50 dark:hover:bg-teal-500/10 transition-all group"
                 >
                     <Plus className="w-4 h-4 group-hover:scale-125 transition-transform" /> Tambah Scene Baru
                 </button>

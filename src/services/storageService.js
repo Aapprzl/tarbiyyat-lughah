@@ -19,6 +19,7 @@ export const storageService = {
             const uniquePath = `${path}/${timestamp}_${safeName}`; // e.g. materials/pdfs/123_abc.pdf
 
             const { error } = await supabase.storage
+                .from(BUCKET_NAME)
                 .upload(uniquePath, file, {
                     cacheControl: '3600',
                     upsert: false

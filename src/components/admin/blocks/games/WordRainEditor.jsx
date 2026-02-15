@@ -1,5 +1,4 @@
-import React from 'react';
-import { Trash2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Trash2, CheckCircle2, AlertCircle, Plus } from 'lucide-react';
 import { cn } from '../../../../utils/cn';
 
 /**
@@ -19,30 +18,55 @@ const WordRainEditor = ({ block, onUpdate }) => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-2">
-         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Kategori Target</label>
-         <input 
-           type="text" 
-           placeholder="Contoh: Isim (Kata Benda)..."
-           className="w-full font-black text-xl text-sky-500 bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none px-1"
-           value={block.data.targetCategory || ''}
-           onChange={(e) => onUpdate({ ...block.data, targetCategory: e.target.value })}
-         />
+    <div className="space-y-4">
+      <div className="bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-200 dark:border-white/10 space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Kategori Target</label>
+            <input 
+              type="text" 
+              placeholder="Contoh: Isim..."
+              className="w-full bg-transparent font-bold text-sky-500 border-b border-transparent focus:border-sky-500 outline-none text-sm py-1 transition-colors"
+              value={block.data.targetCategory || ''}
+              onChange={(e) => onUpdate({ ...block.data, targetCategory: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Durasi (Detik)</label>
+            <input 
+              type="number" 
+              className="w-full bg-transparent font-bold text-slate-700 dark:text-white border-b border-transparent focus:border-sky-500 outline-none text-sm py-1 transition-colors"
+              value={block.data.timeLimit || 60}
+              onChange={(e) => onUpdate({ ...block.data, timeLimit: parseInt(e.target.value) || 60 })}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-         <div className="space-y-3">
-            <label className="text-[10px] font-black text-emerald-500 uppercase tracking-widest px-1 flex items-center gap-2">
-               <CheckCircle2 className="w-3 h-3" /> Kata Benar (Cetak Skor)
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         {/* Kata Benar */}
+         <div className="space-y-2">
+            <label className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest px-2 py-0.5 bg-emerald-50 dark:bg-emerald-900/20 rounded-md flex items-center gap-2 w-fit">
+               <CheckCircle2 className="w-3 h-3" /> Kata Benar
             </label>
-            <div className="bg-emerald-500/5 border border-emerald-500/20 p-4 rounded-3xl space-y-2">
-               {block.data.correctWords?.map((word, idx) => (
-                 <div key={idx} className="flex gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+               {(block.data.correctWords || []).map((word, idx) => (
+                 <div key={idx} className="group relative bg-white dark:bg-white/5 p-2 rounded-lg border border-slate-200 dark:border-white/10 flex items-center overflow-hidden">
+                    <button 
+                      onClick={() => {
+                        const newWords = block.data.correctWords.filter((_, i) => i !== idx);
+                        onUpdate({ ...block.data, correctWords: newWords });
+                      }} 
+                      className="absolute left-1 top-1 text-slate-300 hover:text-red-500 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                     <input 
                       type="text"
+                      dir={isArabic(word) ? 'rtl' : 'ltr'}
                       className={cn(
-                         "flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-emerald-500 transition-colors",
+                         "flex-1 min-w-0 bg-transparent border-b border-dashed border-slate-200 dark:border-white/10 focus:border-emerald-500/50 focus:border-solid text-xs font-bold outline-none py-1 pl-6 pr-3 transition-all",
                          isArabic(word) && "arabic-content text-right"
                       )}
                       value={word}
@@ -52,30 +76,40 @@ const WordRainEditor = ({ block, onUpdate }) => {
                          onUpdate({ ...block.data, correctWords: newWords });
                       }}
                     />
-                    <button onClick={() => {
-                       const newWords = block.data.correctWords.filter((_, i) => i !== idx);
-                       onUpdate({ ...block.data, correctWords: newWords });
-                    }} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                  </div>
                ))}
                <button 
                  onClick={() => onUpdate({ ...block.data, correctWords: [...(block.data.correctWords || []), ''] })}
-                 className="w-full py-2 text-[10px] font-black uppercase text-emerald-600 hover:bg-emerald-500/10 rounded-xl transition-all"
-               >+ Tambah Kata Benar</button>
+                 className="flex items-center justify-center gap-1.5 py-2 border border-dashed border-emerald-200 dark:border-emerald-500/20 rounded-lg text-[9px] font-bold uppercase tracking-widest text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 transition-all"
+               >
+                 <Plus className="w-3 h-3" /> Tambah
+               </button>
             </div>
          </div>
 
-         <div className="space-y-3">
-            <label className="text-[10px] font-black text-rose-500 uppercase tracking-widest px-1 flex items-center gap-2">
-               <AlertCircle className="w-3 h-3" /> Kata Pengecoh (Salah)
+         {/* Kata Pengecoh */}
+         <div className="space-y-2">
+            <label className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest px-2 py-0.5 bg-rose-50 dark:bg-rose-900/20 rounded-md flex items-center gap-2 w-fit">
+               <AlertCircle className="w-3 h-3" /> Kata Pengecoh
             </label>
-            <div className="bg-rose-500/5 border border-rose-500/20 p-4 rounded-3xl space-y-2">
-               {block.data.distractorWords?.map((word, idx) => (
-                 <div key={idx} className="flex gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+               {(block.data.distractorWords || []).map((word, idx) => (
+                 <div key={idx} className="group relative bg-white dark:bg-white/5 p-2 rounded-lg border border-slate-200 dark:border-white/10 flex items-center overflow-hidden">
+                    <button 
+                      onClick={() => {
+                        const newWords = block.data.distractorWords.filter((_, i) => i !== idx);
+                        onUpdate({ ...block.data, distractorWords: newWords });
+                      }} 
+                      className="absolute left-1 top-1 text-slate-300 hover:text-red-500 p-0.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                      title="Hapus"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
                     <input 
                       type="text"
+                      dir={isArabic(word) ? 'rtl' : 'ltr'}
                       className={cn(
-                         "flex-1 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-rose-500 transition-colors",
+                         "flex-1 min-w-0 bg-transparent border-b border-dashed border-slate-200 dark:border-white/10 focus:border-rose-500/50 focus:border-solid text-xs font-bold outline-none py-1 pl-6 pr-3 transition-all",
                          isArabic(word) && "arabic-content text-right"
                       )}
                       value={word}
@@ -85,28 +119,16 @@ const WordRainEditor = ({ block, onUpdate }) => {
                          onUpdate({ ...block.data, distractorWords: newWords });
                       }}
                     />
-                    <button onClick={() => {
-                       const newWords = block.data.distractorWords.filter((_, i) => i !== idx);
-                       onUpdate({ ...block.data, distractorWords: newWords });
-                    }} className="p-2 text-slate-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
                  </div>
                ))}
                <button 
                  onClick={() => onUpdate({ ...block.data, distractorWords: [...(block.data.distractorWords || []), ''] })}
-                 className="w-full py-2 text-[10px] font-black uppercase text-rose-600 hover:bg-rose-500/10 rounded-xl transition-all"
-               >+ Tambah Kata Salah</button>
+                 className="flex items-center justify-center gap-1.5 py-2 border border-dashed border-rose-200 dark:border-rose-500/20 rounded-lg text-[9px] font-bold uppercase tracking-widest text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all"
+               >
+                 <Plus className="w-3 h-3" /> Tambah
+               </button>
             </div>
          </div>
-      </div>
-
-      <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 flex items-center justify-between">
-         <label className="text-xs font-bold text-slate-500">Durasi Permainan (Detik)</label>
-         <input 
-           type="number" 
-           className="w-24 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-2 text-sm font-black text-center"
-           value={block.data.timeLimit || 60}
-           onChange={(e) => onUpdate({ ...block.data, timeLimit: parseInt(e.target.value) || 60 })}
-         />
       </div>
     </div>
   );

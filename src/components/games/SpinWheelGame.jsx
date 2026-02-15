@@ -251,7 +251,7 @@ const SpinWheelGame = ({ items = [], title = "Spin the Wheel" }) => {
             {/* Overlay Start Button if clean slate */}
             {!isSpinning && !result && (
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-                    <span className="bg-white/90 text-sm font-bold px-2 py-1 rounded shadow-sm">SPIN</span>
+                    <span className="bg-white/90 text-slate-900 text-sm font-bold px-2 py-1 rounded shadow-sm">SPIN</span>
                 </div>
             )}
         </div>

@@ -15,7 +15,7 @@ export const BlockWrapper = ({
     onUpdate, // Passed for potential title updates if we ever move title editing to header, but mostly for children
     children 
 }) => {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
     const Icon = info.icon;
 
     // Helper to get preview title

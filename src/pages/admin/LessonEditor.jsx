@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, Image as ImageIcon, Mountain, X, Save, Upload, Search, Telescope, GitGraph } from 'lucide-react';
+import { Type, Table, AlertCircle, Youtube, Music, ClipboardList, Puzzle, HelpCircle, Layers, GripVertical, MoveLeft, RefreshCcw, Trash2, Keyboard, LayoutGrid, Ghost, Plus, Zap, FileText, CloudRain, Image as ImageIcon, Mountain, X, Save, Upload, Search, Telescope, GitGraph } from 'lucide-react';
 import PdfViewer from '../../components/media/PdfViewer';
 import AudioPlayer from '../../components/media/AudioPlayer';
 import MatchUpGame from '../../components/games/MatchUpGame';
@@ -775,6 +775,7 @@ const LessonEditor = () => {
 
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'anagram')} icon={GripVertical} label="Anagram" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'completesentence')} icon={Zap} label="Kilat Bahasa" color="text-indigo-600" bg="bg-indigo-50 dark:bg-indigo-500/10" />
+                                          <AddBlockButton onClick={() => addBlockToStage(stage.id, 'spinwheel')} icon={RefreshCcw} label="Spin Wheel" color="text-pink-600" bg="bg-pink-50 dark:bg-pink-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'unjumble')} icon={MoveLeft} label="Susun Kata" color="text-purple-600" bg="bg-purple-50 dark:bg-purple-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'wordclassification')} icon={Puzzle} label="Tebak Kata" color="text-rose-600" bg="bg-rose-50 dark:bg-rose-500/10" />
                                           <AddBlockButton onClick={() => addBlockToStage(stage.id, 'harakat')} icon={Keyboard} label="Harakat" color="text-orange-600" bg="bg-orange-50 dark:bg-orange-500/10" />

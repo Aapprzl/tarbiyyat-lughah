@@ -19,56 +19,62 @@ const WordDetectiveEditor = ({ block, onUpdate }) => {
   };
 
   return (
-    <div className="space-y-6">
-       <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Judul Permainan</label>
+    <div className="space-y-4">
+      {/* Game Info & Passage */}
+      <div className="bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-200 dark:border-white/10 space-y-4">
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Judul Permainan</label>
           <input 
             type="text" 
-            placeholder="Detektif Kata..."
-            className="w-full font-black text-xl text-emerald-500 bg-transparent border-b border-slate-200 dark:border-white/10 pb-2 outline-none px-1"
+            placeholder="Contoh: Detektif Kata..."
+            className="w-full bg-transparent font-bold text-emerald-600 border-b border-transparent focus:border-emerald-500 outline-none text-sm py-1 transition-colors"
             value={block.data.title || ''}
             onChange={(e) => onUpdate({ ...block.data, title: e.target.value })}
           />
-       </div>
+        </div>
 
-       <div className="space-y-2">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Teks Bacaan</label>
+        <div className="space-y-1">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Teks Bacaan</label>
           <textarea 
             placeholder="Tulis atau tempel teks bacaan di sini..."
             className={cn(
-                "w-full h-48 text-sm resize-y outline-none text-[var(--color-text-main)] bg-slate-50 dark:bg-black/20 placeholder-[var(--color-text-muted)]/50 p-4 rounded-3xl border border-slate-200 dark:border-white/10 transition-all",
+                "w-full h-32 text-xs resize-y outline-none text-[var(--color-text-main)] bg-white dark:bg-black/20 p-3 rounded-lg border border-slate-200 dark:border-white/10 focus:border-emerald-500/50 transition-all",
                 isArabic(block.data.text) && "arabic-content"
             )}
             style={{ 
-                lineHeight: isArabic(block.data.text) ? '2' : '1.5',
+                lineHeight: isArabic(block.data.text) ? '2' : '1.6',
                 direction: isArabic(block.data.text) ? 'rtl' : 'ltr'
             }}
             value={block.data.text || ''}
             onChange={(e) => onUpdate({ ...block.data, text: e.target.value })}
           />
-       </div>
+        </div>
+      </div>
 
-       <div className="space-y-4">
-          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Daftar Misi (Clue & Jawaban)</label>
+      <div className="space-y-3">
+        <label className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest px-1">Daftar Misi (Clue & Jawaban)</label>
+        <div className="space-y-3">
           {(block.data.questions || []).map((q, idx) => (
-            <div key={idx} className="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl border border-slate-200 dark:border-white/10 space-y-4 relative group/q">
+            <div key={idx} className="group relative bg-white dark:bg-white/5 p-3 rounded-xl border border-slate-200 dark:border-white/10 space-y-3 overflow-hidden">
+               {/* Delete Button - Top Left */}
                <button 
                  onClick={() => {
-                     const newQs = block.data.questions.filter((_, i) => i !== idx);
-                     onUpdate({ ...block.data, questions: newQs });
+                   const newQs = block.data.questions.filter((_, i) => i !== idx);
+                   onUpdate({ ...block.data, questions: newQs });
                  }}
-                 className="absolute top-4 right-4 p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover/q:opacity-100"
+                 className="absolute left-1 top-1 text-slate-300 hover:text-red-500 p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                 title="Hapus Misi"
                >
-                 <Trash2 className="w-4 h-4" />
+                 <Trash2 className="w-3.5 h-3.5" />
                </button>
                
-               <div className="grid md:grid-cols-2 gap-4">
+               <div className="grid md:grid-cols-2 gap-3 pl-6">
                   <div className="space-y-1">
-                     <label className="text-[10px] font-bold text-slate-400 px-1 italic">Clue (Petunjuk)</label>
+                     <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Clue (Petunjuk)</label>
                      <input 
                        type="text" 
                        placeholder="Contoh: Kata benda bermakna Buku..."
-                       className="w-full bg-white dark:bg-black/20 p-3 rounded-xl text-xs outline-none focus:ring-1 focus:ring-emerald-500 transition-all"
+                       className="w-full bg-slate-50 dark:bg-white/5 p-2 rounded-lg text-[11px] outline-none border border-transparent focus:border-emerald-500/50 transition-all"
                        value={q.clue || ''}
                        onChange={(e) => {
                           const newQs = [...block.data.questions];
@@ -78,15 +84,14 @@ const WordDetectiveEditor = ({ block, onUpdate }) => {
                      />
                   </div>
                   <div className="space-y-1">
-                     <label className="text-[10px] font-bold text-slate-400 px-1 italic">Jawaban (Satu Kata dari Teks)</label>
+                     <label className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Jawaban (Satu Kata)</label>
                      <input 
                        type="text" 
-                       placeholder="Kata yang harus dicari..."
+                       dir={isArabic(q.answer) ? 'rtl' : 'ltr'}
                        className={cn(
-                           "w-full bg-white dark:bg-black/20 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all text-emerald-600 font-bold",
+                           "w-full bg-slate-50 dark:bg-white/5 p-2 rounded-lg text-xs outline-none border border-transparent focus:border-emerald-500/50 transition-all text-emerald-600 font-bold pr-3",
                            isArabic(q.answer) && "arabic-content text-right font-black"
                        )}
-                       style={{ direction: isArabic(q.answer) ? 'rtl' : 'ltr' }}
                        value={q.answer || ''}
                        onChange={(e) => {
                           const newQs = [...block.data.questions];
@@ -98,25 +103,27 @@ const WordDetectiveEditor = ({ block, onUpdate }) => {
                </div>
             </div>
           ))}
-          <button 
-            onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), clue: '', answer: '' }] })}
-            className="w-full py-3 bg-white dark:bg-white/5 border-2 border-dashed border-emerald-200 dark:border-emerald-500/20 rounded-2xl text-xs font-black uppercase tracking-widest text-emerald-500 hover:border-emerald-500 hover:text-emerald-500 transition-all"
-          >
-             + Tambah Misi Baru
-          </button>
-       </div>
-       
-       <div className="p-4 bg-teal-500/5 rounded-3xl border border-teal-500/10 flex items-start gap-4">
-          <div className="w-10 h-10 bg-teal-500 rounded-2xl flex items-center justify-center text-white shrink-0">
-             <Search className="w-5 h-5" />
-          </div>
-          <div>
-             <p className="text-xs font-bold text-teal-800 dark:text-teal-400 mb-1 line-clamp-1">Tips Detektif Kata</p>
-             <p className="text-[10px] text-teal-600/70 leading-relaxed font-medium">
-                Pastikan jawaban <strong>sama persis</strong> dengan satu kata yang ada di dalam teks bacaan (termasuk harakatnya jika ada). Permainan ini akan membagi teks berdasarkan spasi.
-             </p>
-          </div>
-       </div>
+        </div>
+
+        <button 
+          onClick={() => onUpdate({ ...block.data, questions: [...(block.data.questions || []), { id: Date.now(), clue: '', answer: '' }] })}
+          className="w-full py-2.5 bg-white dark:bg-white/5 border border-dashed border-emerald-200 dark:border-emerald-500/20 rounded-xl text-[10px] font-bold uppercase tracking-widest text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/5 transition-all flex items-center justify-center gap-2"
+        >
+          <Search className="w-3.5 h-3.5" /> Tambah Misi Baru
+        </button>
+      </div>
+      
+      <div className="p-3 bg-emerald-500/5 rounded-xl border border-emerald-500/10 flex items-start gap-3">
+        <div className="w-8 h-8 bg-emerald-500 rounded-lg flex items-center justify-center text-white shrink-0">
+          <Search className="w-4 h-4" />
+        </div>
+        <div>
+          <p className="text-[10px] font-bold text-emerald-800 dark:text-teal-400 mb-0.5 uppercase tracking-widest">Tips Detektif</p>
+          <p className="text-[9px] text-emerald-600/70 leading-relaxed font-medium">
+            Pastikan jawaban <strong>sama persis</strong> dengan satu kata yang ada di dalam teks bacaan (termasuk harakatnya).
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
