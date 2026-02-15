@@ -82,7 +82,9 @@ export const curriculumService = {
     },
 
     async syncCategoryItems(categoryId, items) {
-        console.log(`[curriculumService] syncCategoryItems called for ${categoryId} with ${items?.length || 0} items`);
+        if (import.meta.env.DEV) {
+            console.log(`[curriculumService] syncCategoryItems called for ${categoryId} with ${items?.length || 0} items`);
+        }
         return true;
     },
 

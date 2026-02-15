@@ -52,7 +52,7 @@ const UnjumbleGame = ({ data }) => {
      const audio = audioRefs.current[soundKey];
      if (audio) {
        audio.currentTime = 0;
-       audio.play().catch(e => console.log('Audio Blocked'));
+       audio.play().catch(() => {}); // Silent fail for blocked audio
      }
   }
 

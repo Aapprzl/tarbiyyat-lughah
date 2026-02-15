@@ -13,11 +13,29 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../providers/ThemeProvider';
 import { cn } from '../../utils/cn';
-import * as pdfjs from 'pdfjs-dist';
 
-// Configure PDF.js Worker
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
-pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+// Lazy load PDF.js - only when component is used
+let pdfjsLib = null;
+let pdfjsInitialized = false;
+
+const initializePdfjs = async () => {
+  if (pdfjsInitialized) return pdfjsLib;
+  
+  try {
+    // Dynamic import of pdfjs-dist
+    pdfjsLib = await import('pdfjs-dist');
+    
+    // Dynamic import of worker
+    const pdfWorkerModule = await import('pdfjs-dist/build/pdf.worker.mjs?url');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerModule.default;
+    
+    pdfjsInitialized = true;
+    return pdfjsLib;
+  } catch (error) {
+    console.error('Failed to initialize PDF.js:', error);
+    throw error;
+  }
+};
 
 // Helper: Convert base64 data URL to Blob URL
 const dataUrlToBlobUrl = (dataUrl) => {
@@ -49,6 +67,7 @@ const CanvasPdf = ({ url, containerHeight, isMobile, onBack }) => {
     const loadPdf = async () => {
       try {
         setLoading(true);
+        const pdfjs = await initializePdfjs();
         const loadingTask = pdfjs.getDocument(url);
         const pdf = await loadingTask.promise;
         setNumPages(pdf.numPages);
@@ -71,6 +90,7 @@ const CanvasPdf = ({ url, containerHeight, isMobile, onBack }) => {
           renderTaskRef.current.cancel();
         }
 
+        const pdfjs = await initializePdfjs();
         const loadingTask = pdfjs.getDocument(url);
         const pdf = await loadingTask.promise;
         const page = await pdf.getPage(currentPage);

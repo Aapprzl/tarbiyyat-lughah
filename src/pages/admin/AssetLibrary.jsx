@@ -231,7 +231,7 @@ const AssetLibrary = () => {
                                     )}>
                                         {formData.image ? (
                                             <div className="relative w-full h-full group">
-                                                <img src={formData.image} className="w-full h-full object-contain p-4" alt="Preview" />
+                                                <img src={formData.image} loading="lazy" className="w-full h-full object-contain p-4" alt="Preview" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                                     <label className="p-4 bg-white dark:bg-slate-800 rounded-2xl cursor-pointer hover:scale-110 transition-transform shadow-xl">
                                                         <Upload className="w-6 h-6 text-teal-600" />

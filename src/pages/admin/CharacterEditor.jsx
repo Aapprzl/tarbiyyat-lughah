@@ -176,7 +176,7 @@ const CharacterEditor = () => {
                                     <div className="relative group aspect-[3/4] bg-slate-50 dark:bg-black/20 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-3xl overflow-hidden transition-all hover:border-teal-500/40">
                                         {formData.image ? (
                                             <div className="relative w-full h-full group">
-                                                <img src={formData.image} className="w-full h-full object-contain p-4" alt="Preview" />
+                                                <img src={formData.image} loading="lazy" className="w-full h-full object-contain p-4" alt="Preview" />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                                     <label className="p-3 bg-white dark:bg-slate-800 rounded-2xl cursor-pointer hover:scale-110 transition-transform">
                                                         <Upload className="w-5 h-5 text-teal-600" />
@@ -267,7 +267,7 @@ const CharacterEditor = () => {
                     >
                         <div className="aspect-[3/4] bg-slate-50 dark:bg-black/10 relative overflow-hidden flex items-center justify-center p-6">
                             {char.image ? (
-                                <img src={char.image} alt={char.name} className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
+                                <img src={char.image} alt={char.name} loading="lazy" className="w-full h-full object-contain filter drop-shadow-lg group-hover:scale-105 transition-transform duration-500" />
                             ) : (
                                 <CircleUser className="w-20 h-20 text-slate-200 dark:text-slate-800" />
                             )}

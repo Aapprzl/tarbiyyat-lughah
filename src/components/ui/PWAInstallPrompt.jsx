@@ -38,7 +38,9 @@ const PWAInstallPrompt = () => {
         window.addEventListener('appinstalled', () => {
             setDeferredPrompt(null);
             setShowPrompt(false);
-            console.log('PWA was installed');
+            if (import.meta.env.DEV) {
+                console.log('PWA was installed');
+            }
         });
 
         return () => {
@@ -57,9 +59,13 @@ const PWAInstallPrompt = () => {
         const { outcome } = await deferredPrompt.userChoice;
         
         if (outcome === 'accepted') {
-            console.log('User accepted the install prompt');
+            if (import.meta.env.DEV) {
+                console.log('User accepted the install prompt');
+            }
         } else {
-            console.log('User dismissed the install prompt');
+            if (import.meta.env.DEV) {
+                console.log('User dismissed the install prompt');
+            }
         }
         
         // We've used the prompt, and can't use it again, throw it away
@@ -116,8 +122,8 @@ const PWAInstallPrompt = () => {
                                 </button>
                                 <button
                                     onClick={handleDismiss}
-                                    className="px-3 py-2.5 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 text-slate-400 rounded-xl transition-all"
-                                    title="Tutup"
+                                    aria-label="Tutup prompt install"
+                                    className="p-1 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full text-slate-400 dark:text-slate-500 transition-colors"
                                 >
                                     <X className="w-4 h-4" />
                                 </button>

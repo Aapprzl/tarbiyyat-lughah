@@ -11,7 +11,9 @@ const Analytics = () => {
   useEffect(() => {
     // Initialize GA4
     ReactGA.initialize(TRACKING_ID);
-    console.log('Google Analytics 4 Initialized');
+    if (import.meta.env.DEV) {
+      console.log('Google Analytics 4 Initialized');
+    }
   }, []);
 
   useEffect(() => {

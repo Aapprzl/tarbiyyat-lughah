@@ -83,6 +83,7 @@ const Header = ({ minimal = false }) => {
         {minimal && (
           <button 
             onClick={() => window.dispatchEvent(new CustomEvent('toggle-admin-sidebar'))}
+            aria-label="Buka menu navigasi"
             className="md:hidden w-11 h-11 bg-white text-teal-600 rounded-xl shadow-xl flex items-center justify-center active:scale-90 transition-all border border-teal-500/10"
           >
             <Menu className="w-6 h-6" />
@@ -94,7 +95,7 @@ const Header = ({ minimal = false }) => {
              {/* Dynamic Logo */}
              {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center shadow-sm border border-white/10 group-hover:scale-110 group-hover:bg-white/20 group-hover:border-teal-200/40 group-hover:shadow-[0_0_15px_rgba(45,212,191,0.3)] transition-all duration-300 p-1.5">
-                     <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-full h-full object-contain drop-shadow-sm" />
+                     <img src={siteConfig.siteLogoUrl} alt="Logo" loading="lazy" className="w-full h-full object-contain drop-shadow-sm" />
                  </div>
              ) : (
                  <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white shadow-inner border border-white/10 group-hover:bg-white/20 transition-all">
@@ -141,6 +142,7 @@ const Header = ({ minimal = false }) => {
             {/* Theme Toggle */}
             <button 
               onClick={toggleTheme}
+              aria-label={theme === 'light' ? "Aktifkan mode malam" : "Aktifkan mode terang"}
               className="p-3 rounded-2xl bg-white/10 border border-white/10 text-blue-100 hover:text-teal-200 hover:bg-white/20 transition-all active:scale-95 shadow-sm"
             >
               <AnimatePresence mode="wait">
@@ -156,7 +158,7 @@ const Header = ({ minimal = false }) => {
               </AnimatePresence>
             </button>
             
-            <button onClick={() => setShowSearch(true)} className="md:hidden p-3 rounded-2xl text-blue-100 hover:text-white bg-white/10 border border-white/10">
+            <button onClick={() => setShowSearch(true)} aria-label="Cari materi" className="md:hidden p-3 rounded-2xl text-blue-100 hover:text-white bg-white/10 border border-white/10">
               <Telescope className="w-5 h-5" />
             </button>
           </div>
@@ -185,6 +187,7 @@ const Header = ({ minimal = false }) => {
                      </div>
                      <button 
                         onClick={() => setShowSearch(false)}
+                        aria-label="Tutup pencarian"
                         className="w-12 h-12 flex items-center justify-center rounded-2xl bg-slate-200/50 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 transition-all"
                      >
                         <X className="w-6 h-6" />

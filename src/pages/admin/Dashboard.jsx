@@ -295,6 +295,7 @@ const AdminDashboard = () => {
                           </h2>
                           <button 
                             onClick={() => setShowSectionModal(false)} 
+                            aria-label="Tutup modal"
                             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                           >
                             <X className="w-5 h-5" />
@@ -547,6 +548,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                     </button>
                     <button 
                         onClick={(e) => { e.stopPropagation(); setIsOpen(!isOpen) }}
+                        aria-label={isOpen ? "Tutup detail materi" : "Lihat detail materi"}
                         className="p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                     >
                         {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
@@ -586,6 +588,7 @@ const DashboardSectionItem = ({ section, iconMap, onEdit, onDelete, onDeleteTopi
                                                 disabled={index === section.topics.length - 1}
                                                 className="p-0.5 text-slate-400 hover:text-teal-600 disabled:opacity-30 transition-colors"
                                                 title="Pindah ke Bawah"
+                                                aria-label="Pindah ke Bawah"
                                             >
                                                 <ArrowDown className="w-3.5 h-3.5" />
                                             </button>
@@ -676,6 +679,7 @@ const Modal = ({ title, children, onClose }) => {
                         <h2 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h2>
                         <button 
                             onClick={onClose} 
+                            aria-label="Tutup modal"
                             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                         >
                             <X className="w-5 h-5" />

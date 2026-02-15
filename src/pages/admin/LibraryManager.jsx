@@ -6,13 +6,30 @@ import { storageService } from '../../services/storageService';
 import { useToast } from '../../components/ui/Toast';
 import { useConfirm } from '../../components/ui/Toast';
 import { cn } from '../../utils/cn';
-import * as pdfjs from 'pdfjs-dist';
-
-// Use a more reliable worker source compatible with Vite and pdfjs-dist v5
-// This uses the local worker file from the package via Vite's URL import
 import { supabase } from '../../supabaseClient';
-import pdfWorker from 'pdfjs-dist/build/pdf.worker.mjs?url';
-pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+
+// Lazy load PDF.js - only when needed for thumbnail generation
+let pdfjsLib = null;
+let pdfjsInitialized = false;
+
+const initializePdfjs = async () => {
+  if (pdfjsInitialized) return pdfjsLib;
+  
+  try {
+    // Dynamic import of pdfjs-dist
+    pdfjsLib = await import('pdfjs-dist');
+    
+    // Dynamic import of worker
+    const pdfWorkerModule = await import('pdfjs-dist/build/pdf.worker.mjs?url');
+    pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerModule.default;
+    
+    pdfjsInitialized = true;
+    return pdfjsLib;
+  } catch (error) {
+    console.error('Failed to initialize PDF.js:', error);
+    throw error;
+  }
+};
 
 const LibraryManager = () => {
   const { success, error, warning } = useToast();
@@ -102,10 +119,11 @@ const LibraryManager = () => {
   };
 
   const generateThumbnail = async (file) => {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async () => {
         try {
+          const pdfjs = await initializePdfjs();
           const typedarray = new Uint8Array(reader.result);
           const loadingTask = pdfjs.getDocument({ data: typedarray });
           const pdf = await loadingTask.promise;
@@ -472,7 +490,7 @@ const LibraryManager = () => {
                 >
                   <div className="flex items-start gap-4 mb-6">
                     <div className="w-24 h-32 rounded-lg overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
-                      <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
+                      <img src={book.coverUrl} alt={book.titleId} loading="lazy" className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">

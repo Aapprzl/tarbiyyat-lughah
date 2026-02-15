@@ -18,7 +18,7 @@ import {
     Highlighter,
     Baseline
 } from 'lucide-react';
-import { wrapArabicText } from '../../utils/textUtils';
+import { wrapArabicText } from '../../../../utils/textUtils';
 import DOMPurify from 'dompurify';
 
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {

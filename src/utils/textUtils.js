@@ -3,8 +3,17 @@
  * for proper font application.
  */
 
+import DOMPurify from 'dompurify';
+
 export const wrapArabicText = (html) => {
   if (!html || typeof html !== 'string') return html;
+
+  // SECURITY: Sanitize HTML input to prevent XSS attacks
+  const sanitizedHtml = DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'code', 'pre', 'span', 'div'],
+    ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'id'],
+    ALLOW_DATA_ATTR: false
+  });
 
   // Regex to match Arabic characters including extended ranges, harakat, etc.
   // This range covers most Arabic, Persian, Urdu scripts.
@@ -12,7 +21,7 @@ export const wrapArabicText = (html) => {
 
   // We need to parse the HTML to avoid wrapping text inside tags or attributes
   const parser = new DOMParser();
-  const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+  const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
   const container = doc.body.firstChild;
 
   const processNode = (node) => {

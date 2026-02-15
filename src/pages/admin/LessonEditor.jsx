@@ -467,7 +467,9 @@ const LessonEditor = () => {
     const toDelete = initialUrls.filter(url => !finalUrls.includes(url));
     
     if (toDelete.length > 0) {
-        console.log(`[GC] Found ${toDelete.length} orphaned files. Cleaning up...`);
+        if (import.meta.env.DEV) {
+            console.log(`[GC] Found ${toDelete.length} orphaned files. Cleaning up...`);
+        }
         // Run in background so we don't block UI excessively, or await if critical.
         // Awaiting is safer to ensure it completes before user leaves.
         try {

@@ -11,6 +11,9 @@ import { supabase } from '../supabaseClient';
  * - site_config (global configuration)
  * - game_categories (game specific categories)
  * - blocks_game (game specific blocks, linked to categories)
+ * 
+ * NOTE: This is an internal service (Data Access Layer). 
+ * Components should use `contentService.js` (Facade) instead of using this directly.
  */
 
 // ============================================

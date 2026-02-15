@@ -298,7 +298,7 @@ const HomeEditor = () => {
                                         </label>
                                     ) : (
                                         <div className="p-10 bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] border-2 border-slate-100 dark:border-slate-700 flex flex-col items-center gap-6">
-                                            <img src={config.siteLogoUrl} alt="Logo" className="h-20 object-contain drop-shadow-xl" />
+                                            <img src={config.siteLogoUrl} alt="Logo" loading="lazy" className="h-20 object-contain drop-shadow-xl" />
                                             <button 
                                                 type="button" onClick={() => setConfig({...config, siteLogoUrl: ''})}
                                                 className="flex items-center gap-2 px-6 py-2 bg-red-500/10 text-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-500/20"

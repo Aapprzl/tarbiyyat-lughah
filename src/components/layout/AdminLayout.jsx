@@ -119,7 +119,7 @@ const AdminLayout = () => {
              {/* Dynamic Logo */}
              {siteConfig.siteLogoType === 'image' && siteConfig.siteLogoUrl ? (
                  <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center shadow-sm border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5">
-                     <img src={siteConfig.siteLogoUrl} alt="Logo" className="w-full h-full object-contain" />
+                     <img src={siteConfig.siteLogoUrl} alt="Logo" loading="lazy" className="w-full h-full object-contain" />
                  </div>
              ) : (
                 <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-indigo-600 rounded-lg flex items-center justify-center">

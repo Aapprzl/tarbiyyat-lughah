@@ -206,7 +206,7 @@ const Library = () => {
                   
                   {/* Cover */}
                   <div className="absolute inset-0 rounded-lg overflow-hidden border border-slate-200 dark:border-white/20 bg-slate-100 dark:bg-slate-800 shadow-2xl preserve-3d md:group-hover:rotate-y-[-20deg] transition-transform duration-700">
-                    <img src={book.coverUrl} alt={book.titleId} className="w-full h-full object-cover" />
+                    <img src={book.coverUrl} alt={book.titleId} loading="lazy" className="w-full h-full object-cover" />
                     {/* Glass Overlay on Cover */}
                     <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent pointer-events-none"></div>
                   </div>

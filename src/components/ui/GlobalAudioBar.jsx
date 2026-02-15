@@ -114,11 +114,11 @@ const GlobalAudioBar = () => {
                                 </button>
                                 
                                 <button 
-                                    onClick={stopAudio}
-                                    className="p-2 text-slate-400 hover:text-red-500 transition-all"
-                                    title="Close player"
-                                >
-                                    <X className="w-5 h-5" />
+                                onClick={stopAudio}
+                                aria-label="Tutup pemutar audio"
+                                className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-all ml-2"
+                            >
+                                <X className="w-5 h-5" />
                                 </button>
                             </div>
                         </div>

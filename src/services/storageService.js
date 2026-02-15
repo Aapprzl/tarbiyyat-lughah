@@ -87,7 +87,9 @@ export const storageService = {
                     console.error(`[Storage] Supabase error deleting ${fullPath}:`, error);
                     throw error;
                 }
-                console.log(`[Storage] Successfully deleted file: ${fullPath}`);
+                if (import.meta.env.DEV) {
+                    console.log(`[Storage] Successfully deleted file: ${fullPath}`);
+                }
             } else {
                 console.warn(`[Storage] Could not find bucket marker '/public/${BUCKET_NAME}/' in URL: ${url}`);
             }
@@ -112,7 +114,9 @@ export const storageService = {
             const uniqueUrls = [...new Set(matches)];
 
             if (uniqueUrls.length > 0) {
-                console.log(`[Storage] Cleaning up ${uniqueUrls.length} files from content...`);
+                if (import.meta.env.DEV) {
+                    console.log(`[Storage] Cleaning up ${uniqueUrls.length} files from content...`);
+                }
                 await Promise.allSettled(uniqueUrls.map(url => this.deleteFile(url)));
             }
         } catch (error) {

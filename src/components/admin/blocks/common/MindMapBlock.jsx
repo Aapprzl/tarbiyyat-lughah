@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, Trash2, ChevronDown, GitGraph, Type } from 'lucide-react';
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../../utils/cn';
 
 export const MindMapBlock = ({ data, onUpdate }) => {
     const nodes = data.nodes || [{ id: 'n1', text: 'Topik Utama', parentId: null, color: 'teal' }];
