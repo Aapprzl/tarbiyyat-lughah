@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-    Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
+    Trophy, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Heart, Crosshair, Target, CheckSquare, Sliders, Orbit, MoveRight, ShieldCheck, Diamond, Medal, Gamepad as GamepadIcon, Play, Puzzle, Youtube, Music, ClipboardList, Layers, GripVertical, HelpCircle, MoveLeft, Image as ImageIcon, Keyboard, Type, Table, FileText, RefreshCcw, BrainCircuit, Shuffle, StretchHorizontal, Vibrate, Headphones, CaseSensitive, BookOpen, ALargeSmall, Library,
     Search, Telescope, ChevronRight, Dices, Joystick, Swords, Crown, Ghost, Brain, Gem, Zap, Star, CloudRain, Mountain
 } from 'lucide-react';
 import { contentService } from '../services/contentService';
@@ -76,6 +76,51 @@ const getTypeInfo = (type) => {
 };
 
 // Fallback Icons
+
+const BackgroundIcons = () => {
+    const icons = [
+        { Icon: GamepadIcon, size: 80, x: '5%', y: '10%', delay: 0 },
+        { Icon: Trophy, size: 100, x: '85%', y: '15%', delay: 2 },
+        { Icon: Puzzle, size: 70, x: '15%', y: '45%', delay: 4 },
+        { Icon: Dices, size: 90, x: '75%', y: '50%', delay: 1 },
+        { Icon: Joystick, size: 110, x: '10%', y: '80%', delay: 3 },
+        { Icon: Swords, size: 85, x: '80%', y: '85%', delay: 5 },
+        { Icon: Crown, size: 75, x: '45%', y: '5%', delay: 2.5 },
+        { Icon: Ghost, size: 95, x: '55%', y: '90%', delay: 4.5 },
+        { Icon: Brain, size: 80, x: '35%', y: '55%', delay: 1.5 },
+        { Icon: Zap, size: 70, x: '65%', y: '30%', delay: 3.5 },
+        { Icon: Star, size: 60, x: '25%', y: '25%', delay: 0.5 },
+        { Icon: Gem, size: 65, x: '70%', y: '70%', delay: 2.2 },
+        { Icon: Rocket, size: 85, x: '90%', y: '40%', delay: 1.8 },
+        { Icon: Target, size: 75, x: '40%', y: '15%', delay: 3.2 },
+        { Icon: Medal, size: 80, x: '20%', y: '95%', delay: 0.8 },
+    ];
+
+    return (
+        <div className="absolute inset-x-0 top-0 h-full pointer-events-none overflow-hidden select-none z-[-1] opacity-50 dark:opacity-30">
+            {icons.map(({ Icon, size, x, y, delay }, i) => (
+                <motion.div
+                    key={i}
+                    className="absolute text-rose-600/20 dark:text-rose-400/10"
+                    style={{ left: x, top: y }}
+                    initial={{ y: 0, rotate: 0 }}
+                    animate={{ 
+                        y: [0, -40, 0],
+                        rotate: [0, 20, -20, 0],
+                    }}
+                    transition={{
+                        duration: 15 + Math.random() * 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: delay
+                    }}
+                >
+                    <Icon size={size} strokeWidth={1.5} />
+                </motion.div>
+            ))}
+        </div>
+    );
+};
 
 const GameIndex = () => {
   const [categories, setCategories] = useState([]);
@@ -156,9 +201,11 @@ const GameIndex = () => {
   };
 
   return (
-    <div 
-      className="container mx-auto px-6 py-12 max-w-7xl pb-40"
-    >
+    <div className="relative min-h-screen overflow-hidden">
+        <BackgroundIcons />
+        <div 
+          className="container mx-auto px-6 py-12 max-w-7xl pb-40 relative z-10"
+        >
         
 
         <div className="space-y-24">
@@ -300,6 +347,7 @@ const GameIndex = () => {
                <p className="text-slate-500 font-medium">Instruktur sedang menyiapkan tantangan baru untukmu.</p>
             </motion.div>
         )}
+      </div>
     </div>
   );
 };

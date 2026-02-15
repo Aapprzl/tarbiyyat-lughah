@@ -3,7 +3,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import {
   Telescope, Library, Award, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone,
   CheckCircle2, Lock, ChevronRight, Search, Play, Trophy, Puzzle, Dices, Joystick, Swords, Crown,
-  Ghost, Brain, Heart, Gem, Medal, Zap, Star, Gamepad as GamepadIcon, Crosshair, BookOpen, MoveRight
+  Ghost, Brain, Heart, Gem, Medal, Zap, Star, Gamepad as GamepadIcon, Crosshair, BookOpen, MoveRight,
+  GraduationCap, Languages, Pencil, Globe, Compass, Sparkles, Music, School
 } from 'lucide-react';
 import { contentService } from '../services/contentService';
 import { motion } from 'framer-motion';
@@ -127,13 +128,16 @@ useRealtimeCurriculum(handleRealtimeUpdate);
   };
 
   return (
-    <motion.div 
-      key={(sections || []).map(s => s.id + '-' + (s.topics?.length || 0)).join('|')}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="container mx-auto px-4 py-12 max-w-7xl space-y-20 pb-32"
-    >
+    <div className="relative min-h-screen overflow-hidden">
+        <motion.div 
+          key={(sections || []).map(s => s.id + '-' + (s.topics?.length || 0)).join('|')}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="container mx-auto px-4 py-12 max-w-7xl space-y-20 pb-32 relative z-10"
+        >
+          {/* Silent Background Icons - Now inside the relative container for better stacking */}
+          <BackgroundIcons />
       {/* Search Results Empty State */}
       {searchQuery && sections.length === 0 && (
         <motion.div variants={itemVariants} className="p-20 text-center bg-slate-100 dark:bg-slate-800 rounded-[3rem] border border-dashed border-slate-300 dark:border-slate-700">
@@ -228,7 +232,54 @@ useRealtimeCurriculum(handleRealtimeUpdate);
         </motion.div>
       )}
     </motion.div>
+    </div>
   );
+};
+
+// Decorative Floating Icons for Background
+const BackgroundIcons = () => {
+    const icons = [
+        { Icon: Library, size: 80, x: '5%', y: '10%', delay: 0 },
+        { Icon: GraduationCap, size: 120, x: '85%', y: '15%', delay: 2 },
+        { Icon: BookOpen, size: 70, x: '15%', y: '45%', delay: 1 },
+        { Icon: Languages, size: 90, x: '75%', y: '40%', delay: 3 },
+        { Icon: Pencil, size: 60, x: '10%', y: '80%', delay: 1.5 },
+        { Icon: Brain, size: 100, x: '80%', y: '85%', delay: 2.5 },
+        { Icon: Globe, size: 90, x: '40%', y: '5%', delay: 4 },
+        { Icon: Compass, size: 80, x: '60%', y: '95%', delay: 0.5 },
+        { Icon: Sparkles, size: 60, x: '90%', y: '60%', delay: 1.2 },
+        { Icon: Music, size: 70, x: '5%', y: '60%', delay: 3.5 },
+        { Icon: School, size: 110, x: '35%', y: '90%', delay: 2.2 },
+        { Icon: Medal, size: 80, x: '95%', y: '35%', delay: 0.8 },
+        { Icon: Zap, size: 60, x: '25%', y: '20%', delay: 5 },
+        { Icon: Puzzle, size: 90, x: '55%', y: '25%', delay: 1.7 },
+        { Icon: Trophy, size: 70, x: '45%', y: '70%', delay: 4.2 },
+    ];
+
+    return (
+        <div className="absolute inset-x-0 top-0 h-full pointer-events-none overflow-hidden select-none z-[-1] opacity-50 dark:opacity-30">
+            {icons.map(({ Icon, size, x, y, delay }, i) => (
+                <motion.div
+                    key={i}
+                    className="absolute text-teal-600/20 dark:text-teal-400/10"
+                    style={{ left: x, top: y }}
+                    initial={{ y: 0, rotate: 0 }}
+                    animate={{ 
+                        y: [0, -40, 0],
+                        rotate: [0, 20, -20, 0],
+                    }}
+                    transition={{
+                        duration: 15 + Math.random() * 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: delay
+                    }}
+                >
+                    <Icon size={size} strokeWidth={1.5} />
+                </motion.div>
+            ))}
+        </div>
+    );
 };
 
 // Story Card Component

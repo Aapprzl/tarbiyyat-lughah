@@ -11,6 +11,7 @@ import { useRealtimeCurriculum } from "../hooks/useRealtimeCurriculum";
 import {
   MoveLeft,
   Library,
+  BookOpen,
   AlertCircle,
   Edit,
   Youtube,
@@ -59,7 +60,54 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize,
+  GraduationCap, Languages, Pencil, Globe, Compass, Sparkles, School, Brain, Medal
 } from "lucide-react";
+
+// Decorative Floating Icons for Background
+const BackgroundIcons = () => {
+    const icons = [
+        { Icon: Library, size: 80, x: '5%', y: '10%', delay: 0 },
+        { Icon: GraduationCap, size: 120, x: '85%', y: '15%', delay: 2 },
+        { Icon: BookOpen, size: 70, x: '15%', y: '45%', delay: 1 },
+        { Icon: Languages, size: 90, x: '75%', y: '40%', delay: 3 },
+        { Icon: Pencil, size: 60, x: '10%', y: '80%', delay: 1.5 },
+        { Icon: Brain, size: 100, x: '80%', y: '85%', delay: 2.5 },
+        { Icon: Globe, size: 90, x: '40%', y: '5%', delay: 4 },
+        { Icon: Compass, size: 80, x: '60%', y: '95%', delay: 0.5 },
+        { Icon: Sparkles, size: 60, x: '90%', y: '60%', delay: 1.2 },
+        { Icon: Music, size: 70, x: '5%', y: '60%', delay: 3.5 },
+        { Icon: School, size: 110, x: '35%', y: '90%', delay: 2.2 },
+        { Icon: Medal, size: 80, x: '95%', y: '35%', delay: 0.8 },
+        { Icon: Zap, size: 60, x: '25%', y: '20%', delay: 5 },
+        { Icon: Puzzle, size: 90, x: '55%', y: '25%', delay: 1.7 },
+        { Icon: Trophy, size: 70, x: '45%', y: '70%', delay: 4.2 },
+    ];
+
+    return (
+        <div className="absolute inset-x-0 top-0 h-full pointer-events-none overflow-hidden select-none z-[-1] opacity-60 dark:opacity-30">
+            {icons.map(({ Icon, size, x, y, delay }, i) => (
+                <motion.div
+                    key={i}
+                    className="absolute text-teal-600/20 dark:text-teal-400/10"
+                    style={{ left: x, top: y }}
+                    initial={{ y: 0, rotate: 0 }}
+                    animate={{ 
+                        y: [0, -40, 0],
+                        rotate: [0, 20, -20, 0],
+                    }}
+                    transition={{
+                        duration: 15 + Math.random() * 10,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: delay
+                    }}
+                >
+                    <Icon size={size} strokeWidth={1.5} />
+                </motion.div>
+            ))}
+        </div>
+    );
+};
 
 const iconMap = {
   BookOpen: Library, 
@@ -510,7 +558,9 @@ const MaterialDetailContent = () => {
 
   if (isLocked) {
     return (
-      <div className="container mx-auto px-4 py-24 max-w-4xl text-center">
+      <div className="relative min-h-screen overflow-hidden">
+        <BackgroundIcons />
+        <div className="container mx-auto px-4 py-12 max-w-5xl pb-40 relative z-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -552,6 +602,7 @@ const MaterialDetailContent = () => {
             </button>
           </div>
         </motion.div>
+        </div>
       </div>
     );
   }
@@ -577,29 +628,32 @@ const MaterialDetailContent = () => {
 
     if (foundItem) {
       return (
-        <div className="min-h-screen pb-20">
-          {/* Compact Header for Focus Mode */}
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 dark:border-white/5 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(isGame ? "/permainan" : -1)}
-                className="w-10 h-10 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
-              >
-                <MoveLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  {foundItem.data?.title || foundItem.title || "Fokus Materi"}
-                </h3>
-                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                  {topic?.title}
-                </p>
+        <div className="relative min-h-screen overflow-hidden">
+          <BackgroundIcons />
+          <div className="relative z-10 min-h-screen pb-20">
+            {/* Compact Header for Focus Mode */}
+            <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-200 dark:border-white/5 px-4 md:px-8 py-3 md:py-4 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate(isGame ? "/permainan" : -1)}
+                  className="w-10 h-10 bg-slate-100 dark:bg-white/10 rounded-full flex items-center justify-center text-slate-500 hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
+                >
+                  <MoveLeft className="w-5 h-5" />
+                </button>
+                <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                    {foundItem.data?.title || foundItem.title || "Fokus Materi"}
+                  </h3>
+                  <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                    {topic?.title}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12 animate-in fade-in zoom-in-95 duration-500">
-            <ContentBlock block={foundItem} />
+            <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12 animate-in fade-in zoom-in-95 duration-500">
+              <ContentBlock block={foundItem} />
+            </div>
           </div>
         </div>
       );
@@ -607,7 +661,9 @@ const MaterialDetailContent = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-5xl pb-40">
+    <div className="relative min-h-screen overflow-hidden">
+        <BackgroundIcons />
+        <div className="container mx-auto px-4 py-12 max-w-5xl pb-40 relative z-10">
       {/* Navigation & Header */}
       <div className="relative mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
         {/* Breadcrumb */}
@@ -848,6 +904,7 @@ const MaterialDetailContent = () => {
           <ReactMarkdown>{content}</ReactMarkdown>
         </article>
       )}
+      </div>
     </div>
   );
 };
