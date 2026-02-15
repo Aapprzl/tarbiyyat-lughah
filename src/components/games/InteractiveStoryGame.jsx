@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ChevronRight, 
   RefreshCcw, 
@@ -39,9 +39,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
 
     // Ensure index is always valid and reset if scene changes
     // We do this calculation during render to avoid useEffect state updates
-    const safeBubbleIndex = currentSceneKey !== history[history.length - 1] 
-        ? 0 
-        : Math.min(currentBubbleIndex, currentBubbles.length - 1);
+    const safeBubbleIndex = Math.min(currentBubbleIndex, currentBubbles.length - 1);
         
     const currentBubble = currentBubbles[safeBubbleIndex] || { text: '...', character: null };
     const isLastBubble = safeBubbleIndex === currentBubbles.length - 1;
@@ -160,7 +158,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
     const backgroundLayer = useMemo(() => (
         <div className="absolute inset-0 z-0 overflow-hidden">
             <AnimatePresence>
-                <Motion.div 
+                <motion.div 
                     key={currentSceneKey + "_bg"}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -177,7 +175,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                     ) : (
                         <div className="w-full h-full bg-gradient-to-b from-slate-100 to-white dark:from-slate-800 dark:to-slate-950" />
                     )}
-                </Motion.div>
+                </motion.div>
             </AnimatePresence>
         </div>
     ), [currentSceneKey, currentScene.background]);
@@ -186,7 +184,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
         <div className="flex-1 relative z-10 flex items-end justify-center pointer-events-none min-h-0 overflow-hidden">
             <AnimatePresence mode="wait">
                 {currentBubble.character && (
-                    <Motion.div 
+                    <motion.div 
                         key={currentBubble.character.image}
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -199,7 +197,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                             className="max-h-full object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.3)] dark:drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
                             alt={currentBubble.character.name}
                         />
-                                </Motion.div>
+                                </motion.div>
                 )}
             </AnimatePresence>
         </div>
@@ -240,14 +238,14 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                 {/* Scene Loading Overlay */}
                 <AnimatePresence>
                     {isSceneLoading && (
-                        <Motion.div 
+                        <motion.div 
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             className="absolute inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center"
                         >
                             <div className="w-8 h-8 border-3 border-white/20 border-t-white rounded-full animate-spin" />
-                                    </Motion.div>
+                                    </motion.div>
                     )}
                 </AnimatePresence>
                 
@@ -292,7 +290,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                     <div className="max-w-3xl mx-auto space-y-4 md:space-y-6">
                         
                         {/* Dialogue Box */}
-                        <Motion.div 
+                        <motion.div 
                             key={currentSceneKey + "_bubble_" + safeBubbleIndex}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -304,7 +302,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                             {/* Character Name Badge */}
                             <AnimatePresence mode="wait">
                                 {currentBubble.character && (
-                                    <Motion.div 
+                                    <motion.div 
                                         key={currentBubble.character.name}
                                         initial={{ opacity: 0, x: -10 }}
                                         animate={{ opacity: 1, x: 0 }}
@@ -314,7 +312,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                     >
                                         <User className="w-3 h-3" />
                                         {currentBubble.character.name}
-                                                </Motion.div>
+                                                </motion.div>
                                 )}
                             </AnimatePresence>
 
@@ -324,7 +322,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                 style={{ fontFamily: 'var(--font-latin), var(--font-arabic), sans-serif' }}
                             >
                                 <div className="min-h-[60px] md:min-h-[80px]">
-                                        <Motion.div 
+                                        <motion.div 
                                             key={currentSceneKey + "_bubble_" + safeBubbleIndex + "_segments"}
                                             initial="hidden"
                                             animate="visible"
@@ -338,7 +336,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                             className="space-y-4"
                                         >
                                             {textSegments.map((segment, idx) => (
-                                                <Motion.div
+                                                <motion.div
                                                     key={idx}
                                                     variants={{
                                                         hidden: { opacity: 0, y: 10, filter: 'blur(10px)' },
@@ -352,7 +350,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                     dangerouslySetInnerHTML={{ __html: wrapArabicText(segment) }}
                                                 />
                                             ))}
-                                                    </Motion.div>
+                                                    </motion.div>
                                 </div>
                             </div>
 
@@ -382,7 +380,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                 {/* Internal Bubble Options (Jump within same scene) */}
                                 <AnimatePresence mode="wait">
                                     {!isTyping && currentBubble.options && currentBubble.options.length > 0 && (
-                                        <Motion.div 
+                                        <motion.div 
                                             key={`internal_opts_${safeBubbleIndex}`}
                                             initial="hidden"
                                             animate="visible"
@@ -427,17 +425,17 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                     <ChevronRight className="w-3 h-3 text-teal-500 group-hover:translate-x-1 transition-transform" />
                                                 </motion.button>
                                             ))}
-                                                    </Motion.div>
+                                                    </motion.div>
                                     )}
                                 </AnimatePresence>
                             </div>
-                                    </Motion.div>
+                                    </motion.div>
 
                         {/* Options Layer (Scene Navigation) */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 pb-4">
                             <AnimatePresence mode="popLayout">
                                 {!isTyping && isLastBubble && (!currentBubble.options || currentBubble.options.length === 0) && currentScene.options && (
-                                    <Motion.div 
+                                    <motion.div 
                                         key={currentSceneKey + "_opts_container"}
                                         initial="hidden"
                                         animate="visible"
@@ -480,7 +478,7 @@ const InteractiveStoryGame = ({ data = {}, title }) => {
                                                 <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-teal-500 group-hover:translate-x-1 transition-all shrink-0" />
                                             </motion.button>
                                         ))}
-                                                </Motion.div>
+                                                </motion.div>
                                 )}
                             </AnimatePresence>
                         </div>
