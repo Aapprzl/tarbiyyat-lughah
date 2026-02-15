@@ -32,7 +32,7 @@ export default defineConfig({
             src: 'tarbiyyat-lughah.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'any maskable'
+            purpose: 'any'
           }
         ]
       }
