@@ -2,25 +2,45 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { createPortal } from 'react-dom';
 import { contentService } from '../../services/contentService';
-import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Pocket, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Search, Lock, Unlock, X, Gamepad as GamepadIcon, ArrowUp, ArrowDown } from 'lucide-react';
+import { Edit2, Plus, Library, Package, LineChart, Link2, Award, Rocket, Bookmark, LayoutGrid, Milestone, Heart, Trash2, ChevronDown, ChevronUp, Search, Lock, Unlock, X, Gamepad as GamepadIcon, ArrowUp, ArrowDown, Trophy, Zap, Target, Crosshair, HelpCircle, GraduationCap, Mic2, Languages, PenTool, Users, Globe, Compass, Brain, Sparkles, Flame, Crown, School, Puzzle, Coffee, Music, Video, Image, FileText } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { isArabic } from '../../utils/textUtils';
 
 const iconMap = {
+  // Existing/Standard
   BookOpen: Library, 
   Box: Package, 
   Activity: LineChart, 
   Hash: Link2, 
-  Star: Award, 
+  Award: Award, 
   Zap: Rocket, 
-  Bookmark: Pocket, 
+  Bookmark: Bookmark, 
   Layout: LayoutGrid, 
   Flag: Milestone, 
-  Smile: Heart,
-  PlayCircle: GamepadIcon,
-  Play: GamepadIcon
+  Heart: Heart,
+  Trophy: Trophy,
+  Gamepad: GamepadIcon,
+  // New Additions
+  Graduation: GraduationCap,
+  Mic: Mic2,
+  Languages: Languages,
+  Pen: PenTool,
+  Users: Users,
+  Globe: Globe,
+  Compass: Compass,
+  Brain: Brain,
+  Sparkles: Sparkles,
+  Flame: Flame,
+  Crown: Crown,
+  School: School,
+  Puzzle: Puzzle,
+  Coffee: Coffee,
+  Music: Music,
+  Video: Video,
+  Image: Image,
+  File: FileText
 };
 
 // isArabic is now imported from '../../utils/textUtils'
@@ -296,84 +316,87 @@ const AdminDashboard = () => {
                           <button 
                             onClick={() => setShowSectionModal(false)} 
                             aria-label="Tutup modal"
-                            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
                           >
                             <X className="w-5 h-5" />
                           </button>
                         </div>
                         
-                        <form onSubmit={handleSaveSection} className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="md:col-span-2 space-y-4">
+                        <form onSubmit={handleSaveSection} className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                                <div className="md:col-span-8 space-y-5">
                                    <div>
-                                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Nama Kategori</label>
+                                      <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Nama Kategori</label>
                                       <input 
                                         type="text" 
                                         value={newSectionTitle}
                                         onChange={(e) => setNewSectionTitle(e.target.value)}
                                         className={cn(
-                                          "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all",
-                                          isArabic(newSectionTitle) && "font-arabic text-lg dir-rtl !text-left py-1"
+                                          "w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium focus:border-teal-500 focus:ring-0 outline-none transition-all",
+                                          isArabic(newSectionTitle) && "font-arabic text-xl dir-rtl !text-left py-2"
                                         )}
-                                        placeholder="Contoh: Shorof Dasar"
+                                        placeholder="Contoh: PERTEMUAN 1"
                                         autoFocus
                                         required
                                       />
                                    </div>
-
+                                   
                                    <div>
-                                      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Deskripsi</label>
+                                      <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Deskripsi</label>
                                       <textarea 
                                         value={newSectionDesc}
                                         onChange={(e) => setNewSectionDesc(e.target.value)}
                                         className={cn(
-                                          "w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none h-24 resize-none transition-all",
-                                          isArabic(newSectionDesc) && "font-arabic text-base dir-rtl !text-left py-1"
+                                          "w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-700 rounded-xl px-4 py-3 text-sm font-medium focus:border-teal-500 focus:ring-0 outline-none h-32 resize-none transition-all",
+                                          isArabic(newSectionDesc) && "font-arabic text-lg dir-rtl !text-left py-2"
                                         )}
                                         placeholder="Deskripsi singkat tentang kategori ini..."
                                       />
                                    </div>
                                 </div>
   
-                                <div>
-                                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Pilih Ikon</label>
-                                  <div className="grid grid-cols-4 gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 max-h-64 overflow-y-auto">
-                                     {Object.keys(iconMap).map(iconName => {
-                                        const IconComp = iconMap[iconName];
-                                        const isSelected = selectedIcon === iconName;
-                                        return (
-                                           <button
-                                              key={iconName}
-                                              type="button"
-                                              onClick={() => setSelectedIcon(iconName)}
-                                              className={cn(
-                                                  "aspect-square rounded-lg flex items-center justify-center transition-colors",
-                                                  isSelected 
-                                                    ? "bg-teal-600 text-white" 
-                                                    : "bg-white dark:bg-slate-800 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                              )}
-                                           >
-                                              <IconComp className="w-5 h-5" />
-                                           </button>
-                                        );
-                                     })}
+                                <div className="md:col-span-4">
+                                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Pilih Ikon</label>
+                                  <div className="bg-slate-50/50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-700">
+                                    <div className="grid grid-cols-4 gap-3 max-h-[280px] overflow-y-auto pr-2 custom-scrollbar">
+                                      {Object.keys(iconMap).map(iconName => {
+                                          const IconComp = iconMap[iconName];
+                                          const isSelected = selectedIcon === iconName;
+                                          return (
+                                            <button
+                                                key={iconName}
+                                                type="button"
+                                                onClick={() => setSelectedIcon(iconName)}
+                                                className={cn(
+                                                    "aspect-square rounded-xl flex items-center justify-center transition-all duration-200 shadow-sm",
+                                                    isSelected 
+                                                      ? "bg-teal-600 text-white scale-110 shadow-teal-500/20" 
+                                                      : "bg-white dark:bg-slate-800 text-slate-400 hover:text-teal-500 hover:bg-slate-50 dark:hover:bg-slate-700"
+                                                )}
+                                                title={iconName}
+                                            >
+                                                <IconComp className="w-5 h-5" />
+                                            </button>
+                                          );
+                                      })}
+                                    </div>
                                   </div>
                                 </div>
                             </div>
   
-                            <div className="flex gap-2 pt-2">
-                              <button 
-                                type="submit" 
-                                className="flex-1 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
-                              >
-                                {editingSectionId ? 'Simpan Perubahan' : 'Buat Kategori'}
-                              </button>
+                            <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
                               <button 
                                 type="button" 
                                 onClick={() => setShowSectionModal(false)}
-                                className="px-4 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-sm font-medium"
+                                className="px-6 py-2.5 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors text-sm font-bold"
                               >
                                 Batal
+                              </button>
+                              <button 
+                                type="submit" 
+                                className="px-8 py-2.5 bg-teal-600 text-white rounded-xl hover:bg-teal-700 active:scale-95 transition-all text-sm font-bold shadow-lg shadow-teal-500/20"
+                              >
+                                {editingSectionId ? 'Simpan Perubahan' : 'Buat Kategori'}
                               </button>
                             </div>
                         </form>

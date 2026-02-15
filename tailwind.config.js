@@ -15,12 +15,11 @@ export default {
       },
       colors: {
         slate: {
-          950: '#0b1215', // Darker Depth
-          900: '#131f24', // Main Background (Midnight)
-          800: '#202f36', // Card Background (Light Midnight)
+          950: '#1a2226', // Softer Depth (was #0b1215)
+          900: '#253036', // Softer Midnight (was #131f24)
+          800: '#33414a', // Softer Mid-slate (was #202f36)
           700: '#37464f', // Border/Interactive
           600: '#506575', // Muted Text
-          // Lower values will fallback to default Slate or can be added if needed
         },
       },
       animation: {

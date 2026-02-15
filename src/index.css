@@ -17,7 +17,7 @@
   --color-bg-surface: #ffffff; /* New: Generic Surface */
 
   /* Typography */
-  --color-text-main: #1f2937;
+  --color-text-main: #334155; /* Slate-700 (Softer than #1f2937) */
   --color-text-muted: #6b7280;
   --color-text-light: #e5e7eb; /* For sidebar */
   --color-text-highlight: #0f766e; /* Teal-700 */
