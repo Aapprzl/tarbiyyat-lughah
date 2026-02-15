@@ -1,13 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { contentService } from '../services/contentService';
-import { BookOpen, Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy, Home as HomeIcon, Star, Zap, Activity, Target, Gamepad2, Monitor, Hexagon, Smile } from 'lucide-react';
+import { BookOpen, Library, Award, MoveRight, ShieldCheck, X, Diamond, Orbit, Cpu, Rocket, Gamepad as GamepadIcon, Shield, Trophy, Home as HomeIcon, Star, Zap, Activity, Target, Gamepad2, Monitor, Hexagon, Smile, Sparkles, Crown, ArrowRight } from 'lucide-react';
 import { PdfViewer } from '../components/media/PdfViewer';
 import { VisionSection } from '../components/features/VisionSection';
 import { AuroraBackground } from '../components/animations/AuroraBackground';
-import { SplitText } from '../components/animations/SplitText';
-import { BentoGrid, BentoGridItem } from '../components/animations/BentoGrid';
-import { motion } from 'framer-motion';
+// import { BentoGrid, BentoGridItem } from '../components/animations/BentoGrid';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../utils/cn';
 import { useRealtimeCurriculum } from '../hooks/useRealtimeCurriculum';
 import { useCallback } from 'react';
@@ -58,7 +58,7 @@ const Home = () => {
   }, [loadData]);
 
   // Handle realtime updates with a stable callback
-  const handleRealtimeUpdate = useCallback((type, payload) => {
+  const handleRealtimeUpdate = useCallback((_type, _payload) => {
     const reloadPrograms = async () => {
       try {
         const progs = await contentService.getSpecialPrograms();
@@ -88,7 +88,7 @@ const Home = () => {
     <div className="relative overflow-x-hidden">
       {/* Hero Section - Immersive Aurora */}
       <AuroraBackground className="rounded-b-[3rem] shadow-2xl overflow-hidden mb-24 !justify-start pt-12 md:!justify-center md:pt-0">
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{
@@ -157,32 +157,32 @@ const Home = () => {
               </div>
             </Link>
  
-            <Link 
-              to="/permainan" 
-              className="group relative px-8 py-4 md:px-10 md:py-5 rounded-3xl font-bold transition-all shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 flex items-center justify-center w-full md:w-auto overflow-hidden bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-2 border-white/20 dark:border-white/10"
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              
-              <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center mr-3 relative z-10 shadow-lg shadow-rose-500/20 group-hover:bg-white transition-colors text-white group-hover:text-rose-500">
-                {React.createElement(
-                    { BookOpen, Library, Star, Zap, Activity, Target, Trophy, Gamepad2, Orbit, Monitor, Hexagon, Smile }[config.heroButton2Icon] || Trophy, 
-                    { className: "w-5 h-5 transition-colors" }
-                )}
-              </div>
-              
-              <div className="flex flex-col items-start relative z-10">
-                <span className="text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
-                  {config.heroButton2Text || 'ادخل ساحة الألعاب'}
-                </span>
-                {config.heroButton2TextLatin && (
-                  <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 group-hover:text-white/80 transition-colors -mt-1" style={{ fontFamily: 'var(--font-latin)' }}>
-                    {config.heroButton2TextLatin}
+              <Link 
+                to="/permainan" 
+                className="group relative px-8 py-4 md:px-10 md:py-5 rounded-3xl font-bold transition-all shadow-xl hover:shadow-rose-500/40 hover:scale-105 active:scale-95 flex items-center justify-center w-full md:w-auto overflow-hidden bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-2 border-white/20 dark:border-white/10"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-rose-500 via-pink-500 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                
+                <div className="w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center mr-3 relative z-10 shadow-lg shadow-rose-500/20 group-hover:bg-white transition-colors text-white group-hover:text-rose-500">
+                  {React.createElement(
+                      { BookOpen, Library, Star, Zap, Activity, Target, Trophy, Gamepad2, Orbit, Monitor, Hexagon, Smile }[config.heroButton2Icon] || Trophy, 
+                      { className: "w-5 h-5 transition-colors" }
+                  )}
+                </div>
+                
+                <div className="flex flex-col items-start relative z-10">
+                  <span className="text-2xl text-slate-700 dark:text-slate-200 group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-arabic)' }}>
+                    {config.heroButton2Text || 'ادخل ساحة الألعاب'}
                   </span>
-                )}
-              </div>
-            </Link>
+                  {config.heroButton2TextLatin && (
+                    <span className="text-[10px] md:text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 group-hover:text-white/80 transition-colors -mt-1" style={{ fontFamily: 'var(--font-latin)' }}>
+                      {config.heroButton2TextLatin}
+                    </span>
+                  )}
+                </div>
+              </Link>
           </div>
-        </motion.div>
+        </Motion.div>
       </AuroraBackground>
 
       {/* Vision Section */}

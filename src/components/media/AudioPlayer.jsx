@@ -1,17 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { 
   Play, 
   Pause, 
-  RotateCcw, 
-  SkipForward, 
-  SkipBack, 
   Volume2, 
   VolumeX, 
-  Repeat, 
-  Repeat1,
   Music4
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
 import { useAudio } from '../providers/AudioProvider';
@@ -26,8 +21,6 @@ const AudioPlayer = ({ src, title = 'Audio Clip' }) => {
     playTrack, 
     togglePlay: globalTogglePlay,
     seek: globalSeek,
-    speed,
-    setSpeed, // Assuming I add this to provider or use local if specific
     volume,
     setVolume,
     isMuted,

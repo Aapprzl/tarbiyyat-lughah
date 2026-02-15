@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { contentService } from '../../services/contentService';
-import { Edit2, Award, Plus, Library, Package, LineChart, Link2, Rocket, Pocket, LayoutGrid, Milestone, Trash2, ChevronDown, ChevronUp, Crosshair, CheckSquare, Sliders, Orbit, X, Lock, Unlock, Gamepad as GamepadIcon, Trophy, Puzzle, Dices, Joystick, Swords, Crown, Ghost, Brain, Heart, Gem, Medal, Zap, Star, Shield } from 'lucide-react';
+import { Edit2, Award, Plus, Library, Package, Rocket, LayoutGrid, Trash2, ChevronDown, ChevronUp, Crosshair, X, Lock, Unlock, Gamepad as GamepadIcon, Trophy, Puzzle, Dices, Joystick, Swords, Crown, Ghost, Brain, Heart, Gem, Medal, Zap, Star, Shield } from 'lucide-react';
 import { useConfirm, useToast } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -50,7 +50,7 @@ const AdminPrograms = () => {
     try {
       const data = await contentService.getSpecialPrograms();
       setSpecialPrograms(data);
-    } catch (err) {
+    } catch {
       toast.error('Gagal memuat Program Khusus.');
     } finally {
       setLoading(false);
@@ -85,7 +85,7 @@ const AdminPrograms = () => {
       }
       await loadData();
       setShowCategoryModal(false);
-    } catch (err) {
+    } catch {
       toast.error('Gagal menyimpan kategori.');
     } finally {
       setLoading(false);
@@ -111,7 +111,7 @@ const AdminPrograms = () => {
         await contentService.deleteSpecialCategory(catId);
         await loadData();
         toast.success('Kategori dihapus.');
-      } catch (err) {
+      } catch {
         toast.error('Gagal menghapus kategori.');
       } finally {
         setLoading(false);
@@ -124,7 +124,7 @@ const AdminPrograms = () => {
         await contentService.updateSpecialCategory(category.id, { isLocked: !category.isLocked });
         await loadData();
         toast.success(`Kategori ${!category.isLocked ? 'dikunci' : 'dibuka'}!`);
-    } catch (err) {
+    } catch {
         toast.error('Gagal mengubah status kunci.');
     }
   };
@@ -141,7 +141,7 @@ const AdminPrograms = () => {
         setTopicTitle('');
         setSelectedCategoryId(null);
         toast.success('Topik baru ditambahkan!');
-    } catch (err) {
+    } catch {
         toast.error('Gagal menambahkan topik.');
     } finally {
         setLoading(false);
@@ -156,7 +156,7 @@ const AdminPrograms = () => {
             await contentService.deleteSpecialProgram(categoryId, topicId);
             await loadData();
             toast.success('Topik dihapus.');
-        } catch (err) {
+        } catch {
             toast.error('Gagal menghapus topik.');
         } finally {
             setLoading(false);
@@ -175,7 +175,7 @@ const AdminPrograms = () => {
         await contentService.updateTopicMetadata(topicId, { isLocked: !currentLocked });
         await loadData();
         toast.success(`Topik ${!currentLocked ? 'dikunci' : 'dibuka'}!`);
-    } catch (err) {
+    } catch {
         toast.error('Gagal mengubah status kunci.');
     } finally {
         setLoading(false);

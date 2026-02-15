@@ -118,7 +118,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                 exit={{ opacity: 0, scale: 0.95 }}
                                                 className="relative aspect-video bg-slate-100 dark:bg-black/20 rounded-xl overflow-hidden border border-slate-200 dark:border-white/5 shadow-sm"
                                             >
-                                                <img src={sData.background} loading="lazy" className="w-full h-full object-cover" />
+                                                <img src={sData.background} alt="Scene Background" loading="lazy" className="w-full h-full object-cover" />
                                                 <button 
                                                     onClick={() => {
                                                         const newScenes = { ...block.data.scenes };
@@ -318,7 +318,7 @@ export const InteractiveStoryBlock = ({ block, onUpdate }) => {
                                                     </div>
                                                     {bubble.character && (
                                                         <div className="flex items-center gap-2 p-2 bg-white dark:bg-slate-900/80 rounded-xl border border-slate-100 dark:border-white/5 shadow-sm">
-                                                            <img src={bubble.character.image} loading="lazy" className="w-8 h-8 object-contain shrink-0" />
+                                                            <img src={bubble.character.image} alt={bubble.character.name} loading="lazy" className="w-8 h-8 object-contain shrink-0" />
                                                             <div className="min-w-0">
                                                                 <p className="text-[8px] font-black text-teal-600 uppercase tracking-tighter truncate">{bubble.character.name}</p>
                                                             </div>

@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Home, LayoutGrid, BookOpen, Library, Trophy, CircleUser, ChevronDown } from 'lucide-react';
+import { Home, BookOpen, Library, Trophy, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
 
@@ -13,7 +13,6 @@ const BottomBar = () => {
     }
     return true;
   });
-  const navRef = useRef(null);
 
   useEffect(() => {
     // 1. Media Query Listener for Responsiveness
@@ -84,10 +83,10 @@ const BottomBar = () => {
   }, [pillPosition.x, pillPosition.y]);
 
   const handleDragEnd = (_, info) => {
-    const pillWidth = isDesktop ? 64 : 56;
-    const margin = 4; // Super tight margin (4px)
-    const initialRightOffset = 4; // Matches right-1
-    const availableWidth = window.innerWidth;
+    // const pillWidth = isDesktop ? 64 : 56;
+    // const margin = 4; // Super tight margin (4px)
+    // const initialRightOffset = 4; // Matches right-1
+    // const availableWidth = window.innerWidth;
     
     // Total offset from the initial position (right: 4px)
     // We force snappedX to 0 because the user wants it ONLY on the right side.

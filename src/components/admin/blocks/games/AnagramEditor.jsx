@@ -1,6 +1,4 @@
-import React from 'react';
 import { Trash2 } from 'lucide-react';
-import { cn } from '../../../../utils/cn';
 
 /**
  * Editor for Anagram game block

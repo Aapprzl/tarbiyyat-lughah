@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
-import { Save, LayoutGrid, Type, MousePointer, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, Diamond, ChevronRight, CircleCheckBig, Orbit, Monitor, Info, MapPin, Trophy, BookOpen, Gamepad2 } from 'lucide-react';
-import { useNavigate, useBlocker, useBeforeUnload } from 'react-router-dom';
+import { Save, LayoutGrid, Type, Image, Upload, Trash2, Target, Library, Award, Rocket, LineChart, Package, Medal, Hexagon, Layers, Heart, CircleCheckBig, Orbit, Monitor, Info, MapPin, Trophy, BookOpen, Gamepad2 } from 'lucide-react';
+import { useBlocker, useBeforeUnload } from 'react-router-dom';
 import { useToast, useConfirm } from '../../components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
@@ -92,7 +92,7 @@ const HomeEditor = () => {
         setInitialConfig(data);
         // Capture pristine state
         setPristineState(JSON.stringify(data));
-      } catch (err) {
+      } catch {
         toast.error("Gagal memuat konfigurasi beranda.");
       } finally {
         setLoading(false);

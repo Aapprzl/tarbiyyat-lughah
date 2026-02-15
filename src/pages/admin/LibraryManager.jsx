@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { Library, Plus, Trash2, FileText, Upload, X, Check, BookOpen, AlertCircle, Loader2 } from 'lucide-react';
 import { contentService } from '../../services/contentService';
 import { storageService } from '../../services/storageService';
@@ -74,7 +74,7 @@ const LibraryManager = () => {
 
           let newVal = payload.new.config_value;
           if (typeof newVal === 'string') {
-            try { newVal = JSON.parse(newVal); } catch (e) { /* ignore */ }
+            try { newVal = JSON.parse(newVal); } catch { /* ignore */ }
           }
 
           if (key === 'library_books') {
@@ -111,7 +111,7 @@ const LibraryManager = () => {
       if (config.categories?.length > 0 && !formData.category) {
         setFormData(prev => ({ ...prev, category: config.categories[0] }));
       }
-    } catch (err) {
+    } catch {
       error('Gagal memuat data perpustakaan');
     } finally {
       setLoading(false);
@@ -119,7 +119,7 @@ const LibraryManager = () => {
   };
 
   const generateThumbnail = async (file) => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onload = async () => {
         try {
@@ -223,7 +223,7 @@ const LibraryManager = () => {
         
         await contentService.deleteBook(book.id);
         success('Buku berhasil dihapus');
-      } catch (err) {
+      } catch {
         error('Gagal menghapus buku');
         loadData(); // Rollback on error
       }
@@ -244,7 +244,7 @@ const LibraryManager = () => {
       setCategories(updatedCategories); // Optimistic update
       setNewCategory('');
       success('Kategori berhasil ditambahkan');
-    } catch (err) {
+    } catch {
       error('Gagal menambahkan kategori');
     }
   };
@@ -264,7 +264,7 @@ const LibraryManager = () => {
         await contentService.saveLibraryConfig({ categories: updatedCategories });
         setCategories(updatedCategories); // Optimistic update
         success('Kategori berhasil dihapus');
-      } catch (err) {
+      } catch {
         error('Gagal menghapus kategori');
       }
     }
@@ -325,7 +325,7 @@ const LibraryManager = () => {
           <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto pr-2 custom-scrollbar">
             <AnimatePresence mode="popLayout">
               {categories.map(cat => (
-                <motion.div 
+                <Motion.div 
                   key={cat}
                   layout
                   initial={{ opacity: 0, scale: 0.8 }}
@@ -340,7 +340,7 @@ const LibraryManager = () => {
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
-                </motion.div>
+                </Motion.div>
               ))}
             </AnimatePresence>
             {categories.length === 0 && (
@@ -464,7 +464,7 @@ const LibraryManager = () => {
 
                   {uploading && (
                     <div className="w-full h-1 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                      <motion.div 
+                      <Motion.div 
                         className="h-full bg-teal-500"
                         initial={{ width: 0 }}
                         animate={{ width: `${progress}%` }}
@@ -480,7 +480,7 @@ const LibraryManager = () => {
           <div className="grid sm:grid-cols-2 gap-6 relative">
             <AnimatePresence mode="popLayout">
               {books.map((book) => (
-                <motion.div 
+                <Motion.div 
                   key={book.id}
                   layout
                   initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -519,7 +519,7 @@ const LibraryManager = () => {
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
-                </motion.div>
+                </Motion.div>
               ))}
             </AnimatePresence>
           </div>

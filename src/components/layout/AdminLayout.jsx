@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet, useNavigate, Link, NavLink } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Link, NavLink } from 'react-router-dom';
 import { contentService } from '../../services/contentService';
 import { useTheme } from '../providers/ThemeProvider';
-import { LayoutDashboard, Library, LogOut, LayoutGrid, Award, Info, ShieldCheck, Type, CircleUser, Home, Menu, Sun, Moon, Database, ChevronRight, Diamond, X, Trophy, Hash, Monitor, Layers } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LayoutDashboard, Library, LogOut, LayoutGrid, Type, CircleUser, Home, Menu, Sun, Moon, Layers, Trophy, Monitor, Diamond } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+
+// eslint-disable-next-line no-unused-vars
+const NavItem = ({ to, icon: IconComponent, label, target }) => (
+  <NavLink 
+    to={to} 
+    target={target}
+    className={({ isActive }) => cn(
+      "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
+      isActive 
+        ? "bg-teal-600 text-white" 
+        : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+    )}
+  >
+    <IconComponent className="w-5 h-5 flex-shrink-0" />
+    <span className="text-sm font-medium arabic-sidebar-content">{label}</span>
+  </NavLink>
+);
 
 const AdminLayout = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { theme, toggleTheme } = useTheme();
 
   const [loading, setLoading] = useState(true);
@@ -32,20 +50,6 @@ const AdminLayout = () => {
     return () => window.removeEventListener('toggle-admin-sidebar', handleToggle);
   }, []);
 
-  // Floating Toggle Button (Mobile only)
-  const FloatingToggle = () => (
-    <AnimatePresence>
-      {!isMobileMenuOpen && (
-        <button
-          onClick={() => setIsMobileMenuOpen(true)}
-          className="fixed bottom-6 right-6 z-[100] w-12 h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-full shadow-lg flex items-center justify-center md:hidden transition-colors"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
-      )}
-    </AnimatePresence>
-  );
-
   useEffect(() => {
     const unsubscribe = contentService.onAuthStateChange((user) => {
       if (!user) {
@@ -58,7 +62,7 @@ const AdminLayout = () => {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-  }, [navigate]);
+  }, [location.pathname]);
 
   const handleLogout = async () => {
     await contentService.logout();
@@ -76,20 +80,18 @@ const AdminLayout = () => {
     );
   }
 
-  const NavItem = ({ to, icon: Icon, label, target }) => (
-    <NavLink 
-      to={to} 
-      target={target}
-      className={({ isActive }) => cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg transition-colors",
-        isActive 
-          ? "bg-teal-600 text-white" 
-          : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-200"
+  // Floating Toggle Button (Mobile only)
+  const FloatingToggle = () => (
+    <AnimatePresence>
+      {!isMobileMenuOpen && (
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className="fixed bottom-6 right-6 z-[100] w-12 h-12 bg-teal-600 hover:bg-teal-700 text-white rounded-full shadow-lg flex items-center justify-center md:hidden transition-colors"
+        >
+          <Menu className="w-6 h-6" />
+        </button>
       )}
-    >
-      <Icon className="w-5 h-5 flex-shrink-0" />
-      <span className="text-sm font-medium arabic-sidebar-content">{label}</span>
-    </NavLink>
+    </AnimatePresence>
   );
 
   return (

@@ -21,6 +21,21 @@ import {
 import { wrapArabicText } from '../../../../utils/textUtils';
 import DOMPurify from 'dompurify';
 
+const FormatButton = ({ icon, title, isActive, onAction }) => (
+  <button
+    type="button"
+    onClick={onAction}
+    className={`p-2 rounded transition-all ${
+      isActive 
+        ? 'bg-teal-600 text-white shadow-sm' 
+        : 'hover:bg-[var(--color-bg-hover)] text-[var(--color-text-main)]'
+    }`}
+    title={title}
+  >
+    {React.cloneElement(icon, { className: "w-4 h-4" })}
+  </button>
+);
+
 const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini...' }) => {
   const editorRef = useRef(null);
   const [activeFormats, setActiveFormats] = useState({});
@@ -56,11 +71,14 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
   useEffect(() => {
     // Set default paragraph separator to 'p'
     document.execCommand('defaultParagraphSeparator', false, 'p');
+    // Enable CSS styling for cleaner markup (spans instead of font tags)
+    document.execCommand('styleWithCSS', false, true);
   }, []);
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
-      editorRef.current.innerHTML = value ? DOMPurify.sanitize(value) : '<p><br></p>';
+      // Allow style attribute for colors
+      editorRef.current.innerHTML = value ? DOMPurify.sanitize(value, { ADD_ATTR: ['style', 'class', 'dir'] }) : '<p><br></p>';
     }
   }, [value]);
 
@@ -68,7 +86,8 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     if (editorRef.current) {
       // We don't wrap live while typing to avoid cursor issues
       // But we wrap the output for the parent
-      const cleanHTML = DOMPurify.sanitize(editorRef.current.innerHTML);
+      // Allow style attribute for colors
+      const cleanHTML = DOMPurify.sanitize(editorRef.current.innerHTML, { ADD_ATTR: ['style', 'class', 'dir'] });
       const wrappedHTML = wrapArabicText(cleanHTML);
       onChange(wrappedHTML);
       updateActiveFormats();
@@ -232,48 +251,36 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
     handleInput();
   };
 
-  const formatButton = (icon, command, title, value = null, isActive = false, customHandler = null) => (
-    <button
-      type="button"
-      onClick={() => customHandler ? customHandler() : execCommand(command, value)}
-      className={`p-2 rounded transition-all ${
-        isActive 
-          ? 'bg-teal-600 text-white shadow-sm' 
-          : 'hover:bg-[var(--color-bg-hover)] text-[var(--color-text-main)]'
-      }`}
-      title={title}
-    >
-      {React.cloneElement(icon, { className: "w-4 h-4" })}
-    </button>
-  );
+  // FormatButton moved outside
+
 
   return (
     <>
       <div className="border border-[var(--color-border)] rounded-lg focus-within:ring-2 focus-within:ring-teal-500 focus-within:border-teal-500 bg-[var(--color-bg-card)] relative">
         {/* Toolbar */}
         <div className="bg-[var(--color-bg-muted)] border-b border-[var(--color-border)] p-2 flex flex-wrap gap-1 sticky top-0 z-10 rounded-t-lg">
-          {formatButton(<Bold />, 'bold', 'Tebal (Ctrl+B)', null, activeFormats.bold)}
-          {formatButton(<Italic />, 'italic', 'Miring (Ctrl+I)', null, activeFormats.italic)}
+          <FormatButton icon={<Bold />} command="bold" title="Tebal (Ctrl+B)" isActive={activeFormats.bold} onAction={() => execCommand('bold')} />
+          <FormatButton icon={<Italic />} command="italic" title="Miring (Ctrl+I)" isActive={activeFormats.italic} onAction={() => execCommand('italic')} />
           
           <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<Heading />, 'formatBlock', 'Heading 2', 'h2')}
-          {formatButton(<Heading />, 'formatBlock', 'Heading 3', 'h3')}
+          <FormatButton icon={<Heading />} command="formatBlock" title="Heading 2" value="h2" onAction={() => execCommand('formatBlock', 'h2')} />
+          <FormatButton icon={<Heading />} command="formatBlock" title="Heading 3" value="h3" onAction={() => execCommand('formatBlock', 'h3')} />
           
           <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<List />, 'insertUnorderedList', 'Daftar Bullet', null, activeFormats.insertUnorderedList)}
-          {formatButton(<ListOrdered />, 'insertOrderedList', 'Daftar Nomor', null, activeFormats.insertOrderedList)}
+          <FormatButton icon={<List />} command="insertUnorderedList" title="Daftar Bullet" isActive={activeFormats.insertUnorderedList} onAction={() => execCommand('insertUnorderedList')} />
+          <FormatButton icon={<ListOrdered />} command="insertOrderedList" title="Daftar Nomor" isActive={activeFormats.insertOrderedList} onAction={() => execCommand('insertOrderedList')} />
           
           <div className="w-px bg-[var(--color-border)] mx-1"></div>
           
-          {formatButton(<AlignLeft />, null, 'Teks Kiri (LTR)', null, activeFormats.ltr, () => toggleDirection('ltr'))}
-          {formatButton(<AlignRight />, null, 'Teks Kanan (RTL)', null, activeFormats.rtl, () => toggleDirection('rtl'))}
+          <FormatButton icon={<AlignLeft />} title="Teks Kiri (LTR)" isActive={activeFormats.ltr} onAction={() => toggleDirection('ltr')} />
+          <FormatButton icon={<AlignRight />} title="Teks Kanan (RTL)" isActive={activeFormats.rtl} onAction={() => toggleDirection('rtl')} />
           
           <div className="w-px bg-[var(--color-border)] mx-1"></div>
 
-          {formatButton(<Quote />, null, 'Kutipan (Toggle)', null, activeFormats.blockquote, toggleBlockquote)}
-          {formatButton(<LinkIcon />, null, 'Tautan (Toggle)', null, activeFormats.link, toggleLink)}
+          <FormatButton icon={<Quote />} title="Kutipan (Toggle)" isActive={activeFormats.blockquote} onAction={toggleBlockquote} />
+          <FormatButton icon={<LinkIcon />} title="Tautan (Toggle)" isActive={activeFormats.link} onAction={toggleLink} />
 
           <div className="w-px bg-[var(--color-border)] mx-1"></div>
 
@@ -363,8 +370,8 @@ const RichTextEditor = ({ value, onChange, placeholder = 'Tulis konten di sini..
           
           <div className="flex-1"></div>
           
-          {formatButton(<Undo />, 'undo', 'Undo (Ctrl+Z)')}
-          {formatButton(<Redo />, 'redo', 'Redo (Ctrl+Y)')}
+          <FormatButton icon={<Undo />} command="undo" title="Undo (Ctrl+Z)" onAction={() => execCommand('undo')} />
+          <FormatButton icon={<Redo />} command="redo" title="Redo (Ctrl+Y)" onAction={() => execCommand('redo')} />
         </div>
 
         {/* Editor */}
